@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="Images/plume.png">
+<title>Univers Caresse — Savonnerie artisanale</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Birthstone&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- MAINTENANCE -->
+<div id="page-maintenance" class="cache">
+  <div class="maintenance-contenu">
+    <img src="Images/plume.png" alt="Univers Caresse" class="maintenance-logo">
+    <h1 class="maintenance-titre">Le site prend une pause</h1>
+    <p class="maintenance-texte">Comme nos savons en cure, notre site web se repose quelques instants pour devenir encore meilleur.</p>
+    <p class="maintenance-texte">Nous serons de retour très bientôt, avec la même douceur que toujours.</p>
+    <p class="maintenance-signature">— L'équipe Univers Caresse</p>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<nav id="nav">
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#accueil" class="active" onclick="naviguer('accueil')">Accueil</a></li>
+    <li><a href="#catalogue" onclick="naviguer('catalogue')">Catalogue</a></li>
+    <li><a href="#educatif" onclick="naviguer('educatif')">Le savon artisanal</a></li>
+    <li><a href="#bon-a-savoir" onclick="naviguer('bon-a-savoir')">Bon à savoir</a></li>
+    <li><a href="#contact" onclick="naviguer('contact')">Contact</a></li>
+  </ul>
+  <div class="nav-actions">
+  </div>
+</nav>
+<button class="burger burger-flottant" id="burger" onclick="toggleMenu()">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- MODAL PRODUIT -->
+<div class="modal-overlay" id="modal-produit" onclick="fermerModalProduit(event)">
+  <div class="modal-produit">
+    <div class="modal-visuel">
+      <div class="modal-visuel-photo" id="modal-visuel-photo"></div>
+      <div class="modal-visuel-hex" id="modal-visuel-hex">
+        <div class="modal-prix-format" id="modal-prix-format"></div>
+      </div>
+    </div>
+    <div class="modal-contenu">
+      <button class="modal-fermer" onclick="fermerModal()">✕</button>
+      <div class="modal-collection" id="modal-collection"></div>
+      <div class="modal-nom" id="modal-nom"></div>
+      <div class="modal-ligne" id="modal-ligne"></div>
+      <p class="modal-desc" id="modal-desc"></p>
+      <div class="modal-inci" id="modal-inci"></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ══════════════════════════════════
+       SECTION ACCUEIL
+  ══════════════════════════════════ -->
+  <section id="section-accueil" class="page-section active">
+
+    <div class="hero">
+      <div class="hero-left">
+        <p class="hero-eyebrow fade-in" id="contenu-accueil-eyebrow"></p>
+        <img src="Images/Logofinal.png" alt="Univers Caresse" class="hero-logo-img fade-in delay-3">
+        <a href="#catalogue" class="hero-cta fade-in-doux delay-4 invisible"
+		onclick="naviguer('catalogue')">
+          <span id="contenu-accueil-cta"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <div class="hero-stats fade-in delay-5">
+          <div class="hero-stat">
+            <div class="hero-stat-num" id="hero-stat-collections">—</div>
+            <div class="hero-stat-label">Collections</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num" id="hero-stat-produits">—</div>
+            <div class="hero-stat-label">Produits</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num" id="contenu-accueil-stat-valeur">—</div>
+            <div class="hero-stat-label">Artisanal</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-mosaic">
+          <div class="mosaic-item">
+            <div class="mosaic-soap mosaic-soap-accent">
+              <div class="mosaic-soap-label">
+                <span class="mosaic-soap-name">nouvelles</span>
+                <span class="mosaic-soap-col">livre</span>
+              </div>
+            </div>
+          </div>
+          <div class="mosaic-item">
+            <div class="mosaic-soap mosaic-soap-primary">
+              <div class="mosaic-soap-label">
+                <span class="mosaic-soap-name">disponible</span>
+                <span class="mosaic-soap-col">en prod</span>
+              </div>
+            </div>
+          </div>
+          <div class="mosaic-item">
+            <div class="mosaic-soap mosaic-soap-gris">
+              <div class="mosaic-soap-label">
+                <span class="mosaic-soap-name">a voir</span>
+                <span class="mosaic-soap-col">theme</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-line"></div>
+
+    <!-- ── QUI SOMMES-NOUS intégré ── -->
+    <section class="section-texte fade-in">
+      <div class="texte-principal">
+        <p class="page-hero-eyebrow" id="contenu-qui-eyebrow"></p>
+        <h1 class="page-hero-titre">
+          <span id="contenu-qui-titre"></span>
+          <em id="contenu-qui-titre-em"></em>
+        </h1>
+        <p class="page-hero-texte" id="contenu-qui-texte"></p>
+        <div class="page-hero-signature-bloc">
+          <div class="page-hero-signature" id="contenu-qui-signature-nom"></div>
+          <div class="page-hero-titre-signature" id="contenu-qui-signature-titre"></div>
+        </div>
+      </div>
+      <div class="fade-in delay-1">
+        <div class="section-texte-photo-3-4">
+          <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774627932/a-warm-inviting-photograph-of-an-artisan_uCbddMjKSkWQWJrd_XQJdg_VTqWCfYYQ_Kna8JgcGw28A_lmm3kj.jpg" alt="Atelier Univers Caresse" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </section>
+
+    <section class="section-texte">
+      <div class="texte-principal fade-in delay-1">
+        <p id="contenu-section-texte-p1"></p>
+        <p id="contenu-section-texte-p2"></p>
+        <p id="contenu-section-texte-p3"></p>
+        <div class="section-texte-photo-16-9">
+        <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774628531/a-portrait-oriented-wide-shot-photograph_UA7yPYBBSgOecAa7wOi9rg_spPvtpQoRN-GmTAeUlQQwg_cover_qnihfd.jpg" alt="Atelier Univers Caresse" onerror="this.style.display='none'">
+        </div>
+      </div>
+      <div class="fade-in delay-2">
+        <div class="valeur-item">
+          <div class="valeur-num">01</div>
+          <div class="valeur-titre" id="contenu-valeur-01-titre"></div>
+          <div class="valeur-desc" id="contenu-valeur-01-desc"></div>
+        </div>
+        <div class="valeur-item">
+          <div class="valeur-num">02</div>
+          <div class="valeur-titre" id="contenu-valeur-02-titre"></div>
+          <div class="valeur-desc" id="contenu-valeur-02-desc"></div>
+        </div>
+        <div class="valeur-item">
+          <div class="valeur-num">03</div>
+          <div class="valeur-titre" id="contenu-valeur-03-titre"></div>
+          <div class="valeur-desc" id="contenu-valeur-03-desc"></div>
+        </div>
+        <div class="valeur-item">
+          <div class="valeur-num">04</div>
+          <div class="valeur-titre" id="contenu-valeur-04-titre"></div>
+          <div class="valeur-desc" id="contenu-valeur-04-desc"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="bandeau-citation">
+      <p class="citation-texte"><span class="citation-guillemet">«&nbsp;</span><span id="contenu-citation-texte"></span><span class="citation-guillemet">&nbsp;»</span></p>
+      <span class="citation-source" id="contenu-citation-source"></span>
+    </div>
+
+    <section class="section-collections">
+      <div class="section-header">
+        <h2 class="section-title">Nos collections</h2>
+        <div class="section-line"></div>
+        <span class="section-count" id="collections-count"></span>
+      </div>
+      <div class="collections-strip" id="collections-strip"></div>
+    </section>
+
+  </section>
+
+  <!-- ══════════════════════════════════
+       SECTION CATALOGUE
+  ══════════════════════════════════ -->
+  <section id="section-catalogue" class="page-section">
+
+    <div class="page-entete fade-in">
+      <div class="page-entete-gauche">
+        <p class="page-entete-eyebrow">Produits fabriqués à la main, en petites séries</p>
+        <h1 class="page-entete-titre">Nos <em>collections</em></h1>
+      </div>
+      <img class="page-entete-plume" src="Images/plume.png" alt="" onerror="this.style.display='none'">
+    </div>
+
+    <div class="filtres-bar" id="filtres-bar">
+      <button class="filtre-btn actif" data-filtre="tout" onclick="filtrer('tout')">Toutes</button>
+    </div>
+
+    <div class="chargement" id="chargement">
+      <div class="chargement-spinner"><span></span><span></span><span></span><span></span><span></span></div>
+      Chargement des collections…
+    </div>
+
+    <div class="catalogue-body cache" id="catalogue-body"></div>
+
+  </section>
+
+<section id="section-educatif" class="page-section">
+
+  <!-- ── SECTION 1 — SAPONIFICATION À FROID ── -->
+  <div class="edu-sous-section-panel active" id="edu-1">
+    <div class="page-entete fade-in">
+      <div class="page-entete-gauche">
+        <p class="page-entete-eyebrow" id="edu-s1-surtitre"></p>
+        <h1 class="page-entete-titre" id="edu-s1-titre-bloc"></h1>
+        <p class="edu-accroche" id="edu-s1-accroche"></p>
+      </div>
+    </div>
+    <div class="edu-pager-sticky">
+      <div class="edu-pager">
+        <button class="edu-pager-btn" onclick="afficherEduSection(7)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>
+        <span class="edu-pager-num">1 <span class="edu-pager-total">/ 7</span></span>
+        <button class="edu-pager-btn" onclick="afficherEduSection(2)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>
+      </div>
+    </div>
+    <div class="section-texte fade-in">
+      <div class="texte-principal">
+        <p class="page-hero-texte" id="edu-s1-p1"></p>
+        <p class="page-hero-texte" id="edu-s1-p2"></p>
+        <p class="page-hero-texte" id="edu-s1-p3"></p>
+      </div>
+      <div>
+        <div class="section-texte-photo-auto">
+          <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773875360/sapo_g8kmwq.jpg" alt="Le savon artisanal" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+    <div class="bonne-section fade-in">
+      <h2 class="bonne-section-titre" id="edu-s1-section-titre"></h2>
+      <div class="items-grille">
+        <div class="info-card"><div class="info-card-titre" id="edu-s1-card1-titre"></div><div class="info-card-texte" id="edu-s1-card1-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s1-card2-titre"></div><div class="info-card-texte" id="edu-s1-card2-texte"></div></div>
+        <div class="info-card accent"><div class="info-card-titre" id="edu-s1-card3-titre"></div><div class="info-card-texte" id="edu-s1-card3-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s1-card4-titre"></div><div class="info-card-texte" id="edu-s1-card4-texte"></div></div>
+        <div class="info-card neutre"><div class="info-card-titre" id="edu-s1-card5-titre"></div><div class="info-card-texte" id="edu-s1-card5-texte"></div></div>
+      </div>
+    
+    </div>
+    
+  </div><!-- /edu-1 -->
+
+  <!-- ── SECTION 2 — LA CURE ── -->
+  <div class="edu-sous-section-panel" id="edu-2">
+   <div class="page-entete fade-in">
+      <div class="page-entete-gauche">
+        <p class="page-entete-eyebrow" id="edu-s2-surtitre"></p>
+        <h1 class="page-entete-titre" id="edu-s2-titre-bloc"></h1>
+        <p class="edu-accroche" id="edu-s2-accroche"></p>
+      </div>
+    </div>
+    <div class="edu-pager-sticky">
+      <div class="edu-pager">
+        <button class="edu-pager-btn" onclick="afficherEduSection(1)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>
+        <span class="edu-pager-num">2 <span class="edu-pager-total">/ 7</span></span>
+        <button class="edu-pager-btn" onclick="afficherEduSection(3)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>
+      </div>
+    </div>
+    <div class="section-texte fade-in">
+      <div class="texte-principal">
+        <p id="edu-s2-p1"></p>
+        <p id="edu-s2-p2"></p>
+        <p id="edu-s2-p3"></p>
+       
+      </div>
+      <div>
+        <div class="valeur-item"><div class="valeur-titre" id="edu-s2-val1-titre"></div><div class="valeur-desc" id="edu-s2-val1-texte"></div></div>
+        <div class="valeur-item"><div class="valeur-titre" id="edu-s2-val2-titre"></div><div class="valeur-desc" id="edu-s2-val2-texte"></div></div>
+        <div class="valeur-item"><div class="valeur-titre" id="edu-s2-val3-titre"></div><div class="valeur-desc" id="edu-s2-val3-texte"></div></div>
+        <div class="valeur-item"><div class="valeur-titre" id="edu-s2-val4-titre"></div><div class="valeur-desc" id="edu-s2-val4-texte"></div></div>
+      </div>
+    </div>
+    <div class="bandeau-citation fade-in">
+      <p class="citation-texte"><span class="citation-guillemet">«&nbsp;</span><span id="edu-s2-citation"></span><span class="citation-guillemet">&nbsp;»</span></p>
+      <span class="citation-source" id="edu-s2-citation-source"></span>
+    </div>
+    
+  </div><!-- /edu-2 -->
+
+  <!-- ── SECTION 3 — LE SURGRAISSAGE ── -->
+  <div class="edu-sous-section-panel" id="edu-3">
+   <div class="page-entete fade-in">
+      <div class="page-entete-gauche">
+        <p class="page-entete-eyebrow" id="edu-s3-surtitre"></p>
+        <h1 class="page-entete-titre" id="edu-s3-titre-bloc"></h1>
+        <p class="edu-accroche" id="edu-s3-accroche"></p>
+      </div>
+    </div>
+    <div class="edu-pager-sticky">
+      <div class="edu-pager">
+        <button class="edu-pager-btn" onclick="afficherEduSection(2)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>
+        <span class="edu-pager-num">3 <span class="edu-pager-total">/ 7</span></span>
+        <button class="edu-pager-btn" onclick="afficherEduSection(4)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>
+      </div>
+    </div>
+    <div class="section-texte fade-in">
+      <div class="texte-principal">
+        <p id="edu-s3-p1"></p>
+        <p id="edu-s3-p2"></p>
+        <p id="edu-s3-p3"></p>
+      </div>
+      <div>
+        <div class="section-texte-photo-auto">
+          <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773879204/surgras_yw29r3.jpg" alt="Le surgraissage" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+    <div class="bonne-section fade-in">
+      <h2 class="bonne-section-titre" id="edu-s3-section-titre"></h2>
+      <div class="edu-niveaux">
+        <div class="edu-niveau">
+          <div><div class="edu-niveau-pct" id="edu-s3-niv1-pct"></div><div class="edu-niveau-label" id="edu-s3-niv1-label"></div></div>
+          <div><p class="edu-niveau-texte" id="edu-s3-niv1-texte"></p><a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('ÉPURE')" class="edu-lien">Collection ÉPURE</a></div>
+        </div>
+        <div class="edu-niveau">
+          <div><div class="edu-niveau-pct" id="edu-s3-niv2-pct"></div><div class="edu-niveau-label" id="edu-s3-niv2-label"></div></div>
+          <div><p class="edu-niveau-texte" id="edu-s3-niv2-texte"></p><a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('SAPONICA')" class="edu-lien">Collection SAPONICA</a></div>
+        </div>
+        <div class="edu-niveau">
+          <div><div class="edu-niveau-pct" id="edu-s3-niv3-pct"></div><div class="edu-niveau-label" id="edu-s3-niv3-label"></div></div>
+          <div><p class="edu-niveau-texte" id="edu-s3-niv3-texte"></p><a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('PETIT NUAGE')" class="edu-lien">Collection PETIT NUAGE</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="note-allergenes fade-in">
+      <div class="note-allergenes-texte"><strong>💡 Astuce saisonnière</strong> <span id="edu-s3-astuce"></span></div>
+    </div>
+  
+  </div><!-- /edu-3 -->
+
+  <!-- ── SECTION 4 — LES HUILES ── -->
+  <div class="edu-sous-section-panel" id="edu-4">
+   <div class="page-entete fade-in">
+      <div class="page-entete-gauche">
+        <p class="page-entete-eyebrow" id="edu-s4-surtitre"></p>
+        <h1 class="page-entete-titre" id="edu-s4-titre-bloc"></h1>
+        <p class="edu-accroche" id="edu-s4-accroche"></p>
+      </div>
+    </div>
+    <div class="edu-pager-sticky">
+      <div class="edu-pager">
+        <button class="edu-pager-btn" onclick="afficherEduSection(3)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>
+        <span class="edu-pager-num">4 <span class="edu-pager-total">/ 7</span></span>
+        <button class="edu-pager-btn" onclick="afficherEduSection(5)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>
+      </div>
+    </div>
+    <div class="section-texte fade-in">
+      <div class="texte-principal">
+        <p class="page-hero-texte" id="edu-s4-p1"></p>
+        <p class="page-hero-texte" id="edu-s4-p2"></p>
+      </div>
+      <div>
+        <div class="section-texte-photo-auto">
+          <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773869994/huiles_lnjxah.jpg" alt="Les huiles" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+    <div class="bonne-section fade-in">
+      <h2 class="bonne-section-titre" id="edu-s4-section-titre"></h2>
+      <div class="items-grille">
+        <div class="info-card"><div class="info-card-titre" id="edu-s4-h1-titre"></div><div class="info-card-texte" id="edu-s4-h1-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s4-h2-titre"></div><div class="info-card-texte" id="edu-s4-h2-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s4-h3-titre"></div><div class="info-card-texte" id="edu-s4-h3-texte"></div></div>
+        <div class="info-card accent"><div class="info-card-titre" id="edu-s4-h4-titre"></div><div class="info-card-texte" id="edu-s4-h4-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s4-h5-titre"></div><div class="info-card-texte" id="edu-s4-h5-texte"></div></div>
+        <div class="info-card neutre"><div class="info-card-titre" id="edu-s4-h6-titre"></div><div class="info-card-texte" id="edu-s4-h6-texte"></div></div>
+      </div>
+    </div>
+    <div class="bandeau-citation fade-in">
+      <p class="citation-texte"><span class="citation-guillemet">«&nbsp;</span><span id="edu-s4-citation"></span><span class="citation-guillemet">&nbsp;»</span></p>
+      <span class="citation-source" id="edu-s4-citation-source"></span>
+    </div>
+   
+  </div><!-- /edu-4 -->
+
+  <!-- ── SECTION 5 — ARGILES ET ADDITIFS ── -->
+  <div class="edu-sous-section-panel" id="edu-5">
+   <div class="page-entete fade-in">
+      <div class="page-entete-gauche">
+        <p class="page-entete-eyebrow" id="edu-s5-surtitre"></p>
+        <h1 class="page-entete-titre" id="edu-s5-titre-bloc"></h1>
+        <p class="edu-accroche" id="edu-s5-accroche"></p>
+      </div>
+    </div>
+    <div class="edu-pager-sticky">
+      <div class="edu-pager">
+        <button class="edu-pager-btn" onclick="afficherEduSection(4)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>
+        <span class="edu-pager-num">5 <span class="edu-pager-total">/ 7</span></span>
+        <button class="edu-pager-btn" onclick="afficherEduSection(6)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>
+      </div>
+    </div>
+    <div class="section-texte fade-in">
+      <div class="texte-principal">
+        <p id="edu-s5-p1"></p>
+        <p id="edu-s5-p2"></p>
+      </div>
+      <div>
+        <div class="section-texte-photo-auto">
+          <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773869994/additif_bcbpgh.jpg" alt="Argiles et additifs" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+    <div class="bonne-section fade-in">
+      <h2 class="bonne-section-titre" id="edu-s5-section1-titre"></h2>
+      <div class="items-grille">
+        <div class="info-card neutre"><div class="info-card-titre" id="edu-s5-a1-titre"></div><div class="info-card-texte" id="edu-s5-a1-texte"></div></div>
+        <div class="info-card accent"><div class="info-card-titre" id="edu-s5-a2-titre"></div><div class="info-card-texte" id="edu-s5-a2-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s5-a3-titre"></div><div class="info-card-texte" id="edu-s5-a3-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s5-a4-titre"></div><div class="info-card-texte" id="edu-s5-a4-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s5-a5-titre"></div><div class="info-card-texte" id="edu-s5-a5-texte"></div></div>
+      </div>
+    </div>
+    <div class="bonne-section fade-in">
+      <h2 class="bonne-section-titre" id="edu-s5-section2-titre"></h2>
+      <div class="items-grille">
+        <div class="info-card"><div class="info-card-titre" id="edu-s5-ad1-titre"></div><div class="info-card-texte" id="edu-s5-ad1-texte"></div></div>
+        <div class="info-card accent"><div class="info-card-titre" id="edu-s5-ad2-titre"></div><div class="info-card-texte" id="edu-s5-ad2-texte"></div></div>
+        <div class="info-card neutre"><div class="info-card-titre" id="edu-s5-ad3-titre"></div><div class="info-card-texte" id="edu-s5-ad3-texte"></div></div>
+      </div>
+     
+    </div>
+   
+  </div><!-- /edu-5 -->
+
+  <!-- ── SECTION 6 — HUILES ESSENTIELLES ── -->
+  <div class="edu-sous-section-panel" id="edu-6">
+  <div class="page-entete fade-in">
+      <div class="page-entete-gauche">
+        <p class="page-entete-eyebrow" id="edu-s6-surtitre"></p>
+        <h1 class="page-entete-titre" id="edu-s6-titre-bloc"></h1>
+        <p class="edu-accroche" id="edu-s6-accroche"></p>
+      </div>
+    </div>
+    <div class="edu-pager-sticky">
+      <div class="edu-pager">
+        <button class="edu-pager-btn" onclick="afficherEduSection(5)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>
+        <span class="edu-pager-num">6 <span class="edu-pager-total">/ 7</span></span>
+        <button class="edu-pager-btn" onclick="afficherEduSection(7)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>
+      </div>
+    </div>
+    <div class="section-texte fade-in">
+      <div class="texte-principal">
+        <p class="page-hero-texte" id="edu-s6-p1"></p>
+        <p class="page-hero-texte" id="edu-s6-p2"></p>
+      </div>
+      <div>
+        <div class="section-texte-photo-auto">
+          <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773878615/essences_vevuvf.jpg" alt="Huiles essentielles" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+    <div class="bonne-section fade-in">
+      <h2 class="bonne-section-titre" id="edu-s6-section-titre"></h2>
+      <div class="items-grille">
+        <div class="info-card accent"><div class="info-card-titre" id="edu-s6-he1-titre"></div><div class="info-card-texte" id="edu-s6-he1-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s6-he2-titre"></div><div class="info-card-texte" id="edu-s6-he2-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s6-he3-titre"></div><div class="info-card-texte" id="edu-s6-he3-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s6-he4-titre"></div><div class="info-card-texte" id="edu-s6-he4-texte"></div></div>
+        <div class="info-card neutre"><div class="info-card-titre" id="edu-s6-he5-titre"></div><div class="info-card-texte" id="edu-s6-he5-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s6-he6-titre"></div><div class="info-card-texte" id="edu-s6-he6-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s6-he7-titre"></div><div class="info-card-texte" id="edu-s6-he7-texte"></div></div>
+        <div class="info-card accent"><div class="info-card-titre" id="edu-s6-he8-titre"></div><div class="info-card-texte" id="edu-s6-he8-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s6-he9-titre"></div><div class="info-card-texte" id="edu-s6-he9-texte"></div></div>
+        <div class="info-card"><div class="info-card-titre" id="edu-s6-he10-titre"></div><div class="info-card-texte" id="edu-s6-he10-texte"></div></div>
+        <div class="info-card neutre"><div class="info-card-titre" id="edu-s6-he11-titre"></div><div class="info-card-texte" id="edu-s6-he11-texte"></div></div>
+      </div>
+    </div>
+    <div class="note-allergenes fade-in">
+      <div class="note-allergenes-texte"><strong>Précautions d'usage</strong> <span id="edu-s6-precautions"></span></div>
+    </div>
+  
+  </div><!-- /edu-6 -->
+
+  <!-- ── SECTION 7 — CONNAÎTRE SA PEAU ── -->
+  <div class="edu-sous-section-panel" id="edu-7">
+   <div class="page-entete fade-in">
+      <div class="page-entete-gauche">
+        <p class="page-entete-eyebrow" id="edu-s7-surtitre"></p>
+        <h1 class="page-entete-titre" id="edu-s7-titre-bloc"></h1>
+        <p class="edu-accroche" id="edu-s7-accroche"></p>
+      </div>
+    </div>
+    <div class="edu-pager-sticky">
+      <div class="edu-pager">
+        <button class="edu-pager-btn" onclick="afficherEduSection(6)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>
+        <span class="edu-pager-num">7 <span class="edu-pager-total">/ 7</span></span>
+        <button class="edu-pager-btn" onclick="afficherEduSection(1)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>
+      </div>
+    </div>
+    <div class="bonne-section fade-in">
+      <h2 class="bonne-section-titre" id="edu-s7-section1-titre"></h2>
+      <div class="edu-types-grille">
+        <div class="edu-type-peau">
+          <div class="edu-type-titre" id="edu-s7-peau1-titre"></div>
+          <span class="edu-type-label">Les signes</span>
+          <p class="edu-type-texte" id="edu-s7-peau1-signes"></p>
+          <span class="edu-type-label">Ce qu'elle aime</span>
+          <p class="edu-type-texte" id="edu-s7-peau1-aime"></p>
+          <div class="edu-type-liens"><a href="#" onclick="naviguer('catalogue')" class="edu-lien">SAPONICA</a><a href="#" onclick="naviguer('catalogue')" class="edu-lien">ÉPURE</a></div>
+        </div>
+        <div class="edu-type-peau">
+          <div class="edu-type-titre" id="edu-s7-peau2-titre"></div>
+          <span class="edu-type-label">Les signes</span>
+          <p class="edu-type-texte" id="edu-s7-peau2-signes"></p>
+          <span class="edu-type-label">Ce qu'elle aime</span>
+          <p class="edu-type-texte" id="edu-s7-peau2-aime"></p>
+          <div class="edu-type-liens"><a href="#" onclick="naviguer('catalogue')" class="edu-lien">PETIT NUAGE</a><a href="#" onclick="naviguer('catalogue')" class="edu-lien">CAPRIN</a></div>
+        </div>
+        <div class="edu-type-peau">
+          <div class="edu-type-titre" id="edu-s7-peau3-titre"></div>
+          <span class="edu-type-label">Les signes</span>
+          <p class="edu-type-texte" id="edu-s7-peau3-signes"></p>
+          <span class="edu-type-label">Ce qu'elle aime</span>
+          <p class="edu-type-texte" id="edu-s7-peau3-aime"></p>
+          <div class="edu-type-liens"><a href="#" onclick="naviguer('catalogue')" class="edu-lien">ÉPURE</a></div>
+        </div>
+        <div class="edu-type-peau">
+          <div class="edu-type-titre" id="edu-s7-peau4-titre"></div>
+          <span class="edu-type-label">Les signes</span>
+          <p class="edu-type-texte" id="edu-s7-peau4-signes"></p>
+          <span class="edu-type-label">Ce qu'elle aime</span>
+          <p class="edu-type-texte" id="edu-s7-peau4-aime"></p>
+          <div class="edu-type-liens"><a href="#" onclick="naviguer('catalogue')" class="edu-lien">SAPONICA</a></div>
+        </div>
+        <div class="edu-type-peau">
+          <div class="edu-type-titre" id="edu-s7-peau5-titre"></div>
+          <span class="edu-type-label">Les signes</span>
+          <p class="edu-type-texte" id="edu-s7-peau5-signes"></p>
+          <span class="edu-type-label">Ce qu'elle aime</span>
+          <p class="edu-type-texte" id="edu-s7-peau5-aime"></p>
+          <div class="edu-type-liens"><a href="#" onclick="naviguer('catalogue')" class="edu-lien">PETIT NUAGE</a><a href="#" onclick="naviguer('catalogue')" class="edu-lien">CAPRIN</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="note-allergenes fade-in">
+      <div class="note-allergenes-texte"><strong>💡 Astuce saisonnière</strong> <span id="edu-s7-astuce"></span></div>
+    </div>
+    <div class="bonne-section fade-in">
+      <h2 class="bonne-section-titre" id="edu-s7-section2-titre"></h2>
+      <div class="edu-besoins">
+        <div class="edu-besoin"><div class="edu-besoin-titre" id="edu-s7-usage1-titre"></div><p class="edu-besoin-texte" id="edu-s7-usage1-texte"></p></div>
+        <div class="edu-besoin"><div class="edu-besoin-titre" id="edu-s7-usage2-titre"></div><p class="edu-besoin-texte" id="edu-s7-usage2-texte"></p></div>
+        <div class="edu-besoin"><div class="edu-besoin-titre" id="edu-s7-usage3-titre"></div><p class="edu-besoin-texte" id="edu-s7-usage3-texte"></p></div>
+        <div class="edu-besoin"><div class="edu-besoin-titre" id="edu-s7-usage4-titre"></div><p class="edu-besoin-texte" id="edu-s7-usage4-texte"></p></div>
+        <div class="edu-besoin"><div class="edu-besoin-titre" id="edu-s7-usage5-titre"></div><p class="edu-besoin-texte" id="edu-s7-usage5-texte"></p></div>
+      </div>
+    </div>
+    <div class="bonne-section">
+      <h2 class="bonne-section-titre" id="edu-s7-section3-titre"></h2>
+      <div class="edu-checklists">
+        <div class="edu-checklist">
+          <div class="edu-checklist-titre">Signes qu'il vous convient</div>
+          <ul class="edu-checklist-liste">
+            <li id="edu-s7-ok1"></li>
+            <li id="edu-s7-ok2"></li>
+            <li id="edu-s7-ok3"></li>
+            <li id="edu-s7-ok4"></li>
+          </ul>
+        </div>
+        <div class="edu-checklist non">
+          <div class="edu-checklist-titre">Signes qu'il ne convient pas</div>
+          <ul class="edu-checklist-liste">
+            <li id="edu-s7-non1"></li>
+            <li id="edu-s7-non2"></li>
+            <li id="edu-s7-non3"></li>
+            <li id="edu-s7-non4"></li>
+          </ul>
+        </div>
+      </div>
+      <div class="edu-liens" style="margin-top:32px;">
+        <a href="#catalogue" onclick="naviguer('catalogue')" class="edu-lien">Toutes nos collections</a>
+       
+      </div>
+    </div>
+   
+  <div class="bonne-section">
+    <h2 class="bonne-section-titre" id="edu-guide-titre"></h2>
+    <div class="edu-tableau-wrap">
+      <table class="edu-tableau">
+        <thead>
+          <tr>
+            <th>Type de peau</th>
+            <th>Surgraissage</th>
+            <th>Huiles privilégiées</th>
+            <th>Argiles / Additifs</th>
+          </tr>
+        </thead>
+        <tbody id="edu-guide-tbody">
+          <tr><td id="edu-guide-ligne1-peau"></td><td id="edu-guide-ligne1-surgraissage"></td><td id="edu-guide-ligne1-huiles"></td><td id="edu-guide-ligne1-argiles"></td></tr>
+          <tr><td id="edu-guide-ligne2-peau"></td><td id="edu-guide-ligne2-surgraissage"></td><td id="edu-guide-ligne2-huiles"></td><td id="edu-guide-ligne2-argiles"></td></tr>
+          <tr><td id="edu-guide-ligne3-peau"></td><td id="edu-guide-ligne3-surgraissage"></td><td id="edu-guide-ligne3-huiles"></td><td id="edu-guide-ligne3-argiles"></td></tr>
+          <tr><td id="edu-guide-ligne4-peau"></td><td id="edu-guide-ligne4-surgraissage"></td><td id="edu-guide-ligne4-huiles"></td><td id="edu-guide-ligne4-argiles"></td></tr>
+          <tr><td id="edu-guide-ligne5-peau"></td><td id="edu-guide-ligne5-surgraissage"></td><td id="edu-guide-ligne5-huiles"></td><td id="edu-guide-ligne5-argiles"></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="edu-guide-accordeon" id="edu-guide-accordeon"></div>
+  </div>
+  </div><!-- /edu-7 -->
+
+  </section>
+  <!-- ══════════════════════════════════
+       SECTION BON À SAVOIR
+  ══════════════════════════════════ -->
+
+<section id="section-bon-a-savoir" class="page-section">
+
+    <div class="page-entete fade-in">
+      <div class="page-entete-gauche">
+        <p class="page-entete-eyebrow">Informations importantes</p>
+        <h1 class="page-entete-titre">Bon à <em>savoir</em></h1>
+      </div>
+      <img class="page-entete-plume" src="Images/plume.png" alt="" onerror="this.style.display='none'">
+    </div>
+
+    <section class="bonne-section fade-in delay-1">
+      <h2 class="bonne-section-titre">Nos engagements</h2>
+      <div class="items-grille">
+        <div class="info-card cache" id="card-bas-engagement-01"><div class="info-card-titre" id="contenu-bas-engagement-01-titre"></div><div class="info-card-texte" id="contenu-bas-engagement-01-texte"></div></div>
+        <div class="info-card cache" id="card-bas-engagement-02"><div class="info-card-titre" id="contenu-bas-engagement-02-titre"></div><div class="info-card-texte" id="contenu-bas-engagement-02-texte"></div></div>
+        <div class="info-card cache" id="card-bas-engagement-03"><div class="info-card-titre" id="contenu-bas-engagement-03-titre"></div><div class="info-card-texte" id="contenu-bas-engagement-03-texte"></div></div>
+        <div class="info-card cache" id="card-bas-engagement-04"><div class="info-card-titre" id="contenu-bas-engagement-04-titre"></div><div class="info-card-texte" id="contenu-bas-engagement-04-texte"></div></div>
+        <div class="info-card cache" id="card-bas-engagement-05"><div class="info-card-titre" id="contenu-bas-engagement-05-titre"></div><div class="info-card-texte" id="contenu-bas-engagement-05-texte"></div></div>
+      </div>
+    </section>
+
+    <section class="bonne-section fade-in delay-2">
+      <h2 class="bonne-section-titre">Notes importantes</h2>
+      <div id="zone-notes-importantes">
+        <div class="note-allergenes cache" id="card-bas-note-01">
+          <svg class="note-allergenes-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="note-allergenes-texte"><strong id="contenu-bas-note-01-titre"></strong><span id="contenu-bas-note-01-texte"></span></div>
+        </div>
+        <div class="note-allergenes cache" id="card-bas-note-02">
+          <svg class="note-allergenes-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="note-allergenes-texte"><strong id="contenu-bas-note-02-titre"></strong><span id="contenu-bas-note-02-texte"></span></div>
+        </div>
+        <div class="note-allergenes cache" id="card-bas-note-03">
+          <svg class="note-allergenes-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="note-allergenes-texte"><strong id="contenu-bas-note-03-titre"></strong><span id="contenu-bas-note-03-texte"></span></div>
+        </div>
+        <div class="note-allergenes cache" id="card-bas-note-04">
+          <svg class="note-allergenes-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="note-allergenes-texte"><strong id="contenu-bas-note-04-titre"></strong><span id="contenu-bas-note-04-texte"></span></div>
+        </div>
+        <div class="note-allergenes cache" id="card-bas-note-05">
+          <svg class="note-allergenes-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="note-allergenes-texte"><strong id="contenu-bas-note-05-titre"></strong><span id="contenu-bas-note-05-texte"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bonne-section fade-in delay-2">
+      <h2 class="bonne-section-titre">Conservation et utilisation</h2>
+      <div class="items-grille">
+        <div class="info-card accent cache" id="card-bas-conservation-01"><div class="info-card-titre" id="contenu-bas-conservation-01-titre"></div><div class="info-card-texte" id="contenu-bas-conservation-01-texte"></div></div>
+        <div class="info-card accent cache" id="card-bas-conservation-02"><div class="info-card-titre" id="contenu-bas-conservation-02-titre"></div><div class="info-card-texte" id="contenu-bas-conservation-02-texte"></div></div>
+        <div class="info-card accent cache" id="card-bas-conservation-03"><div class="info-card-titre" id="contenu-bas-conservation-03-titre"></div><div class="info-card-texte" id="contenu-bas-conservation-03-texte"></div></div>
+        <div class="info-card accent cache" id="card-bas-conservation-04"><div class="info-card-titre" id="contenu-bas-conservation-04-titre"></div><div class="info-card-texte" id="contenu-bas-conservation-04-texte"></div></div>
+        <div class="info-card accent cache" id="card-bas-conservation-05"><div class="info-card-titre" id="contenu-bas-conservation-05-titre"></div><div class="info-card-texte" id="contenu-bas-conservation-05-texte"></div></div>
+      </div>
+    </section>
+
+    <section class="bonne-section fade-in delay-3">
+      <h2 class="bonne-section-titre">Commandes et délais</h2>
+      <div class="items-grille">
+        <div class="info-card neutre cache" id="card-bas-commande-01"><div class="info-card-titre" id="contenu-bas-commande-01-titre"></div><div class="info-card-texte" id="contenu-bas-commande-01-texte"></div></div>
+        <div class="info-card neutre cache" id="card-bas-commande-02"><div class="info-card-titre" id="contenu-bas-commande-02-titre"></div><div class="info-card-texte" id="contenu-bas-commande-02-texte"></div></div>
+        <div class="info-card neutre cache" id="card-bas-commande-03"><div class="info-card-titre" id="contenu-bas-commande-03-titre"></div><div class="info-card-texte" id="contenu-bas-commande-03-texte"></div></div>
+        <div class="info-card neutre cache" id="card-bas-commande-04"><div class="info-card-titre" id="contenu-bas-commande-04-titre"></div><div class="info-card-texte" id="contenu-bas-commande-04-texte"></div></div>
+        <div class="info-card neutre cache" id="card-bas-commande-05"><div class="info-card-titre" id="contenu-bas-commande-05-titre"></div><div class="info-card-texte" id="contenu-bas-commande-05-texte"></div></div>
+      </div>
+    </section>
+
+  </section>
+
+  <!-- ══════════════════════════════════
+       SECTION CONTACT
+  ══════════════════════════════════ -->
+  <section id="section-contact" class="page-section">
+
+    <div class="page-entete fade-in">
+      <div>
+        <p class="page-entete-eyebrow">Nous joindre</p>
+        <h1 class="page-entete-titre">Écrivez-<em>nous</em></h1>
+      </div>
+      <img class="page-entete-plume" src="Images/plume.png" alt="" onerror="this.style.display='none'">
+    </div>
+
+    <div class="contact-grille">
+
+      <div class="fade-in delay-1">
+        <h2 class="contact-info-titre">Une question ? Une commande ?</h2>
+        <p class="contact-info-desc">Nous serions ravies de vous répondre. Que ce soit pour une question sur nos produits, une commande spéciale ou simplement pour en savoir plus sur notre savonnerie artisanale.</p>
+
+        <div class="contact-item">
+          <div class="contact-item-icone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <div>
+            <div class="contact-item-label">Courriel</div>
+            <div class="contact-item-valeur">
+              <a href="mailto:universcaresse@outlook.com">universcaresse@outlook.com</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-delai">
+          <p><strong>Délai de réponse</strong><br>
+          Nous répondons à toutes les demandes dans un délai de 2 à 3 jours ouvrables.</p>
+        </div>
+        <div class="section-texte-photo-16-9" style="">
+          <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773870810/couriel_tgdykb.jpg" alt="Contact Univers Caresse" onerror="this.style.display='none'">
+        </div>
+      </div>
+
+      <div class="fade-in delay-2">
+        <h2 class="formulaire-titre">Formulaire de contact</h2>
+
+        <div id="msg-succes" class="msg-succes">Merci pour votre message ! Nous vous répondrons dans les meilleurs délais.</div>
+        <div id="msg-erreur" class="msg-erreur"></div>
+
+        <div id="formulaire-contact">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Prénom <span>*</span></label>
+              <input type="text" class="form-control" id="prenom">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nom <span>*</span></label>
+              <input type="text" class="form-control" id="nom">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Courriel <span>*</span></label>
+            <input type="email" class="form-control" id="courriel">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sujet</label>
+            <select class="form-control" id="sujet">
+              <option value="">— Choisir un sujet —</option>
+              <option value="Information produit">Information sur un produit</option>
+              <option value="Commande">Passer une commande</option>
+              <option value="Commande spéciale">Commande spéciale / personnalisée</option>
+              <option value="Ingrédients / allergies">Ingrédients / allergies</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message <span>*</span></label>
+            <textarea class="form-control" id="message"></textarea>
+          </div>
+          <div class="form-submit">
+            <button class="btn-envoyer" id="btn-envoyer" onclick="envoyerFormulaire()">
+              Envoyer le message
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+            <span class="form-note">* Champs obligatoires</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-left">
+    <div class="footer-logo">univers caresse</div>
+    <div class="footer-tagline">La douceur à chaque geste</div>
+  </div>
+  <div class="footer-right">© 2026 Univers Caresse — Savonnerie artisanale</div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+// ─── CATALOGUE — données et logique ───
+let donneescatalogue = [];
+let collectionsOrdre = [];
+let infoCollectionsData = {};
+let catalogueCharge = false;
+let collectionEnAttente = null;
+
+async function chargerCatalogue() {
+  if (catalogueCharge) return;
+  catalogueCharge = true;
+  try {
+    const data = donneesCatalogue || await appelAPI('getCatalogue');
+    if (!data || !data.success || !data.produits) { afficherErreurCatalogue('Impossible de charger le catalogue.'); return; }
+    donneescatalogue = data.produits;
+    collectionsOrdre = data.collections || [];
+    infoCollectionsData = data.infoCollections || {};
+    construireCatalogue();
+  } catch (err) {
+    afficherErreurCatalogue('Erreur de connexion.');
+  }
+}
+
+function afficherErreurCatalogue(msg) {
+  const el = document.getElementById('chargement');
+  if (el) el.innerHTML = `<p class="chargement-erreur">${msg}</p>`;
+}
+
+function construireCatalogue() {
+  const chargement = document.getElementById('chargement');
+  const body = document.getElementById('catalogue-body');
+if (chargement) chargement.classList.add('cache');
+if (body) body.classList.remove('cache');
+
+  const parCollection = {};
+  donneescatalogue.forEach(p => {
+    if (!parCollection[p.collection]) parCollection[p.collection] = [];
+    parCollection[p.collection].push(p);
+    if (Array.isArray(p.collections_secondaires)) {
+      p.collections_secondaires.forEach(colSec => {
+        if (!parCollection[colSec]) parCollection[colSec] = [];
+        if (!parCollection[colSec].find(x => x.recette_id === p.recette_id)) {
+          parCollection[colSec].push(p);
+        }
+      });
+    }
+  });
+
+  const ordre = collectionsOrdre.length ? collectionsOrdre : Object.keys(parCollection);
+  const filtresBar = document.getElementById('filtres-bar');
+
+  ordre.forEach(col => {
+    if (parCollection[col]) {
+      const btn = document.createElement('button');
+      btn.className = 'filtre-btn';
+      btn.dataset.filtre = col;
+      btn.textContent = col;
+      btn.onclick = () => filtrer(col);
+      filtresBar.appendChild(btn);
+    }
+  });
+
+  body.innerHTML = '';
+  ordre.forEach(col => {
+    if (!parCollection[col]) return;
+    const produits = parCollection[col];
+    const infoCol = infoCollectionsData[col] || {};
+    const infoProduit = produits.find(p => p.collection === col) || produits[0];
+    const infos = {
+      slogan:           infoCol.slogan       || infoProduit.slogan           || '',
+      desc_collection:  infoCol.desc         || infoProduit.desc_collection  || '',
+      couleur_hex:      infoCol.couleur_hex  || infoProduit.couleur_hex      || '',
+      image_collection: infoCol.photo_url    || infoProduit.image_collection || ''
+    };
+    const section = document.createElement('div');
+    section.className = 'collection-section';
+    section.dataset.collection = col;
+
+    const parLigne = {};
+    const ordreLignes = [];
+    produits.forEach(p => {
+      const ligne = p.ligne || '';
+      if (!parLigne[ligne]) { parLigne[ligne] = []; ordreLignes.push(ligne); }
+      parLigne[ligne].push(p);
+    });
+
+    const lignesHTML = ordreLignes.map(ligne => {
+      const prods = parLigne[ligne];
+      const descLigne = prods[0].desc_ligne || '';
+      return `
+        <div class="ligne-groupe">
+          ${ligne ? `<div class="ligne-groupe-entete">
+            <div class="ligne-groupe-nom">${ligne.toUpperCase()}</div>
+            ${descLigne ? `<p class="ligne-groupe-desc">${descLigne}</p>` : ''}
+          </div>` : ''}
+          <div class="produits-grille">${prods.map(p => carteProduit(p)).join('')}</div>
+        </div>`;
+    }).join('');
+
+    section.innerHTML = `
+      <div class="collection-entete fade-in">
+        <div>
+          <h2 class="collection-entete-nom">${col.toUpperCase()}</h2>
+          <p class="collection-entete-slogan">${infos.slogan || ''}</p>
+          <p class="collection-entete-desc">${infos.desc_collection || ''}</p>
+        </div>
+        <div class="collection-entete-visuel">
+          <div class="collection-entete-bg" style="--col-hex: ${infos.couleur_hex};">
+            ${infos.image_collection
+              ? `<img src="${infos.image_collection}" alt="${col}" onerror="this.style.display='none'">`
+              : `<span class="entete-visuel-placeholder">Photo ambiance<br>à venir</span>`}
+          </div>
+        </div>
+      </div>
+      ${lignesHTML}`;
+    body.appendChild(section);
+    if (scrollObserver) {
+      section.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
+    }
+  });
+  if (collectionEnAttente) {
+    filtrer(collectionEnAttente);
+    collectionEnAttente = null;
+  }
+}
+function fermerModal() {
+  document.getElementById('modal-produit').classList.remove('ouvert');
+  document.body.style.overflow = '';
+}
+function fermerModalProduit(e) {
+  if (e.target === document.getElementById('modal-produit')) fermerModal();
+}
+</script>
+</body>
+</html>
