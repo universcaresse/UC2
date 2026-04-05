@@ -500,7 +500,7 @@ tr.cliquable  { cursor: pointer; }
 /* ═══════════════════════════════════════
    FOOTER
    ═══════════════════════════════════════ */
-footer { background: url('../Images/fond.png') center center / cover no-repeat; padding: var(--gap-md) var(--pad-xl); display: flex; justify-content: space-between; align-items: center; font-size: var(--t8); letter-spacing: var(--ls-nav); position: relative; color: var(--blanc-pur-75); }
+footer { background: url('Images/fond.png') center center / cover no-repeat; padding: var(--gap-md) var(--pad-xl); display: flex; justify-content: space-between; align-items: center; font-size: var(--t8); letter-spacing: var(--ls-nav); position: relative; color: var(--blanc-pur-75); }
 footer::before { content: ''; position: absolute; inset: 0; background: var(--gris-fonce-60); z-index: 0; }
 footer > * { position: relative; z-index: 1; }
 
