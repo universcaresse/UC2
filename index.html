@@ -1,3 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="Images/plume.png">
+  <title>Univers Caresse — Savonnerie artisanale</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Birthstone&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style2.css">
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav id="nav">
+  <div class="nav-logo">
+    <span class="nav-logo-nom">Univers Caresse</span>
+    <span class="nav-logo-tagline">La douceur à chaque geste</span>
+  </div>
+  <ul class="nav-liens" id="nav-liens">
+    <li><a href="#accueil" class="actif" onclick="naviguer('accueil')">Accueil</a></li>
+    <li><a href="#catalogue" onclick="naviguer('catalogue')">Catalogue</a></li>
+    <li><a href="#educatif" onclick="naviguer('educatif')">Le savon artisanal</a></li>
+    <li><a href="#bon-a-savoir" onclick="naviguer('bon-a-savoir')">Bon à savoir</a></li>
+    <li><a href="#contact" onclick="naviguer('contact')">Contact</a></li>
+  </ul>
+</nav>
+<button class="burger burger-flottant" id="burger" onclick="toggleMenu()">
+  <span></span><span></span><span></span>
+</button>
+
+<main>
+
   <!-- ══════════════════════════════════
        SECTION ACCUEIL
   ══════════════════════════════════ -->
@@ -27,7 +59,6 @@
           </div>
         </div>
       </div>
-
       <div class="mosaique">
         <div class="mosaique-item">
           <div class="mosaique-bloc mosaique-bloc-accent">
@@ -118,15 +149,27 @@
     </div>
 
     <!-- COLLECTIONS -->
-    <div>
-      <div class="section-entete">
-        <h2 class="section-entete-titre">Nos <em>collections</em></h2>
-        <div class="section-entete-ligne"></div>
-        <span class="section-entete-count" id="collections-count"></span>
-      </div>
-      <div class="zone-js">
-        <div class="zone-js-strip" id="collections-strip"></div>
-      </div>
+    <div class="section-entete">
+      <h2 class="section-entete-titre">Nos <em>collections</em></h2>
+      <div class="section-entete-ligne"></div>
+      <span class="section-entete-count" id="collections-count"></span>
+    </div>
+    <div class="zone-js">
+      <div class="zone-js-strip" id="collections-strip"></div>
     </div>
 
   </section>
+
+</main>
+
+<footer>
+  <div class="nav-logo">
+    <span class="nav-logo-nom">Univers Caresse</span>
+    <span class="nav-logo-tagline">La douceur à chaque geste</span>
+  </div>
+  <div>© 2026 Univers Caresse — Savonnerie artisanale</div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
