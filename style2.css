@@ -524,7 +524,7 @@ tr:hover td  { background: var(--beige-15); }
 .accord-item.ouvert .accord-panel { display: block; }
 
 /* ═══════════════════════════════════════
-   FILTRES EN CASCADE
+   FILTRES EN CASCADE      
    ═══════════════════════════════════════ */
 
 .filtres-cascade { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; align-items: center; }
