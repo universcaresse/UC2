@@ -465,6 +465,10 @@ tr.cliquable  { cursor: pointer; }
 .grille-auto    { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 .grille-auto-sm { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 .grille-serree  { gap: 2px; }
+.fond-accent  { background: var(--accent-60); }
+.fond-primary { background: var(--primary-60); }
+.fond-gris    { background: var(--gris-60); }
+.double-ligne { grid-row: span 2; }
 
 
 /* ═══════════════════════════════════════
@@ -482,7 +486,7 @@ tr.cliquable  { cursor: pointer; }
    SÉPARATEUR
    ═══════════════════════════════════════ */
 .sep      { height: 1px; background: var(--beige); }
-.sep-vert { flex: 1; height: 1px; background: var(--beige); }
+.separateur-flexible { flex: 1; height: 1px; background: var(--beige); }
 
 
 /* ═══════════════════════════════════════

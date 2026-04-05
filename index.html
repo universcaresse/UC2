@@ -23,17 +23,15 @@
 
 <!-- NAVIGATION -->
 <nav id="nav">
-  <ul class="nav-links" id="nav-links">
-    <li><a href="#accueil" class="active" onclick="naviguer('accueil')">Accueil</a></li>
+  <ul class="nav-liens" id="nav-liens">
+    <li><a href="#accueil" class="actif" onclick="naviguer('accueil')">Accueil</a></li>
     <li><a href="#catalogue" onclick="naviguer('catalogue')">Catalogue</a></li>
     <li><a href="#educatif" onclick="naviguer('educatif')">Le savon artisanal</a></li>
     <li><a href="#bon-a-savoir" onclick="naviguer('bon-a-savoir')">Bon à savoir</a></li>
     <li><a href="#contact" onclick="naviguer('contact')">Contact</a></li>
   </ul>
-  <div class="nav-actions">
-  </div>
 </nav>
-<button class="burger burger-flottant" id="burger" onclick="toggleMenu()">
+<button class="burger-flottant" id="burger" onclick="toggleMenu()">
   <span></span><span></span><span></span>
 </button>
 
@@ -58,138 +56,147 @@
 </div>
 
 <main>
-
-  <!-- ══════════════════════════════════
+<!-- ══════════════════════════════════
        SECTION ACCUEIL
   ══════════════════════════════════ -->
   <section id="section-accueil" class="page-section active">
 
-    <div class="hero">
-      <div class="hero-left">
-        <p class="hero-eyebrow fade-in" id="contenu-accueil-eyebrow"></p>
-        <img src="Images/Logofinal.png" alt="Univers Caresse" class="hero-logo-img fade-in delay-3">
-        <a href="#catalogue" class="hero-cta fade-in-doux delay-4 invisible"
-		onclick="naviguer('catalogue')">
+    <div class="grille-2">
+
+      <div class="accueil-gauche">
+        <p class="sur-titre fade-in" id="contenu-accueil-eyebrow"></p>
+        <img src="Images/Logofinal.png" alt="Univers Caresse" class="fade-in delay-3">
+        <a href="#catalogue" class="btn btn-primary fade-in delay-4" onclick="naviguer('catalogue')">
           <span id="contenu-accueil-cta"></span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
-        <div class="hero-stats fade-in delay-5">
-          <div class="hero-stat">
-            <div class="hero-stat-num" id="hero-stat-collections">—</div>
-            <div class="hero-stat-label">Collections</div>
+        <div class="accueil-stats fade-in delay-5">
+          <div>
+            <div class="titre-3 em-primary" id="hero-stat-collections">—</div>
+            <div class="texte-4 em-upper">Collections</div>
           </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num" id="hero-stat-produits">—</div>
-            <div class="hero-stat-label">Produits</div>
+          <div>
+            <div class="titre-3 em-primary" id="hero-stat-produits">—</div>
+            <div class="texte-4 em-upper">Produits</div>
           </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num" id="contenu-accueil-stat-valeur">—</div>
-            <div class="hero-stat-label">Artisanal</div>
+          <div>
+            <div class="titre-3 em-primary" id="contenu-accueil-stat-valeur">—</div>
+            <div class="texte-4 em-upper">Artisanal</div>
           </div>
         </div>
       </div>
 
-      <div class="hero-right">
-        <div class="hero-mosaic">
-          <div class="mosaic-item">
-            <div class="mosaic-soap mosaic-soap-accent">
-              <div class="mosaic-soap-label">
-                <span class="mosaic-soap-name">nouvelles</span>
-                <span class="mosaic-soap-col">livre</span>
-              </div>
-            </div>
+      <div class="accueil-mosaique grille-2 grille-serree">
+        <div class="carte carte-3-4 fond-accent double-ligne">
+          <div class="carte-contenu-abs">
+            <span class="texte-3 em-blanc em-upper">nouvelles</span>
           </div>
-          <div class="mosaic-item">
-            <div class="mosaic-soap mosaic-soap-primary">
-              <div class="mosaic-soap-label">
-                <span class="mosaic-soap-name">disponible</span>
-                <span class="mosaic-soap-col">en prod</span>
-              </div>
-            </div>
+        </div>
+        <div class="carte carte-1-1 fond-primary">
+          <div class="carte-contenu-abs">
+            <span class="texte-3 em-blanc em-upper">disponible</span>
           </div>
-          <div class="mosaic-item">
-            <div class="mosaic-soap mosaic-soap-gris">
-              <div class="mosaic-soap-label">
-                <span class="mosaic-soap-name">a voir</span>
-                <span class="mosaic-soap-col">theme</span>
-              </div>
-            </div>
+        </div>
+        <div class="carte carte-1-1 fond-gris">
+          <div class="carte-contenu-abs">
+            <span class="texte-3 em-blanc em-upper">à voir</span>
           </div>
         </div>
       </div>
+
     </div>
 
-    <div class="section-line"></div>
+    <div class="sep"></div>
+	
+	
+	
+	
+
+	
+	
 
     <!-- ── QUI SOMMES-NOUS intégré ── -->
-    <section class="section-texte fade-in">
-      <div class="texte-principal">
-        <p class="page-hero-eyebrow" id="contenu-qui-eyebrow"></p>
-        <h1 class="page-hero-titre">
+    <section class="grille-2 fade-in">
+      <div>
+        <p class="sur-titre" id="contenu-qui-eyebrow"></p>
+        <h1 class="titre-2">
           <span id="contenu-qui-titre"></span>
           <em id="contenu-qui-titre-em"></em>
         </h1>
-        <p class="page-hero-texte" id="contenu-qui-texte"></p>
-        <div class="page-hero-signature-bloc">
-          <div class="page-hero-signature" id="contenu-qui-signature-nom"></div>
-          <div class="page-hero-titre-signature" id="contenu-qui-signature-titre"></div>
+        <p class="texte-1" id="contenu-qui-texte"></p>
+        <div>
+          <div class="signature" id="contenu-qui-signature-nom"></div>
+          <div class="texte-3 em-gris" id="contenu-qui-signature-titre"></div>
         </div>
       </div>
       <div class="fade-in delay-1">
-        <div class="section-texte-photo-3-4">
+        <div class="carte carte-3-4">
           <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774627932/a-warm-inviting-photograph-of-an-artisan_uCbddMjKSkWQWJrd_XQJdg_VTqWCfYYQ_Kna8JgcGw28A_lmm3kj.jpg" alt="Atelier Univers Caresse" onerror="this.style.display='none'">
         </div>
       </div>
     </section>
+	
+	
+	
+	
+		
+	
+	
 
-    <section class="section-texte">
-      <div class="texte-principal fade-in delay-1">
-        <p id="contenu-section-texte-p1"></p>
-        <p id="contenu-section-texte-p2"></p>
-        <p id="contenu-section-texte-p3"></p>
-        <div class="section-texte-photo-16-9">
-        <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774628531/a-portrait-oriented-wide-shot-photograph_UA7yPYBBSgOecAa7wOi9rg_spPvtpQoRN-GmTAeUlQQwg_cover_qnihfd.jpg" alt="Atelier Univers Caresse" onerror="this.style.display='none'">
+    <section class="grille-2">
+      <div class="fade-in delay-1">
+        <p class="texte-1" id="contenu-section-texte-p1"></p>
+        <p class="texte-1" id="contenu-section-texte-p2"></p>
+        <p class="texte-1" id="contenu-section-texte-p3"></p>
+        <div class="carte carte-4-3">
+          <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774628531/a-portrait-oriented-wide-shot-photograph_UA7yPYBBSgOecAa7wOi9rg_spPvtpQoRN-GmTAeUlQQwg_cover_qnihfd.jpg" alt="Atelier Univers Caresse" onerror="this.style.display='none'">
         </div>
       </div>
       <div class="fade-in delay-2">
-        <div class="valeur-item">
-          <div class="valeur-num">01</div>
-          <div class="valeur-titre" id="contenu-valeur-01-titre"></div>
-          <div class="valeur-desc" id="contenu-valeur-01-desc"></div>
+        <div>
+          <div class="titre-3 em-accent">01</div>
+          <div class="titre-5" id="contenu-valeur-01-titre"></div>
+          <div class="texte-2" id="contenu-valeur-01-desc"></div>
         </div>
-        <div class="valeur-item">
-          <div class="valeur-num">02</div>
-          <div class="valeur-titre" id="contenu-valeur-02-titre"></div>
-          <div class="valeur-desc" id="contenu-valeur-02-desc"></div>
+        <div>
+          <div class="titre-3 em-accent">02</div>
+          <div class="titre-5" id="contenu-valeur-02-titre"></div>
+          <div class="texte-2" id="contenu-valeur-02-desc"></div>
         </div>
-        <div class="valeur-item">
-          <div class="valeur-num">03</div>
-          <div class="valeur-titre" id="contenu-valeur-03-titre"></div>
-          <div class="valeur-desc" id="contenu-valeur-03-desc"></div>
+        <div>
+          <div class="titre-3 em-accent">03</div>
+          <div class="titre-5" id="contenu-valeur-03-titre"></div>
+          <div class="texte-2" id="contenu-valeur-03-desc"></div>
         </div>
-        <div class="valeur-item">
-          <div class="valeur-num">04</div>
-          <div class="valeur-titre" id="contenu-valeur-04-titre"></div>
-          <div class="valeur-desc" id="contenu-valeur-04-desc"></div>
+        <div>
+          <div class="titre-3 em-accent">04</div>
+          <div class="titre-5" id="contenu-valeur-04-titre"></div>
+          <div class="texte-2" id="contenu-valeur-04-desc"></div>
         </div>
       </div>
     </section>
 
-    <div class="bandeau-citation">
-      <p class="citation-texte"><span class="citation-guillemet">«&nbsp;</span><span id="contenu-citation-texte"></span><span class="citation-guillemet">&nbsp;»</span></p>
-      <span class="citation-source" id="contenu-citation-source"></span>
+    <div class="bandeau bandeau-primary">
+      <p class="titre-3 em-italic em-blanc">«&nbsp;<span id="contenu-citation-texte"></span>&nbsp;»</p>
+      <span class="texte-3 em-upper em-blanc" id="contenu-citation-source"></span>
     </div>
+	
+	
+	
+	 <!-- ce qui suit est la v1 ── -->
+	
+	
+	
 
-    <section class="section-collections">
-      <div class="section-header">
-        <h2 class="section-title">Nos collections</h2>
-        <div class="section-line"></div>
-        <span class="section-count" id="collections-count"></span>
+    <section>
+      <div class="filtres-bar">
+        <h2 class="titre-3">Nos collections</h2>
+        <div class="separateur-flexible"></div>
+        <span class="texte-3 em-gris" id="collections-count"></span>
       </div>
-      <div class="collections-strip" id="collections-strip"></div>
+      <div id="collections-strip"></div>
     </section>
 
-  </section>
 
   <!-- ══════════════════════════════════
        SECTION CATALOGUE
@@ -790,11 +797,11 @@
 </main>
 
 <footer>
-  <div class="footer-left">
-    <div class="footer-logo">univers caresse</div>
-    <div class="footer-tagline">La douceur à chaque geste</div>
+  <div>
+    <div class="titre-5 em-blanc">univers caresse</div>
+    <div class="titre-3 em-cursive">La douceur à chaque geste</div>
   </div>
-  <div class="footer-right">© 2026 Univers Caresse — Savonnerie artisanale</div>
+  <div class="texte-3 em-blanc">© 2026 Univers Caresse — Savonnerie artisanale</div>
 </footer>
 
 <script src="js/main.js"></script>
