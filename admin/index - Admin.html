@@ -29,7 +29,8 @@
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Création <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
           <button class="nav-dropdown-item" onclick="afficherSection('collections', null)">Collections</button>
-          <button class="nav-dropdown-item" onclick="afficherSection('recettes', null)">Recettes</button>
+         <button class="nav-dropdown-item" onclick="afficherSection('produits', null)">Produits</button>
+          <button class="nav-dropdown-item" onclick="afficherSection('familles', null)">Familles</button>
           <button class="nav-dropdown-item" onclick="afficherSection('import-recettes', null)">Import recettes</button>
           <button class="nav-dropdown-item bientot">Catalogue</button>
         </div>
@@ -94,7 +95,8 @@
       <div class="sidebar-groupe">
         <div class="sidebar-titre">Création</div>
         <button class="sidebar-lien actif" onclick="afficherSection('collections', this)">Collections</button>
-        <button class="sidebar-lien" onclick="afficherSection('recettes', this)">Recettes</button>
+ <button class="sidebar-lien" onclick="afficherSection('produits', this)">Produits</button>
+        <button class="sidebar-lien" onclick="afficherSection('familles', this)">Familles</button>
         <button class="sidebar-lien" onclick="afficherSection('import-recettes', this)">Import recettes</button>
         <button class="sidebar-lien bientot">Catalogue</button>
       </div>
@@ -170,7 +172,7 @@
       </span>
       <span class="tuile-nom">Collections</span>
     </button>
-    <button class="accueil-tuile" onclick="afficherSection('recettes', null)">
+   <button class="accueil-tuile" onclick="afficherSection('produits', null)">
       <span class="tuile-icone">
         <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="6" y="14" width="22" height="26" rx="3"/>
@@ -183,7 +185,7 @@
           <circle cx="40" cy="18" r="1"/>
         </svg>
       </span>
-      <span class="tuile-nom">Recettes</span>
+      <span class="tuile-nom">Produits</span>
     </button>
   </div>
   <div class="accueil-grande-tuile accueil-grande-tuile-jaune">
@@ -442,16 +444,89 @@
         </div>
   
 
-      <!-- RECETTES -->
-      <div class="section-admin" id="section-recettes">
+     <!-- FAMILLES -->
+      <div class="section-admin" id="section-familles">
         <div class="page-entete fade-in">
           <div>
-            <div class="page-entete-eyebrow">Gérer les formulations de recettes</div>
-            <div class="page-entete-titre">Recettes</div>
+            <div class="page-entete-eyebrow">Gérer les familles de produits</div>
+            <div class="page-entete-titre">Familles</div>
+          </div>
+          <button class="btn btn-primary" id="btn-nouvelle-famille" onclick="ouvrirFormFamille()">+ Nouvelle famille</button>
+        </div>
+        <div class="msg-zone" id="msg-familles"></div>
+        <div class="form-panel" id="fiche-famille">
+          <button class="btn-fermer-panneau" onclick="fermerFicheFamille()" title="Fermer">✕</button>
+          <div class="form-panel-header">
+            <div class="form-panel-titre" id="fiche-famille-titre"></div>
+          </div>
+          <div class="form-body">
+            <div class="form-groupe">
+              <label class="form-label">Collection</label>
+              <div class="form-valeur" id="fiche-famille-collection"></div>
+            </div>
+            <div class="form-groupe">
+              <label class="form-label">Description</label>
+              <div class="form-valeur" id="fiche-famille-desc"></div>
+            </div>
+            <hr class="separateur">
+            <div class="form-actions">
+              <button class="btn btn-primary" id="fiche-famille-modifier">Modifier</button>
+              <button class="btn btn-danger" id="btn-supprimer-famille">Supprimer</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-panel" id="form-familles">
+          <button class="btn-fermer-panneau" onclick="fermerFormFamille()" title="Fermer">✕</button>
+          <div class="form-panel-header">
+            <div class="form-panel-titre" id="form-familles-titre">Nouvelle famille</div>
+          </div>
+          <div class="form-body">
+            <input type="hidden" id="ff-id">
+            <div class="form-grille">
+              <div class="form-groupe">
+                <label class="form-label">Collection</label>
+                <select class="form-ctrl" id="ff-collection">
+                  <option value="">— Choisir —</option>
+                </select>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Nom</label>
+                <input type="text" class="form-ctrl" id="ff-nom">
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Description</label>
+                <textarea class="form-ctrl" id="ff-desc" rows="3"></textarea>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Couleur HEX</label>
+                <input type="text" class="form-ctrl" id="ff-couleur-hex">
+              </div>
+            </div>
+            <hr class="separateur">
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="sauvegarderFamille()">Enregistrer</button>
+              <button class="btn btn-secondary" onclick="fermerFormFamille()">Annuler</button>
+            </div>
+          </div>
+        </div>
+        <div class="chargement" id="loading-familles"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div id="contenu-familles"></div>
+        <div class="vide cache" id="vide-familles">
+          <div class="vide-titre">Aucune famille</div>
+          <div class="vide-desc">Créez votre première famille</div>
+        </div>
+      </div>
+
+      <!-- RECETTES -->
+      <div class="section-admin" id="section-produits">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Gérer les produits</div>
+            <div class="page-entete-titre">Produits</div>
           </div>
           <button class="btn btn-primary" id="btn-nouvelle-recette" onclick="ouvrirFormRecette()">+ Nouvelle recette</button>
         </div>
-       <div class="msg-zone" id="msg-recettes"></div>
+       <div class="msg-zone" id="msg-produits"></div>
 	   
         <div class="filtres-bar">
           <select class="form-ctrl filtre-select" id="filtre-recette-collection" onchange="onFiltreCollection()">
@@ -505,10 +580,18 @@
                   <option value="">— Choisir —</option>
                 </select>
               </div>
-              <div class="form-groupe">
+			  
+			  
+             <div class="form-groupe">
                 <label class="form-label">Ligne</label>
                 <select class="form-ctrl" id="fr-ligne" onchange="chargerIngredientsBaseRecette()">
                   <option value="">— Choisir collection —</option>
+                </select>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Famille (optionnel)</label>
+                <select class="form-ctrl" id="fr-famille">
+                  <option value="">— Aucune —</option>
                 </select>
               </div>
               
@@ -596,9 +679,9 @@
             </div>
           </div>
         </div>
-        <div class="chargement" id="loading-recettes"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
-        <div class="recettes-grille cache" id="grille-recettes"></div>
-        <div class="vide cache" id="vide-recettes">
+      <div class="chargement" id="loading-produits"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div class="recettes-grille cache" id="grille-produits"></div>
+      <div class="vide cache" id="vide-produits">
           <div class="vide-titre">Aucune recette</div>
           <div class="vide-desc">Créez votre première recette</div>
         </div>
@@ -1408,6 +1491,8 @@
         <label class="form-label">Collection</label>
         <input type="text" class="form-ctrl" id="imp-collection">
       </div>
+	  
+	  
       <div class="form-groupe">
         <label class="form-label">Ligne</label>
         <input type="text" class="form-ctrl" id="imp-ligne">
