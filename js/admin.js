@@ -2825,8 +2825,22 @@ function fabFiltrerRecettes() {
   document.getElementById('fab-apercu').classList.add('cache');
 }
 
-// fabFiltrerFormats — alias de fabFiltrerRecettes
-function fabFiltrerFormats() { fabFiltrerRecettes(); }
+function fabFiltrerFormats() {
+  const pro_id = document.getElementById('fab-recette').value;
+  const select = document.getElementById('fab-format');
+  select.innerHTML = '<option value="">— Choisir un format —</option>';
+  if (!pro_id) return;
+  appelAPI('getProduitsFormats', { pro_id }).then(res => {
+    if (!res || !res.success) return;
+    (res.items || []).forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = JSON.stringify({ poids: f.poids, unite: f.unite, prix: f.prix_vente });
+      opt.textContent = f.poids + ' ' + f.unite + (f.prix_vente ? ' — ' + parseFloat(f.prix_vente).toFixed(2) + ' $' : '');
+      select.appendChild(opt);
+    });
+  });
+  calculerApercuLot();
+}
 
 function fermerFormFabrication() {
   document.getElementById('form-fabrication').classList.remove('visible');
