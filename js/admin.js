@@ -847,8 +847,7 @@ function fermerFicheProduit() {
   produitActif = null;
 }
 
-// Compatibilité noms V1 dans le HTML
-const fermerFicheRecette = fermerFicheProduit;
+// Compatibilité noms V1 dans le HTML — fermerFicheRecette défini comme function ci-dessous
 
 async function basculerModeEditionRecette() {
   if (!produitActif) return;
@@ -860,6 +859,7 @@ function supprimerRecetteActive() {
   if (!produitActif) return;
   supprimerProduit(produitActif.pro_id);
 }
+function fermerFicheRecette() { fermerFicheProduit(); }
 
 function ouvrirFormRecette() { ouvrirFormProduit(); }
 
@@ -899,7 +899,7 @@ function fermerFormProduit() {
   document.getElementById('btn-nouvelle-recette').classList.remove('cache');
 }
 
-const fermerFormRecette = fermerFormProduit;
+function fermerFormRecette() { fermerFormProduit(); }
 
 async function modifierProduit(pro_id) {
   const pro = donneesProduits.find(p => p.pro_id === pro_id);
@@ -968,7 +968,7 @@ async function modifierProduit(pro_id) {
 }
 
 // Compatibilité nom V1
-const modifierRecette = modifierProduit;
+function modifierRecette(id) { return modifierProduit(id); }
 
 async function sauvegarderRecette() {
   const btnSauvegarder = document.querySelector('#form-recettes .btn-primary');
@@ -1035,7 +1035,7 @@ function supprimerProduit(pro_id) {
   });
 }
 
-// supprimerRecetteActive — alias défini plus haut
+// supprimerRecetteActive — défini plus haut
 
 // ─── CLOUDINARY ───
 let _mediaLibrary        = null;
@@ -1330,42 +1330,7 @@ function rafraichirListeFormatsRecette() {
     </div>`).join('');
 }
 
-
-async function appelAPI(action, params = {}) {
-  try {
-    const url = new URL(CONFIG.APPS_SCRIPT_URL);
-    url.searchParams.set('action', action);
-    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-    url.searchParams.set('t', Date.now());
-    const response = await fetch(url.toString());
-    if (!response.ok) throw new Error('Erreur réseau');
-    return await response.json();
-  } catch (err) {
-    console.error('Erreur API:', err);
-    return null;
-  }
-}
-
-async function appelAPIPost(action, data = {}) {
-  try {
-    const payload  = JSON.stringify({ action, ...data });
-    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: payload,
-      redirect: 'follow'
-    });
-    if (!response.ok) throw new Error('Erreur réseau');
-    return await response.json();
-  } catch (err) {
-    console.error('Erreur API POST:', err);
-    return null;
-  }
-}
-
-function formaterPrix(montant) {
-  return parseFloat(montant).toFixed(2).replace('.', ',') + ' $';
-}
+// CONFIG et appelAPI/appelAPIPost définis dans main.js
 
 // ─── LISTES DROPDOWN V2 ───
 let listesDropdown = { types: [], fullData: [], config: {}, fournisseurs: [], formats: [] };
@@ -2680,8 +2645,8 @@ function fabFiltrerRecettes() {
   document.getElementById('fab-apercu').classList.add('cache');
 }
 
-// Compatibilité nom V1
-const fabFiltrerFormats = fabFiltrerRecettes;
+// fabFiltrerFormats — alias de fabFiltrerRecettes
+function fabFiltrerFormats() { fabFiltrerRecettes(); }
 
 function fermerFormFabrication() {
   document.getElementById('form-fabrication').classList.remove('visible');
