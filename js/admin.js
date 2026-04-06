@@ -314,7 +314,7 @@ function ouvrirFormFamille() {
   document.getElementById('form-familles').classList.add('visible');
   window.scrollTo(0, 0);
 }
-}
+
 
 function fermerFormFamille() {
   document.getElementById('form-familles').classList.remove('visible');
