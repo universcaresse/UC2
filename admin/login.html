@@ -37,13 +37,13 @@
 
   <script>
     if (sessionStorage.getItem('uc_admin') === 'true') {
-      window.location.href = '/universcaresse/admin/';
+      window.location.href = '/UC2/admin/';
     }
     function valider() {
       const mdp = document.getElementById('input-mdp').value;
       if (mdp === '2026') {
         sessionStorage.setItem('uc_admin', 'true');
-        window.location.href = '/universcaresse/admin/';
+        window.location.href = '/UC2/admin/';
       } else {
         document.getElementById('erreur-mdp').textContent = 'Mot de passe incorrect.';
         document.getElementById('input-mdp').value = '';
