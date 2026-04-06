@@ -372,7 +372,6 @@ async function ouvrirFicheGamme(gam_id) {
   window.scrollTo(0, 0);
 }
 
-function fermerFicheLigne() { fermerFicheGamme(); }
 function fermerFicheGamme() {
   document.getElementById('fiche-ligne').classList.remove('visible');
   document.getElementById('fiche-collection').classList.add('visible');
@@ -572,9 +571,9 @@ async function chargerProduitsData() {
 }
 
 async function afficherProduits() {
-  const loading = document.getElementById('loading-recettes');
-  const grille  = document.getElementById('grille-recettes');
-  const vide    = document.getElementById('vide-recettes');
+  const loading = document.getElementById('loading-produits');
+  const grille  = document.getElementById('grille-produits');
+  const vide    = document.getElementById('vide-produits');
   if (loading) loading.classList.add('cache');
   if (grille)  grille.classList.add('cache');
   if (vide)    vide.classList.add('cache');
@@ -703,8 +702,8 @@ function filtrerRecettes() {
   const gamme  = document.getElementById('filtre-recette-ligne')?.value;
   const statut = document.getElementById('filtre-recette-statut')?.value;
   const nom    = (document.getElementById('filtre-recette-nom')?.value || '').toLowerCase().trim();
-  const cartes = document.querySelectorAll('#grille-recettes .recette-carte');
-  const vide   = document.getElementById('vide-recettes');
+  const cartes = document.querySelectorAll('#grille-produits .recette-carte');
+  const vide   = document.getElementById('vide-produits');
   let visible  = 0;
   cartes.forEach(carte => {
     const nomEl = carte.querySelector('.recette-nom');
@@ -721,11 +720,11 @@ function filtrerRecettes() {
   });
   if (vide) vide.classList.toggle('cache', visible !== 0);
 
-  document.querySelectorAll('#grille-recettes .recette-section-ligne').forEach(sec => {
+  document.querySelectorAll('#grille-produits .recette-section-ligne').forEach(sec => {
     const aDesCartesVisibles = [...sec.querySelectorAll('.recette-carte')].some(c => !c.classList.contains('cache'));
     sec.classList.toggle('cache', !aDesCartesVisibles);
   });
-  document.querySelectorAll('#grille-recettes .recette-section-collection').forEach(sec => {
+  document.querySelectorAll('#grille-produits .recette-section-collection').forEach(sec => {
     const aDesLignesVisibles = [...sec.querySelectorAll('.recette-section-ligne')].some(l => !l.classList.contains('cache'));
     sec.classList.toggle('cache', !aDesLignesVisibles);
   });
@@ -833,16 +832,16 @@ async function ouvrirFicheProduit(pro_id) {
 
   fermerFormProduit();
   document.getElementById('fiche-recette').classList.add('visible');
-  document.querySelector('#section-recettes .filtres-bar')?.classList.add('cache');
-  document.getElementById('grille-recettes').classList.add('cache');
+  document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
+  document.getElementById('grille-produits').classList.add('cache');
   document.getElementById('btn-nouvelle-recette').classList.add('cache');
   document.querySelector('.admin-contenu').scrollTop = 0;
 }
 
 function fermerFicheProduit() {
   document.getElementById('fiche-recette').classList.remove('visible');
-  document.querySelector('#section-recettes .filtres-bar')?.classList.remove('cache');
-  document.getElementById('grille-recettes').classList.remove('cache');
+  document.querySelector('#section-produits .filtres-bar')?.classList.remove('cache');
+  document.getElementById('grille-produits').classList.remove('cache');
   document.getElementById('filtre-recette-nom').value = '';
   filtrerRecettes();
   produitActif = null;
@@ -883,8 +882,8 @@ function ouvrirFormProduit() {
   if (prevNoel) prevNoel.innerHTML = '';
   const apercuRecette = document.getElementById('fr-couleur-apercu');
   if (apercuRecette) apercuRecette.style.background = '';
-  document.querySelector('#section-recettes .filtres-bar')?.classList.add('cache');
-  document.getElementById('grille-recettes').classList.add('cache');
+  document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
+  document.getElementById('grille-produits').classList.add('cache');
   document.getElementById('btn-nouvelle-recette').classList.add('cache');
   document.getElementById('form-recettes').classList.add('visible');
   rafraichirListeIngredientsRecette();
@@ -894,9 +893,9 @@ function ouvrirFormProduit() {
 
 function fermerFormProduit() {
   document.getElementById('form-recettes').classList.remove('visible');
-  const filtresBar = document.querySelector('#section-recettes .filtres-bar');
+  const filtresBar = document.querySelector('#section-produits .filtres-bar');
   if (filtresBar) filtresBar.classList.remove('cache');
-  document.getElementById('grille-recettes').classList.remove('cache');
+  document.getElementById('grille-produits').classList.remove('cache');
   document.getElementById('btn-nouvelle-recette').classList.remove('cache');
 }
 
@@ -960,8 +959,8 @@ async function modifierProduit(pro_id) {
     poids: f.poids, unite: f.unite, prix: f.prix_vente, desc: ''
   }));
 
-  document.querySelector('#section-recettes .filtres-bar')?.classList.add('cache');
-  document.getElementById('grille-recettes').classList.add('cache');
+  document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
+  document.getElementById('grille-produits').classList.add('cache');
   document.getElementById('form-recettes').classList.add('visible');
   rafraichirListeIngredientsRecette();
   rafraichirListeFormatsRecette();

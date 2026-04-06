@@ -331,15 +331,15 @@
       <div class="edu-niveaux">
         <div class="edu-niveau">
           <div><div class="edu-niveau-pct" id="edu-s3-niv1-pct"></div><div class="edu-niveau-label" id="edu-s3-niv1-label"></div></div>
-          <div><p class="edu-niveau-texte" id="edu-s3-niv1-texte"></p><a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('ÉPURE')" class="edu-lien">Collection ÉPURE</a></div>
+          <div><p class="edu-niveau-texte" id="edu-s3-niv1-texte"></p><a href="#catalogue" onclick="naviguer('catalogue')" class="edu-lien">Collection ÉPURE</a></div>
         </div>
         <div class="edu-niveau">
           <div><div class="edu-niveau-pct" id="edu-s3-niv2-pct"></div><div class="edu-niveau-label" id="edu-s3-niv2-label"></div></div>
-          <div><p class="edu-niveau-texte" id="edu-s3-niv2-texte"></p><a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('SAPONICA')" class="edu-lien">Collection SAPONICA</a></div>
+          <div><p class="edu-niveau-texte" id="edu-s3-niv2-texte"></p><a href="#catalogue" onclick="naviguer('catalogue')" class="edu-lien">Collection SAPONICA</a></div>
         </div>
         <div class="edu-niveau">
           <div><div class="edu-niveau-pct" id="edu-s3-niv3-pct"></div><div class="edu-niveau-label" id="edu-s3-niv3-label"></div></div>
-          <div><p class="edu-niveau-texte" id="edu-s3-niv3-texte"></p><a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('PETIT NUAGE')" class="edu-lien">Collection PETIT NUAGE</a></div>
+          <div><p class="edu-niveau-texte" id="edu-s3-niv3-texte"></p><a href="#catalogue" onclick="naviguer('catalogue')" class="edu-lien">Collection PETIT NUAGE</a></div>
         </div>
       </div>
     </div>
@@ -723,7 +723,7 @@
           <div>
             <div class="contact-item-label">Courriel</div>
             <div class="contact-item-valeur">
-              <a href="mailto:universcaresse@outlook.com">universcaresse@outlook.com</a>
+              <a href="/cdn-cgi/l/email-protection#2f5a4146594a5d5c4c4e5d4a5c5c4a6f405a5b43404044014c4042"><span class="__cf_email__" data-cfemail="8cf9e2e5fae9feffefedfee9ffffe9cce3f9f8e0e3e3e7a2efe3e1">[email&#160;protected]</span></a>
             </div>
           </div>
         </div>
@@ -797,139 +797,7 @@
   <div class="footer-right">© 2026 Univers Caresse — Savonnerie artisanale</div>
 </footer>
 
-<script src="js/main.js"></script>
-<script>
-// ─── CATALOGUE — données et logique ───
-let donneescatalogue = [];
-let collectionsOrdre = [];
-let infoCollectionsData = {};
-let catalogueCharge = false;
-let collectionEnAttente = null;
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/main.js"></script>
 
-async function chargerCatalogue() {
-  if (catalogueCharge) return;
-  catalogueCharge = true;
-  try {
-    const data = donneesCatalogue || await appelAPI('getCatalogue');
-    if (!data || !data.success || !data.produits) { afficherErreurCatalogue('Impossible de charger le catalogue.'); return; }
-    donneescatalogue = data.produits;
-    collectionsOrdre = data.collections || [];
-    infoCollectionsData = data.infoCollections || {};
-    construireCatalogue();
-  } catch (err) {
-    afficherErreurCatalogue('Erreur de connexion.');
-  }
-}
-
-function afficherErreurCatalogue(msg) {
-  const el = document.getElementById('chargement');
-  if (el) el.innerHTML = `<p class="chargement-erreur">${msg}</p>`;
-}
-
-function construireCatalogue() {
-  const chargement = document.getElementById('chargement');
-  const body = document.getElementById('catalogue-body');
-if (chargement) chargement.classList.add('cache');
-if (body) body.classList.remove('cache');
-
-  const parCollection = {};
-  donneescatalogue.forEach(p => {
-    if (!parCollection[p.collection]) parCollection[p.collection] = [];
-    parCollection[p.collection].push(p);
-    if (Array.isArray(p.collections_secondaires)) {
-      p.collections_secondaires.forEach(colSec => {
-        if (!parCollection[colSec]) parCollection[colSec] = [];
-        if (!parCollection[colSec].find(x => x.recette_id === p.recette_id)) {
-          parCollection[colSec].push(p);
-        }
-      });
-    }
-  });
-
-  const ordre = collectionsOrdre.length ? collectionsOrdre : Object.keys(parCollection);
-  const filtresBar = document.getElementById('filtres-bar');
-
-  ordre.forEach(col => {
-    if (parCollection[col]) {
-      const btn = document.createElement('button');
-      btn.className = 'filtre-btn';
-      btn.dataset.filtre = col;
-      btn.textContent = col;
-      btn.onclick = () => filtrer(col);
-      filtresBar.appendChild(btn);
-    }
-  });
-
-  body.innerHTML = '';
-  ordre.forEach(col => {
-    if (!parCollection[col]) return;
-    const produits = parCollection[col];
-    const infoCol = infoCollectionsData[col] || {};
-    const infoProduit = produits.find(p => p.collection === col) || produits[0];
-    const infos = {
-      slogan:           infoCol.slogan       || infoProduit.slogan           || '',
-      desc_collection:  infoCol.desc         || infoProduit.desc_collection  || '',
-      couleur_hex:      infoCol.couleur_hex  || infoProduit.couleur_hex      || '',
-      image_collection: infoCol.photo_url    || infoProduit.image_collection || ''
-    };
-    const section = document.createElement('div');
-    section.className = 'collection-section';
-    section.dataset.collection = col;
-
-    const parLigne = {};
-    const ordreLignes = [];
-    produits.forEach(p => {
-      const ligne = p.ligne || '';
-      if (!parLigne[ligne]) { parLigne[ligne] = []; ordreLignes.push(ligne); }
-      parLigne[ligne].push(p);
-    });
-
-    const lignesHTML = ordreLignes.map(ligne => {
-      const prods = parLigne[ligne];
-      const descLigne = prods[0].desc_ligne || '';
-      return `
-        <div class="ligne-groupe">
-          ${ligne ? `<div class="ligne-groupe-entete">
-            <div class="ligne-groupe-nom">${ligne.toUpperCase()}</div>
-            ${descLigne ? `<p class="ligne-groupe-desc">${descLigne}</p>` : ''}
-          </div>` : ''}
-          <div class="produits-grille">${prods.map(p => carteProduit(p)).join('')}</div>
-        </div>`;
-    }).join('');
-
-    section.innerHTML = `
-      <div class="collection-entete fade-in">
-        <div>
-          <h2 class="collection-entete-nom">${col.toUpperCase()}</h2>
-          <p class="collection-entete-slogan">${infos.slogan || ''}</p>
-          <p class="collection-entete-desc">${infos.desc_collection || ''}</p>
-        </div>
-        <div class="collection-entete-visuel">
-          <div class="collection-entete-bg" style="--col-hex: ${infos.couleur_hex};">
-            ${infos.image_collection
-              ? `<img src="${infos.image_collection}" alt="${col}" onerror="this.style.display='none'">`
-              : `<span class="entete-visuel-placeholder">Photo ambiance<br>à venir</span>`}
-          </div>
-        </div>
-      </div>
-      ${lignesHTML}`;
-    body.appendChild(section);
-    if (scrollObserver) {
-      section.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
-    }
-  });
-  if (collectionEnAttente) {
-    filtrer(collectionEnAttente);
-    collectionEnAttente = null;
-  }
-}
-function fermerModal() {
-  document.getElementById('modal-produit').classList.remove('ouvert');
-  document.body.style.overflow = '';
-}
-function fermerModalProduit(e) {
-  if (e.target === document.getElementById('modal-produit')) fermerModal();
-}
-</script>
 </body>
 </html>
