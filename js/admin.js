@@ -1330,10 +1330,6 @@ function rafraichirListeFormatsRecette() {
     </div>`).join('');
 }
 
-// ─── APPEL APPS SCRIPT V2 ───
-const CONFIG = {
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec'
-};
 
 async function appelAPI(action, params = {}) {
   try {
