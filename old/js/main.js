@@ -5,7 +5,7 @@
  
 // ─── CONFIGURATION ───
 const CONFIG = {
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz2PKZWUTyxDcfd2HH-RZmbPVEhgsSDooK1R4Cp3I90UA45ZD0DURfJtc23RukWlGkdSg/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec',
   MOT_DE_PASSE: '2026'
 }; 
 

@@ -1,0 +1,39 @@
+# FEU D'AUTOMNE — SAPONICA
+
+**Date de création :** 19 mars 2026
+**Dernière mise à jour :** 28 mars 2026
+**Ligne :** SAVON | **Cure :** 28 jours | **Nb unités :** 9 | **Statut :** public
+
+---
+
+**HEX :** #FC6B33
+**Image :** https://res.cloudinary.com/dfasrauyy/image/upload/v1773448368/Feudautomne_etjdou.jpg
+**Image Noël :** https://res.cloudinary.com/dfasrauyy/image/upload/v1773449076/Feudautomnenoel_fmh0ss.jpg
+**Rang :** 1
+**Surgras :** 8%
+
+---
+
+## RECETTE DE BASE SAPONICA
+
+- 325g Huile de tournesol oléique
+- 260g Huile de coco
+- 65g Beurre de karité
+- 184g Eau
+- 92g Soude caustique (NaOH)
+
+---
+
+**Fragrances :**
+- 10g HA canneberge
+- 2g HE romarin
+- 3g HE pin blanc
+
+**Additifs :**
+- 5 gouttes Colorant rouge
+
+**Notes :** Romarin sur le dessus en petite quantité
+
+**Version courte :** Teintes cuivrées de canneberge, résine de pin blanc et essence de romarin. L'âme des forêts automnales dans un savon vibrant et vivifiant.
+
+**Version longue :** Quand les feuilles virent au cuivre et que l'air sent la résine, Feu d'automne arrive. La canneberge apporte son acidité lumineuse, le pin blanc sa fraîcheur boisée, le romarin sa vivacité herbacée. Un savon qui capte ce moment précis où la nature s'embrase avant de se reposer, vif, coloré, profondément québécois.

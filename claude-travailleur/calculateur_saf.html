@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur SAF Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            color: #2a5298;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .oil-row {
+            display: grid;
+            grid-template-columns: 2fr 120px 100px;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        select, input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #1e3c72;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.9em;
+        }
+        
+        .btn-danger {
+            background: #c44536;
+        }
+        
+        .btn-danger:hover {
+            background: #a03428;
+        }
+        
+        .btn-success {
+            background: #4caf50;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+        }
+        
+        .params {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .param-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+        
+        .results {
+            background: #f5f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .result-value {
+            font-size: 1.1em;
+            color: #2a5298;
+            font-weight: 600;
+        }
+        
+        .scale-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .additives-row {
+            display: grid;
+            grid-template-columns: 2fr 100px 80px 100px;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .saved-recipes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .recipe-card {
+            padding: 15px;
+            background: #f5f9ff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            position: relative;
+        }
+        
+        .recipe-card:hover {
+            background: #e8f2ff;
+        }
+        
+        .recipe-name {
+            font-weight: 600;
+            color: #2a5298;
+            margin-bottom: 5px;
+        }
+        
+        .recipe-info {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .delete-recipe {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #c44536;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        .water-guide {
+            background: #fff9e6;
+            border-left: 4px solid #f5a623;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .water-guide-text {
+            flex: 1;
+        }
+        
+        .property-bar {
+            margin: 15px 0;
+        }
+        
+        .property-name {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .bar-container {
+            background: #e0e0e0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+        
+        .bar-good { background: #4caf50; }
+        .bar-warning { background: #ff9800; }
+        .bar-danger { background: #f44336; }
+        
+        .property-suggestion {
+            background: #e3f2fd;
+            padding: 8px 12px;
+            margin-top: 5px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: #1976d2;
+        }
+        
+        .suggestions {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        
+        .suggestion-item {
+            margin: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .suggestion-item:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+        
+        .warning-item:before {
+            content: "⚠️";
+        }
+        
+        .success-item:before {
+            content: "✨";
+        }
+        
+        .context-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .total-oils-display {
+            background: #e8f2ff;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            color: #2a5298;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚗️ Calculateur SAF Pro</h1>
+        <p class="subtitle">Saponification à froid - Analyse complète et suggestions intelligentes</p>
+        
+        <div class="section">
+            <h2 class="section-title">🎯 Contexte d'utilisation</h2>
+            <div class="context-selector">
+                <div class="param-group">
+                    <label>Type de peau</label>
+                    <select id="skinType">
+                        <option value="dry">Très sèche</option>
+                        <option value="normal">Normale</option>
+                        <option value="oily">Grasse</option>
+                        <option value="sensitive">Sensible</option>
+                    </select>
+                </div>
+                <div class="param-group">
+                    <label>Saison / Climat</label>
+                    <select id="season">
+                        <option value="winter">Hiver québécois</option>
+                        <option value="summer">Été</option>
+                        <option value="spring">Printemps/Automne</option>
+                    </select>
+                </div>
+                <div class="param-group">
+                    <label>Usage</label>
+                    <select id="usage">
+                        <option value="body">Corps</option>
+                        <option value="face">Visage</option>
+                        <option value="hands">Mains</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">🫒 Composition des huiles (en grammes)</h2>
+            <div class="total-oils-display" id="totalOilsDisplay">Total huiles : 0 g</div>
+            <div id="oilsContainer"></div>
+            <button class="btn btn-small" onclick="addOilRow()">+ Ajouter une huile</button>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">📊 Paramètres</h2>
+            <div class="params">
+                <div class="param-group">
+                    <label>Surgras (%)</label>
+                    <input type="number" id="superfat" value="10" min="0" max="20" step="1">
+                </div>
+                <div class="param-group">
+                    <label>Eau (grammes)</label>
+                    <input type="number" id="waterGrams" value="165" min="50" step="5">
+                </div>
+            </div>
+            <div id="waterGuide" class="water-guide" style="display:none;">
+                <div class="water-guide-text" id="waterGuideText"></div>
+                <button class="btn btn-small btn-success" id="applyWaterBtn" onclick="applyWaterSuggestion()" style="display:none;">Appliquer</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">✨ Ajouts (optionnel)</h2>
+            <div id="additivesContainer"></div>
+            <button class="btn btn-small" onclick="addAdditiveRow()">+ Ajouter un ingrédient</button>
+        </div>
+        
+        <div class="section">
+            <button class="btn" onclick="calculate()" style="width: 100%; font-size: 1.1em;">🧮 ANALYSER LA RECETTE</button>
+            
+            <div class="scale-controls">
+                <button class="btn btn-small" onclick="scaleRecipe(0.5)">÷2</button>
+                <button class="btn btn-small" onclick="scaleRecipe(2)">×2</button>
+                <button class="btn btn-small" onclick="scaleRecipe(3)">×3</button>
+                <input type="number" id="customScale" placeholder="Facteur" step="0.1" min="0.1" style="width: 100px;">
+                <button class="btn btn-small" onclick="scaleRecipe(parseFloat(document.getElementById('customScale').value))">Appliquer</button>
+            </div>
+        </div>
+        
+        <div id="results" class="results" style="display: none;">
+            <h2 class="section-title">📋 Résultats</h2>
+            <div id="resultsContent"></div>
+        </div>
+        
+        <div id="properties" style="display: none;" class="section">
+            <h2 class="section-title">📊 Propriétés du savon</h2>
+            <div id="propertiesContent"></div>
+        </div>
+        
+        <div id="suggestions" style="display: none;">
+            <h2 class="section-title">💡 Analyse et suggestions</h2>
+            <div id="suggestionsContent"></div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">💾 Sauvegarder</h2>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="recipeName" placeholder="Nom de la recette (ex: Nordet)" style="flex: 1;">
+                <button class="btn" onclick="saveRecipe()">Sauvegarder</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">📚 Recettes sauvegardées</h2>
+            <div id="savedRecipes" class="saved-recipes"></div>
+        </div>
+    </div>
+
+    <script>
+        const sapValues = {
+            "Olive": 0.134,
+            "Karité": 0.128,
+            "Tournesol oléique": 0.134,
+            "Coco": 0.190,
+            "Ricin": 0.128,
+            "Amande douce": 0.136,
+            "Avocat": 0.133,
+            "Colza": 0.124,
+            "Sésame": 0.133,
+            "Jojoba": 0.069,
+            "Beurre de cacao": 0.137,
+            "Neem": 0.139,
+            "Babassu": 0.175
+        };
+        
+        const oilProperties = {
+            "Olive": { hardness: 17, bubbly: 0, creamy: 17, conditioning: 82, cleansing: 0 },
+            "Karité": { hardness: 43, bubbly: 5, creamy: 38, conditioning: 56, cleansing: 0 },
+            "Tournesol oléique": { hardness: 10, bubbly: 0, creamy: 10, conditioning: 69, cleansing: 0 },
+            "Coco": { hardness: 79, bubbly: 67, creamy: 12, conditioning: 10, cleansing: 67 },
+            "Ricin": { hardness: 3, bubbly: 90, creamy: 91, conditioning: 90, cleansing: 0 },
+            "Amande douce": { hardness: 7, bubbly: 0, creamy: 7, conditioning: 82, cleansing: 0 },
+            "Avocat": { hardness: 12, bubbly: 0, creamy: 12, conditioning: 75, cleansing: 0 },
+            "Colza": { hardness: 10, bubbly: 0, creamy: 10, conditioning: 56, cleansing: 0 },
+            "Sésame": { hardness: 11, bubbly: 0, creamy: 11, conditioning: 81, cleansing: 0 },
+            "Jojoba": { hardness: 11, bubbly: 0, creamy: 11, conditioning: 69, cleansing: 0 },
+            "Beurre de cacao": { hardness: 57, bubbly: 0, creamy: 57, conditioning: 41, cleansing: 0 },
+            "Neem": { hardness: 14, bubbly: 0, creamy: 14, conditioning: 76, cleansing: 0 },
+            "Babassu": { hardness: 76, bubbly: 67, creamy: 9, conditioning: 19, cleansing: 67 }
+        };
+        
+        const traceAccelerators = ['indigo', 'karité', 'cacao', 'argile', 'charbon', 'miel', 'lait'];
+        
+        let currentRecipe = null;
+        let suggestedWater = null;
+        
+        function updateTotalOils() {
+            let total = 0;
+            document.querySelectorAll('.oil-weight').forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            document.getElementById('totalOilsDisplay').textContent = `Total huiles : ${total.toFixed(0)} g`;
+            analyzeWaterNeeds();
+        }
+        
+        function analyzeWaterNeeds() {
+            const oils = [];
+            const additives = [];
+            
+            document.querySelectorAll('.oil-row').forEach(row => {
+                const name = row.querySelector('.oil-select').value;
+                const weight = parseFloat(row.querySelector('.oil-weight').value) || 0;
+                if (name && weight > 0) oils.push({ name, weight });
+            });
+            
+            document.querySelectorAll('.additives-row').forEach(row => {
+                const name = row.querySelector('.additive-name').value.toLowerCase();
+                if (name) additives.push(name);
+            });
+            
+            const totalOils = oils.reduce((sum, oil) => sum + oil.weight, 0);
+            if (totalOils === 0) {
+                document.getElementById('waterGuide').style.display = 'none';
+                return;
+            }
+            
+            let recommendedPercent = 33;
+            let reasons = [];
+            
+            const hasShea = oils.some(o => o.name === 'Karité');
+            const hasCocoa = oils.some(o => o.name === 'Beurre de cacao');
+            const highOlive = oils.find(o => o.name === 'Olive' && (o.weight / totalOils) > 0.6);
+            
+            if (hasShea || hasCocoa) {
+                recommendedPercent = 35;
+                reasons.push('Beurre (karité/cacao) accélère la trace');
+            }
+            
+            if (highOlive) {
+                recommendedPercent = Math.max(28, recommendedPercent - 3);
+                reasons.push('Olive élevé - peut réduire l\'eau');
+            }
+            
+            const hasAccelerator = additives.some(add => 
+                traceAccelerators.some(acc => add.includes(acc))
+            );
+            
+            if (hasAccelerator) {
+                recommendedPercent = Math.max(35, recommendedPercent);
+                reasons.push('Additifs (indigo/argile/miel) accélèrent');
+            }
+            
+            const recommendedWater = Math.round((totalOils * recommendedPercent) / 100);
+            suggestedWater = recommendedWater;
+            
+            const guide = document.getElementById('waterGuide');
+            const guideText = document.getElementById('waterGuideText');
+            const applyBtn = document.getElementById('applyWaterBtn');
+            
+            guide.style.display = 'flex';
+            guideText.innerHTML = `
+                <strong>💡 Suggestion eau :</strong> ${recommendedPercent}% = <strong>${recommendedWater}g</strong><br>
+                ${reasons.length > 0 ? '<br>Pourquoi : ' + reasons.join(' • ') : ''}
+                <br><br>
+                <em>Standard : 33% | Réduction : 28-30% | Plus d'eau : 35-38%</em>
+            `;
+            applyBtn.style.display = 'block';
+        }
+        
+        function applyWaterSuggestion() {
+            if (suggestedWater) {
+                document.getElementById('waterGrams').value = suggestedWater;
+            }
+        }
+        
+        function addOilRow() {
+            const container = document.getElementById('oilsContainer');
+            const row = document.createElement('div');
+            row.className = 'oil-row';
+            row.innerHTML = `
+                <select class="oil-select" onchange="updateTotalOils()">
+                    <option value="">-- Choisir une huile --</option>
+                    ${Object.keys(sapValues).map(oil => `<option value="${oil}">${oil}</option>`).join('')}
+                </select>
+                <input type="number" class="oil-weight" placeholder="Grammes" min="0" step="1" oninput="updateTotalOils()">
+                <button class="btn btn-small btn-danger" onclick="this.parentElement.remove(); updateTotalOils();">Retirer</button>
+            `;
+            container.appendChild(row);
+        }
+        
+        function addAdditiveRow() {
+            const container = document.getElementById('additivesContainer');
+            const row = document.createElement('div');
+            row.className = 'additives-row';
+            row.innerHTML = `
+                <input type="text" class="additive-name" placeholder="Nom (ex: Indigo, HE Patchouli)" onchange="analyzeWaterNeeds()">
+                <input type="number" class="additive-amount" placeholder="Quantité" step="0.1" min="0">
+                <select class="additive-unit">
+                    <option value="g">g</option>
+                    <option value="ml">ml</option>
+                    <option value="c.thé">c. à thé</option>
+                    <option value="c.soupe">c. à soupe</option>
+                </select>
+                <button class="btn btn-small btn-danger" onclick="this.parentElement.remove(); analyzeWaterNeeds();">Retirer</button>
+            `;
+            container.appendChild(row);
+        }
+        
+        function calculateProperties(oils, totalOils) {
+            const props = { hardness: 0, bubbly: 0, creamy: 0, conditioning: 0, cleansing: 0 };
+            
+            oils.forEach(oil => {
+                const percent = oil.weight / totalOils;
+                const oilProps = oilProperties[oil.name];
+                if (oilProps) {
+                    props.hardness += oilProps.hardness * percent;
+                    props.bubbly += oilProps.bubbly * percent;
+                    props.creamy += oilProps.creamy * percent;
+                    props.conditioning += oilProps.conditioning * percent;
+                    props.cleansing += oilProps.cleansing * percent;
+                }
+            });
+            
+            return props;
+        }
+        
+        function getPropertySuggestion(key, value, oils, totalOils) {
+            const ranges = {
+                hardness: { min: 29, max: 54 },
+                cleansing: { min: 12, max: 22 },
+                conditioning: { min: 44, max: 69 },
+                bubbly: { min: 14, max: 46 },
+                creamy: { min: 16, max: 48 }
+            };
+            
+            const range = ranges[key];
+            if (value >= range.min && value <= range.max) return null;
+            
+            const cocoOil = oils.find(o => o.name === 'Coco');
+            const cocoWeight = cocoOil ? cocoOil.weight : 0;
+            const cocoPercent = cocoOil ? ((cocoOil.weight / totalOils) * 100).toFixed(0) : 0;
+            
+            const oliveOil = oils.find(o => o.name === 'Olive');
+            const tournesolOil = oils.find(o => o.name === 'Tournesol oléique');
+            
+            if (key === 'hardness' && value < range.min) {
+                const cocoToAdd = Math.round(totalOils * 0.10);
+                const cacaoToAdd = Math.round(totalOils * 0.15);
+                return `💡 Ajoutez ${cocoToAdd}g de coco (mousse + dureté) ou ${cacaoToAdd}g de beurre de cacao (dureté douce)`;
+            }
+            
+            if (key === 'hardness' && value > range.max) {
+                if (cocoWeight > 0) {
+                    const cocoToReduce = Math.round(cocoWeight * 0.3);
+                    return `⚠️ Réduisez coco de ${cocoToReduce}g, ajoutez ${cocoToReduce}g d'olive ou tournesol`;
+                }
+                return '⚠️ Réduisez coco/cacao, augmentez olive ou tournesol';
+            }
+            
+            if (key === 'cleansing' && value > range.max) {
+                const targetCoco = Math.round(totalOils * 0.11);
+                const cocoToReduce = Math.round(cocoWeight - targetCoco);
+                if (cocoToReduce > 0) {
+                    return `⚠️ Réduisez coco de ${cocoToReduce}g (actuellement ${cocoWeight}g), remplacez par olive/tournesol`;
+                }
+                return `⚠️ Coco actuellement ${cocoWeight}g (${cocoPercent}%) - maximum recommandé: ${targetCoco}g (11%)`;
+            }
+            
+            if (key === 'cleansing' && value < range.min) {
+                const cocoToAdd = Math.round(totalOils * 0.13 - cocoWeight);
+                return `💡 Ajoutez ${cocoToAdd}g de coco pour plus de nettoyant`;
+            }
+            
+            if (key === 'conditioning' && value < range.min) {
+                const toAdd = Math.round(totalOils * 0.20);
+                return `💡 Ajoutez ${toAdd}g d'olive, karité, avocat ou amande douce`;
+            }
+            
+            if (key === 'conditioning' && value > range.max) {
+                const cocoToAdd = Math.round(totalOils * 0.05);
+                return `ℹ️ Très nourrissant - peut laisser film gras, ajoutez ${cocoToAdd}g de coco si nécessaire`;
+            }
+            
+            if (key === 'bubbly' && value < range.min) {
+                const ricinToAdd = Math.round(totalOils * 0.06);
+                return `💡 Ajoutez ${ricinToAdd}g de ricin pour mousse bulles rapide`;
+            }
+            
+            if (key === 'creamy' && value < range.min) {
+                const ricinToAdd = Math.round(totalOils * 0.06);
+                const kariteToAdd = Math.round(totalOils * 0.15);
+                return `💡 Ajoutez ${ricinToAdd}g de ricin ou ${kariteToAdd}g de karité pour mousse crémeuse`;
+            }
+            
+            return null;
+        }
+        
+        function displayProperties(props, oils, totalOils) {
+            const ranges = {
+                hardness: { min: 29, max: 54, label: 'Dureté' },
+                cleansing: { min: 12, max: 22, label: 'Nettoyant' },
+                conditioning: { min: 44, max: 69, label: 'Douceur' },
+                bubbly: { min: 14, max: 46, label: 'Mousse bulles' },
+                creamy: { min: 16, max: 48, label: 'Mousse crémeuse' }
+            };
+            
+            let html = '';
+            
+            Object.keys(ranges).forEach(key => {
+                const value = Math.round(props[key]);
+                const range = ranges[key];
+                const percentage = Math.min(100, (value / 100) * 100);
+                
+                let barClass = 'bar-good';
+                if (value < range.min || value > range.max) {
+                    barClass = 'bar-warning';
+                }
+                if (value < range.min * 0.7 || value > range.max * 1.3) {
+                    barClass = 'bar-danger';
+                }
+                
+                html += `
+                    <div class="property-bar">
+                        <div class="property-name">
+                            <span>${range.label}</span>
+                            <span><strong>${value}</strong> (idéal: ${range.min}-${range.max})</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill ${barClass}" style="width: ${percentage}%">${value}</div>
+                        </div>
+                `;
+                
+                const suggestion = getPropertySuggestion(key, value, oils, totalOils);
+                if (suggestion) {
+                    html += `<div class="property-suggestion">${suggestion}</div>`;
+                }
+                
+                html += `</div>`;
+            });
+            
+            document.getElementById('propertiesContent').innerHTML = html;
+            document.getElementById('properties').style.display = 'block';
+        }
+        
+        function generateSuggestions(oils, totalOils, props, context) {
+            const suggestions = [];
+            const warnings = [];
+            const successes = [];
+            
+            const skinType = document.getElementById('skinType').value;
+            const season = document.getElementById('season').value;
+            const usage = document.getElementById('usage').value;
+            
+            if (skinType === 'dry' && props.cleansing > 15) {
+                warnings.push(`Trop nettoyant (${Math.round(props.cleansing)}) pour peau très sèche - Réduisez la coco à 10% max`);
+            } else if (skinType === 'oily' && props.cleansing < 12) {
+                suggestions.push('Peu nettoyant pour peau grasse - Montez la coco à 15-20%');
+            }
+            
+            if (skinType === 'dry' && season === 'winter') {
+                if (props.conditioning < 50) {
+                    warnings.push('Pas assez nourrissant pour hiver québécois - Ajoutez karité, avocat ou amande douce');
+                } else if (props.conditioning > 60) {
+                    successes.push('❄️ Parfait pour hiver québécois! Protection maximale contre le froid');
+                }
+            }
+            
+            const cocoPercent = oils.find(o => o.name === 'Coco');
+            const cocoPercentValue = cocoPercent ? (cocoPercent.weight / totalOils) * 100 : 0;
+            
+            if (cocoPercentValue > 25 && skinType === 'dry') {
+                warnings.push(`Coco trop élevé (${Math.round(cocoPercentValue)}%) pour peau sèche - maximum 15%`);
+            }
+            
+            const olivePercent = oils.find(o => o.name === 'Olive');
+            const olivePercentValue = olivePercent ? (olivePercent.weight / totalOils) * 100 : 0;
+            
+            if (olivePercentValue > 70) {
+                suggestions.push('Olive très élevé - cure de 8 semaines minimum recommandée');
+            }
+            
+            if (season === 'winter' && skinType === 'dry') {
+                const hasShea = oils.some(o => o.name === 'Karité');
+                const hasAvocado = oils.some(o => o.name === 'Avocat');
+                
+                if (!hasShea && !hasAvocado) {
+                    suggestions.push('Pour hiver québécois : Ajoutez 20-25% karité ou 10% avocat');
+                }
+            }
+            
+            let html = '';
+            
+            if (successes.length > 0) {
+                html += '<div class="suggestions">';
+                successes.forEach(s => {
+                    html += `<div class="suggestion-item success-item">${s}</div>`;
+                });
+                html += '</div>';
+            }
+            
+            if (warnings.length > 0) {
+                html += '<div class="suggestions" style="background: #fff3e0; border-color: #ff9800;">';
+                warnings.forEach(w => {
+                    html += `<div class="suggestion-item warning-item">${w}</div>`;
+                });
+                html += '</div>';
+            }
+            
+            if (suggestions.length > 0) {
+                html += '<div class="suggestions" style="background: #e3f2fd; border-color: #2196f3;">';
+                suggestions.forEach(s => {
+                    html += `<div class="suggestion-item">${s}</div>`;
+                });
+                html += '</div>';
+            }
+            
+            if (html) {
+                document.getElementById('suggestionsContent').innerHTML = html;
+                document.getElementById('suggestions').style.display = 'block';
+            }
+        }
+        
+        function calculate() {
+            const superfat = parseFloat(document.getElementById('superfat').value);
+            const waterGrams = parseFloat(document.getElementById('waterGrams').value);
+            
+            const oilRows = document.querySelectorAll('.oil-row');
+            let totalOils = 0;
+            let totalNaOH = 0;
+            let oilsBreakdown = [];
+            
+            oilRows.forEach(row => {
+                const oilName = row.querySelector('.oil-select').value;
+                const weight = parseFloat(row.querySelector('.oil-weight').value) || 0;
+                
+                if (oilName && weight > 0) {
+                    totalOils += weight;
+                    const naoh = weight * sapValues[oilName];
+                    totalNaOH += naoh;
+                    
+                    oilsBreakdown.push({
+                        name: oilName,
+                        weight: weight,
+                        percent: 0
+                    });
+                }
+            });
+            
+            if (totalOils === 0) {
+                alert('⚠️ Ajoutez au moins une huile');
+                return;
+            }
+            
+            oilsBreakdown.forEach(oil => {
+                oil.percent = ((oil.weight / totalOils) * 100).toFixed(1);
+            });
+            
+            const naohWithSuperfat = totalNaOH * (1 - superfat / 100);
+            
+            const additiveRows = document.querySelectorAll('.additives-row');
+            let additivesBreakdown = [];
+            additiveRows.forEach(row => {
+                const name = row.querySelector('.additive-name').value;
+                const amount = parseFloat(row.querySelector('.additive-amount').value);
+                const unit = row.querySelector('.additive-unit').value;
+                
+                if (name && amount > 0) {
+                    additivesBreakdown.push({
+                        name: name,
+                        amount: amount.toFixed(1),
+                        unit: unit
+                    });
+                }
+            });
+            
+            currentRecipe = {
+                totalOils,
+                superfat,
+                waterGrams,
+                oils: oilsBreakdown,
+                additives: additivesBreakdown,
+                naoh: naohWithSuperfat,
+                water: waterGrams
+            };
+            
+            const props = calculateProperties(oilsBreakdown, totalOils);
+            
+            displayResults(currentRecipe);
+            displayProperties(props, oilsBreakdown, totalOils);
+            generateSuggestions(oilsBreakdown, totalOils, props);
+        }
+        
+        function displayResults(recipe) {
+            const resultsDiv = document.getElementById('results');
+            const content = document.getElementById('resultsContent');
+            
+            let html = `
+                <div class="result-item">
+                    <span class="result-label">💧 Soude caustique (NaOH)</span>
+                    <span class="result-value">${recipe.naoh.toFixed(1)} g</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">💦 Eau</span>
+                    <span class="result-value">${recipe.water.toFixed(1)} g</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">🫒 Poids total huiles</span>
+                    <span class="result-value">${recipe.totalOils.toFixed(1)} g</span>
+                </div>
+            `;
+            
+            if (recipe.oils.length > 0) {
+                html += `<div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #ddd;">
+                    <strong>Détail des huiles:</strong><br><br>`;
+                recipe.oils.forEach(oil => {
+                    html += `<div class="result-item">
+                        <span class="result-label">${oil.name} (${oil.percent}%)</span>
+                        <span class="result-value">${oil.weight.toFixed(1)} g</span>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+            
+            if (recipe.additives.length > 0) {
+                html += `<div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #ddd;">
+                    <strong>Ajouts:</strong><br><br>`;
+                recipe.additives.forEach(add => {
+                    html += `<div class="result-item">
+                        <span class="result-label">${add.name}</span>
+                        <span class="result-value">${add.amount} ${add.unit}</span>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+            
+            content.innerHTML = html;
+            resultsDiv.style.display = 'block';
+        }
+        
+        function scaleRecipe(factor) {
+            if (!currentRecipe || !factor || factor <= 0) {
+                alert('⚠️ Calculez d\'abord une recette et entrez un facteur valide');
+                return;
+            }
+            
+            document.getElementById('oilsContainer').innerHTML = '';
+            currentRecipe.oils.forEach(oil => {
+                addOilRow();
+                const rows = document.querySelectorAll('.oil-row');
+                const lastRow = rows[rows.length - 1];
+                lastRow.querySelector('.oil-select').value = oil.name;
+                lastRow.querySelector('.oil-weight').value = (oil.weight * factor).toFixed(0);
+            });
+            
+            document.getElementById('waterGrams').value = Math.round(currentRecipe.water * factor);
+            
+            document.getElementById('additivesContainer').innerHTML = '';
+            if (currentRecipe.additives) {
+                currentRecipe.additives.forEach(add => {
+                    addAdditiveRow();
+                    const rows = document.querySelectorAll('.additives-row');
+                    const lastRow = rows[rows.length - 1];
+                    lastRow.querySelector('.additive-name').value = add.name;
+                    lastRow.querySelector('.additive-amount').value = (parseFloat(add.amount) * factor).toFixed(1);
+                    lastRow.querySelector('.additive-unit').value = add.unit;
+                });
+            }
+            
+            updateTotalOils();
+            calculate();
+        }
+        
+        function saveRecipe() {
+            if (!currentRecipe) {
+                alert('⚠️ Calculez d\'abord une recette');
+                return;
+            }
+            
+            const name = document.getElementById('recipeName').value.trim();
+            if (!name) {
+                alert('⚠️ Donnez un nom à votre recette');
+                return;
+            }
+            
+            const recipes = JSON.parse(localStorage.getItem('safRecipes') || '[]');
+            recipes.push({
+                name: name,
+                date: new Date().toISOString(),
+                recipe: currentRecipe,
+                params: {
+                    superfat: parseFloat(document.getElementById('superfat').value),
+                    skinType: document.getElementById('skinType').value,
+                    season: document.getElementById('season').value,
+                    usage: document.getElementById('usage').value
+                }
+            });
+            
+            localStorage.setItem('safRecipes', JSON.stringify(recipes));
+            document.getElementById('recipeName').value = '';
+            loadSavedRecipes();
+            alert(`✅ Recette "${name}" sauvegardée!`);
+        }
+        
+        function loadSavedRecipes() {
+            const recipes = JSON.parse(localStorage.getItem('safRecipes') || '[]');
+            const container = document.getElementById('savedRecipes');
+            
+            if (recipes.length === 0) {
+                container.innerHTML = '<p style="color: #999;">Aucune recette sauvegardée</p>';
+                return;
+            }
+            
+            container.innerHTML = recipes.map((r, index) => `
+                <div class="recipe-card" onclick="loadRecipe(${index})">
+                    <button class="delete-recipe" onclick="event.stopPropagation(); deleteRecipe(${index})">×</button>
+                    <div class="recipe-name">${r.name}</div>
+                    <div class="recipe-info">${r.recipe.totalOils}g | Surgras ${r.params.superfat}%</div>
+                    <div class="recipe-info">${new Date(r.date).toLocaleDateString('fr-CA')}</div>
+                </div>
+            `).join('');
+        }
+        
+        function loadRecipe(index) {
+            const recipes = JSON.parse(localStorage.getItem('safRecipes') || '[]');
+            const saved = recipes[index];
+            
+            if (!saved) return;
+            
+            document.getElementById('superfat').value = saved.params.superfat;
+            document.getElementById('waterGrams').value = saved.recipe.water;
+            document.getElementById('skinType').value = saved.params.skinType || 'dry';
+            document.getElementById('season').value = saved.params.season || 'winter';
+            document.getElementById('usage').value = saved.params.usage || 'body';
+            
+            document.getElementById('oilsContainer').innerHTML = '';
+            saved.recipe.oils.forEach(oil => {
+                addOilRow();
+                const rows = document.querySelectorAll('.oil-row');
+                const lastRow = rows[rows.length - 1];
+                lastRow.querySelector('.oil-select').value = oil.name;
+                lastRow.querySelector('.oil-weight').value = oil.weight;
+            });
+            
+            document.getElementById('additivesContainer').innerHTML = '';
+            if (saved.recipe.additives) {
+                saved.recipe.additives.forEach(add => {
+                    addAdditiveRow();
+                    const rows = document.querySelectorAll('.additives-row');
+                    const lastRow = rows[rows.length - 1];
+                    lastRow.querySelector('.additive-name').value = add.name;
+                    lastRow.querySelector('.additive-amount').value = add.amount;
+                    lastRow.querySelector('.additive-unit').value = add.unit;
+                });
+            }
+            
+            updateTotalOils();
+            calculate();
+        }
+        
+        function deleteRecipe(index) {
+            if (!confirm('Supprimer cette recette?')) return;
+            
+            const recipes = JSON.parse(localStorage.getItem('safRecipes') || '[]');
+            recipes.splice(index, 1);
+            localStorage.setItem('safRecipes', JSON.stringify(recipes));
+            loadSavedRecipes();
+        }
+        
+        addOilRow();
+        loadSavedRecipes();
+    </script>
+</body>
+</html>

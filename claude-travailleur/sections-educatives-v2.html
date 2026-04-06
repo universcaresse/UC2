@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Le savon artisanal — Univers Caresse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Birthstone&display=swap" rel="stylesheet">
+  <style>
+    /* ── VARIABLES (identiques style.css) ── */
+    :root {
+      --primary:        #5a8a3a;
+      --primary-dark:   #4a6e2e;
+      --accent:         #d4a445;
+      --danger:         #c44536;
+      --blanc:          #f9f7f4;
+      --beige:          #e8dcc8;
+      --gris:           #8b8680;
+      --gris-fonce:     #3d3b39;
+      --logo:           #333333;
+      --nav-h:          72px;
+      --padding-page:   80px;
+      --padding-mobile: 20px;
+      --primary-04:     rgba(90,138,58,0.04);
+      --primary-06:     rgba(90,138,58,0.06);
+      --primary-08:     rgba(90,138,58,0.08);
+      --primary-10:     rgba(90,138,58,0.10);
+      --primary-15:     rgba(90,138,58,0.15);
+      --primary-20:     rgba(90,138,58,0.20);
+      --accent-08:      rgba(212,164,69,0.08);
+      --accent-10:      rgba(212,164,69,0.10);
+      --accent-15:      rgba(212,164,69,0.15);
+      --beige-30:       rgba(232,220,200,0.30);
+      --noir-15:        rgba(0,0,0,0.15);
+    }
+
+    /* ── RESET & BASE (identiques style.css) ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; font-weight: 300; background: var(--blanc); color: var(--gris-fonce); overflow-x: hidden; }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; }
+    p { white-space: pre-line; }
+    a { color: var(--primary); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--primary-dark); }
+
+    /* ── CLASSES DU SITE RÉUTILISÉES ── */
+    .page-entete { padding: var(--padding-page) var(--padding-page) 56px; border-bottom: 1px solid var(--beige); display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; }
+    .page-entete-gauche { max-width: 560px; }
+    .page-entete-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; font-weight: 500; }
+    .page-entete-titre { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 3.5vw, 3.2rem); font-weight: 400; line-height: 1.1; color: var(--gris-fonce); }
+    .page-entete-titre em { font-style: italic; color: var(--primary); }
+
+    .page-hero { padding: var(--padding-page) var(--padding-page) 64px; border-bottom: 1px solid var(--beige); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .page-hero-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; font-weight: 500; }
+    .page-hero-titre { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 4vw, 4rem); font-weight: 400; line-height: 1.1; color: var(--gris-fonce); margin-bottom: 8px; }
+    .page-hero-titre em { font-style: italic; color: var(--primary); display: block; }
+    .page-hero-texte { font-family: 'DM Sans', sans-serif; font-size: 1rem; line-height: 1.9; color: var(--gris); font-weight: 300; margin-top: 28px; max-width: 480px; }
+    .page-hero-visuel { display: flex; align-items: center; justify-content: center; }
+    .page-hero-visuel-bg { width: 100%; aspect-ratio: 4/5; background: var(--beige); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .page-hero-visuel-bg img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+
+    .section-texte { padding: var(--padding-page); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .texte-principal p { font-family: 'DM Sans', sans-serif; font-size: 1rem; line-height: 1.9; color: var(--gris); font-weight: 300; margin-bottom: 24px; }
+    .texte-principal p:last-child { margin-bottom: 0; }
+    .valeur-item { padding: 28px 0; border-bottom: 1px solid var(--beige); }
+    .valeur-item:first-child { padding-top: 0; }
+    .valeur-item:last-child { border-bottom: none; }
+    .valeur-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; color: var(--gris-fonce); margin-bottom: 8px; }
+    .valeur-desc { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; line-height: 1.7; color: var(--gris); font-weight: 300; }
+
+    .bandeau-citation { background: var(--primary); padding: 64px var(--padding-page); text-align: center; }
+    .citation-texte { font-family: 'Playfair Display', serif; font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 400; font-style: italic; color: white; line-height: 1.5; max-width: 800px; margin: 0 auto 20px; }
+    .citation-source { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.65); }
+
+    .bonne-section { padding: 64px var(--padding-page); border-bottom: 1px solid var(--beige); }
+    .bonne-section:last-of-type { border-bottom: none; }
+    .bonne-section-titre { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; color: var(--gris-fonce); margin-bottom: 32px; display: flex; align-items: center; gap: 16px; }
+    .bonne-section-titre::after { content: ''; flex: 1; height: 1px; background: var(--beige); }
+    .items-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+    .info-card { background: white; padding: 28px 28px 28px 24px; border-left: 3px solid var(--primary); }
+    .info-card.accent { border-left-color: var(--accent); }
+    .info-card.neutre { border-left-color: var(--beige); }
+    .info-card-titre { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gris-fonce); margin-bottom: 10px; }
+    .info-card-texte { font-family: 'DM Sans', sans-serif; font-size: 0.88rem; line-height: 1.75; color: var(--gris); font-weight: 300; }
+
+    .note-allergenes { margin: 0 var(--padding-page) 64px; background: rgba(212,164,69,0.08); border: 1px solid rgba(212,164,69,0.3); padding: 28px 32px; display: flex; gap: 20px; align-items: flex-start; }
+    .note-allergenes-texte { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; line-height: 1.7; color: var(--gris-fonce); font-weight: 300; }
+    .note-allergenes-texte strong { font-weight: 500; display: block; margin-bottom: 4px; }
+
+    /* ── PHOTO PLACEHOLDER ── */
+    .edu-photo {
+      width: 100%; aspect-ratio: 4/5;
+      background: var(--beige-30); border: 1px dashed var(--beige);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px; padding: 24px; text-align: center;
+    }
+    .edu-photo svg { width: 32px; height: 32px; color: var(--gris); opacity: 0.4; }
+    .edu-photo-legende { font-family: 'DM Sans', sans-serif; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gris); opacity: 0.6; line-height: 1.6; }
+
+    /* ── NAVIGATION ENTRE SECTIONS ── */
+    .edu-nav {
+      padding: 32px var(--padding-page);
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid var(--beige);
+      background: var(--blanc);
+    }
+    .edu-nav-btn {
+      font-family: 'DM Sans', sans-serif; font-size: 0.72rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris);
+      display: flex; align-items: center; gap: 10px;
+      transition: color 0.2s; font-weight: 400;
+    }
+    .edu-nav-btn:hover { color: var(--primary); }
+    .edu-nav-btn svg { width: 16px; height: 16px; transition: transform 0.2s; flex-shrink: 0; }
+    .edu-nav-btn.suivant:hover svg { transform: translateX(4px); }
+    .edu-nav-btn.precedent:hover svg { transform: translateX(-4px); }
+
+    /* ── SÉPARATEUR DE SECTION ── */
+    .edu-wrapper { border-bottom: 2px solid var(--beige); }
+    .edu-wrapper:last-of-type { border-bottom: none; }
+
+    /* ── NIVEAUX SURGRAISSAGE ── */
+    .edu-niveaux { display: flex; flex-direction: column; gap: 0; }
+    .edu-niveau {
+      padding: 28px 32px; border-bottom: 1px solid var(--beige);
+      display: grid; grid-template-columns: 80px 1fr; gap: 24px; align-items: start;
+    }
+    .edu-niveau:last-child { border-bottom: none; }
+    .edu-niveau-pct { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--primary); line-height: 1; }
+    .edu-niveau-label { font-family: 'DM Sans', sans-serif; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); font-weight: 500; margin-top: 4px; }
+    .edu-niveau-texte { font-family: 'DM Sans', sans-serif; font-size: 0.88rem; line-height: 1.75; color: var(--gris); font-weight: 300; margin-bottom: 12px; }
+
+    /* ── TABLEAU ── */
+    .edu-tableau-wrap { overflow-x: auto; }
+    .edu-tableau { width: 100%; border-collapse: collapse; font-family: 'DM Sans', sans-serif; }
+    .edu-tableau thead tr { border-bottom: 2px solid var(--beige); }
+    .edu-tableau th { text-align: left; padding: 10px 16px; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gris); font-weight: 500; }
+    .edu-tableau td { padding: 14px 16px; border-bottom: 1px solid rgba(232,220,200,0.4); font-size: 0.84rem; color: var(--gris); font-weight: 300; }
+    .edu-tableau tr:hover td { background: rgba(232,220,200,0.15); }
+    .edu-tableau td:first-child { font-weight: 500; color: var(--gris-fonce); }
+
+    /* ── CHECKLIST ── */
+    .edu-checklists { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 0; }
+    .edu-checklist { padding: 24px 28px 24px 24px; border-left: 3px solid var(--primary); background: white; }
+    .edu-checklist.non { border-left-color: var(--danger); }
+    .edu-checklist-titre { font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; color: var(--primary); margin-bottom: 16px; }
+    .edu-checklist.non .edu-checklist-titre { color: var(--danger); }
+    .edu-checklist-liste { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .edu-checklist-liste li { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; line-height: 1.5; color: var(--gris); font-weight: 300; }
+
+    /* ── TYPES DE PEAU ── */
+    .edu-types-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 2px; }
+    .edu-type-peau { padding: 28px 24px; background: white; border-top: 3px solid var(--beige); }
+    .edu-type-peau:nth-child(1) { border-top-color: var(--primary); }
+    .edu-type-peau:nth-child(2) { border-top-color: var(--accent); }
+    .edu-type-peau:nth-child(3) { border-top-color: var(--gris); }
+    .edu-type-peau:nth-child(4) { border-top-color: var(--primary-dark); }
+    .edu-type-peau:nth-child(5) { border-top-color: var(--danger); }
+    .edu-type-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; color: var(--gris-fonce); margin-bottom: 16px; }
+    .edu-type-label { font-family: 'DM Sans', sans-serif; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gris); font-weight: 500; margin-bottom: 6px; margin-top: 12px; display: block; }
+    .edu-type-texte { font-family: 'DM Sans', sans-serif; font-size: 0.82rem; line-height: 1.7; color: var(--gris); font-weight: 300; }
+    .edu-type-liens { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .edu-lien { font-family: 'DM Sans', sans-serif; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); padding: 5px 12px; border: 1px solid rgba(90,138,58,0.3); font-weight: 400; transition: all 0.2s; display: inline-block; }
+    .edu-lien:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* ── BESOINS SPÉCIFIQUES ── */
+    .edu-besoins { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 2px; }
+    .edu-besoin { padding: 24px 20px; background: white; }
+    .edu-besoin-titre { font-family: 'DM Sans', sans-serif; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary); font-weight: 500; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--beige); }
+    .edu-besoin-texte { font-family: 'DM Sans', sans-serif; font-size: 0.82rem; line-height: 1.7; color: var(--gris); font-weight: 300; margin-bottom: 12px; }
+
+    /* ── LIENS COLLECTIONS ── */
+    .edu-liens { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+
+    /* ── RESPONSIVE (calqué sur style.css) ── */
+    @media (max-width: 900px) {
+      .page-entete { padding: 48px var(--padding-mobile) 40px; flex-direction: column; gap: 16px; }
+      .page-hero { grid-template-columns: 1fr; padding: 48px var(--padding-mobile); gap: 40px; }
+      .page-hero-visuel-bg { aspect-ratio: 4/5; }
+      .section-texte { grid-template-columns: 1fr; padding: 48px var(--padding-mobile); gap: 48px; }
+      .bandeau-citation { padding: 48px var(--padding-mobile); }
+      .bonne-section { padding: 48px var(--padding-mobile); }
+      .note-allergenes { margin: 0 var(--padding-mobile) 48px; }
+      .edu-nav { padding: 24px var(--padding-mobile); }
+      .edu-checklists { grid-template-columns: 1fr; }
+      .edu-niveau { grid-template-columns: 60px 1fr; gap: 16px; }
+    }
+    @media (max-width: 480px) {
+      .edu-besoins { grid-template-columns: 1fr 1fr; }
+      .edu-checklists { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 1 — SAPONIFICATION À FROID
+     Layout : page-entete + page-hero (texte gauche, photo droite) + points clés bonne-section
+     ══════════════════════════════════════════════════ -->
+<div class="edu-wrapper" id="s1">
+
+  <div class="page-entete">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Le savon artisanal — 1 / 7</div>
+      <h1 class="page-entete-titre">La saponification <em>à froid</em></h1>
+    </div>
+    <p style="font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; color:var(--gris); max-width:320px; text-align:right;">Quand la chimie devient une caresse</p>
+  </div>
+
+  <div class="page-hero">
+    <div>
+      <p class="page-hero-texte" style="margin-top:0;">La saponification à froid, c'est l'alchimie douce qui transforme des huiles végétales en savon sans jamais les brutaliser par la chaleur. Contrairement aux savons industriels chauffés à haute température, cette méthode ancestrale préserve toute la richesse des ingrédients. Le processus est simple : des huiles rencontrent de l'hydroxyde de sodium dans l'eau, et ensemble, ils se transforment lentement en un savon pur et doux.</p>
+      <p class="page-hero-texte">Cette transformation prend son temps. Les molécules s'enlacent à température ambiante, créant naturellement de la glycérine — cette substance précieuse que les savons industriels extraient pour la revendre. Ici, elle reste. Elle hydrate, elle protège, elle caresse la peau à chaque usage.</p>
+      <p class="page-hero-texte">Le résultat ? Un savon vivant, riche, généreux. Chaque barre conserve les vertus intactes des huiles qui la composent : vitamines, acides gras essentiels, bienfaits naturels que la chaleur aurait détruits.</p>
+    </div>
+    <div class="page-hero-visuel">
+      <div class="page-hero-visuel-bg">
+        <div class="edu-photo" style="aspect-ratio:unset; width:100%; height:100%; border:none; background:transparent;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span class="edu-photo-legende">Processus de fabrication,<br>huiles végétales,<br>texture crémeuse de la pâte</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bonne-section">
+    <h2 class="bonne-section-titre">Pourquoi choisir un savon saponifié à froid</h2>
+    <div class="items-grille">
+      <div class="info-card">
+        <div class="info-card-titre">Glycérine naturelle préservée</div>
+        <div class="info-card-texte">Hydratation profonde à chaque usage — cette substance précieuse reste dans le savon au lieu d'être extraite et revendue.</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Huiles intactes</div>
+        <div class="info-card-texte">Vitamines et nutriments non dégradés par la chaleur. Les acides gras essentiels restent actifs, prêts à prendre soin de votre peau.</div>
+      </div>
+      <div class="info-card accent">
+        <div class="info-card-titre">Surgraissage</div>
+        <div class="info-card-texte">Un excès d'huile nourrissante reste libre dans le savon pour nourrir votre peau à chaque usage. <a href="#s3">En savoir plus →</a></div>
+      </div>
+      <div class="info-card neutre">
+        <div class="info-card-titre">Fabrication artisanale</div>
+        <div class="info-card-texte">Chaque barre est unique, faite à la main en petites séries. Aucun raccourci industriel, aucun compromis sur la qualité.</div>
+      </div>
+    </div>
+    <div class="edu-liens">
+      <a href="#" class="edu-lien">Collection SAPONICA</a>
+      <a href="#" class="edu-lien">Collection CAPRIN</a>
+      <a href="#" class="edu-lien">Collection ÉPURE</a>
+    </div>
+  </div>
+
+  <div class="edu-nav">
+    <span></span>
+    <a href="#s2" class="edu-nav-btn suivant">La cure : patience et transformation <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></a>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 2 — LA CURE
+     Layout : page-entete + section-texte (texte gauche, valeurs droite) + bandeau citation
+     ══════════════════════════════════════════════════ -->
+<div class="edu-wrapper" id="s2">
+
+  <div class="page-entete">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Le savon artisanal — 2 / 7</div>
+      <h1 class="page-entete-titre">La cure : <em>patience et transformation</em></h1>
+    </div>
+    <p style="font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; color:var(--gris); max-width:320px; text-align:right;">Le temps comme ingrédient essentiel</p>
+  </div>
+
+  <div class="section-texte">
+    <div class="texte-principal">
+      <p>Quand un savon sort du moule, il n'est pas encore prêt. Il est tendre, encore humide, en pleine métamorphose. C'est là que commence la cure — cette période de repos essentielle où le savon devient vraiment lui-même. Entre quatre et six semaines, selon la recette, il sèche lentement à l'air libre, perdant son excès d'eau tout en complétant sa transformation chimique.</p>
+      <p>Durant ces semaines de patience, la saponification se finalise. Les dernières molécules d'huile et de soude trouvent leur équilibre parfait. Le pH se stabilise, s'adoucit, devient aussi doux qu'une caresse. L'eau s'évapore progressivement, et le savon durcit, se concentre, devient plus dense.</p>
+      <p>On ne peut pas précipiter ce processus. Les savons riches en huile d'olive demandent plus de temps. Ceux chargés en beurre de karité atteignent leur douceur optimale après six semaines. C'est une leçon de patience que nous offre la matière : les meilleures choses ne se forcent pas, elles mûrissent.</p>
+      <div class="edu-liens" style="margin-top:32px;">
+        <a href="#" class="edu-lien">Collection SAPONICA</a>
+        <a href="#" class="edu-lien">Collection CAPRIN</a>
+        <a href="#" class="edu-lien">Collection ÉPURE</a>
+        <a href="#" class="edu-lien">Collection PETIT NUAGE</a>
+      </div>
+    </div>
+    <div>
+      <div class="valeur-item">
+        <div class="valeur-titre">pH optimal</div>
+        <div class="valeur-desc">Passage de caustique à doux, parfaitement équilibré pour la peau. Aucune trace de soude libre à la fin de la cure.</div>
+      </div>
+      <div class="valeur-item">
+        <div class="valeur-titre">Dureté accrue</div>
+        <div class="valeur-desc">Un savon bien curé dure 2 à 3 fois plus longtemps qu'un savon industriel. Il ne fond pas à la première goutte d'eau.</div>
+      </div>
+      <div class="valeur-item">
+        <div class="valeur-titre">Concentration maximale</div>
+        <div class="valeur-desc">L'évaporation de l'eau concentre les ingrédients actifs. Chaque gramme de savon est plus riche, plus généreux.</div>
+      </div>
+      <div class="valeur-item">
+        <div class="valeur-titre">Mousse onctueuse</div>
+        <div class="valeur-desc">La texture finale se développe pleinement après la cure. Une mousse crémeuse qui transforme chaque lavage en rituel.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bandeau-citation">
+    <p class="citation-texte">C'est pour cette raison que nos savons portent une date de fabrication. Chaque barre vous arrive après avoir complété sa cure, prête à vous offrir le meilleur d'elle-même.</p>
+    <div class="citation-source">Notre engagement envers la qualité</div>
+  </div>
+
+  <div class="edu-nav">
+    <a href="#s1" class="edu-nav-btn precedent"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg> La saponification à froid</a>
+    <a href="#s3" class="edu-nav-btn suivant">Le surgraissage <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></a>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 3 — LE SURGRAISSAGE
+     Layout : page-entete + 3 niveaux + note astuce + points clés
+     ══════════════════════════════════════════════════ -->
+<div class="edu-wrapper" id="s3">
+
+  <div class="page-entete">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Le savon artisanal — 3 / 7</div>
+      <h1 class="page-entete-titre">Le surgraissage</h1>
+    </div>
+    <p style="font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; color:var(--gris); max-width:320px; text-align:right;">L'excès qui fait toute la différence</p>
+  </div>
+
+  <div class="section-texte">
+    <div class="texte-principal">
+      <p>Le surgraissage, c'est cette générosité calculée qui transforme un savon nettoyant en véritable soin. On ajoute volontairement plus d'huile que nécessaire à la réaction chimique. Cet excédent ne se transforme pas en savon — il reste là, libre, précieux, prêt à nourrir votre peau à chaque usage.</p>
+      <p>Un savon industriel n'a pas de surgraissage. Toutes les huiles sont converties en agent nettoyant. Résultat : une peau qui tiraille, qui s'assèche, qui réclame une crème immédiatement après. Nos savons, eux, contiennent entre 5% et 10% d'huiles non saponifiées — un film protecteur invisible qui hydrate et préserve l'équilibre naturel.</p>
+      <p>Le pourcentage n'est jamais choisi au hasard. Il s'adapte à l'usage, à la peau, à la saison.</p>
+    </div>
+    <div>
+      <div class="page-hero-visuel-bg">
+        <div class="edu-photo" style="aspect-ratio:unset; width:100%; height:100%; border:none; background:transparent;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span class="edu-photo-legende">Huiles végétales dorées,<br>texture crémeuse,<br>peau hydratée après utilisation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bonne-section">
+    <h2 class="bonne-section-titre">Les trois niveaux de surgraissage</h2>
+    <div class="edu-niveaux">
+      <div class="edu-niveau">
+        <div>
+          <div class="edu-niveau-pct">5%</div>
+          <div class="edu-niveau-label">Normale à grasse</div>
+        </div>
+        <div>
+          <p class="edu-niveau-texte">Nettoie efficacement sans laisser de film gras. Idéal pour les mains et le visage des peaux qui produisent naturellement du sébum. Léger, rafraîchissant, parfaitement équilibré.</p>
+          <a href="#" class="edu-lien">Collection ÉPURE</a>
+        </div>
+      </div>
+      <div class="edu-niveau">
+        <div>
+          <div class="edu-niveau-pct">8%</div>
+          <div class="edu-niveau-label">Normale à sèche</div>
+        </div>
+        <div>
+          <p class="edu-niveau-texte">Le juste équilibre entre nettoyage et hydratation. Parfait pour un usage quotidien sur tout le corps. Nourrit sans alourdir, protège sans graisser.</p>
+          <a href="#" class="edu-lien">Collection SAPONICA</a>
+        </div>
+      </div>
+      <div class="edu-niveau">
+        <div>
+          <div class="edu-niveau-pct">10%</div>
+          <div class="edu-niveau-label">Très sèche et délicate</div>
+        </div>
+        <div>
+          <p class="edu-niveau-texte">Une générosité d'huiles nourrissantes pour les peaux fragiles, réactives ou assoiffées. Les bébés, les peaux matures, les épidermes sensibles trouvent ici une douceur incomparable.</p>
+          <a href="#" class="edu-lien">Collection PETIT NUAGE</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note-allergenes">
+    <div class="note-allergenes-texte">
+      <strong>💡 Astuce saisonnière</strong>
+      L'hiver québécois, avec son chauffage électrique et son air sec, peut assoiffer même les peaux habituellement grasses. Si vous sentez votre peau tirailler de novembre à mars, n'hésitez pas à passer temporairement à un surgraissage plus élevé. Votre peau d'été n'est pas votre peau d'hiver — écoutez-la.
+    </div>
+  </div>
+
+  <div class="edu-nav">
+    <a href="#s2" class="edu-nav-btn precedent"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg> La cure</a>
+    <a href="#s4" class="edu-nav-btn suivant">Les huiles et leurs vertus <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></a>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 4 — LES HUILES
+     Layout : page-entete + page-hero (photo gauche, texte droite) + bonne-section grille
+     ══════════════════════════════════════════════════ -->
+<div class="edu-wrapper" id="s4">
+
+  <div class="page-entete">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Le savon artisanal — 4 / 7</div>
+      <h1 class="page-entete-titre">Les huiles <em>et leurs vertus</em></h1>
+    </div>
+    <p style="font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; color:var(--gris); max-width:320px; text-align:right;">Chaque goutte a son histoire</p>
+  </div>
+
+  <!-- Photo à gauche cette fois -->
+  <div class="page-hero" style="grid-template-columns: 1fr 1fr;">
+    <div class="page-hero-visuel">
+      <div class="page-hero-visuel-bg">
+        <div class="edu-photo" style="aspect-ratio:unset; width:100%; height:100%; border:none; background:transparent;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span class="edu-photo-legende">Huiles végétales dans des flacons,<br>tournesol, olives, noix de coco,<br>karité brut</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="page-hero-texte" style="margin-top:0;">Dans un savon saponifié à froid, les huiles ne sont pas de simples ingrédients. Ce sont les âmes du savon, celles qui lui donnent sa personnalité, sa texture, ses bienfaits. Chaque huile apporte quelque chose d'unique : l'une crée une mousse généreuse, l'autre nourrit en profondeur, une troisième protège et apaise.</p>
+      <p class="page-hero-texte">Contrairement aux savons industriels où les huiles sont chauffées à haute température, la saponification à froid préserve toute leur richesse. Les acides gras essentiels, les vitamines A et E, les antioxydants naturels restent intacts, prêts à prendre soin de votre peau à chaque usage.</p>
+    </div>
+  </div>
+
+  <div class="bonne-section">
+    <h2 class="bonne-section-titre">Les huiles que nous choisissons</h2>
+    <div class="items-grille">
+      <div class="info-card">
+        <div class="info-card-titre">Tournesol — La généreuse</div>
+        <div class="info-card-texte">Riche en vitamines E, elle nourrit sans alourdir. Légère pour les peaux grasses, nourrissante pour les peaux normales. Mousse fine et crémeuse, toucher soyeux. <br><a href="#">Savons contenant tournesol</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Coco — L'alliée de la mousse</div>
+        <div class="info-card-texte">Crée une mousse abondante et onctueuse. Nettoie en profondeur, donne de la fermeté au savon. Dosée avec précision pour ne pas assécher. <br><a href="#">Savons contenant coco</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Olive — La douceur méditerranéenne</div>
+        <div class="info-card-texte">Utilisée depuis l'Antiquité. Nourrit profondément, forme un film protecteur. Sa mousse lactée demande une longue cure — récompensée par une douceur incomparable. <br><a href="#">Murmure d'Olivia</a></div>
+      </div>
+      <div class="info-card accent">
+        <div class="info-card-titre">Karité — La caresse nourrissante</div>
+        <div class="info-card-texte">Vitamines A, E, F, acides gras essentiels : une source de nutrition pure. Apaise, répare, protège les épidermes fragilisés. Texture veloutée qui perdure après le rinçage. <br><a href="#">Savons contenant karité</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Amande douce — La délicate</div>
+        <div class="info-card-texte">Pour les peaux fragiles et réactives. Apaise les démangeaisons, calme les rougeurs. Parfaite pour les bébés et les peaux matures. <br><a href="#">Collection PETIT NUAGE</a></div>
+      </div>
+      <div class="info-card neutre">
+        <div class="info-card-titre">Lait de chèvre — La tradition apaisante</div>
+        <div class="info-card-texte">Riche en vitamines A, B, C. Nourrit intensément tout en respectant l'équilibre naturel. Mousse crémeuse et réconfortante pour les peaux sensibles. <br><a href="#">Collection CAPRIN</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bandeau-citation">
+    <p class="citation-texte">Un savon n'est jamais composé d'une seule huile. C'est l'équilibre entre plusieurs qui crée la perfection.</p>
+    <div class="citation-source">La symphonie d'huiles Univers Caresse</div>
+  </div>
+
+  <div class="edu-nav">
+    <a href="#s3" class="edu-nav-btn precedent"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg> Le surgraissage</a>
+    <a href="#s5" class="edu-nav-btn suivant">Les argiles et additifs <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></a>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 5 — ARGILES ET ADDITIFS
+     Layout : page-entete + section-texte + bonne-section grille argiles + bonne-section grille additifs
+     ══════════════════════════════════════════════════ -->
+<div class="edu-wrapper" id="s5">
+
+  <div class="page-entete">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Le savon artisanal — 5 / 7</div>
+      <h1 class="page-entete-titre">Les argiles <em>et additifs</em></h1>
+    </div>
+    <p style="font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; color:var(--gris); max-width:320px; text-align:right;">Les trésors de la terre dans votre savon</p>
+  </div>
+
+  <div class="section-texte">
+    <div class="texte-principal">
+      <p>Au-delà des huiles, nos savons accueillent des alliés précieux venus de la terre et des plantes. Les argiles, les poudres végétales, les flocons d'avoine, le charbon activé — chacun apporte sa touche unique, son bienfait particulier. Ce ne sont pas de simples ajouts décoratifs : ce sont des ingrédients actifs.</p>
+      <p>Les argiles sont des cadeaux millénaires. Elles absorbent les impuretés, régulent le sébum, apaisent les irritations. Et souvent, c'est elles qui donnent aux savons leurs couleurs naturelles, sans aucun colorant artificiel. Chaque couleur a sa personnalité, son action privilégiée, sa peau de prédilection.</p>
+    </div>
+    <div>
+      <div class="page-hero-visuel-bg">
+        <div class="edu-photo" style="aspect-ratio:unset; width:100%; height:100%; border:none; background:transparent;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span class="edu-photo-legende">Argiles colorées dans des bols,<br>charbon activé noir,<br>flocons d'avoine, pétales séchées</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bonne-section">
+    <h2 class="bonne-section-titre">Les argiles</h2>
+    <div class="items-grille">
+      <div class="info-card neutre">
+        <div class="info-card-titre">Argile blanche (Kaolin)</div>
+        <div class="info-card-texte">La plus délicate. Nettoie sans agresser, absorbe légèrement l'excès de sébum. Pour les bébés et les peaux les plus sensibles. <br><a href="#">Brise des lagunes</a> • <a href="#">Délicat</a></div>
+      </div>
+      <div class="info-card accent">
+        <div class="info-card-titre">Argile jaune</div>
+        <div class="info-card-texte">L'équilibre parfait. Purifie sans décaper, tonifie, régule. Redonne de l'éclat aux teints ternes. Sa couleur dorée apporte une lumière solaire au savon. <br><a href="#">Boréal</a> • <a href="#">Éclat floral</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Argile rose</div>
+        <div class="info-card-texte">Mariage subtil entre blanche et rouge. La douceur de l'une, la force minéralisante de l'autre. Pour les peaux sensibles qui ont besoin d'un peu plus. <br><a href="#">Douce pensée</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Argile verte</div>
+        <div class="info-card-texte">La plus puissante. Absorbe l'excès de sébum, resserre les pores, matifie. L'argile des peaux grasses et des pores dilatés. <br><a href="#">Murmure d'Olivia</a> • <a href="#">Clarté verte (KÉRYS)</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Argile rouge</div>
+        <div class="info-card-texte">Améliore la microcirculation, redonne de l'éclat. Pour les peaux normales à sèches, matures ou fatiguées. Sa teinte terracotta est 100% naturelle. <br><a href="#">Jardin de roses</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bonne-section">
+    <h2 class="bonne-section-titre">Les additifs</h2>
+    <div class="items-grille">
+      <div class="info-card">
+        <div class="info-card-titre">Charbon activé</div>
+        <div class="info-card-texte">Un aimant à impuretés. Attire et capture toxines, polluants, impuretés logées dans les pores. L'allié des peaux urbaines. Marbrures noires spectaculaires. <br><a href="#">Boréal</a></div>
+      </div>
+      <div class="info-card accent">
+        <div class="info-card-titre">Avoine</div>
+        <div class="info-card-texte">Une caresse pour les peaux irritées. Apaise, adoucit, exfolie ultra-doucement. Appréciée des peaux à eczéma et de tous ceux qui cherchent un réconfort doux. <br><a href="#">Étreinte gourmande</a> • <a href="#">Pure Harmonie (KÉRYS)</a></div>
+      </div>
+      <div class="info-card neutre">
+        <div class="info-card-titre">Fleurs et pétales</div>
+        <div class="info-card-texte">Lavande, rose, calendula — pas que décoratives. La lavande apaise, la rose tonifie, le calendula répare. Chaque savon devient une petite œuvre d'art végétale. <br><a href="#">Délicat</a> • <a href="#">Jardin de roses</a></div>
+      </div>
+    </div>
+    <div class="edu-liens">
+      <a href="#" class="edu-lien">Collection SAPONICA</a>
+      <a href="#" class="edu-lien">Collection ÉPURE</a>
+      <a href="#" class="edu-lien">Toutes nos collections</a>
+    </div>
+  </div>
+
+  <div class="edu-nav">
+    <a href="#s4" class="edu-nav-btn precedent"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg> Les huiles</a>
+    <a href="#s6" class="edu-nav-btn suivant">Les huiles essentielles <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></a>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 6 — HUILES ESSENTIELLES
+     Layout : page-entete + page-hero (texte gauche, photo droite) + bonne-section grille + précautions
+     ══════════════════════════════════════════════════ -->
+<div class="edu-wrapper" id="s6">
+
+  <div class="page-entete">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Le savon artisanal — 6 / 7</div>
+      <h1 class="page-entete-titre">Les huiles <em>essentielles</em></h1>
+    </div>
+    <p style="font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; color:var(--gris); max-width:320px; text-align:right;">Les âmes parfumées de nos savons</p>
+  </div>
+
+  <div class="page-hero">
+    <div>
+      <p class="page-hero-texte" style="margin-top:0;">Les huiles essentielles ne sont pas de simples parfums. Ce sont des concentrés de plantes qui portent en eux l'essence même de la nature. Quelques gouttes suffisent pour transformer un savon : elles apportent leur parfum, certes, mais aussi leurs vertus thérapeutiques reconnues depuis des millénaires.</p>
+      <p class="page-hero-texte">Dans nos savons saponifiés à froid, les huiles essentielles restent actives. Notre méthode douce préserve leurs propriétés. Elles se libèrent au contact de l'eau, enveloppent votre peau de leurs bienfaits, transforment chaque lavage en rituel sensoriel.</p>
+    </div>
+    <div class="page-hero-visuel">
+      <div class="page-hero-visuel-bg">
+        <div class="edu-photo" style="aspect-ratio:unset; width:100%; height:100%; border:none; background:transparent;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span class="edu-photo-legende">Flacons d'huiles essentielles,<br>lavande, menthe, eucalyptus,<br>romarin frais</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bonne-section">
+    <h2 class="bonne-section-titre">Les huiles essentielles de nos savons</h2>
+    <div class="items-grille">
+      <div class="info-card accent">
+        <div class="info-card-titre">Lavande vraie — L'apaisante</div>
+        <div class="info-card-texte">Apaisante, cicatrisante, régulatrice. Convient à tous les types de peaux. Transforme la douche en moment de sérénité. <br><a href="#">Délicat</a> • <a href="#">Nuage de lavande</a> • <a href="#">Pure Harmonie (KÉRYS)</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Eucalyptus — Le purifiant</div>
+        <div class="info-card-texte">Fraîcheur intense, presque mentholée. Resserre les pores, purifie en profondeur. Sous la douche, c'est comme une bouffée d'air frais. <br><a href="#">Savons contenant eucalyptus</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Menthe poivrée — La vivifiante</div>
+        <div class="info-card-texte">L'huile essentielle du réveil. Stimule, rafraîchit, chasse la torpeur. Idéale pour les douches matinales et les peaux fatiguées. <br><a href="#">Jardin d'Aurore</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Romarin — Le tonifiant</div>
+        <div class="info-card-texte">Tonifiante, purifiante, régénérante. Stimule la circulation, revitalise les tissus, apporte de l'éclat. Parfum herbacé des garrigues méditerranéennes. <br><a href="#">Murmure d'Olivia</a></div>
+      </div>
+      <div class="info-card neutre">
+        <div class="info-card-titre">Cèdre — Le boisé</div>
+        <div class="info-card-texte">Profondeur boisée, presque masculine. Apaisant, purifiant pour tous types de peaux. Parfum chaud et résineux des forêts anciennes. <br><a href="#">Boréal</a> • <a href="#">Collection LUI</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Géranium rosat — L'équilibrant</div>
+        <div class="info-card-texte">Régule la production de sébum. Précieuse pour les peaux mixtes. Parfum floral légèrement rosé, douceur féminine sans être sucré. <br><a href="#">Douce pensée</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Ylang-ylang — La sensuelle</div>
+        <div class="info-card-texte">La chaleur des tropiques. Régule le sébum, tonifie, apaise. Quelques gouttes suffisent à transformer un savon en expérience olfactive. <br><a href="#">Douce pensée</a></div>
+      </div>
+      <div class="info-card accent">
+        <div class="info-card-titre">Citron — Le lumineux</div>
+        <div class="info-card-texte">Fraîcheur pétillante, presque solaire. Illumine le teint, resserre les pores, purifie. L'huile essentielle du matin, de l'énergie. <br><a href="#">Rayon lumineux (KÉRYS)</a> • <a href="#">Collection LUI</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Thé vert — L'antioxydant</div>
+        <div class="info-card-texte">Protège contre les agressions, lutte contre le vieillissement prématuré. L'huile essentielle des peaux urbaines exposées à la pollution. <br><a href="#">Délicat</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-titre">Petitgrain — Le relaxant</div>
+        <div class="info-card-texte">Fraîcheur verte et florale. Rééquilibrante pour les peaux grasses et mixtes. Parfum entre fleur d'oranger et agrumes, atmosphère de détente raffinée. <br><a href="#">Boréal</a></div>
+      </div>
+      <div class="info-card neutre">
+        <div class="info-card-titre">Palmarosa — La régénérante</div>
+        <div class="info-card-texte">Stimule le renouvellement cellulaire, maintient l'hydratation. Pour tous les types de peaux, particulièrement les peaux sèches et matures. <br><a href="#">Boréal</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note-allergenes">
+    <div class="note-allergenes-texte">
+      <strong>Précautions d'usage</strong>
+      <strong>Femmes enceintes et allaitantes :</strong> certaines huiles essentielles sont déconseillées. Privilégiez les savons sans HE ou consultez votre médecin. &nbsp;&nbsp;<strong>Bébés et jeunes enfants :</strong> préférez la <a href="#">Collection PETIT NUAGE</a>, formulée sans huiles essentielles. &nbsp;&nbsp;<strong>Peaux très sensibles :</strong> testez toujours un nouveau savon sur une petite zone avant usage complet.
+    </div>
+  </div>
+
+  <div class="edu-nav">
+    <a href="#s5" class="edu-nav-btn precedent"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg> Les argiles et additifs</a>
+    <a href="#s7" class="edu-nav-btn suivant">Connaître sa peau <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></a>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 7 — CONNAÎTRE SA PEAU
+     Layout : page-entete + types de peau grille + astuce + besoins + tableau + checklists
+     ══════════════════════════════════════════════════ -->
+<div class="edu-wrapper" id="s7">
+
+  <div class="page-entete">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Le savon artisanal — 7 / 7</div>
+      <h1 class="page-entete-titre">Connaître sa peau <em>et choisir son savon</em></h1>
+    </div>
+    <p style="font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; color:var(--gris); max-width:320px; text-align:right;">Le guide pour trouver votre allié parfait</p>
+  </div>
+
+  <div class="bonne-section">
+    <h2 class="bonne-section-titre">Identifier votre type de peau</h2>
+    <div class="edu-types-grille">
+      <div class="edu-type-peau">
+        <div class="edu-type-titre">Peau normale</div>
+        <span class="edu-type-label">Les signes</span>
+        <p class="edu-type-texte">Confortable toute la journée, ni brillances ni tiraillements. Grain de peau régulier, pores peu visibles.</p>
+        <span class="edu-type-label">Ce qu'elle aime</span>
+        <p class="edu-type-texte">Savons équilibrés, surgraissage 5-8%, huiles légères (tournesol, coco), argiles douces (blanche, jaune).</p>
+        <div class="edu-type-liens">
+          <a href="#" class="edu-lien">SAPONICA</a>
+          <a href="#" class="edu-lien">ÉPURE</a>
+        </div>
+      </div>
+      <div class="edu-type-peau">
+        <div class="edu-type-titre">Peau sèche</div>
+        <span class="edu-type-label">Les signes</span>
+        <p class="edu-type-texte">Tiraillement après le lavage, particulièrement en hiver. Texture parfois rugueuse, pores fins, peu visibles.</p>
+        <span class="edu-type-label">Ce qu'elle aime</span>
+        <p class="edu-type-texte">Savons riches, surgraissage 8-10%, huiles nourrissantes (olive, karité, amande douce), avoine apaisante.</p>
+        <div class="edu-type-liens">
+          <a href="#" class="edu-lien">PETIT NUAGE</a>
+          <a href="#" class="edu-lien">Étreinte gourmande</a>
+        </div>
+      </div>
+      <div class="edu-type-peau">
+        <div class="edu-type-titre">Peau grasse</div>
+        <span class="edu-type-label">Les signes</span>
+        <p class="edu-type-texte">Brillances sur la zone T, pores dilatés, tendance aux imperfections.</p>
+        <span class="edu-type-label">Ce qu'elle aime</span>
+        <p class="edu-type-texte">Savons purifiants, surgraissage 3-5%, argiles absorbantes (verte, jaune), charbon activé, HE purifiantes.</p>
+        <div class="edu-type-liens">
+          <a href="#" class="edu-lien">Murmure d'Olivia</a>
+          <a href="#" class="edu-lien">Clarté verte</a>
+        </div>
+      </div>
+      <div class="edu-type-peau">
+        <div class="edu-type-titre">Peau mixte</div>
+        <span class="edu-type-label">Les signes</span>
+        <p class="edu-type-texte">Zone T grasse, joues normales à sèches. Le grand classique : deux peaux en une.</p>
+        <span class="edu-type-label">Ce qu'elle aime</span>
+        <p class="edu-type-texte">Savons équilibrants, argiles régulatrices (jaune, rose), HE régulatrices (géranium, petitgrain), surgraissage 5-8%.</p>
+        <div class="edu-type-liens">
+          <a href="#" class="edu-lien">Douce pensée</a>
+        </div>
+      </div>
+      <div class="edu-type-peau">
+        <div class="edu-type-titre">Peau sensible</div>
+        <span class="edu-type-label">Les signes</span>
+        <p class="edu-type-texte">Réactions fréquentes, rougeurs, démangeaisons. Peau fine, réactive au froid, au chaud, au stress.</p>
+        <span class="edu-type-label">Ce qu'elle aime</span>
+        <p class="edu-type-texte">Savons doux, surgraissage 8-10%, argiles délicates (blanche, rose), avoine apaisante, HE douces ou aucune HE.</p>
+        <div class="edu-type-liens">
+          <a href="#" class="edu-lien">PETIT NUAGE</a>
+          <a href="#" class="edu-lien">Délicat</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note-allergenes">
+    <div class="note-allergenes-texte">
+      <strong>💡 Astuce saisonnière</strong>
+      L'hiver québécois, avec son chauffage électrique et son air sec, peut assoiffer même les peaux habituellement grasses. Si vous sentez votre peau tirailler de novembre à mars, n'hésitez pas à passer temporairement à un surgraissage plus élevé. Une peau grasse en été peut avoir besoin d'un savon pour peau normale en hiver. Écoutez votre peau — elle sait ce dont elle a besoin.
+    </div>
+  </div>
+
+  <div class="bonne-section">
+    <h2 class="bonne-section-titre">Choisir selon votre usage</h2>
+    <div class="edu-besoins">
+      <div class="edu-besoin">
+        <div class="edu-besoin-titre">Pour le visage</div>
+        <p class="edu-besoin-texte">Savons doux, surgraissés 8-10%, argiles adaptées à votre type de peau. Éviter les formules trop purifiantes.</p>
+        <a href="#" class="edu-lien">Délicat</a>
+      </div>
+      <div class="edu-besoin">
+        <div class="edu-besoin-titre">Pour le corps</div>
+        <p class="edu-besoin-texte">Surgraissage 5-8%, savons purifiants ou nourrissants selon votre peau.</p>
+        <a href="#" class="edu-lien">Collection SAPONICA</a>
+      </div>
+      <div class="edu-besoin">
+        <div class="edu-besoin-titre">Pour les mains</div>
+        <p class="edu-besoin-texte">Lavage fréquent = douceur essentielle. Surgraissage 5%, huiles protectrices.</p>
+        <a href="#" class="edu-lien">Collection ÉPURE</a>
+      </div>
+      <div class="edu-besoin">
+        <div class="edu-besoin-titre">Pour les bébés</div>
+        <p class="edu-besoin-texte">Douceur absolue : surgraissage 10%, sans huiles essentielles, argiles délicates.</p>
+        <a href="#" class="edu-lien">Collection PETIT NUAGE</a>
+      </div>
+      <div class="edu-besoin">
+        <div class="edu-besoin-titre">Pour les cheveux</div>
+        <p class="edu-besoin-texte">Shampoings solides formulés par type : gras, normaux, secs/bouclés.</p>
+        <a href="#" class="edu-lien">Collection KÉRYS</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="bonne-section">
+    <h2 class="bonne-section-titre">Votre guide rapide</h2>
+    <div class="edu-tableau-wrap">
+      <table class="edu-tableau">
+        <thead>
+          <tr>
+            <th>Type de peau</th>
+            <th>Surgraissage</th>
+            <th>Huiles privilégiées</th>
+            <th>Argiles / Additifs</th>
+            <th>Collections</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Normale</td><td>5–8%</td><td>Tournesol, coco, karité</td><td>Blanche, jaune</td><td><a href="#">SAPONICA</a>, <a href="#">ÉPURE</a></td></tr>
+          <tr><td>Sèche</td><td>8–10%</td><td>Olive, karité, amande</td><td>Rose, avoine</td><td><a href="#">PETIT NUAGE</a>, <a href="#">CAPRIN</a></td></tr>
+          <tr><td>Grasse</td><td>3–5%</td><td>Tournesol, coco</td><td>Verte, charbon</td><td><a href="#">ÉPURE</a>, <a href="#">PURÉLIA</a></td></tr>
+          <tr><td>Mixte</td><td>5–8%</td><td>Équilibrées</td><td>Jaune, rose</td><td><a href="#">SAPONICA</a></td></tr>
+          <tr><td>Sensible</td><td>8–10%</td><td>Amande, karité</td><td>Blanche, avoine</td><td><a href="#">PETIT NUAGE</a>, <a href="#">CAPRIN</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bonne-section">
+    <h2 class="bonne-section-titre">Testez et écoutez votre peau</h2>
+    <div class="edu-checklists">
+      <div class="edu-checklist">
+        <div class="edu-checklist-titre">Signes qu'il vous convient</div>
+        <ul class="edu-checklist-liste">
+          <li>Peau confortable, pas de tiraillements</li>
+          <li>Aucune irritation ou rougeur</li>
+          <li>Sensation de propreté sans effet décapant</li>
+          <li>Hydratation qui dure plusieurs heures</li>
+        </ul>
+      </div>
+      <div class="edu-checklist non">
+        <div class="edu-checklist-titre">Signes qu'il ne convient pas</div>
+        <ul class="edu-checklist-liste">
+          <li>Tiraillements après le rinçage</li>
+          <li>Rougeurs, démangeaisons, inconfort</li>
+          <li>Peau qui brille excessivement ou qui pèle</li>
+          <li>Besoin urgent de crème hydratante</li>
+        </ul>
+      </div>
+    </div>
+    <div class="edu-liens" style="margin-top:32px;">
+      <a href="#" class="edu-lien">Toutes nos collections</a>
+      <a href="#" class="edu-lien">Nous contacter pour des conseils</a>
+    </div>
+  </div>
+
+  <div class="edu-nav">
+    <a href="#s6" class="edu-nav-btn precedent"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg> Les huiles essentielles</a>
+    <a href="#s1" class="edu-nav-btn suivant">Retour au début <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></a>
+  </div>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="Images/plume.png">
+  <title>Univers Caresse — Savonnerie artisanale</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Birthstone&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style2.css">
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav id="nav">
+  <ul class="nav-liens" id="nav-liens">
+    <li><a href="#accueil" class="actif" onclick="naviguer('accueil')">Accueil</a></li>
+    <li><a href="#catalogue" onclick="naviguer('catalogue')">Catalogue</a></li>
+    <li><a href="#educatif" onclick="naviguer('educatif')">Le savon artisanal</a></li>
+    <li><a href="#bon-a-savoir" onclick="naviguer('bon-a-savoir')">Bon à savoir</a></li>
+    <li><a href="#contact" onclick="naviguer('contact')">Contact</a></li>
+  </ul>
+</nav>
+<button class="burger burger-flottant" id="burger" onclick="toggleMenu()">
+  <span></span><span></span><span></span>
+</button>
+
+<main>
+
+  <!-- ══════════════════════════════════
+       SECTION ACCUEIL
+  ══════════════════════════════════ -->
+  <section id="section-accueil" class="page-section active">
+
+    <div class="col-2 col-2-hero">
+      <div class="col-contenu fade-in">
+        <p class="eyebrow" id="contenu-accueil-eyebrow"></p>
+        <img src="Images/Logofinal.png" alt="Univers Caresse" class="logo fade-in delay-3">
+        <a href="#catalogue" class="btn btn-primary btn-lg fade-in-doux delay-4 invisible" onclick="naviguer('catalogue')">
+          <span id="contenu-accueil-cta"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <div class="stats fade-in delay-5">
+          <div class="stat-item">
+            <div class="titre-4 em-primary" id="hero-stat-collections">—</div>
+            <div class="texte-4 em-upper em-gris">Collections</div>
+          </div>
+          <div class="stat-item">
+            <div class="titre-4 em-primary" id="hero-stat-produits">—</div>
+            <div class="texte-4 em-upper em-gris">Produits</div>
+          </div>
+          <div class="stat-item">
+            <div class="titre-4 em-primary" id="contenu-accueil-stat-valeur">—</div>
+            <div class="texte-4 em-upper em-gris">Artisanal</div>
+          </div>
+        </div>
+      </div>
+      <div class="mosaique">
+        <div class="mosaique-item">
+          <div class="mosaique-bloc mosaique-bloc-accent">
+            <div class="mosaique-label">
+              <span class="mosaique-nom">nouvelles</span>
+              <span class="mosaique-col">livre</span>
+            </div>
+          </div>
+        </div>
+        <div class="mosaique-item">
+          <div class="mosaique-bloc mosaique-bloc-primary">
+            <div class="mosaique-label">
+              <span class="mosaique-nom">disponible</span>
+              <span class="mosaique-col">en prod</span>
+            </div>
+          </div>
+        </div>
+        <div class="mosaique-item">
+          <div class="mosaique-bloc mosaique-bloc-gris">
+            <div class="mosaique-label">
+              <span class="mosaique-nom">à voir</span>
+              <span class="mosaique-col">thème</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- QUI SOMMES-NOUS -->
+    <div class="col-2 fade-in">
+    <div class="pile">
+        <p class="eyebrow" id="contenu-qui-eyebrow"></p>
+        <h1 class="titre-2" id="contenu-qui-titre"></h1>
+        <p class="texte-1" id="contenu-qui-texte"></p>
+        <div class="signature" id="contenu-qui-signature-nom"></div>
+        <div class="texte-3 em-upper em-gris" id="contenu-qui-signature-titre"></div>
+      </div>
+      <div class="photo photo-3-4 fade-in delay-1">
+        <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774627932/a-warm-inviting-photograph-of-an-artisan_uCbddMjKSkWQWJrd_XQJdg_VTqWCfYYQ_Kna8JgcGw28A_lmm3kj.jpg" alt="Atelier Univers Caresse" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <!-- TEXTE + VALEURS -->
+    <div class="col-2">
+      <div class="pile fade-in delay-1">
+        <p class="texte-1" id="contenu-section-texte-p1"></p>
+        <p class="texte-1" id="contenu-section-texte-p2"></p>
+        <p class="texte-1" id="contenu-section-texte-p3"></p>
+        <div class="photo photo-16-9">
+          <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774628531/a-portrait-oriented-wide-shot-photograph_UA7yPYBBSgOecAa7wOi9rg_spPvtpQoRN-GmTAeUlQQwg_cover_qnihfd.jpg" alt="Atelier Univers Caresse" onerror="this.style.display='none'">
+        </div>
+      </div>
+      <div class="pile fade-in delay-2">
+        <div class="valeur">
+          <div class="titre-3 em-gris">01</div>
+          <div class="titre-5" id="contenu-valeur-01-titre"></div>
+          <p class="texte-2 em-gris" id="contenu-valeur-01-desc"></p>
+        </div>
+        <div class="valeur">
+          <div class="titre-3 em-gris">02</div>
+          <div class="titre-5" id="contenu-valeur-02-titre"></div>
+          <p class="texte-2 em-gris" id="contenu-valeur-02-desc"></p>
+        </div>
+        <div class="valeur">
+          <div class="titre-3 em-gris">03</div>
+          <div class="titre-5" id="contenu-valeur-03-titre"></div>
+          <p class="texte-2 em-gris" id="contenu-valeur-03-desc"></p>
+        </div>
+        <div class="valeur">
+          <div class="titre-3 em-gris">04</div>
+          <div class="titre-5" id="contenu-valeur-04-titre"></div>
+          <p class="texte-2 em-gris" id="contenu-valeur-04-desc"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CITATION -->
+    <div class="bandeau bandeau-primary">
+      <p class="titre-3 em-italic em-blanc">«&nbsp;<span id="contenu-citation-texte"></span>&nbsp;»</p>
+      <span class="texte-4 em-upper em-blanc" id="contenu-citation-source"></span>
+    </div>
+
+    <!-- COLLECTIONS -->
+    <div class="section-entete">
+      <h2 class="section-entete-titre">Nos <em>collections</em></h2>
+      <div class="section-entete-ligne"></div>
+      <span class="section-entete-count" id="collections-count"></span>
+    </div>
+    <div class="zone-js">
+      <div class="zone-js-strip" id="collections-strip"></div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <div>
+    <div class="titre-5">univers caresse</div>
+    <div class="signature em-accent">La douceur à chaque geste</div>
+  </div>
+  <div class="texte-3 em-gris">© 2026 Univers Caresse — Savonnerie artisanale</div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

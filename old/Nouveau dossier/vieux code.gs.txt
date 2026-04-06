@@ -1,0 +1,2705 @@
+/**
+ * UNIVERS CARESSE
+ * Système de gestion des achats d'ingrédients
+ */
+
+// ========================================
+// CONFIGURATION
+// ========================================
+
+const CONFIG = {
+  SHEETS: {
+    FACTURES: 'Factures',
+    ACHATS: 'Achats',
+    INVENTAIRE: 'Inventaire_ingredients',
+    FOURNISSEURS: 'Fournisseurs'
+  },
+  HE_DENSITY: 0.9
+};
+
+// ========================================
+// INITIALISATION DES FEUILLES
+// ========================================
+
+function initializeSheets() {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+
+  // FACTURES
+  let factures = ss.getSheetByName(CONFIG.SHEETS.FACTURES);
+  if (!factures) {
+    factures = ss.insertSheet(CONFIG.SHEETS.FACTURES);
+  } else {
+    factures.clearContents();
+  }
+  factures.appendRow(['Numéro Facture','Date','Fournisseur','Sous-total','TPS','TVQ','Livraison','Total','Facteur majoration','Statut']);
+  factures.getRange('A1:J1').setFontWeight('bold').setBackground('#e8f5e9');
+
+  // ACHATS
+  let achats = ss.getSheetByName(CONFIG.SHEETS.ACHATS);
+  if (!achats) {
+    achats = ss.insertSheet(CONFIG.SHEETS.ACHATS);
+  } else {
+    achats.clearContents();
+  }
+  achats.appendRow(['code_barres','num_facture','date','fournisseur','type','ingredient','format_qte','format_unite','prix_unitaire','prix_par_g','prix_par_g_reel','quantite','prix_total','notes']);
+  achats.getRange('A1:N1').setFontWeight('bold').setBackground('#e3f2fd');
+
+  // INVENTAIRE
+  let inventaire = ss.getSheetByName(CONFIG.SHEETS.INVENTAIRE);
+  if (!inventaire) {
+    inventaire = ss.insertSheet(CONFIG.SHEETS.INVENTAIRE);
+    inventaire.appendRow(['Code-barres','Ingrédient','Type','Quantité totale (g)','Prix/g','Prix/g réel','Fournisseur','Dernier achat']);
+    inventaire.getRange('A1:H1').setFontWeight('bold').setBackground('#fff3e0');
+  }
+
+  return { factures, achats, inventaire };
+}
+
+// ========================================
+// GESTION DES FACTURES
+// ========================================
+
+function createInvoice(numeroFacture, date, fournisseur) {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    let factures = ss.getSheetByName(CONFIG.SHEETS.FACTURES);
+    if (!factures) {
+      initializeSheets();
+      factures = ss.getSheetByName(CONFIG.SHEETS.FACTURES);
+    }
+    const data = factures.getDataRange().getValues();
+
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === String(numeroFacture)) {
+        return { success: false, message: 'Cette facture existe déjà' };
+      }
+    }
+
+    factures.appendRow([numeroFacture, date, fournisseur, 0, 0, 0, 0, 0, 1, 'En cours']);
+    return { success: true, message: 'Facture créée avec succès', numeroFacture };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+function finalizeInvoice(data) {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const facturesSheet = ss.getSheetByName(CONFIG.SHEETS.FACTURES);
+    const achatsSheet   = ss.getSheetByName(CONFIG.SHEETS.ACHATS);
+    if (!facturesSheet) return { success: false, message: 'Feuille Factures introuvable' };
+
+    const numeroFacture = data.numeroFacture;
+    const tps           = parseFloat(data.tps) || 0;
+    const tvq           = parseFloat(data.tvq) || 0;
+    const livraison     = parseFloat(data.livraison) || 0;
+    const sousTotal     = parseFloat(data.sousTotal) || 0;
+    const total         = sousTotal + tps + tvq + livraison;
+    const facteur       = sousTotal > 0 ? total / sousTotal : 1;
+
+    // Mettre à jour la facture
+    const facturesData = facturesSheet.getDataRange().getValues();
+    for (let i = 1; i < facturesData.length; i++) {
+      if (String(facturesData[i][0]) === String(numeroFacture)) {
+        facturesSheet.getRange(i + 1, 4).setValue(sousTotal.toFixed(2));
+        facturesSheet.getRange(i + 1, 5).setValue(tps.toFixed(2));
+        facturesSheet.getRange(i + 1, 6).setValue(tvq.toFixed(2));
+        facturesSheet.getRange(i + 1, 7).setValue(livraison.toFixed(2));
+        facturesSheet.getRange(i + 1, 8).setValue(total.toFixed(2));
+        facturesSheet.getRange(i + 1, 9).setValue(facteur.toFixed(6));
+        facturesSheet.getRange(i + 1, 10).setValue('Finalisée');
+        break;
+      }
+    }
+
+    // Mettre à jour prix_par_g_reel sur chaque item de la facture
+    if (achatsSheet) {
+      const achatsData = achatsSheet.getDataRange().getValues();
+      for (let i = 1; i < achatsData.length; i++) {
+        if (String(achatsData[i][1]) === String(numeroFacture)) {
+          const prixParG = parseFloat(achatsData[i][9]) || 0;
+          achatsSheet.getRange(i + 1, 11).setValue((prixParG * facteur).toFixed(6));
+        }
+      }
+    }
+
+   mettreAJourInventaire(numeroFacture, facteur);
+    return { success: true, message: 'Facture finalisée', total: total.toFixed(2), facteur: facteur.toFixed(4) };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+
+
+function diminuerStockRecette(recette_id) {
+  try {
+    const ss              = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const recettesSheet   = ss.getSheetByName('Recettes');
+    const inventaireSheet = ss.getSheetByName(CONFIG.SHEETS.INVENTAIRE);
+    const configSheet     = getConfigSheet();
+
+    if (!recettesSheet || !inventaireSheet) 
+      return { success: false, message: 'Feuille introuvable' };
+
+    // Charger les marges de perte par type
+    const configData = configSheet.getDataRange().getValues();
+    const marges = {};
+    for (let i = 1; i < configData.length; i++) {
+      if (configData[i][0]) {
+        marges[configData[i][0]] = parseFloat(configData[i][3]) || 0;
+      }
+    }
+
+    // Charger les ingrédients de la recette
+    const recettesData = recettesSheet.getDataRange().getValues();
+    const ingredients  = [];
+    for (let i = 1; i < recettesData.length; i++) {
+      if (String(recettesData[i][0]) === String(recette_id) && recettesData[i][11]) {
+        ingredients.push({
+          type:       recettesData[i][11] || '',
+          nom:        recettesData[i][12] || '',
+          quantite_g: parseFloat(recettesData[i][13]) || 0
+        });
+      }
+    }
+
+    if (ingredients.length === 0)
+      return { success: false, message: 'Recette introuvable ou sans ingrédients' };
+
+    // Diminuer le stock
+    const inventaireData = inventaireSheet.getDataRange().getValues();
+    for (const ing of ingredients) {
+      const marge      = marges[ing.type] || 0;
+      const qteRetirer = ing.quantite_g * (1 + marge);
+
+      for (let j = 1; j < inventaireData.length; j++) {
+        if (String(inventaireData[j][1]) === String(ing.nom) &&
+            String(inventaireData[j][2]) === String(ing.type)) {
+          const stockActuel = parseFloat(inventaireData[j][3]) || 0;
+          const nouveauStock = Math.max(0, stockActuel - qteRetirer);
+          inventaireSheet.getRange(j + 1, 4).setValue(nouveauStock);
+          inventaireData[j][3] = nouveauStock;
+          break;
+        }
+      }
+    }
+
+    return { success: true, message: 'Stock mis à jour' };
+  } catch (e) {
+    return { success: false, message: 'Erreur: ' + e.message };
+  }
+}
+
+
+
+
+function mettreAJourInventaire(numeroFacture, facteur) {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+  const achatsSheet     = ss.getSheetByName(CONFIG.SHEETS.ACHATS);
+  const inventaireSheet = ss.getSheetByName(CONFIG.SHEETS.INVENTAIRE);
+  if (!achatsSheet || !inventaireSheet) return;
+
+  const achatsData     = achatsSheet.getDataRange().getValues();
+  const inventaireData = inventaireSheet.getDataRange().getValues();
+
+  for (let i = 1; i < achatsData.length; i++) {
+    const row = achatsData[i];
+    if (String(row[1]) !== String(numeroFacture)) continue;
+
+    const ingredient   = row[5]  || '';
+    const type         = row[4]  || '';
+    const fournisseur  = row[3]  || '';
+    const quantite     = parseFloat(row[11]) || 0;
+    const formatQte    = parseFloat(row[6])  || 0;
+    const formatUnite  = row[7]  || 'g';
+    const prixParG     = parseFloat(row[9])  || 0;
+    const prixParGReel = parseFloat(row[10]) || 0;
+    const date         = row[2]  || '';
+
+    // Convertir en grammes
+    let grammesParUnite = formatQte;
+    if (formatUnite === 'L')  grammesParUnite = formatQte * 1000;
+    if (formatUnite === 'kg') grammesParUnite = formatQte * 1000;
+    const grammesAjoutes = quantite * grammesParUnite;
+
+    // Chercher si l'ingrédient existe déjà
+    let trouve = false;
+    for (let j = 1; j < inventaireData.length; j++) {
+      if (String(inventaireData[j][1]) === String(ingredient) &&
+          String(inventaireData[j][2]) === String(type)) {
+        const stockActuel = parseFloat(inventaireData[j][3]) || 0;
+        inventaireSheet.getRange(j + 1, 4).setValue(stockActuel + grammesAjoutes);
+        inventaireSheet.getRange(j + 1, 5).setValue(prixParG);
+        inventaireSheet.getRange(j + 1, 6).setValue(prixParGReel);
+        inventaireSheet.getRange(j + 1, 7).setValue(fournisseur);
+        inventaireSheet.getRange(j + 1, 8).setValue(date);
+        inventaireData[j][3] = stockActuel + grammesAjoutes; // mise à jour locale
+        trouve = true;
+        break;
+      }
+    }
+
+    // Nouvel ingrédient
+    if (!trouve) {
+      inventaireSheet.appendRow([
+        '', ingredient, type, grammesAjoutes,
+        prixParG, prixParGReel, fournisseur, date
+      ]);
+      inventaireData.push(['', ingredient, type, grammesAjoutes,
+        prixParG, prixParGReel, fournisseur, date]);
+    }
+  }
+}
+
+
+
+
+function getInvoicesListWithFilters() {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const facturesSheet = ss.getSheetByName(CONFIG.SHEETS.FACTURES);
+    const achatsSheet   = ss.getSheetByName(CONFIG.SHEETS.ACHATS);
+
+    if (!facturesSheet || !achatsSheet) {
+      return { invoices: [], fournisseurs: [], types: [], ingredients: [] };
+    }
+
+    const facturesData = facturesSheet.getDataRange().getValues();
+    const achatsData   = achatsSheet.getDataRange().getValues();
+    const invoices     = [];
+    const fournisseursSet = new Set();
+    const typesSet        = new Set();
+    const ingredientsSet  = new Set();
+
+    for (let i = 1; i < facturesData.length; i++) {
+      if (facturesData[i][0]) {
+        const numero = facturesData[i][0];
+        let dateStr  = facturesData[i][1];
+        if (dateStr instanceof Date) {
+          dateStr = Utilities.formatDate(dateStr, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+        }
+
+        const fournisseur = facturesData[i][2];
+        fournisseursSet.add(fournisseur);
+
+        const factureTypes       = [];
+        const factureIngredients = [];
+
+        for (let j = 1; j < achatsData.length; j++) {
+          if (String(achatsData[j][1]) === String(numero)) {
+            const type       = achatsData[j][4];
+            const ingredient = achatsData[j][5];
+            if (type && !factureTypes.includes(type))             { factureTypes.push(type); typesSet.add(type); }
+            if (ingredient && !factureIngredients.includes(ingredient)) { factureIngredients.push(ingredient); ingredientsSet.add(ingredient); }
+          }
+        }
+
+        invoices.push({
+          numero,
+          date:        dateStr,
+          dateRaw:     dateStr,
+          fournisseur,
+          tps:         facturesData[i][4] || 0,
+          tvq:         facturesData[i][5] || 0,
+          livraison:   facturesData[i][6] || 0,
+          total:       facturesData[i][7] || 0,
+          facteur:     facturesData[i][8] || 1,
+          statut:      facturesData[i][9],
+          types:       factureTypes,
+          ingredients: factureIngredients
+        });
+      }
+    }
+
+    return {
+      invoices,
+      fournisseurs: Array.from(fournisseursSet).sort(),
+      types:        Array.from(typesSet).sort(),
+      ingredients:  Array.from(ingredientsSet).sort()
+    };
+  } catch (error) {
+    return { invoices: [], fournisseurs: [], types: [], ingredients: [] };
+  }
+}
+
+// ========================================
+// GESTION DES PRODUITS
+// ========================================
+
+function addProduct(productData) {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const achats = ss.getSheetByName(CONFIG.SHEETS.ACHATS);
+    if (!achats) return { success: false, message: 'Feuille Achats introuvable' };
+
+    const quantite     = parseFloat(productData.quantite) || 0;
+    const prixUnitaire = parseFloat(productData.prixUnitaire) || 0;
+    const formatQte    = parseFloat(productData.formatQte) || 0;
+    const formatUnite  = productData.formatUnite || 'g';
+    const prixTotal    = (quantite * prixUnitaire).toFixed(2);
+
+   const prixParG = productData.prixParG ? parseFloat(productData.prixParG) : 0;
+
+    achats.appendRow([
+      productData.codeBarres || '',
+      productData.numFacture,
+      productData.date || '',
+      productData.fournisseur || '',
+      productData.type || '',
+      productData.ingredient || '',
+      formatQte,
+      formatUnite,
+      prixUnitaire,
+      prixParG,
+      0, // prix_par_g_reel — calculé à la finalisation
+      quantite,
+      prixTotal,
+      productData.notes || ''
+    ]);
+
+    return { success: true, message: 'Produit ajouté', prixTotal };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+function getInvoiceProducts(numeroFacture) {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const achatsSheet = ss.getSheetByName(CONFIG.SHEETS.ACHATS);
+    if (!achatsSheet) return { success: false, message: 'Feuille Achats introuvable' };
+
+    const data     = achatsSheet.getDataRange().getValues();
+    const products = [];
+    let total      = 0;
+
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][1]) === String(numeroFacture)) {
+        const quantite     = parseFloat(data[i][11]) || 0;
+        const prixUnitaire = parseFloat(data[i][8])  || 0;
+        const prixTotal    = parseFloat(data[i][12]) || (quantite * prixUnitaire);
+        products.push({
+          rowIndex:     i + 1,
+          codeBarres:   data[i][0]  || '',
+          type:         data[i][4]  || '',
+          ingredient:   data[i][5]  || '',
+          formatQte:    data[i][6]  || '',
+          formatUnite:  data[i][7]  || '',
+          prixUnitaire,
+          prixParG:     parseFloat(data[i][9])  || 0,
+          prixParGReel: parseFloat(data[i][10]) || 0,
+          quantite,
+          prixTotal,
+          notes:        data[i][13] || ''
+        });
+        total += prixTotal;
+      }
+    }
+
+    return { success: true, products, total };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+function updateProduct(productData) {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const achatsSheet = ss.getSheetByName(CONFIG.SHEETS.ACHATS);
+    if (!achatsSheet) return { success: false, message: 'Feuille Achats introuvable' };
+
+    const quantite     = parseFloat(productData.quantite) || 0;
+    const prixUnitaire = parseFloat(productData.prixUnitaire) || 0;
+    const formatQte    = parseFloat(productData.formatQte) || 0;
+    const formatUnite  = productData.formatUnite || 'g';
+    const prixTotal    = (quantite * prixUnitaire).toFixed(2);
+
+    let grammes = formatQte;
+    if (formatUnite === 'L')  grammes = formatQte * 1000;
+    if (formatUnite === 'kg') grammes = formatQte * 1000;
+    const prixParG = grammes > 0 ? (prixUnitaire / grammes).toFixed(6) : 0;
+
+    achatsSheet.getRange(productData.rowIndex, 1, 1, 14).setValues([[
+      productData.codeBarres || '',
+      productData.numFacture,
+      productData.date || '',
+      productData.fournisseur || '',
+      productData.type || '',
+      productData.ingredient || '',
+      formatQte,
+      formatUnite,
+      prixUnitaire,
+      prixParG,
+      0,
+      quantite,
+      prixTotal,
+      productData.notes || ''
+    ]]);
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+function deleteProduct(numeroFacture, rowIndex) {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const achatsSheet = ss.getSheetByName(CONFIG.SHEETS.ACHATS);
+    if (!achatsSheet) return { success: false, message: 'Feuille Achats introuvable' };
+    achatsSheet.deleteRow(rowIndex);
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+function deleteInvoice(numeroFacture) {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const facturesSheet = ss.getSheetByName(CONFIG.SHEETS.FACTURES);
+    const achatsSheet   = ss.getSheetByName(CONFIG.SHEETS.ACHATS);
+
+    if (!facturesSheet) return { success: false, message: 'Feuille Factures introuvable' };
+
+    const facturesData = facturesSheet.getDataRange().getValues();
+    for (let i = facturesData.length - 1; i >= 1; i--) {
+      if (String(facturesData[i][0]) === String(numeroFacture)) {
+        facturesSheet.deleteRow(i + 1);
+        break;
+      }
+    }
+
+    if (achatsSheet) {
+      const achatsData = achatsSheet.getDataRange().getValues();
+      for (let i = achatsData.length - 1; i >= 1; i--) {
+        if (String(achatsData[i][1]) === String(numeroFacture)) {
+          achatsSheet.deleteRow(i + 1);
+        }
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+// ========================================
+// INVENTAIRE
+// ========================================
+
+function getInventory() {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const achatsSheet   = ss.getSheetByName(CONFIG.SHEETS.ACHATS);
+    const facturesSheet = ss.getSheetByName(CONFIG.SHEETS.FACTURES);
+    if (!achatsSheet) return { success: false, message: 'Feuille Achats introuvable' };
+
+    const achatsData   = achatsSheet.getDataRange().getValues();
+    const facturesData = facturesSheet ? facturesSheet.getDataRange().getValues() : [];
+
+    const facturesFinalisees = new Set();
+    for (let i = 1; i < facturesData.length; i++) {
+      if (facturesData[i][9] === 'Finalisée') facturesFinalisees.add(String(facturesData[i][0]));
+    }
+
+    const inventory = {};
+
+    for (let i = 1; i < achatsData.length; i++) {
+      const row = achatsData[i];
+      if (!row[1] || !facturesFinalisees.has(String(row[1]))) continue;
+
+      const type         = row[4]  || 'Non classé';
+      const ingredient   = row[5]  || 'Non classé';
+      const fournisseur  = row[3]  || 'Inconnu';
+      const quantite     = parseFloat(row[11]) || 0;
+      const formatQte    = parseFloat(row[6])  || 0;
+      const formatUnite  = row[7]  || 'g';
+      const prixUnitaire = parseFloat(row[8])  || 0;
+      const prixParG     = parseFloat(row[9])  || 0;
+      const prixParGReel = parseFloat(row[10]) || 0;
+
+      let grammesParUnite = formatQte;
+      if (formatUnite === 'L')  grammesParUnite = formatQte * 1000;
+      if (formatUnite === 'kg') grammesParUnite = formatQte * 1000;
+      const grammesTotal = quantite * grammesParUnite;
+      const valeur       = quantite * prixUnitaire;
+
+      if (!inventory[type]) inventory[type] = {};
+      if (!inventory[type][ingredient]) inventory[type][ingredient] = {};
+      if (!inventory[type][ingredient][fournisseur]) {
+        inventory[type][ingredient][fournisseur] = {
+          unites: 0, grammes: 0, prixParG, prixParGReel,
+          format: formatQte + ' ' + formatUnite, valeur: 0
+        };
+      }
+
+      inventory[type][ingredient][fournisseur].unites   += quantite;
+      inventory[type][ingredient][fournisseur].grammes  += grammesTotal;
+      inventory[type][ingredient][fournisseur].valeur   += valeur;
+      if (prixParG > 0)     inventory[type][ingredient][fournisseur].prixParG     = prixParG;
+      if (prixParGReel > 0) inventory[type][ingredient][fournisseur].prixParGReel = prixParGReel;
+    }
+
+    return { success: true, inventory };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+// ========================================
+// COLLECTIONS
+// ========================================
+
+function getCollections() {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const sheet = ss.getSheetByName('Collections');
+    if (!sheet) return { success: false, message: 'Onglet Collections introuvable' };
+
+    const data  = sheet.getDataRange().getValues();
+    const items = [];
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][1]) {
+        items.push({
+          rowIndex:               i + 1,
+          rang:                   data[i][0] || '',
+          collection:             data[i][1] || '',
+          slogan:                 data[i][2] || '',
+          description_collection: data[i][3] || '',
+          ligne:                  data[i][4] || '',
+          description_ligne:      data[i][5] || '',
+          format:                 data[i][6] || '',
+          couleur_hex:            data[i][7] || '',
+       photo_url:              data[i][8] || '',
+          photo_url_noel:         data[i][9] || ''
+        });
+      }
+    }
+    return { success: true, items };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+function addCollectionItem(data) {
+  try {
+    const ss    = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const sheet = ss.getSheetByName('Collections');
+    if (!sheet) return { success: false, message: 'Onglet Collections introuvable' };
+
+    const rangCible = parseInt(data.rang) || 0;
+    if (rangCible > 0) {
+      const rows = sheet.getDataRange().getValues();
+      for (let i = 1; i < rows.length; i++) {
+        const r = parseInt(rows[i][0]) || 0;
+        const c = String(rows[i][1] || '').toUpperCase();
+        if (r >= rangCible && c !== String(data.collection || '').toUpperCase()) {
+          sheet.getRange(i + 1, 1).setValue(r + 1);
+        }
+      }
+    }
+
+    const newRow = sheet.getLastRow() + 1;
+    sheet.getRange(newRow, 1).setValue(data.rang || '');
+    sheet.getRange(newRow, 2).setValue(data.collection || '');
+    sheet.getRange(newRow, 3).setValue(data.slogan || '');
+    sheet.getRange(newRow, 4).setValue(data.description_collection || '');
+    sheet.getRange(newRow, 5).setValue(data.ligne || '');
+    sheet.getRange(newRow, 6).setValue(data.description_ligne || '');
+    sheet.getRange(newRow, 7).setValue(data.format || '');
+    sheet.getRange(newRow, 8).setValue(data.couleur_hex || '');
+   sheet.getRange(newRow, 9).setValue(data.photo_url || '');
+    sheet.getRange(newRow, 10).setValue(data.photo_url_noel || '');
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+async function sauvegarderCollection() {
+  const btnSauvegarder = document.querySelector('#form-collections .btn-primary');
+  if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = '<span class="spinner"></span> Sauvegarde…'; }
+  const rowIndex = document.getElementById('fc-rowIndex').value;
+  const mode     = document.getElementById('fc-mode').value;
+
+  if (mode === 'ligne') {
+    const col   = document.getElementById('fc-collection-ligne').value;
+    const ligne = document.getElementById('fc-ligne').value.toUpperCase();
+    if (!col || !ligne) {
+      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+      afficherMsg('collections', 'Le nom de la ligne est requis.', 'erreur');
+      return;
+    }
+    await appelAPIPost('saveRecetteBase', {
+      collection: col,
+      ligne,
+      ingredients: ingredientsBase.map(i => ({ type: i.type, nom: i.nom, quantite_g: i.quantite }))
+    });
+    const d = {
+      collection:        col,
+      ligne,
+      format:            document.getElementById('fc-format').value,
+      description_ligne: document.getElementById('fc-desc-ligne').value,
+      couleur_hex:       document.getElementById('fc-couleur-hex-ligne').value,
+      photo_url:         document.getElementById('fc-photo-url-ligne').value,
+      rang:              '', slogan: '', description_collection: ''
+    };
+    const res = await appelAPIPost('addCollectionItem', d);
+    if (res && res.success) {
+      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+      fermerFormCollection();
+      afficherMsg('collections', 'Ligne ajoutée.');
+      await chargerCollections();
+    } else {
+      afficherMsg('collections', 'Erreur lors de la sauvegarde.', 'erreur');
+      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    }
+    return;
+  }
+
+  const d = {
+    rang:                   document.getElementById('fc-rang').value,
+    collection:             document.getElementById('fc-collection').value.toUpperCase(),
+    slogan:                 document.getElementById('fc-slogan').value,
+    description_collection: document.getElementById('fc-desc-col').value,
+    couleur_hex:            document.getElementById('fc-couleur-hex').value,
+    photo_url:              document.getElementById('fc-photo-url').value,
+  };
+  if (!d.collection) {
+    if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    afficherMsg('collections', 'Le nom de la collection est requis.', 'erreur');
+    return;
+  }
+  const res = rowIndex
+    ? await appelAPIPost('updateCollectionItem', { ...d, rowIndex: parseInt(rowIndex) })
+    : await appelAPIPost('addCollectionItem', d);
+  if (res && res.success) {
+    if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    fermerFormCollection();
+    afficherMsg('collections', rowIndex ? 'Entrée mise à jour.' : 'Entrée ajoutée.');
+    await chargerCollections();
+  } else {
+    afficherMsg('collections', 'Erreur lors de la sauvegarde.', 'erreur');
+    if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+  }
+}
+
+function deleteCollectionItem(rowIndex) {
+  try {
+    const ss    = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const sheet = ss.getSheetByName('Collections');
+    if (!sheet) return { success: false, message: 'Onglet Collections introuvable' };
+    sheet.deleteRow(rowIndex);
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+// ========================================
+// LISTES DÉROULANTES
+// ========================================
+
+function getDropdownLists() {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+const listesSheet  = ss.getSheetByName('Ingredients_INCI');
+    const typesUniques = [];
+    const fullData     = [];
+    if (!listesSheet) return { types: [], fullData: [], config: {} };
+    const data = listesSheet.getDataRange().getValues();
+
+   // Construire le dictionnaire des formats par contenant (colonnes D, E, F)
+    const formatsByContenant = {};
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][3] && data[i][4]) {
+        const contenant = String(data[i][3]).trim();
+        if (!formatsByContenant[contenant]) formatsByContenant[contenant] = [];
+        formatsByContenant[contenant].push({
+          contenant: contenant,
+          quantite:  parseFloat(data[i][4]) || 0,
+          unite:     data[i][5] || 'g'
+        });
+      }
+    }
+
+    // Construire fullData avec type, ingrédient, contenant (C) et formats associés
+    const ingMap = {};
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] && data[i][1]) {
+        if (!typesUniques.includes(data[i][0])) typesUniques.push(data[i][0]);
+        const key = data[i][0] + '||' + data[i][1];
+        if (!ingMap[key]) {
+          const contenant = String(data[i][2] || '').trim();
+      ingMap[key] = {
+            type:           data[i][0],
+            ingredient:     data[i][1],
+            contenant:      contenant,
+            formats:        formatsByContenant[contenant] || [],
+            inci:           data[i][2] || '',
+            note_olfactive: data[i][6] || ''
+          };
+        }
+      }
+    }
+
+// Lire la sheet Config pour les densités
+    const configSheet = ss.getSheetByName('Config');
+    const config = {};
+    if (configSheet) {
+      const configData = configSheet.getDataRange().getValues();
+      for (let i = 1; i < configData.length; i++) {
+        if (configData[i][0]) {
+          config[configData[i][0]] = {
+            densite:       parseFloat(configData[i][1]) || 1,
+            unite:         configData[i][2] || 'g',
+            margePertePct: parseFloat(configData[i][3]) || 0
+          };
+        }
+      }
+    }
+
+    return { types: typesUniques, fullData: Object.values(ingMap), config };
+  } catch (error) {
+    return { types: [], fullData: [], config: {} };
+  }
+}
+
+// ========================================
+// CONFIGURATION - DENSITÉS
+// ========================================
+
+var DENSITES_DEFAUT = [
+  { type: 'Huile essentielle',      densite: 0.900, unite: 'ml' },
+  { type: 'Huile',                  densite: 0.920, unite: 'ml' },
+  { type: 'Hydrolat',               densite: 1.000, unite: 'ml' },
+  { type: 'Fragrance',              densite: 0.900, unite: 'ml' },
+  { type: 'Beurre',                 densite: 1.000, unite: 'g'  },
+  { type: 'Argile',                 densite: 1.000, unite: 'g'  },
+  { type: 'Additif',                densite: 1.000, unite: 'g'  },
+  { type: 'Colorants et pigments',  densite: 1.000, unite: 'g'  },
+  { type: 'Herbes et fleurs',       densite: 1.000, unite: 'g'  },
+  { type: 'Cire',                   densite: 0.950, unite: 'g'  },
+  { type: 'Saveur naturelles',      densite: 0.900, unite: 'ml' },
+  { type: 'Emballage',              densite: 1.000, unite: 'g'  }
+];
+
+function getConfigSheet() {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+  let configSheet = ss.getSheetByName('Config');
+
+  if (!configSheet) {
+    configSheet = ss.insertSheet('Config');
+  configSheet.appendRow(['Type', 'Densité (g/ml)', 'Unité source', 'marge_perte_pct']);
+    configSheet.getRange('A1:D1').setFontWeight('bold').setBackground('#f3e5f5');
+    DENSITES_DEFAUT.forEach(function(d) {
+      configSheet.appendRow([d.type, d.densite, d.unite, d.marge_perte || 0]);
+    });
+  }
+
+  return configSheet;
+}
+
+function getDensities() {
+  try {
+    const configSheet = getConfigSheet();
+    const data        = configSheet.getDataRange().getValues();
+    const densities   = [];
+    for (let i = 1; i < data.length; i++) {
+     if (data[i][0]) {
+        densities.push({ type: data[i][0], densite: parseFloat(data[i][1]) || 1.0, unite: data[i][2] || 'g', marge_perte_pct: parseFloat(data[i][3]) || 0 });
+      }
+    }
+    return densities;
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveDensity(data) {
+  try {
+    const configSheet = getConfigSheet();
+    const sheetData   = configSheet.getDataRange().getValues();
+    for (let i = 1; i < sheetData.length; i++) {
+      if (sheetData[i][0] === data.type) {
+        configSheet.getRange(i + 1, 2).setValue(data.densite);
+        configSheet.getRange(i + 1, 3).setValue(data.unite);
+        configSheet.getRange(i + 1, 4).setValue(data.marge_perte_pct || 0);
+        return { success: true };
+      }
+    }
+    return { success: false, message: 'Type introuvable' };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+function addDensityType(data) {
+  try {
+    const configSheet = getConfigSheet();
+    const sheetData   = configSheet.getDataRange().getValues();
+    for (let i = 1; i < sheetData.length; i++) {
+      if (sheetData[i][0].toLowerCase() === data.type.toLowerCase()) {
+        return { success: false, message: 'Ce type existe déjà' };
+      }
+    }
+    configSheet.appendRow([data.type, data.densite, data.unite, data.marge_perte_pct || 0]);
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+// ========================================
+// RECETTES
+// ========================================
+
+function getRecettesFormatsSheet() {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+  let sheet = ss.getSheetByName('Recettes_Formats');
+  if (!sheet) {
+    sheet = ss.insertSheet('Recettes_Formats');
+    sheet.appendRow(['recette_id','poids','unite','prix_vente','desc_emballage']);
+    sheet.getRange('A1:E1').setFontWeight('bold').setBackground('#e8f5e9');
+  }
+  return sheet;
+}
+
+function getRecettesSheet() {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+  let sheet = ss.getSheetByName('Recettes');
+  if (!sheet) {
+    sheet = ss.insertSheet('Recettes');
+    sheet.appendRow([
+      'recette_id','nom','description','couleur_hex',
+      'collection','rang','ligne','format','nb_unites',
+      'instructions','notes',
+      'ingredient_type','ingredient_nom','quantite_g','cout_ingredient','cure',
+      'prix_vente','image_url','statut','image_url_noel','collections_secondaires','desc_emballage'
+    ]);
+    sheet.getRange('A1:V1').setFontWeight('bold').setBackground('#e8f5e9');
+  }
+  return sheet;
+}
+
+function getRecettes() {
+  try {
+    const sheet = getRecettesSheet();
+    const data  = sheet.getDataRange().getValues();
+    const recettes = {};
+
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      if (!row[0]) continue;
+      const id = String(row[0]);
+      if (!recettes[id]) {
+        recettes[id] = {
+          recette_id:   id,
+          nom:          row[1] || '',
+          description:  row[2] || '',
+          couleur_hex:  row[3] || '',
+          collection:   row[4] || '',
+          rang:         row[5] || '',
+          ligne:        row[6] || '',
+          format:       row[7] || '',
+          nb_unites:    row[8] || 1,
+          instructions: row[9] || '',
+          notes:        row[10] || '',
+          cure:         row[15] || 0,
+          prix_vente:   parseFloat(row[16]) || 0,
+          image_url:       row[17] || '',
+          statut:          row[18] || 'test',
+          image_url_noel:  row[19] || '',
+          collections_secondaires: row[20] ? String(row[20]).split(',').map(s => s.trim()).filter(Boolean) : [],
+          desc_emballage: row[21] || '',
+          ingredients:  []
+        };
+      }
+      if (row[11]) {
+        recettes[id].ingredients.push({
+          type:       row[11] || '',
+          nom:        row[12] || '',
+          quantite_g: parseFloat(row[13]) || 0,
+          cout:       parseFloat(row[14]) || 0
+        });
+      }
+    }
+    return { success: true, recettes: Object.values(recettes) };
+  } catch (e) {
+    return { success: false, message: 'Erreur: ' + e.message };
+  }
+}
+
+function saveRecette(data) {
+  try {
+    const sheet = getRecettesSheet();
+    const id    = data.recette_id;
+
+    let rang = '';
+    if (data.collection && data.ligne) {
+      const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+      const collectionsSheet = ss.getSheetByName('Collections');
+      if (collectionsSheet) {
+        const collectionsData = collectionsSheet.getDataRange().getValues();
+        for (let i = 1; i < collectionsData.length; i++) {
+          if (collectionsData[i][1] === data.collection && collectionsData[i][4] === data.ligne) {
+            rang = collectionsData[i][0] || '';
+            break;
+          }
+        }
+      }
+    }
+
+    const existing = sheet.getDataRange().getValues();
+    for (let i = existing.length - 1; i >= 1; i--) {
+      if (String(existing[i][0]) === String(id)) sheet.deleteRow(i + 1);
+    }
+
+    const ingredients = data.ingredients && data.ingredients.length > 0
+      ? data.ingredients
+      : [{ type: '', nom: '', quantite_g: 0, cout: 0 }];
+
+    const colsSecondaires = Array.isArray(data.collections_secondaires)
+      ? data.collections_secondaires.join(',')
+      : (data.collections_secondaires || '');
+
+    ingredients.forEach(function(ing) {
+      sheet.appendRow([
+        id, data.nom, data.description, data.couleur_hex,
+        data.collection, rang, data.ligne, data.format, data.nb_unites,
+        data.instructions, data.notes,
+        ing.type, ing.nom, ing.quantite_g, ing.cout, data.cure || 0,
+        data.prix_vente || 0, data.image_url || '', data.statut || 'test',
+        data.image_url_noel || '', colsSecondaires, data.desc_emballage || ''
+      ]);
+    });
+    return { success: true, recette_id: id };
+  } catch (e) {
+    return { success: false, message: 'Erreur: ' + e.message };
+  }
+}
+
+function deleteRecette(recette_id) {
+  try {
+    const sheet = getRecettesSheet();
+    const data  = sheet.getDataRange().getValues();
+    for (let i = data.length - 1; i >= 1; i--) {
+      if (String(data[i][0]) === String(recette_id)) sheet.deleteRow(i + 1);
+    }
+    return { success: true };
+  } catch (e) {
+    return { success: false, message: 'Erreur: ' + e.message };
+  }
+}
+
+function getIngredientsPrixMin() {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const achatsSheet   = ss.getSheetByName(CONFIG.SHEETS.ACHATS);
+    const facturesSheet = ss.getSheetByName(CONFIG.SHEETS.FACTURES);
+    const listesSheet   = ss.getSheetByName('Listes');
+
+    if (!achatsSheet) return { success: false, message: 'Feuille Achats introuvable' };
+
+    const facturesFinalisees = new Set();
+    if (facturesSheet) {
+      const fd = facturesSheet.getDataRange().getValues();
+      for (let i = 1; i < fd.length; i++) {
+        if (fd[i][9] === 'Finalisée') facturesFinalisees.add(String(fd[i][0]));
+      }
+    }
+
+    const prixMin   = {};
+    const achatsData = achatsSheet.getDataRange().getValues();
+    for (let i = 1; i < achatsData.length; i++) {
+      const row = achatsData[i];
+      if (!row[1] || !facturesFinalisees.has(String(row[1]))) continue;
+      const type  = row[4] || '';
+      const ing   = row[5] || '';
+      const prixG = parseFloat(row[9]) || 0;
+      if (!type || !ing || !prixG) continue;
+      const key = type + '||' + ing;
+      if (!prixMin[key] || prixG < prixMin[key].prixG) {
+        prixMin[key] = { type, nom: ing, prixG };
+      }
+    }
+
+    const disponibles = [];
+    if (listesSheet) {
+      const ld = listesSheet.getDataRange().getValues();
+      for (let i = 1; i < ld.length; i++) {
+        const type = ld[i][0] || '';
+        const nom  = ld[i][1] || '';
+        if (!type || !nom) continue;
+        const key  = type + '||' + nom;
+        const prix = prixMin[key] ? prixMin[key].prixG : 0;
+        if (!disponibles.find(function(d) { return d.type === type && d.nom === nom; })) {
+          disponibles.push({ type, nom, prixG: prix });
+        }
+      }
+    }
+
+    Object.values(prixMin).forEach(function(p) {
+      if (!disponibles.find(function(d) { return d.type === p.type && d.nom === p.nom; })) {
+        disponibles.push({ type: p.type, nom: p.nom, prixG: p.prixG });
+      }
+    });
+
+    disponibles.sort(function(a, b) {
+      return a.type.localeCompare(b.type) || a.nom.localeCompare(b.nom);
+    });
+
+    return { success: true, ingredients: disponibles };
+  } catch (e) {
+    return { success: false, message: 'Erreur: ' + e.message };
+  }
+}
+
+// ========================================
+// API PUBLIQUE — GITHUB PAGES
+// ========================================
+
+function doGet(e) {
+  const action = e.parameter.action;
+  let result   = {};
+
+  if (action === 'getCatalogue') {
+    result = getCataloguePublic();
+  } else if (action === 'getCollectionsPublic') {
+    result = getCollectionsPublic();
+  } else if (action === 'getCollections') {
+    result = getCollections();
+  } else if (action === 'getRecettes') {
+    result = getRecettes();
+  } else if (action === 'getDensities') {
+    result = { densities: getDensities() };
+  } else if (action === 'getInventory') {
+    result = getInventory();
+  } else if (action === 'getInvoicesListWithFilters') {
+    result = getInvoicesListWithFilters();
+  } else if (action === 'getDropdownLists') {
+    result = getDropdownLists();
+ } else if (action === 'getRecettesFormats') {
+    result = getRecettesFormats(e.parameter.recette_id);
+  } else if (action === 'getRecettesBase') {
+    result = getRecettesBase();
+ } else if (action === 'getContenu') {
+    result = getContenu();
+ } else if (action === 'getSourcesInci') {
+    result = getSourcesInci();
+  } else if (action === 'getCategoriesUC') {
+    result = getCategoriesUC();
+  } else if (e.parameter.data) {
+    const data = JSON.parse(decodeURIComponent(e.parameter.data));
+    const act  = data.action;
+    if (act === 'addCollectionItem')         result = addCollectionItem(data);
+    else if (act === 'updateCollectionItem') result = updateCollectionItem(data);
+    else if (act === 'deleteCollectionItem') result = deleteCollectionItem(data.rowIndex);
+    else if (act === 'saveRecette')          result = saveRecette(data);
+    else if (act === 'deleteRecette')        result = deleteRecette(data.recette_id);
+    else if (act === 'createInvoice')        result = createInvoice(data.numeroFacture, data.date, data.fournisseur);
+    else if (act === 'addProduct')           result = addProduct(data);
+    else if (act === 'updateProduct')        result = updateProduct(data);
+    else if (act === 'deleteProduct')        result = deleteProduct(data.numeroFacture, data.rowIndex);
+    else if (act === 'getInvoiceProducts')   result = getInvoiceProducts(data.numeroFacture);
+    else if (act === 'finalizeInvoice')      result = finalizeInvoice(data);
+    else if (act === 'saveDensity')          result = saveDensity(data);
+    else if (act === 'addDensityType')       result = addDensityType(data);
+    else if (act === 'deleteInvoice')        result = deleteInvoice(data.numeroFacture);
+    else if (act === 'diminuerStockRecette') result = diminuerStockRecette(data.recette_id);
+ else if (act === 'saveRecetteBase')      result = saveRecetteBase(data);
+    else if (act === 'saveRecetteFormat')    result = saveRecetteFormat(data);
+    else if (act === 'deleteRecetteFormat')  result = deleteRecetteFormat(data.rowIndex);
+    else if (act === 'updateContenu')        result = updateContenu(data);
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+// ========================================
+// RECETTES DE BASE
+// ========================================
+
+function getRecettesBaseSheet() {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+  let sheet = ss.getSheetByName('Recettes_Base');
+  if (!sheet) {
+    sheet = ss.insertSheet('Recettes_Base');
+    sheet.appendRow(['collection','ligne','ingredient_type','ingredient_nom','quantite_g']);
+    sheet.getRange('A1:E1').setFontWeight('bold').setBackground('#e8f5e9');
+  }
+  return sheet;
+}
+
+function getRecettesFormats(recette_id) {
+  try {
+    const sheet = getRecettesFormatsSheet();
+    const data = sheet.getDataRange().getValues();
+    const formats = [];
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === String(recette_id)) {
+        formats.push({
+          rowIndex:      i + 1,
+          recette_id:    data[i][0],
+          poids:         parseFloat(data[i][1]) || 0,
+          unite:         data[i][2] || 'g',
+          prix_vente:    parseFloat(data[i][3]) || 0,
+          desc_emballage: data[i][4] || ''
+        });
+      }
+    }
+    return { success: true, formats };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function saveRecetteFormat(data) {
+  try {
+    const sheet = getRecettesFormatsSheet();
+    if (data.rowIndex) {
+      sheet.getRange(data.rowIndex, 1, 1, 5).setValues([[
+        data.recette_id, data.poids, data.unite, data.prix_vente, data.desc_emballage || ''
+      ]]);
+    } else {
+      sheet.appendRow([data.recette_id, data.poids, data.unite, data.prix_vente, data.desc_emballage || '']);
+    }
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function deleteRecetteFormat(rowIndex) {
+  try {
+    const sheet = getRecettesFormatsSheet();
+    sheet.deleteRow(rowIndex);
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function getRecettesBase() {
+  try {
+    const sheet = getRecettesBaseSheet();
+    const data = sheet.getDataRange().getValues();
+    const items = [];
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] && data[i][1]) {
+        items.push({
+          rowIndex: i + 1,
+          collection: data[i][0],
+          ligne: data[i][1],
+          ingredient_type: data[i][2] || '',
+          ingredient_nom: data[i][3] || '',
+          quantite_g: parseFloat(data[i][4]) || 0
+        });
+      }
+    }
+    return { success: true, items };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function saveRecetteBase(data) {
+  try {
+    const sheet = getRecettesBaseSheet();
+    const all = sheet.getDataRange().getValues();
+    // Supprimer les anciennes lignes pour cette collection+ligne
+    for (let i = all.length - 1; i >= 1; i--) {
+      if (all[i][0] === data.collection && all[i][1] === data.ligne) {
+        sheet.deleteRow(i + 1);
+      }
+    }
+    // Ajouter les nouvelles
+    if (data.ingredients && data.ingredients.length > 0) {
+      data.ingredients.forEach(function(ing) {
+        sheet.appendRow([data.collection, data.ligne, ing.type, ing.nom, ing.quantite_g]);
+      });
+    }
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+// ─── CATALOGUE PUBLIC ───
+function getCataloguePublic() {
+  try {
+    const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const recettesSheet     = ss.getSheetByName('Recettes');
+    const collectionsSheet  = ss.getSheetByName('Collections');
+
+    if (!recettesSheet) return { success: false, message: 'Onglet Recettes introuvable' };
+
+    const recettesData = recettesSheet.getDataRange().getValues();
+
+const infoCollections = {};
+    const infoLignes = {};
+    if (collectionsSheet) {
+      const colData = collectionsSheet.getDataRange().getValues();
+      for (let i = 1; i < colData.length; i++) {
+        const col = colData[i][1] || '';
+        if (col && !infoCollections[col]) {
+          infoCollections[col] = {
+            rang:        colData[i][0] || 99,
+            slogan:      colData[i][2] || '',
+            desc:        colData[i][3] || '',
+            couleur_hex: colData[i][7] || '',
+            photo_url:   colData[i][8] || ''
+          };
+        }
+        const ligne = colData[i][4] || '';
+        if (col && ligne) {
+          infoLignes[col + '||' + ligne] = colData[i][5] || '';
+        }
+      }
+    }
+
+    const recettesMap = {};
+   for (let i = 1; i < recettesData.length; i++) {
+      const row = recettesData[i];
+      if (!row[0]) continue;
+       if (row[18] === 'test') continue;
+
+      const id         = String(row[0]);
+      const prixVente  = parseFloat(row[16]) || 0;
+      const imageUrl   = row[17] || '';
+
+      if (!recettesMap[id]) {
+        const col    = row[4] || '';
+        const infoCol = infoCollections[col] || {};
+   recettesMap[id] = {
+          recette_id:      id,
+          nom:             row[1] || '',
+          description:     row[2] || '',
+          couleur_hex:     row[3] || infoCol.couleur_hex || '#c44536',
+          collection:      col,
+          rang:            row[5] || infoCol.rang || 99,
+          ligne:           row[6] || '',
+          format:          row[7] || '',
+          nb_unites:       row[8] || 1,
+          cure:            row[15] || 0,
+          prix_vente:      prixVente,
+         image_url:       imageUrl,
+          image_url_noel:  row[19] || '',
+          image_collection: infoCol.photo_url || '',
+          slogan:          infoCol.slogan || '',
+          desc_collection: infoCol.desc   || '',
+          desc_ligne:      infoLignes[(row[4] || '') + '||' + (row[6] || '')] || '',
+          formats:         row[7] ? [row[7]] : [],
+          collections_secondaires: row[20] ? String(row[20]).split(',').map(s => s.trim()).filter(Boolean) : []
+        };
+      }
+    }
+
+    const produits = Object.values(recettesMap);
+    produits.sort((a, b) => {
+      if (a.rang !== b.rang) return a.rang - b.rang;
+      if (a.ligne !== b.ligne) return a.ligne.localeCompare(b.ligne);
+      return a.nom.localeCompare(b.nom);
+    });
+
+    const collectionsVues = [];
+    produits.forEach(p => {
+      if (p.collection && !collectionsVues.includes(p.collection)) {
+        collectionsVues.push(p.collection);
+      }
+    });
+
+    return { success: true, produits, collections: collectionsVues, infoCollections };
+
+  } catch (e) {
+    return { success: false, message: 'Erreur: ' + e.message };
+  }
+}
+
+function getCollectionsPublic() {
+  try {
+    const ss    = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const sheet = ss.getSheetByName('Collections');
+    if (!sheet) return { success: false, message: 'Onglet Collections introuvable' };
+
+    const data           = sheet.getDataRange().getValues();
+    const collectionsMap = {};
+
+    for (let i = 1; i < data.length; i++) {
+      const col = data[i][1] || '';
+      if (col && !collectionsMap[col]) {
+        collectionsMap[col] = {
+          rang:        data[i][0] || 99,
+          nom:         col,
+          slogan:      data[i][2] || '',
+          desc:        data[i][3] || '',
+          couleur_hex: data[i][7] || '',
+          photo_url:   data[i][8] || ''
+        };
+      }
+    }
+
+    const collections = Object.values(collectionsMap);
+    collections.sort((a, b) => a.rang - b.rang || a.nom.localeCompare(b.nom));
+
+    return { success: true, collections };
+
+  } catch (e) {
+    return { success: false, message: 'Erreur: ' + e.message };
+  }
+}
+
+
+
+// ========================================
+// API POST — GITHUB PAGES
+// ========================================
+
+function doPost(e) {
+  try {
+    const data   = JSON.parse(e.postData.contents);
+    const action = data.action;
+    let result   = { success: false, message: 'Action inconnue' };
+
+    if (action === 'addCollectionItem')         result = addCollectionItem(data);
+    else if (action === 'updateCollectionItem') result = updateCollectionItem(data);
+    else if (action === 'deleteCollectionItem') result = deleteCollectionItem(data.rowIndex);
+    else if (action === 'saveRecette')          result = saveRecette(data);
+    else if (action === 'deleteRecette')        result = deleteRecette(data.recette_id);
+    else if (action === 'createInvoice')        result = createInvoice(data.numeroFacture, data.date, data.fournisseur);
+    else if (action === 'addProduct')           result = addProduct(data);
+    else if (action === 'updateProduct')        result = updateProduct(data);
+    else if (action === 'deleteProduct')        result = deleteProduct(data.numeroFacture, data.rowIndex);
+    else if (action === 'getInvoiceProducts')   result = getInvoiceProducts(data.numeroFacture);
+    else if (action === 'finalizeInvoice')      result = finalizeInvoice(data);
+    else if (action === 'saveDensity')          result = saveDensity(data);
+    else if (action === 'addDensityType')       result = addDensityType(data);
+    else if (action === 'deleteInvoice')        result = deleteInvoice(data.numeroFacture);
+    else if (action === 'diminuerStockRecette') result = diminuerStockRecette(data.recette_id);
+    else if (action === 'saveRecetteBase')      result = saveRecetteBase(data);
+    else if (action === 'getRecettesFormats')   result = getRecettesFormats(data.recette_id);
+    else if (action === 'saveRecetteFormat')    result = saveRecetteFormat(data);
+    else if (action === 'deleteRecetteFormat')  result = deleteRecetteFormat(data.rowIndex);
+   else if (action === 'envoyerContact')       result = envoyerContact(data);
+   else if (action === 'updateContenu')        result = updateContenu(data);
+   else if (action === 'saveIngredientInci')      result = saveIngredientInci(data);
+    else if (action === 'validerIngredientInci')   result = validerIngredientInci(data);
+    else if (action === 'sauvegarderCorrespondanceInci') result = sauvegarderCorrespondanceInci(data);
+   else if (action === 'scraperIngredientUrl')          result = scraperIngredientUrl(data.url);
+    else if (action === 'ajouterCategorieUC')            result = ajouterCategorieUC(data);
+    else if (action === 'modifierCategorieUC')           result = modifierCategorieUC(data);
+    else if (action === 'supprimerCategorieUC')          result = supprimerCategorieUC(data);
+
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, message: 'Erreur: ' + err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+}
+
+function updateCollectionItem(data) {
+  try {
+    const ss    = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+    const sheet = ss.getSheetByName('Collections');
+    if (!sheet) return { success: false, message: 'Onglet Collections introuvable' };
+
+    const rangCible  = parseInt(data.rang) || 0;
+    const rangActuel = parseInt(sheet.getRange(data.rowIndex, 1).getValue()) || 0;
+    if (rangCible > 0 && rangCible !== rangActuel) {
+      const rows = sheet.getDataRange().getValues();
+      for (let i = 1; i < rows.length; i++) {
+        if (i + 1 === data.rowIndex) continue;
+        const r = parseInt(rows[i][0]) || 0;
+        const c = String(rows[i][1] || '').toUpperCase();
+        if (r >= rangCible && c !== String(data.collection || '').toUpperCase()) {
+          sheet.getRange(i + 1, 1).setValue(r + 1);
+        }
+      }
+    }
+
+    const nomCollection = String(data.collection || '').toUpperCase();
+    const allRows = sheet.getDataRange().getValues();
+
+    sheet.getRange(data.rowIndex, 1).setValue(data.rang || '');
+    sheet.getRange(data.rowIndex, 2).setValue(data.collection || '');
+    sheet.getRange(data.rowIndex, 3).setValue(data.slogan || '');
+    sheet.getRange(data.rowIndex, 4).setValue(data.description_collection || '');
+    if (data.ligne !== undefined) sheet.getRange(data.rowIndex, 5).setValue(data.ligne);
+    if (data.description_ligne !== undefined) sheet.getRange(data.rowIndex, 6).setValue(data.description_ligne);
+    if (data.format !== undefined) sheet.getRange(data.rowIndex, 7).setValue(data.format);
+    sheet.getRange(data.rowIndex, 8).setValue(data.couleur_hex || '');
+    sheet.getRange(data.rowIndex, 9).setValue(data.photo_url || '');
+    sheet.getRange(data.rowIndex, 10).setValue(data.photo_url_noel || '');
+
+    for (let i = 1; i < allRows.length; i++) {
+      if (i + 1 === data.rowIndex) continue;
+      if (String(allRows[i][1] || '').toUpperCase() === nomCollection) {
+        sheet.getRange(i + 1, 8).setValue(data.couleur_hex || '');
+        sheet.getRange(i + 1, 9).setValue(data.photo_url || '');
+        sheet.getRange(i + 1, 10).setValue(data.photo_url_noel || '');
+      }
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: 'Erreur: ' + error.message };
+  }
+}
+
+// ========================================
+// CONTACT
+// ========================================
+
+function envoyerContact(data) {
+  try {
+    const prenom   = data.prenom   || '';
+    const nom      = data.nom      || '';
+    const courriel = data.courriel || '';
+    const sujet    = data.sujet    || 'Message du site';
+    const message  = data.message  || '';
+
+    if (!prenom || !nom || !courriel || !message) {
+      return { success: false, message: 'Champs obligatoires manquants.' };
+    }
+
+    MailApp.sendEmail({
+      to:      'universcaresse@outlook.com',
+      subject: `[Univers Caresse] ${sujet} — ${prenom} ${nom}`,
+      body:    `Prénom : ${prenom}\nNom : ${nom}\nCourriel : ${courriel}\nSujet : ${sujet}\n\n${message}`
+    });
+
+    return { success: true };
+  } catch (e) {
+    return { success: false, message: 'Erreur: ' + e.message };
+  }
+}
+
+
+function initialiserContenu() {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+  let sheet = ss.getSheetByName('Contenu');
+  if (sheet) { Logger.log('Onglet Contenu existe déjà.'); return; }
+  sheet = ss.insertSheet('Contenu');
+
+  const donnees = [
+    ['cle', 'valeur'],
+    ['accueil_eyebrow', 'Collections 2026'],
+    ['accueil_cta', 'Découvrir les collections'],
+    ['accueil_stat_label', 'Artisanal'],
+    ['accueil_stat_valeur', '100%'],
+    ['qui_eyebrow', 'Savonnerie artisanale'],
+    ['qui_titre', "L'art de la"],
+    ['qui_titre_em', 'douceur naturelle'],
+    ['qui_texte', "Dans notre savonnerie artisanale, chaque création est pensée pour offrir une expérience sensorielle unique. Nos savons sont élaborés avec des ingrédients naturels soigneusement sélectionnés, dans le respect de votre peau et de l'environnement."],
+    ['qui_signature_nom', 'Chantal Mondor'],
+    ['qui_signature_titre', 'Fondatrice — Univers Caresse'],
+    ['section_texte_p1', "Découvrez nos collections inspirées par la nature, où chaque fragrance raconte une histoire et chaque texture invite à la douceur. De la fraîcheur des lagunes à la chaleur gourmande, laissez-vous porter par un voyage olfactif exceptionnel."],
+    ['section_texte_p2', "Chaque savon est fabriqué à la main en petites séries, selon le procédé de saponification à froid. Cette méthode traditionnelle préserve toutes les propriétés des huiles végétales et produit naturellement de la glycérine, reconnue pour ses vertus hydratantes."],
+    ['section_texte_p3', "Nos formules sont sans huile de palme, entièrement biodégradables et emballées de façon écoresponsable. Parce que prendre soin de soi ne devrait jamais se faire au détriment de la planète."],
+    ['valeur_01_titre', 'Ingrédients naturels'],
+    ['valeur_01_desc', "Chaque ingrédient est choisi pour ses propriétés bienfaisantes. Huiles végétales, beurres précieux, argiles et plantes sont au cœur de nos formules."],
+    ['valeur_02_titre', 'Saponification à froid'],
+    ['valeur_02_desc', "Le procédé à froid préserve toutes les propriétés des huiles et génère naturellement de la glycérine. Un savoir-faire traditionnel au service de votre peau."],
+    ['valeur_03_titre', 'Fabriqué au Québec'],
+    ['valeur_03_desc', "Chaque savon naît dans notre atelier québécois, en petites séries soigneusement contrôlées pour vous garantir fraîcheur et qualité."],
+    ['valeur_04_titre', 'Sans huile de palme'],
+    ['valeur_04_desc', "Nos formules excluent l'huile de palme et privilégient des alternatives durables, pour un soin qui respecte autant votre peau que l'environnement."],
+    ['citation_texte', "Chaque savon est pensé comme une caresse — un geste de douceur offert à votre peau, et à la nature."],
+    ['citation_source', 'Chantal Mondor — Fondatrice'],
+    ['bas_engagement_01_titre', 'Ingrédients de qualité'],
+    ['bas_engagement_01_texte', "Toujours confectionné avec des ingrédients de qualité, soigneusement sélectionnés pour leurs propriétés bienfaisantes et leur respect de la peau."],
+    ['bas_engagement_02_titre', 'Petites quantités et sur commande'],
+    ['bas_engagement_02_texte', "Nos produits sont fabriqués en petite quantité et sur commande, pour vous garantir fraîcheur et soin à chaque savon."],
+    ['bas_engagement_03_titre', 'Sans huile de palme'],
+    ['bas_engagement_03_texte', "Nos formules excluent l'huile de palme. Nous privilégions des alternatives durables qui respectent autant votre peau que l'environnement."],
+    ['bas_engagement_04_titre', 'Entièrement biodégradable'],
+    ['bas_engagement_04_texte', "Nos savons sont entièrement biodégradables pour minimiser leur impact environnemental."],
+    ['bas_allergenes', "Si vous avez des allergies connues ou une peau sensible, consultez la liste complète des ingrédients (INCI) disponible sur demande pour chaque produit. En cas de doute, effectuez un test cutané avant la première utilisation."],
+    ['bas_conservation_titre', 'Conservation idéale'],
+    ['bas_conservation_texte', "Conservez vos savons dans un endroit sec, à l'abri de l'humidité et de la lumière directe. Un porte-savon bien drainé prolonge considérablement leur durée de vie."],
+    ['bas_cure_titre', 'Période de cure'],
+    ['bas_cure_texte', "Nos savons à froid bénéficient d'une période de cure de 4 à 6 semaines après fabrication. Ce processus permet au savon de durcir et d'atteindre son plein potentiel."],
+    ['bas_usage_titre', 'Usage recommandé'],
+    ['bas_usage_texte', "Nos produits sont destinés à un usage externe uniquement. Évitez le contact avec les yeux. En cas d'irritation, cessez l'utilisation et consultez un professionnel de la santé."],
+    ['bas_commande_titre', 'Sur commande'],
+    ['bas_commande_texte', "La majorité de nos produits sont préparés sur commande. Comptez un délai de préparation variable selon les produits et la disponibilité des ingrédients."],
+    ['bas_demande_titre', "Demande d'information"],
+    ['bas_demande_texte', "Pour toute question sur la disponibilité, les délais ou les ingrédients, utilisez notre formulaire de contact. Nous vous répondrons dans les meilleurs délais."],
+  ];
+
+  sheet.getRange(1, 1, donnees.length, 2).setValues(donnees);
+  Logger.log('Onglet Contenu créé avec succès.');
+}
+
+
+function initialiserNouvellesClesContenu() {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+  const sheet = ss.getSheetByName('Contenu');
+  if (!sheet) { Logger.log('Onglet Contenu introuvable.'); return; }
+
+  const rows = sheet.getDataRange().getValues();
+  const clesExistantes = new Set(rows.slice(1).map(r => r[0]));
+
+  const nouvellesCles = [
+    ['bas_engagement_05_titre', ''],
+    ['bas_engagement_05_texte', ''],
+    ['bas_note_01_titre', ''],
+    ['bas_note_01_texte', ''],
+    ['bas_note_02_titre', ''],
+    ['bas_note_02_texte', ''],
+    ['bas_note_03_titre', ''],
+    ['bas_note_03_texte', ''],
+    ['bas_note_04_titre', ''],
+    ['bas_note_04_texte', ''],
+    ['bas_note_05_titre', ''],
+    ['bas_note_05_texte', ''],
+    ['bas_conservation_01_titre', ''],
+    ['bas_conservation_01_texte', ''],
+    ['bas_conservation_02_titre', ''],
+    ['bas_conservation_02_texte', ''],
+    ['bas_conservation_03_titre', ''],
+    ['bas_conservation_03_texte', ''],
+    ['bas_conservation_04_titre', ''],
+    ['bas_conservation_04_texte', ''],
+    ['bas_conservation_05_titre', ''],
+    ['bas_conservation_05_texte', ''],
+    ['bas_commande_01_titre', ''],
+    ['bas_commande_01_texte', ''],
+    ['bas_commande_02_titre', ''],
+    ['bas_commande_02_texte', ''],
+    ['bas_commande_03_titre', ''],
+    ['bas_commande_03_texte', ''],
+    ['bas_commande_04_titre', ''],
+    ['bas_commande_04_texte', ''],
+    ['bas_commande_05_titre', ''],
+    ['bas_commande_05_texte', ''],
+  ];
+
+  let ajoutees = 0;
+  nouvellesCles.forEach(([cle, valeur]) => {
+    if (!clesExistantes.has(cle)) {
+      sheet.appendRow([cle, valeur]);
+      ajoutees++;
+    }
+  });
+
+  Logger.log(`${ajoutees} nouvelles clés ajoutées.`);
+}
+
+function getContenu() {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+  const sheet = ss.getSheetByName('Contenu');
+  if (!sheet) return { success: false, message: 'Onglet Contenu introuvable.' };
+  const rows = sheet.getDataRange().getValues();
+  const contenu = {};
+  rows.slice(1).forEach(row => {
+    if (row[0]) contenu[row[0]] = row[1];
+  });
+  return { success: true, contenu };
+}
+
+function updateContenu(data) {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+  const sheet = ss.getSheetByName('Contenu');
+  if (!sheet) return { success: false, message: 'Onglet Contenu introuvable.' };
+  const rows = sheet.getDataRange().getValues();
+  rows.slice(1).forEach((row, i) => {
+    if (data.contenu[row[0]] !== undefined) {
+      sheet.getRange(i + 2, 2).setValue(data.contenu[row[0]]);
+    }
+  });
+  return { success: true };
+}
+
+
+
+
+function initialiserClesEdu() {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+  const sheet = ss.getSheetByName('Contenu');
+  if (!sheet) { Logger.log('Onglet Contenu introuvable.'); return; }
+
+  const rows = sheet.getDataRange().getValues();
+  const clesExistantes = new Set(rows.slice(1).map(r => r[0]));
+
+  const cles = [
+
+    // ─── SECTION 1 — SAPONIFICATION À FROID ───
+    ['edu_s1_surtitre',       'Le savon artisanal — 1 / 7'],
+    ['edu_s1_titre',          'La saponification à froid'],
+    ['edu_s1_titre_em',       ''],
+    ['edu_s1_accroche',       'Quand la chimie devient une caresse'],
+    ['edu_s1_p1',             "La saponification à froid, c'est l'alchimie douce qui transforme des huiles végétales en savon sans jamais les brutaliser par la chaleur. Contrairement aux savons industriels chauffés à haute température, cette méthode ancestrale préserve toute la richesse des ingrédients. Le processus est simple : des huiles rencontrent de l'hydroxyde de sodium dans l'eau, et ensemble, ils se transforment lentement en un savon pur et doux."],
+    ['edu_s1_p2',             "Cette transformation prend son temps. Pas de précipitation, pas de raccourci. Les molécules s'enlacent à température ambiante, créant naturellement de la glycérine — cette substance précieuse que les savons industriels extraient pour la revendre. Ici, elle reste. Elle hydrate, elle protège, elle caresse la peau à chaque usage. C'est cette glycérine qui fait toute la différence entre un savon qui nettoie et un savon qui prend soin."],
+    ['edu_s1_p3',             "Le résultat ? Un savon vivant, riche, généreux. Chaque barre conserve les vertus intactes des huiles qui la composent : les vitamines, les acides gras essentiels, les bienfaits naturels que la chaleur aurait détruits. C'est un soin véritable, pas juste un produit nettoyant. Et c'est exactement ce que nous créons, barre après barre, avec patience et respect de la matière."],
+    ['edu_s1_photo_legende',  'Processus de fabrication, huiles végétales, texture crémeuse de la pâte à savon'],
+    ['edu_s1_section_titre',  'Pourquoi choisir un savon saponifié à froid'],
+    ['edu_s1_card1_titre',    'Glycérine naturelle préservée'],
+    ['edu_s1_card1_texte',    'Hydratation profonde à chaque usage — cette substance précieuse reste dans le savon au lieu d\'être extraite et revendue.'],
+    ['edu_s1_card2_titre',    'Huiles intactes'],
+    ['edu_s1_card2_texte',    'Vitamines et nutriments non dégradés par la chaleur. Les acides gras essentiels restent actifs, prêts à prendre soin de votre peau.'],
+    ['edu_s1_card3_titre',    'Surgraissage'],
+    ['edu_s1_card3_texte',    'Un excès d\'huile nourrissante reste libre dans le savon pour nourrir votre peau à chaque usage.'],
+    ['edu_s1_card4_titre',    'Douceur authentique'],
+    ['edu_s1_card4_texte',    'Respecte l\'équilibre naturel de votre peau, sans produits chimiques agressifs.'],
+    ['edu_s1_card5_titre',    'Fabrication artisanale'],
+    ['edu_s1_card5_texte',    'Chaque barre est unique, faite à la main en petites séries. Aucun raccourci industriel, aucun compromis sur la qualité.'],
+
+    // ─── SECTION 2 — LA CURE ───
+    ['edu_s2_surtitre',       'Le savon artisanal — 2 / 7'],
+    ['edu_s2_titre',          'La cure'],
+    ['edu_s2_titre_em',       'patience et transformation'],
+    ['edu_s2_accroche',       'Le temps comme ingrédient essentiel'],
+    ['edu_s2_p1',             "Quand un savon sort du moule, il n'est pas encore prêt. Il est tendre, encore humide, en pleine métamorphose. C'est là que commence la cure — cette période de repos essentielle où le savon devient vraiment lui-même. Entre quatre et six semaines, selon la recette, il sèche lentement à l'air libre, perdant son excès d'eau tout en complétant sa transformation chimique."],
+    ['edu_s2_p2',             "Durant ces semaines de patience, la saponification se finalise. Les dernières molécules d'huile et de soude trouvent leur équilibre parfait. Le pH se stabilise, s'adoucit, devient aussi doux qu'une caresse. L'eau s'évapore progressivement, et le savon durcit, se concentre, devient plus dense. C'est ce temps de repos qui lui donne sa longévité : un savon bien curé dure plus longtemps, ne fond pas à la première goutte d'eau, reste ferme et généreux jusqu'à la dernière utilisation."],
+    ['edu_s2_p3',             "On ne peut pas précipiter ce processus. Chaque savon a son propre rythme, dicté par sa composition et la saison. Les savons riches en huile d'olive demandent plus de temps. Ceux chargés en beurre de karité atteignent leur douceur optimale après six semaines. C'est une leçon de patience que nous offre la matière : les meilleures choses ne se forcent pas, elles mûrissent."],
+    ['edu_s2_photo_legende',  'Savons en cure sur étagères, transformation avant/après, texture du savon curé'],
+    ['edu_s2_section_titre',  'Pourquoi la cure est-elle si importante'],
+    ['edu_s2_val1_titre',     'pH optimal'],
+    ['edu_s2_val1_texte',     'Passage de caustique à doux, parfaitement équilibré pour la peau. Aucune trace de soude libre à la fin de la cure.'],
+    ['edu_s2_val2_titre',     'Dureté accrue'],
+    ['edu_s2_val2_texte',     'Un savon bien curé dure 2 à 3 fois plus longtemps qu\'un savon industriel. Il ne fond pas à la première goutte d\'eau.'],
+    ['edu_s2_val3_titre',     'Concentration maximale'],
+    ['edu_s2_val3_texte',     'L\'évaporation de l\'eau concentre les ingrédients actifs. Chaque gramme de savon est plus riche, plus généreux.'],
+    ['edu_s2_val4_titre',     'Mousse onctueuse'],
+    ['edu_s2_val4_texte',     'La texture finale se développe pleinement après la cure. Une mousse crémeuse qui transforme chaque lavage en rituel.'],
+    ['edu_s2_citation',       'C\'est pour cette raison que nos savons portent une date de fabrication. Chaque barre vous arrive après avoir complété sa cure, prête à vous offrir le meilleur d\'elle-même.'],
+    ['edu_s2_citation_source','Notre engagement envers la qualité'],
+
+    // ─── SECTION 3 — LE SURGRAISSAGE ───
+    ['edu_s3_surtitre',       'Le savon artisanal — 3 / 7'],
+    ['edu_s3_titre',          'Le surgraissage'],
+    ['edu_s3_titre_em',       ''],
+    ['edu_s3_accroche',       'L\'excès qui fait toute la différence'],
+    ['edu_s3_p1',             "Le surgraissage, c'est cette générosité calculée qui transforme un savon nettoyant en véritable soin. Lorsqu'on fabrique un savon, on ajoute volontairement plus d'huile que nécessaire à la réaction chimique. Cet excédent ne se transforme pas en savon — il reste là, libre, précieux, prêt à nourrir votre peau à chaque usage. C'est ce surplus d'huile qui fait qu'un savon artisanal caresse au lieu de décaper."],
+    ['edu_s3_p2',             "Un savon industriel n'a pas de surgraissage. Toutes les huiles sont converties en agent nettoyant, sans rien laisser pour hydrater. Résultat : une peau qui tiraille, qui s'assèche, qui réclame une crème immédiatement après. Nos savons, eux, contiennent entre 5% et 10% d'huiles non saponifiées. Ces huiles libres forment un film protecteur invisible sur votre peau, l'hydratent en profondeur, préservent son équilibre naturel."],
+    ['edu_s3_p3',             "Le pourcentage de surgraissage n'est jamais choisi au hasard. Il s'adapte à l'usage, à la peau, à la saison. Un savon pour le corps peut porter un surgraissage de 8%, parfait pour nourrir sans alourdir. Un savon pour les mains, utilisé plusieurs fois par jour, sera surgraissé à 5% pour rester efficace tout en protégeant. Les savons pour bébés, eux, montent jusqu'à 10% — une douceur extrême pour une peau si délicate."],
+    ['edu_s3_photo_legende',  'Huiles végétales dorées, texture crémeuse, peau hydratée après utilisation'],
+    ['edu_s3_section_titre',  'Les trois niveaux de surgraissage'],
+    ['edu_s3_niv1_pct',       '5%'],
+    ['edu_s3_niv1_label',     'Peau normale à grasse'],
+    ['edu_s3_niv1_texte',     'Nettoie efficacement sans laisser de film gras. Idéal pour les mains et le visage des peaux qui produisent naturellement du sébum. Léger, rafraîchissant, parfaitement équilibré.'],
+    ['edu_s3_niv2_pct',       '8%'],
+    ['edu_s3_niv2_label',     'Peau normale à sèche'],
+    ['edu_s3_niv2_texte',     'Le juste équilibre entre nettoyage et hydratation. Parfait pour un usage quotidien sur tout le corps. Nourrit sans alourdir, protège sans graisser.'],
+    ['edu_s3_niv3_pct',       '10%'],
+    ['edu_s3_niv3_label',     'Peau très sèche et délicate'],
+    ['edu_s3_niv3_texte',     'Une générosité d\'huiles nourrissantes pour les peaux fragiles, réactives ou assoiffées. Les bébés, les peaux matures, les épidermes sensibles trouvent ici une douceur incomparable.'],
+    ['edu_s3_astuce',         'L\'hiver québécois, avec son chauffage électrique et son air sec, peut assoiffer même les peaux habituellement grasses. Si vous sentez votre peau tirailler de novembre à mars, n\'hésitez pas à passer temporairement à un surgraissage plus élevé. Votre peau d\'été n\'est pas votre peau d\'hiver — écoutez-la.'],
+
+    // ─── SECTION 4 — LES HUILES ───
+    ['edu_s4_surtitre',       'Le savon artisanal — 4 / 7'],
+    ['edu_s4_titre',          'Les huiles'],
+    ['edu_s4_titre_em',       'et leurs vertus'],
+    ['edu_s4_accroche',       'Chaque goutte a son histoire'],
+    ['edu_s4_p1',             "Dans un savon saponifié à froid, les huiles ne sont pas de simples ingrédients. Ce sont les âmes du savon, celles qui lui donnent sa personnalité, sa texture, ses bienfaits. Chaque huile apporte quelque chose d'unique : l'une crée une mousse généreuse, l'autre nourrit en profondeur, une troisième protège et apaise. C'est en les combinant avec soin qu'on crée un savon équilibré, où chaque vertu trouve sa place."],
+    ['edu_s4_p2',             "Contrairement aux savons industriels où les huiles sont chauffées à haute température — détruisant leurs vitamines et nutriments — la saponification à froid préserve toute leur richesse. Les acides gras essentiels, les vitamines A et E, les antioxydants naturels restent intacts, prêts à prendre soin de votre peau à chaque usage."],
+    ['edu_s4_photo_legende',  'Huiles végétales dans des flacons, tournesol, olives, noix de coco, karité brut'],
+    ['edu_s4_section_titre',  'Les huiles que nous choisissons'],
+    ['edu_s4_h1_titre',       'Tournesol — La généreuse'],
+    ['edu_s4_h1_texte',       'Riche en vitamines E et en acides gras insaturés, l\'huile de tournesol nourrit sans alourdir. Elle pénètre facilement, laissant la peau douce et souple sans film gras. Elle apporte une mousse fine et crémeuse, un toucher soyeux, une douceur quotidienne.'],
+    ['edu_s4_h2_titre',       'Coco — L\'alliée de la mousse'],
+    ['edu_s4_h2_texte',       'L\'huile de coco est celle qui fait chanter le savon sous l\'eau. Elle crée une mousse abondante, onctueuse, presque crémeuse. Elle nettoie en profondeur, purifie, rafraîchit. En petite quantité, elle équilibre. En excès, elle peut assécher — c\'est pourquoi nous la dosons toujours avec précision.'],
+    ['edu_s4_h3_titre',       'Olive — La douceur méditerranéenne'],
+    ['edu_s4_h3_texte',       'L\'huile d\'olive est l\'ancêtre des savons. Utilisée depuis l\'Antiquité, elle nourrit profondément, protège, apaise les peaux les plus sensibles. Sa mousse est douce, crémeuse, presque lactée. Les savons à base d\'olive demandent une longue cure, mais cette patience est récompensée par une douceur incomparable.'],
+    ['edu_s4_h4_titre',       'Karité — La caresse nourrissante'],
+    ['edu_s4_h4_texte',       'Le beurre de karité apporte une richesse incomparable. Vitamines A, E, F, acides gras essentiels : c\'est une source de nutrition pure pour la peau. Il apaise, répare, protège les épidermes fragilisés. Il crée une texture crémeuse, une mousse onctueuse, un toucher velouté qui perdure longtemps après le rinçage.'],
+    ['edu_s4_h5_titre',       'Amande douce — La délicate'],
+    ['edu_s4_h5_texte',       'Douce comme son nom l\'indique, l\'huile d\'amande est celle qu\'on choisit pour les peaux fragiles, réactives, facilement irritées. Elle apaise les démangeaisons, calme les rougeurs, nourrit sans alourdir. Parfaite pour les bébés, les peaux matures, tous ceux qui cherchent une tendresse particulière.'],
+    ['edu_s4_h6_titre',       'Lait de chèvre — La tradition apaisante'],
+    ['edu_s4_h6_texte',       'Le lait de chèvre est un trésor connu depuis l\'Antiquité pour ses vertus apaisantes. Riche en vitamines A, B, C et en acides gras, il nourrit intensément tout en respectant l\'équilibre naturel de la peau. Il apporte une douceur lactée, une mousse crémeuse, un réconfort incomparable.'],
+    ['edu_s4_citation',       'Un savon n\'est jamais composé d\'une seule huile. C\'est l\'équilibre entre plusieurs qui crée la perfection.'],
+    ['edu_s4_citation_source','La symphonie d\'huiles Univers Caresse'],
+
+    // ─── SECTION 5 — ARGILES ET ADDITIFS ───
+    ['edu_s5_surtitre',       'Le savon artisanal — 5 / 7'],
+    ['edu_s5_titre',          'Les argiles'],
+    ['edu_s5_titre_em',       'et additifs'],
+    ['edu_s5_accroche',       'Les trésors de la terre dans votre savon'],
+    ['edu_s5_p1',             "Au-delà des huiles, nos savons accueillent des alliés précieux venus de la terre et des plantes. Les argiles, les poudres végétales, les flocons d'avoine, le charbon activé — chacun apporte sa touche unique, son bienfait particulier. Ce ne sont pas de simples ajouts décoratifs : ce sont des ingrédients actifs qui prennent soin de votre peau, la purifient, l'apaisent, la nourrissent."],
+    ['edu_s5_p2',             "Les argiles, en particulier, sont des cadeaux millénaires. Utilisées depuis l'Antiquité pour leurs vertus purifiantes et reminéralisantes, elles absorbent les impuretés, régulent le sébum, apaisent les irritations. Chaque couleur d'argile a sa personnalité, son action privilégiée, sa peau de prédilection."],
+    ['edu_s5_photo_legende',  'Argiles colorées dans des bols, charbon activé noir, flocons d\'avoine, pétales de fleurs séchées'],
+    ['edu_s5_section1_titre', 'Les argiles'],
+    ['edu_s5_a1_titre',       'Argile blanche (Kaolin)'],
+    ['edu_s5_a1_texte',       'L\'argile blanche est la plus délicate de toutes. Elle convient même aux peaux les plus sensibles. Elle nettoie sans agresser, absorbe légèrement l\'excès de sébum sans assécher, apaise les rougeurs. C\'est l\'argile de la douceur, celle qu\'on choisit pour les bébés et les peaux réactives.'],
+    ['edu_s5_a2_titre',       'Argile jaune'],
+    ['edu_s5_a2_texte',       'L\'argile jaune est celle de l\'équilibre. Plus absorbante que la blanche, plus douce que la verte, elle convient aux peaux normales à mixtes. Elle purifie sans décaper, tonifie sans irriter, régule sans assécher. Sa couleur dorée apporte une lumière chaleureuse aux savons.'],
+    ['edu_s5_a3_titre',       'Argile rose'],
+    ['edu_s5_a3_texte',       'L\'argile rose est un mariage subtil entre l\'argile blanche et l\'argile rouge. Elle hérite de la douceur de l\'une et de la force minéralisante de l\'autre. Parfaite pour les peaux sensibles qui ont besoin d\'un peu plus que la simple douceur.'],
+    ['edu_s5_a4_titre',       'Argile verte'],
+    ['edu_s5_a4_texte',       'L\'argile verte est la plus puissante. C\'est l\'argile des peaux grasses, des pores dilatés, des brillances indésirables. Elle absorbe l\'excès de sébum avec efficacité, purifie en profondeur, resserre les pores, matifie.'],
+    ['edu_s5_a5_titre',       'Argile rouge'],
+    ['edu_s5_a5_texte',       'L\'argile rouge est celle de la circulation et de la régénération. Elle convient aux peaux normales à sèches, particulièrement les peaux matures ou fatiguées. Elle améliore la microcirculation, redonne de l\'éclat, illumine le teint.'],
+    ['edu_s5_section2_titre', 'Les additifs'],
+    ['edu_s5_ad1_titre',      'Charbon activé'],
+    ['edu_s5_ad1_texte',      'Le charbon activé est un aimant à impuretés. Il attire et capture les toxines, les polluants, les impuretés logées dans les pores. C\'est l\'allié des peaux urbaines. Dans un savon, il crée des marbrures noires spectaculaires.'],
+    ['edu_s5_ad2_titre',      'Avoine'],
+    ['edu_s5_ad2_texte',      'Les flocons d\'avoine sont une caresse pour les peaux irritées, sensibles, sujettes aux démangeaisons. Ils apaisent, adoucissent, calment les rougeurs. Leur texture fine agit comme un exfoliant ultra-doux, retirant les cellules mortes sans jamais agresser.'],
+    ['edu_s5_ad3_titre',      'Fleurs et pétales'],
+    ['edu_s5_ad3_texte',      'Les fleurs — lavande, rose, calendula — ne sont pas que décoratives. La lavande apaise, la rose tonifie, le calendula répare. Chaque savon devient une petite œuvre d\'art végétale.'],
+
+    // ─── SECTION 6 — HUILES ESSENTIELLES ───
+    ['edu_s6_surtitre',       'Le savon artisanal — 6 / 7'],
+    ['edu_s6_titre',          'Les huiles'],
+    ['edu_s6_titre_em',       'essentielles'],
+    ['edu_s6_accroche',       'Les âmes parfumées de nos savons'],
+    ['edu_s6_p1',             "Les huiles essentielles ne sont pas de simples parfums. Ce sont des concentrés de plantes qui portent en eux l'essence même de la nature. Quelques gouttes suffisent pour transformer un savon : elles apportent leur parfum, certes, mais aussi leurs vertus thérapeutiques reconnues depuis des millénaires."],
+    ['edu_s6_p2',             "Dans nos savons saponifiés à froid, les huiles essentielles restent actives. Notre méthode douce préserve leurs propriétés. Elles se libèrent au contact de l'eau, enveloppent votre peau de leurs bienfaits, transforment chaque lavage en rituel sensoriel."],
+    ['edu_s6_photo_legende',  'Flacons d\'huiles essentielles, plantes fraîches (lavande, eucalyptus, menthe, romarin), gouttes d\'HE'],
+    ['edu_s6_section_titre',  'Les huiles essentielles de nos savons'],
+    ['edu_s6_he1_titre',      'Lavande vraie — L\'apaisante'],
+    ['edu_s6_he1_texte',      'Apaisante, cicatrisante, régulatrice, elle convient à tous les types de peaux — même les plus sensibles. Elle calme les irritations, favorise la régénération cutanée, apaise les petites inflammations. Son parfum herbacé et floral crée une atmosphère de sérénité.'],
+    ['edu_s6_he2_titre',      'Eucalyptus — Le purifiant'],
+    ['edu_s6_he2_texte',      'L\'eucalyptus apporte une fraîcheur intense, presque mentholée. Purifiante et tonifiante, cette huile essentielle est appréciée des peaux grasses et mixtes. Elle resserre les pores, purifie en profondeur, rafraîchit.'],
+    ['edu_s6_he3_titre',      'Menthe poivrée — La vivifiante'],
+    ['edu_s6_he3_texte',      'La menthe poivrée est l\'huile essentielle du réveil. Fraîche, piquante, presque électrisante, elle stimule la peau, active la circulation, apporte une sensation de fraîcheur qui perdure longtemps après le rinçage.'],
+    ['edu_s6_he4_titre',      'Romarin — Le tonifiant'],
+    ['edu_s6_he4_texte',      'Le romarin est l\'huile essentielle de la vitalité. Tonifiante, purifiante, régénérante, elle stimule la circulation, revitalise les tissus, apporte de l\'éclat aux teints ternes.'],
+    ['edu_s6_he5_titre',      'Cèdre — Le boisé'],
+    ['edu_s6_he5_texte',      'Le cèdre apporte une profondeur boisée, presque masculine. Apaisant, purifiant, il convient à tous les types de peaux. Son parfum chaud, résineux, enveloppant crée une atmosphère de sérénité.'],
+    ['edu_s6_he6_titre',      'Géranium rosat — L\'équilibrant'],
+    ['edu_s6_he6_texte',      'Le géranium rosat est l\'huile essentielle de l\'équilibre. Elle régule la production de sébum — précieuse pour les peaux mixtes. Son parfum floral, légèrement rosé, apporte une touche de douceur féminine sans être trop sucré.'],
+    ['edu_s6_he7_titre',      'Ylang-ylang — La sensuelle'],
+    ['edu_s6_he7_texte',      'L\'ylang-ylang porte en elle la chaleur des tropiques. Elle régule la production de sébum, tonifie, apaise. Son odeur est si puissante qu\'une petite quantité suffit à transformer un savon en expérience olfactive.'],
+    ['edu_s6_he8_titre',      'Citron — Le lumineux'],
+    ['edu_s6_he8_texte',      'Le citron apporte une fraîcheur pétillante, presque solaire. Purifiante, astringente, tonifiante, cette huile essentielle illumine le teint, resserre les pores, purifie les peaux grasses.'],
+    ['edu_s6_he9_titre',      'Thé vert — L\'antioxydant'],
+    ['edu_s6_he9_texte',      'L\'huile essentielle de thé vert protège la peau des agressions extérieures, lutte contre le vieillissement prématuré, tonifie. C\'est l\'huile essentielle des peaux urbaines exposées à la pollution.'],
+    ['edu_s6_he10_titre',     'Petitgrain — Le relaxant'],
+    ['edu_s6_he10_texte',     'Le petitgrain apporte une fraîcheur verte et florale. Rééquilibrante, apaisante, il convient particulièrement aux peaux grasses et mixtes. Son parfum délicat crée une atmosphère de détente raffinée.'],
+    ['edu_s6_he11_titre',     'Palmarosa — La régénérante'],
+    ['edu_s6_he11_texte',     'La palmarosa est précieuse pour la peau. Régénérante, hydratante, elle stimule le renouvellement cellulaire, maintient l\'hydratation. Elle convient à tous les types de peaux, particulièrement les peaux sèches et matures.'],
+    ['edu_s6_precautions',    'Femmes enceintes et allaitantes : certaines huiles essentielles sont déconseillées. Privilégiez les savons sans HE ou consultez votre médecin. Bébés et jeunes enfants : préférez la Collection PETIT NUAGE, formulée sans huiles essentielles. Peaux très sensibles : testez toujours un nouveau savon sur une petite zone avant usage complet.'],
+
+    // ─── SECTION 7 — CONNAÎTRE SA PEAU ───
+    ['edu_s7_surtitre',       'Le savon artisanal — 7 / 7'],
+    ['edu_s7_titre',          'Connaître sa peau'],
+    ['edu_s7_titre_em',       'et choisir son savon'],
+    ['edu_s7_accroche',       'Le guide pour trouver votre allié parfait'],
+    ['edu_s7_intro',          "Votre peau est unique. Elle a ses besoins, ses réactions, ses préférences. Comprendre son type, c'est la première étape pour choisir le savon qui lui fera du bien — celui qui nettoie sans agresser, qui nourrit sans alourdir, qui respecte son équilibre naturel."],
+    ['edu_s7_photo_legende',  'Différents types de peau en gros plan, savons adaptés à chaque type, routine de soin'],
+    ['edu_s7_section1_titre', 'Identifier votre type de peau'],
+    ['edu_s7_peau1_titre',    'Peau normale'],
+    ['edu_s7_peau1_signes',   'Confortable toute la journée, ni brillances ni tiraillements. Grain de peau régulier, pores peu visibles. Peu de réactions, bonne tolérance à la plupart des produits.'],
+    ['edu_s7_peau1_aime',     'Des savons équilibrés, avec un surgraissage modéré (5-8%), des huiles légères (tournesol, coco), des argiles douces (blanche, jaune).'],
+    ['edu_s7_peau2_titre',    'Peau sèche'],
+    ['edu_s7_peau2_signes',   'Sensation de tiraillement après le lavage, particulièrement en hiver. Texture parfois rugueuse, desquamation légère, inconfort. Pores fins, peu visibles.'],
+    ['edu_s7_peau2_aime',     'Des savons riches, généreusement surgraissés (8-10%), des huiles nourrissantes (olive, karité, amande douce), de l\'avoine apaisante.'],
+    ['edu_s7_peau3_titre',    'Peau grasse'],
+    ['edu_s7_peau3_signes',   'Brillances, particulièrement sur la zone T (front, nez, menton). Pores dilatés, tendance aux imperfections.'],
+    ['edu_s7_peau3_aime',     'Des savons purifiants, légèrement surgraissés (3-5%), des argiles absorbantes (verte, jaune), du charbon activé, des huiles essentielles purifiantes.'],
+    ['edu_s7_peau4_titre',    'Peau mixte'],
+    ['edu_s7_peau4_signes',   'Zone T grasse avec brillances et pores dilatés. Joues normales à sèches. Le grand classique : deux peaux en une.'],
+    ['edu_s7_peau4_aime',     'Des savons équilibrants avec argiles régulatrices (jaune, rose), des huiles essentielles régulatrices (géranium rosat, petitgrain), un surgraissage modéré (5-8%).'],
+    ['edu_s7_peau5_titre',    'Peau sensible'],
+    ['edu_s7_peau5_signes',   'Réactions fréquentes (rougeurs, picotements, démangeaisons). Intolérance à certains produits. Peau fine, réactive au froid, au chaud, au stress.'],
+    ['edu_s7_peau5_aime',     'Des savons doux, généreusement surgraissés (8-10%), des argiles délicates (blanche, rose), de l\'avoine apaisante, des huiles essentielles douces (lavande) ou aucune HE du tout.'],
+    ['edu_s7_astuce',         'Beaucoup de gens remarquent que leur peau change avec les saisons. L\'hiver québécois, avec son chauffage électrique et son air sec, peut assoiffer même les peaux habituellement grasses. Une peau grasse en été peut avoir besoin d\'un savon pour peau normale en hiver. Écoutez votre peau — elle sait ce dont elle a besoin.'],
+    ['edu_s7_section2_titre', 'Choisir selon vos besoins spécifiques'],
+    ['edu_s7_usage1_titre',   'Pour le visage'],
+    ['edu_s7_usage1_texte',   'Privilégiez des savons doux, surgraissés entre 8-10%, avec des argiles adaptées à votre type de peau. Évitez les savons trop purifiants qui pourraient déséquilibrer le film hydrolipidique délicat du visage.'],
+    ['edu_s7_usage2_titre',   'Pour le corps'],
+    ['edu_s7_usage2_texte',   'Vous pouvez choisir un surgraissage légèrement inférieur (5-8%) si votre peau le tolère bien. Les savons pour le corps peuvent être plus purifiants, plus tonifiants.'],
+    ['edu_s7_usage3_titre',   'Pour les mains'],
+    ['edu_s7_usage3_texte',   'Les mains sont lavées plusieurs fois par jour — elles méritent une douceur particulière. Un surgraissage modéré (5%) avec des huiles protectrices est idéal.'],
+    ['edu_s7_usage4_titre',   'Pour les bébés et enfants'],
+    ['edu_s7_usage4_texte',   'Douceur absolue : surgraissage élevé (10%), aucune huile essentielle, argiles délicates, formules testées pour les peaux fragiles.'],
+    ['edu_s7_usage5_titre',   'Pour les cheveux'],
+    ['edu_s7_usage5_texte',   'Les shampoings solides ont leurs propres formulations, adaptées au type de cheveux (gras, normaux, secs/bouclés). Ils nettoient le cuir chevelu sans décaper, respectent l\'équilibre capillaire.'],
+    ['edu_s7_section3_titre', 'Testez et écoutez votre peau'],
+    ['edu_s7_ok1',            'Peau confortable, pas de tiraillements'],
+    ['edu_s7_ok2',            'Aucune irritation ou rougeur'],
+    ['edu_s7_ok3',            'Sensation de propreté sans effet décapant'],
+    ['edu_s7_ok4',            'Hydratation qui dure plusieurs heures'],
+    ['edu_s7_non1',           'Tiraillements après le rinçage'],
+    ['edu_s7_non2',           'Rougeurs, démangeaisons, inconfort'],
+    ['edu_s7_non3',           'Peau qui brille excessivement ou qui pèle'],
+    ['edu_s7_non4',           'Besoin urgent de crème hydratante'],
+  ];
+
+  let ajoutees = 0;
+  cles.forEach(([cle, valeur]) => {
+    if (!clesExistantes.has(cle)) {
+      sheet.appendRow([cle, valeur]);
+      ajoutees++;
+    }
+  });
+
+  Logger.log(`${ajoutees} clés éducatives ajoutées sur ${cles.length} total.`);
+}
+
+
+// ========================================
+// UTILITAIRE NETTOYAGE TEXTE
+// ========================================
+
+function nettoyerTexte(str) {
+  if (!str) return '';
+  // Décoder unicode \uXXXX
+  str = str.replace(/\\u([0-9a-fA-F]{4})/g, function(m, code) {
+    return String.fromCharCode(parseInt(code, 16));
+  });
+  // Retirer balises HTML
+  str = str.replace(/<[^>]+>/g, ' ');
+  // Décoder entités HTML communes
+  str = str.replace(/&eacute;/g, 'é').replace(/&egrave;/g, 'è').replace(/&agrave;/g, 'à')
+           .replace(/&acirc;/g, 'â').replace(/&ecirc;/g, 'ê').replace(/&ocirc;/g, 'ô')
+           .replace(/&ucirc;/g, 'û').replace(/&icirc;/g, 'î').replace(/&ccedil;/g, 'ç')
+           .replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<')
+           .replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/&#39;/g, "'")
+           .replace(/&rsquo;/g, "'").replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')
+           .replace(/&ndash;/g, '–').replace(/&mdash;/g, '—');
+  // Nettoyer espaces multiples
+  str = str.replace(/\s+/g, ' ').trim();
+  return str;
+}
+
+// ========================================
+// TRANSFERT VERS INGREDIENTS_INCI
+// ========================================
+
+function initialiserIngredientsInci() {
+  getIngredientsInciSheet();
+  Logger.log('Onglet Ingredients_INCI créé.');
+}
+
+function testerApiSansCategorie() {
+  const TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3NzQ1NzE2NzQsImV4cCI6MTgwNjEwNzY3NCwicm9sZXMiOlsiSVNfQVVUSEVOVElDQVRFRF9BTk9OWU1PVVNMWSJdLCJ1c2VybmFtZSI6IjMxOGNhNzZlLWJmN2EtNDYxYi05NWM0LTBlY2ViMzVkZjYxYiIsImlwIjoiMTU5LjIwMy4zNS40OSIsImlkZW50aXR5IjoiMzE4Y2E3NmUtYmY3YS00NjFiLTk1YzQtMGVjZWIzNWRmNjFiIiwiY3VzdG9tZXJfc2Vzc2lvbl90b2tlbiI6IjU4MDFhZTFlLWI2OTctNDM5OS05NjZhLWVjZjViMzJlZTE2MyIsInNob3BfaWQiOjEwNzV9.DzyI5PkTW5b_HeFM1F_pUhhPJ3jt6nEoA0ulvfYXYOvkrSar7LlNCMGWktIuA58SAhlgo7yOwjXXvIqN_qNTzfgwMS9BSeDogrUDVaw_pZXE3jDKMK3fuxBWS2CG9I9zQGIkf3VSxgG_nqmfn9OiAqBhdYt3ZH-Y73rGGKIBY1OXhIj_2VW3MukCYvk0xJ63pxxJkXDAx-e-1CUVNwtgm_NByGpQ_db8COQju6SpN_sXaaZ7Tn28Rvm9hLWBWC83OGlRu8dnKZKrHjIO9FpSWLknxlbeMF8HtYoF6OHGkVs2_ofTy3w4Azw9Vp1PIh2CfgYjBP-gRk2oVYXn3cz9jBoL28acu_s07A9ZV7HygBTthOPlRAd5r46Ec2yF0rV5U9tqArbBdJ3-5v5PxmuBw9p0bATVkTdBrWXXD-UWNq8MDBaH9Fh80G2DnXMBiBTMb_sikX7yMC33VX4P7HQNLuc1O_Uv8a-K97mgLUJYoi_8lCc9C82WTT0UAnKRqBGI64L5D9ggB5FCdxiqwb9LvmI0IjJzrY3JRC6Xg2rszrniR6sxmwqhVtmTTIY0uAQbxbQgAEpOqGIUbgDjcpSt7aQsyuTbkEB-v0MmJmx4zgsjEa3P5N5E6xSr020YBV2AQi3v-EV9UJYl9Leau3BcG0EvPt-vBuGT-vGpWAvI9aU';
+
+  const url = 'https://api2.panierdachat.app/api/public/products?offset=0&limit=10&order%5Btitle%5D=asc';
+  const resp = UrlFetchApp.fetch(url, {
+    method: 'GET',
+    headers: { 'Authorization': 'Bearer ' + TOKEN },
+    muteHttpExceptions: true
+  });
+  Logger.log('Code HTTP: ' + resp.getResponseCode());
+  const json = JSON.parse(resp.getContentText());
+  const produits = json.products || json.items || json.data || [];
+  Logger.log('Nombre produits: ' + produits.length);
+  if (produits.length > 0) Logger.log('Premier: ' + produits[0].title);
+}
+
+function nettoyerScrapingPA() {
+  const ss    = SpreadsheetApp.openById('16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0');
+  const sheet = ss.getSheetByName('Scraping_PA_v4');
+  if (!sheet) { Logger.log('Scraping_PA_v4 introuvable'); return; }
+
+  const data    = sheet.getDataRange().getValues();
+  const headers = data[0];
+
+  const colNom  = headers.indexOf('Nom');
+  const colCat  = headers.indexOf('Catégorie');
+  const colInci = headers.indexOf('INCI');
+  const colBot  = headers.indexOf('Nom botanique');
+  const colBrut = headers.indexOf('Texte brut');
+
+  // Catégories fourre-tout — perdent toujours contre une catégorie spécifique
+  const fourreToutes = new Set(['ingrédients secs', 'ingrédients liquides']);
+
+  function scorer(row) {
+    const cat = (row[colCat] || '').toString().trim().toLowerCase();
+    return ((row[colInci] || '') ? 30 : 0)
+         + ((row[colBot]  || '') ? 20 : 0)
+         + ((row[colBrut] || '') ? 10 : 0)
+         + (fourreToutes.has(cat) ? 0 : 1); // catégorie spécifique vaut 1 point de plus
+  }
+
+  // Garder la meilleure ligne par nom
+  const meilleure = {};
+  for (let i = 1; i < data.length; i++) {
+    const nom = (data[i][colNom] || '').toString().trim().toLowerCase();
+    if (!nom) continue;
+    const score = scorer(data[i]);
+    if (!meilleure[nom] || score > meilleure[nom].score) {
+      meilleure[nom] = { rowIndex: i, score, row: data[i] };
+    }
+  }
+
+  // Identifier les lignes à garder
+  const aGarder = new Set(Object.values(meilleure).map(m => m.rowIndex));
+
+  // Supprimer de bas en haut les lignes en double
+  let supprimes = 0;
+  for (let i = data.length - 1; i >= 1; i--) {
+    const nom = (data[i][colNom] || '').toString().trim().toLowerCase();
+    if (!nom) continue;
+    if (!aGarder.has(i)) {
+      sheet.deleteRow(i + 1);
+      supprimes++;
+    }
+  }
+
+  Logger.log('Nettoyage terminé — ' + supprimes + ' doublons supprimés — ' + Object.keys(meilleure).length + ' lignes conservées');
+}
+
+
+
+function getIngredientsInciSheet() {
+  const ss = SpreadsheetApp.openById('16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0');
+  let sheet = ss.getSheetByName('Ingredients_INCI');
+  if (!sheet) {
+    sheet = ss.insertSheet('Ingredients_INCI');
+    sheet.appendRow(['Catégorie', 'Nom', 'INCI', 'Nom botanique', 'Source', 'Date', 'Note olfactive', 'Statut']);
+    sheet.getRange('A1:H1').setFontWeight('bold').setBackground('#e8f5e9');
+  }
+  return sheet;
+}
+
+function transfererVersIngredientsInci() {
+  const ss = SpreadsheetApp.openById('16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0');
+  const purearome = ss.getSheetByName('Purearome_Test');
+  if (!purearome) { Logger.log('Purearome_Test introuvable'); return; }
+
+  const inci = getIngredientsInciSheet();
+  const dataSource = purearome.getDataRange().getValues();
+  const headers = dataSource[0];
+
+  const colNom      = headers.indexOf('Nom') + 1;
+  const colCat      = headers.indexOf('Catégorie') + 1;
+  const colInci     = headers.indexOf('INCI') + 1;
+  const colCas      = headers.indexOf('CAS') + 1;
+
+  if (!colNom || !colCat) { Logger.log('Colonnes Nom/Catégorie introuvables dans Purearome_Test'); return; }
+
+  // Charger les entrées existantes dans Ingredients_INCI
+  const dataInci = inci.getDataRange().getValues();
+  const existants = {};
+  for (let i = 1; i < dataInci.length; i++) {
+    const key = String(dataInci[i][0]).toLowerCase() + '||' + String(dataInci[i][1]).toLowerCase();
+    existants[key] = { row: i + 1, source: dataInci[i][4] };
+  }
+
+  const aujourd_hui = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  let ajoutes = 0;
+  let misAJour = 0;
+
+  for (let i = 1; i < dataSource.length; i++) {
+    const nom      = nettoyerTexte(String(dataSource[i][colNom - 1] || ''));
+    const cat      = nettoyerTexte(String(dataSource[i][colCat - 1] || ''));
+    const inciVal  = colInci ? nettoyerTexte(String(dataSource[i][colInci - 1] || '')) : '';
+    const casVal   = colCas  ? nettoyerTexte(String(dataSource[i][colCas - 1]  || '')) : '';
+
+    if (!nom || !cat || !inciVal) continue;
+
+    const key = nom.toLowerCase() + '||' + cat.toLowerCase();
+
+    if (!existants[key]) {
+      // Nouveau — ajouter
+      inci.appendRow([nom, cat, inciVal, casVal, 'Purearome', aujourd_hui]);
+      ajoutes++;
+    } else {
+      // Existant — mettre à jour INCI/CAS seulement si source était EU CosIng ou Manuel
+      // et qu'on a maintenant un INCI de Purearome
+      const sourceActuelle = existants[key].source || '';
+      if (inciVal && (sourceActuelle === 'EU CosIng' || sourceActuelle === 'Manuel')) {
+        inci.getRange(existants[key].row, 3).setValue(inciVal);
+        inci.getRange(existants[key].row, 4).setValue(casVal);
+        inci.getRange(existants[key].row, 5).setValue('Purearome');
+        misAJour++;
+      }
+    }
+  }
+
+  Logger.log('Transfert terminé — ' + ajoutes + ' ajoutés, ' + misAJour + ' mis à jour');
+}
+
+// ========================================
+// SCRAPING PUREAROME
+// ========================================
+
+function scrapePurearome() {
+  const TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3NzM4MzYzMjcsImV4cCI6MTgwNTM3MjMyNywicm9sZXMiOlsiSVNfQVVUSEVOVElDQVRFRF9BTk9OWU1PVVNMWSJdLCJ1c2VybmFtZSI6ImE3MmRmN2RkLTc5MDItNDFlOC04ZmY4LTQ2MGUyYzk0ZDEzMCIsImlwIjoiMTU5LjIwMy4zNS40OSIsImlkZW50aXR5IjoiYTcyZGY3ZGQtNzkwMi00MWU4LThmZjgtNDYwZTJjOTRkMTMwIiwiY3VzdG9tZXJfc2Vzc2lvbl90b2tlbiI6ImYwMDg4ZjIxLTlhZGMtNDA0MS1hMGU3LTBkOTkzYTc5YjljZSIsInNob3BfaWQiOjEwNzV9.LxTFw_Hn0T4JvXCy23eKiU3T6Q8cuJebiSzySNrZzzCzXs4FxDqv5Yk91bpsRag8y-lDf_9lPop7W1NaJTPSEz8PIAQD-z8CUBGygaYW2MKCP4ijR0bM9loQZPnJROykpgCbg2b_jWpTZfqyiFrPQsLtWbPP42Z6twWMgVllbQY4r_MEPEUJ6CIL2hyYDe5cq_cpG8hLSEb7jg_7VBa1it-b7yTH4DmpwcO7kPoDH7rAg3QbvW4kWuFj79q1HhmV5f-S8AyWx-O4U97SnZTz17OorJ_iCxmtqdhfOEAsP1nG8kox3_DyVv2Tz61a7TWVuUvyyzpNxvFpG6lKUUU2wmirtzQRC5wjbydg4kL_DM64Q1AGyu4MD9QWVTLwAv08P3UYbV8mhnJ0hRjfTqNw04zjh8lIDYW4aR0lSADhba1FkjvhXraMDN4cKXzWOazRzJuA8mZsy_lj0nWX3p6Pxf1U5bc2u_7bHyYpk-qSwPRuHAnq67VeWF2kAmYZ4jdIg0pDHwG-Ggd30iy3o60buKljpwTvMtMBKdwRx0kSGa-YHnjMnSJyPgnAAQ_d_zrP_Y-AmpD3j2kRUTEg75ELFgahjq69SZXgqx7nFM2SuqyV-0gCB5ONQ0t2lm-fNQeIpnt61x4ZJ-4g5ycUd5N7-WAUrQJmHhRCI6Qof1qF1RU';
+
+  const CATEGORIES = [
+    { id: 14329, nom: 'Argiles' },
+    { id: 14332, nom: 'Bases neutres' },
+    { id: 14335, nom: 'Cires' },
+    { id: 14337, nom: 'Colorants et Pigments' },
+    { id: 14340, nom: 'Herbes et Fleurs' },
+    { id: 14341, nom: 'Huiles aromatiques naturelle' },
+    { id: 14342, nom: 'Huiles essentielles' },
+    { id: 14343, nom: 'Huiles et Beurres' },
+    { id: 14344, nom: 'Hydrolats' },
+    { id: 14345, nom: 'Ingrédients Liquides' },
+    { id: 14346, nom: 'Ingrédients Secs' },
+    { id: 14347, nom: 'Fragrances' },
+    { id: 14348, nom: 'Saveurs naturelles' }
+  ];
+
+  const ss = SpreadsheetApp.openById('16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0');
+  let sheet = ss.getSheetByName('Purearome_Test');
+  if (!sheet) {
+    sheet = ss.insertSheet('Purearome_Test');
+  } else {
+    sheet.clearContents();
+  }
+
+  // En-têtes — tous les champs extraits
+  sheet.appendRow([
+    'Catégorie', 'Nom', 'Prix min', 'Prix max',
+    'Slug', 'Image URL', 'Hors stock',
+    'ID produit', 'SKU', 'Description courte', 'Description longue',
+    'Poids (g)', 'Unité', 'Marque', 'Tags'
+  ]);
+  sheet.getRange('A1:O1').setFontWeight('bold').setBackground('#e8f5e9');
+
+  let premierProduitLogge = false;
+  let totalEcrits = 0;
+
+  for (let c = 0; c < CATEGORIES.length; c++) {
+    const categorie = CATEGORIES[c];
+    let offset = 0;
+    let continuer = true;
+
+    while (continuer) {
+      try {
+        const url = 'https://api2.panierdachat.app/api/public/products?categoryId=' + categorie.id +
+                    '&offset=' + offset + '&limit=100&order%5Btitle%5D=asc';
+
+        const response = UrlFetchApp.fetch(url, {
+          method: 'GET',
+          headers: { 'Authorization': 'Bearer ' + TOKEN },
+          muteHttpExceptions: true
+        });
+
+        const code = response.getResponseCode();
+        if (code !== 200) {
+          Logger.log('Erreur HTTP ' + code + ' — catégorie ' + categorie.nom + ' offset ' + offset);
+          continuer = false;
+          continue;
+        }
+
+        const json = JSON.parse(response.getContentText());
+        const produits = json.products || json.items || json.data || json || [];
+
+        if (!Array.isArray(produits) || produits.length === 0) {
+          continuer = false;
+          continue;
+        }
+
+        // Logger tous les champs du tout premier produit
+        if (!premierProduitLogge && produits.length > 0) {
+          Logger.log('=== TOUS LES CHAMPS DISPONIBLES ===');
+          Logger.log(JSON.stringify(produits[0], null, 2));
+          premierProduitLogge = true;
+        }
+
+        const rows = produits.map(function(p) {
+          return [
+            categorie.nom,
+            p.title || p.name || '',
+            p.regular_range_price ? (p.regular_range_price.amount_min || 0) : 0,
+            p.regular_range_price ? (p.regular_range_price.amount_max || 0) : 0,
+            p.slug || '',
+            p.image ? (p.image.cdn_url || p.image.url || '') : '',
+            p.no_stock ? 'Oui' : 'Non',
+            p.id || '',
+            p.sku || p.reference || '',
+            p.short_description || p.excerpt || '',
+            p.description || p.long_description || '',
+            p.weight || '',
+            p.unit || p.unit_label || '',
+            p.brand ? (p.brand.name || '') : '',
+            Array.isArray(p.tags) ? p.tags.map(function(t) { return t.name || t; }).join(', ') : ''
+          ];
+        });
+
+        sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
+        totalEcrits += rows.length;
+
+        Logger.log(categorie.nom + ' — offset ' + offset + ' — ' + produits.length + ' produits');
+
+        if (produits.length < 100) {
+          continuer = false;
+        } else {
+          offset += 100;
+          Utilities.sleep(300);
+        }
+
+      } catch(e) {
+        Logger.log('Erreur: ' + e.message + ' — catégorie ' + categorie.nom);
+        continuer = false;
+      }
+    }
+
+    Utilities.sleep(500);
+  }
+
+  Logger.log('=== TERMINÉ — ' + totalEcrits + ' produits écrits ===');
+}
+
+
+// ========================================
+// SCRAPING INCI PUREAROME — AUTO-RELANCE
+// ========================================
+
+function lancerScrapingInci() {
+  // Réinitialiser la position
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty('inci_reprise', '2');
+  props.setProperty('inci_en_cours', 'true');
+
+  // Supprimer les triggers existants pour éviter les doublons
+  supprimerTriggerInci();
+
+  // Créer le trigger auto-relance toutes les 5 min
+  ScriptApp.newTrigger('scrapeInciPurearome')
+    .timeBased()
+    .everyMinutes(5)
+    .create();
+
+  // Lancer immédiatement la première passe
+  scrapeInciPurearome();
+}
+
+function scrapeInciPurearome() {
+  const props = PropertiesService.getScriptProperties();
+  if (props.getProperty('inci_en_cours') !== 'true') return;
+
+  const ss = SpreadsheetApp.openById('16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0');
+  const sheet = ss.getSheetByName('Purearome_Test');
+  if (!sheet) { Logger.log('Onglet Purearome_Test introuvable'); return; }
+
+  // Ajouter colonnes INCI, CAS, Description si absentes
+  const headersRow = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  let colInci = headersRow.indexOf('INCI') + 1;
+  let colCas  = headersRow.indexOf('CAS') + 1;
+  let colDesc = headersRow.indexOf('Description') + 1;
+  const lastCol = headersRow.length;
+  if (!colInci) { sheet.getRange(1, lastCol + 1).setValue('INCI');        colInci = lastCol + 1; }
+  if (!colCas)  { sheet.getRange(1, lastCol + 2).setValue('CAS');         colCas  = lastCol + 2; }
+  if (!colDesc) { sheet.getRange(1, lastCol + 3).setValue('Description'); colDesc = lastCol + 3; }
+
+  const data       = sheet.getDataRange().getValues();
+  const headers    = data[0];
+  const colSlugIdx = headers.indexOf('Slug');
+
+  const LIMITE_MS = 4.5 * 60 * 1000; // 4m30 — marge de sécurité
+  const debut     = Date.now();
+  let   depart    = parseInt(props.getProperty('inci_reprise') || '2');
+  let   i         = depart;
+
+  for (; i < data.length; i++) {
+    if (Date.now() - debut > LIMITE_MS) {
+      props.setProperty('inci_reprise', String(i));
+      Logger.log('Pause — reprise automatique à la ligne ' + i);
+      return; // Le trigger relancera dans 5 min
+    }
+
+    // Sauter si INCI déjà rempli
+    if (data[i][colInci - 1]) continue;
+
+    const slug = data[i][colSlugIdx];
+    if (!slug) continue;
+
+    try {
+      const url      = 'https://www.purearome.com/fr/produit/' + slug;
+      const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+      const html     = response.getContentText();
+
+      // Extraire INCI
+    const htmlDecode = html.replace(/\\u([0-9a-fA-F]{4})/g, function(m, c) { return String.fromCharCode(parseInt(c, 16)); });
+     const inciMatches = [...htmlDecode.matchAll(/INCI\s*:\s*<\/strong>\s*([^<]+)/gi)];
+      const inci = inciMatches.length > 0 ? inciMatches[inciMatches.length - 1][1].trim() : '';
+
+      // Extraire CAS
+   const casMatches = [...htmlDecode.matchAll(/CAS\s*:\s*<\/strong>\s*([^<]+)/gi)];
+      const cas = casMatches.length > 0 ? casMatches[casMatches.length - 1][1].trim() : '';
+
+      // Extraire description
+      const descMatch = html.match(/class="product-main__description[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+      let desc = '';
+      if (descMatch) {
+        desc = descMatch[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 500);
+      }
+
+     sheet.getRange(i + 1, colInci).setValue(nettoyerTexte(inci));
+      sheet.getRange(i + 1, colCas).setValue(nettoyerTexte(cas));
+      sheet.getRange(i + 1, colDesc).setValue(nettoyerTexte(desc));
+
+      Logger.log(i + ' — ' + slug + ' — INCI: ' + (inci || 'non trouvé'));
+      Utilities.sleep(800);
+
+    } catch(e) {
+      Logger.log('Erreur ligne ' + i + ' — ' + slug + ' : ' + e.message);
+    }
+  }
+
+ // Terminé — nettoyer
+  props.setProperty('inci_en_cours', 'false');
+  props.setProperty('inci_reprise', '2');
+  supprimerTriggerInci();
+  Logger.log('=== SCRAPING INCI TERMINÉ — trigger supprimé ===');
+  // Transfert automatique vers Ingredients_INCI
+  transfererVersIngredientsInci();
+}
+
+function initialiserClesGuideRapide() {
+  const ss = SpreadsheetApp.openById("16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0");
+  const sheet = ss.getSheetByName('Contenu');
+  if (!sheet) { Logger.log('Onglet Contenu introuvable.'); return; }
+  const rows = sheet.getDataRange().getValues();
+  const clesExistantes = new Set(rows.slice(1).map(r => r[0]));
+  const cles = [
+    ['edu_guide_titre', 'Votre guide rapide'],
+    ['edu_guide_ligne1_peau', 'Normale'],
+    ['edu_guide_ligne1_surgraissage', '5–8%'],
+    ['edu_guide_ligne1_huiles', 'Tournesol, coco, karité'],
+    ['edu_guide_ligne1_argiles', 'Blanche, jaune'],
+    ['edu_guide_ligne2_peau', 'Sèche'],
+    ['edu_guide_ligne2_surgraissage', '8–10%'],
+    ['edu_guide_ligne2_huiles', 'Olive, karité, amande'],
+    ['edu_guide_ligne2_argiles', 'Rose, avoine'],
+    ['edu_guide_ligne3_peau', 'Grasse'],
+    ['edu_guide_ligne3_surgraissage', '3–5%'],
+    ['edu_guide_ligne3_huiles', 'Tournesol, coco'],
+    ['edu_guide_ligne3_argiles', 'Verte, charbon'],
+    ['edu_guide_ligne4_peau', 'Mixte'],
+    ['edu_guide_ligne4_surgraissage', '5–8%'],
+    ['edu_guide_ligne4_huiles', 'Équilibrées'],
+    ['edu_guide_ligne4_argiles', 'Jaune, rose'],
+    ['edu_guide_ligne5_peau', 'Sensible'],
+    ['edu_guide_ligne5_surgraissage', '8–10%'],
+    ['edu_guide_ligne5_huiles', 'Amande, karité'],
+    ['edu_guide_ligne5_argiles', 'Blanche, avoine'],
+  ];
+  let ajoutees = 0;
+  cles.forEach(([cle, valeur]) => {
+    if (!clesExistantes.has(cle)) { sheet.appendRow([cle, valeur]); ajoutees++; }
+  });
+  Logger.log(ajoutees + ' clés guide rapide ajoutées.');
+}
+
+function supprimerTriggerInci() {
+  ScriptApp.getProjectTriggers().forEach(function(trigger) {
+    if (trigger.getHandlerFunction() === 'scrapeInciPurearome') {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  });
+}
+
+// ========================================
+// PAGE INCI — FONCTIONS
+// ========================================
+
+function getCategoriesUCSheet() {
+  const ss = SpreadsheetApp.openById('16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0');
+  let sheet = ss.getSheetByName('Categories_UC');
+  if (!sheet) {
+    sheet = ss.insertSheet('Categories_UC');
+    sheet.appendRow(['Catégorie', 'Date ajout']);
+    sheet.getRange('A1:B1').setFontWeight('bold').setBackground('#e8f5e9');
+
+    // Pré-remplir avec les catégories PA comme base
+    const categoriesBase = [
+      'Argiles', 'Bases neutres', 'Cires', 'Colorants et Pigments',
+      'Herbes et Fleurs', 'Huiles aromatiques naturelle', 'Huiles essentielles',
+      'Huiles et Beurres', 'Hydrolats', 'Ingrédients Liquides',
+      'Ingrédients Secs', 'Fragrances', 'Saveurs naturelles'
+    ];
+    const today = Utilities.formatDate(new Date(), 'America/Toronto', 'yyyy-MM-dd');
+    const rows  = categoriesBase.map(c => [c, today]);
+    sheet.getRange(2, 1, rows.length, 2).setValues(rows);
+  }
+  return sheet;
+}
+
+function getCategoriesUC() {
+  try {
+    const sheet = getCategoriesUCSheet();
+    const data  = sheet.getDataRange().getValues();
+    const cats  = [];
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0]) cats.push({ rowIndex: i + 1, categorie: data[i][0], dateAjout: data[i][1] || '' });
+    }
+    return { success: true, categories: cats };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function ajouterCategorieUC(data) {
+  try {
+    const sheet    = getCategoriesUCSheet();
+    const rows     = sheet.getDataRange().getValues();
+    const nom      = (data.categorie || '').trim();
+    if (!nom) return { success: false, message: 'Nom requis.' };
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0].toLowerCase() === nom.toLowerCase())
+        return { success: false, message: 'Catégorie déjà existante.' };
+    }
+    const today = Utilities.formatDate(new Date(), 'America/Toronto', 'yyyy-MM-dd');
+    sheet.appendRow([nom, today]);
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function modifierCategorieUC(data) {
+  try {
+    const sheet = getCategoriesUCSheet();
+    if (!data.rowIndex || !data.categorie) return { success: false, message: 'Données manquantes.' };
+    sheet.getRange(data.rowIndex, 1).setValue(data.categorie.trim());
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function supprimerCategorieUC(data) {
+  try {
+    const sheet = getCategoriesUCSheet();
+    if (!data.rowIndex) return { success: false, message: 'rowIndex manquant.' };
+    sheet.deleteRow(data.rowIndex);
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function getConfigInciSheet() {
+  const ss = SpreadsheetApp.openById('16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0');
+  let sheet = ss.getSheetByName('Config_INCI');
+  if (!sheet) {
+    sheet = ss.insertSheet('Config_INCI');
+    sheet.appendRow(['Catégorie source', 'Catégorie maître', 'Source', 'Confirmé']);
+    sheet.getRange('A1:D1').setFontWeight('bold').setBackground('#e8f5e9');
+
+    const categoriesPA = [
+      'Argiles', 'Bases neutres', 'Cires', 'Colorants et Pigments',
+      'Herbes et Fleurs', 'Huiles aromatiques naturelle', 'Huiles essentielles',
+      'Huiles et Beurres', 'Hydrolats', 'Ingrédients Liquides',
+      'Ingrédients Secs', 'Fragrances', 'Saveurs naturelles'
+    ];
+
+    const categoriesMH = ['Huiles essentielles', 'Huiles et Beurres', 'Hydrolats', 'À classer'];
+
+    const vues = new Set(categoriesPA.map(c => c.toLowerCase()));
+    const rows = categoriesPA.map(c => [c, c, 'PA', 'non']);
+
+    categoriesMH.forEach(c => {
+      if (!vues.has(c.toLowerCase())) {
+        rows.push([c, '', 'MH', 'non']);
+        vues.add(c.toLowerCase());
+      }
+    });
+
+    sheet.getRange(2, 1, rows.length, 4).setValues(rows);
+  }
+  return sheet;
+}
+
+function getSourcesInci() {
+  try {
+    const ss = SpreadsheetApp.openById('16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0');
+
+    // Charger la table de correspondance catégorie source → catégorie UC
+    const configSheet = getConfigInciSheet();
+    const configData  = configSheet.getDataRange().getValues();
+    const correspondance = {};
+    const confirmeesSet  = new Set();
+    for (let i = 1; i < configData.length; i++) {
+      if (configData[i][0]) {
+        const catSource = configData[i][0].trim();
+        correspondance[catSource] = (configData[i][1] || '').trim() || catSource;
+        if (configData[i][3] === 'oui') confirmeesSet.add(catSource.toLowerCase());
+      }
+    }
+
+    // Charger Ingredients_INCI — source de vérité validée
+    const sheetInci  = ss.getSheetByName('Ingredients_INCI');
+    const inciValides = {};
+    if (sheetInci) {
+      const inciData = sheetInci.getDataRange().getValues();
+      for (let i = 1; i < inciData.length; i++) {
+        const nom = (inciData[i][1] || '').toString().trim().toLowerCase();
+ if (nom) inciValides[nom] = {
+          inci:          inciData[i][2] || '',
+          nomBotanique:  inciData[i][3] || '',
+          noteOlfactive: inciData[i][6] || '',
+          categorie:     inciData[i][0] || ''
+        };
+      }
+    }
+
+    // Score d'une ligne — INCI=3, nom botanique=2, texte brut=1
+    function scorer(l) {
+      return (l.inci ? 3 : 0) + (l.nomBotanique ? 2 : 0) + (l.texteBrut ? 1 : 0);
+    }
+
+    // Ordre de priorité des sources
+    const prioriteSource = { 'PA': 0, 'MH': 1, 'Arbressence': 2, 'DE': 3 };
+
+    // Lire toutes les sources dans un tableau brut
+    const toutes = [];
+
+    function lireSheet(nomSheet, source, colMap) {
+      const sheet = ss.getSheetByName(nomSheet);
+      if (!sheet) return;
+      const data    = sheet.getDataRange().getValues();
+      const headers = data[0];
+      const idx     = {};
+      for (const [cle, label] of Object.entries(colMap)) {
+        idx[cle] = headers.indexOf(label);
+      }
+      for (let i = 1; i < data.length; i++) {
+        const qual = idx.qualite >= 0 ? (data[i][idx.qualite] || '').toString().trim() : '';
+        if (qual === 'Erreur' || qual === 'Redirection') continue;
+        const nom  = idx.nom  >= 0 ? (data[i][idx.nom]  || '').toString().trim() : '';
+        const cat  = idx.cat  >= 0 ? (data[i][idx.cat]  || '').toString().trim() : '';
+        if (!nom) continue;
+        toutes.push({
+          source,
+          categorie:     cat,
+          categorMaitre: correspondance[cat] || cat,
+          nom,
+          url:          idx.url  >= 0 ? (data[i][idx.url]  || '').toString().trim() : '',
+          inci:         idx.inci >= 0 ? (data[i][idx.inci] || '').toString().trim() : '',
+          nomBotanique: idx.bot  >= 0 ? (data[i][idx.bot]  || '').toString().trim() : '',
+          texteBrut:    idx.brut >= 0 ? (data[i][idx.brut] || '').toString().trim() : '',
+          noteOlfactive: '',
+          qualite:      qual
+        });
+      }
+    }
+
+    lireSheet('Scraping_PA', 'PA', {
+      nom: 'Nom', cat: 'Catégorie', url: 'URL',
+      inci: 'INCI', bot: 'Nom botanique', brut: 'Texte brut', qualite: 'Qualité'
+    });
+    lireSheet('Scraping_MH', 'MH', {
+      nom: 'Nom', cat: 'Catégorie', url: 'URL produit',
+      inci: 'INCI', bot: 'Nom botanique', brut: 'Composantes majoritaires', qualite: 'Qualité'
+    });
+    lireSheet('Scraping_Arbressence', 'Arbressence', {
+      nom: 'Nom', cat: 'Catégorie', url: 'URL produit',
+      inci: 'INCI', bot: 'Nom botanique', brut: 'Texte brut', qualite: 'Qualité'
+    });
+    lireSheet('Scraping_DE', 'DE', {
+      nom: 'Nom', cat: 'Catégorie', url: 'URL produit',
+      inci: 'INCI', bot: 'Nom botanique', brut: 'Texte brut', qualite: 'Qualité'
+    });
+
+    // Dédupliquer — un nom = la meilleure ligne tous fournisseurs confondus
+    const dedupMap = {};
+    for (const l of toutes) {
+      const key   = l.nom.toLowerCase();
+      const score = scorer(l);
+      const prio  = prioriteSource[l.source] ?? 99;
+
+      if (!dedupMap[key]) {
+        dedupMap[key] = { ...l, _score: score, _prio: prio };
+      } else {
+        const ex      = dedupMap[key];
+        const exScore = ex._score;
+        const exPrio  = ex._prio;
+        // Meilleur score gagne — à égalité, priorité source (PA d'abord)
+        if (score > exScore || (score === exScore && prio < exPrio)) {
+          // Garder le texte brut le plus long si la nouvelle ligne n'en a pas
+          const texteBrut = l.texteBrut || ex.texteBrut;
+          dedupMap[key] = { ...l, texteBrut, _score: score, _prio: prio };
+        } else if (!ex.texteBrut && l.texteBrut) {
+          // Ligne existante gagne mais n'a pas de texte brut — on le prend
+          ex.texteBrut = l.texteBrut;
+        }
+      }
+    }
+
+    // Appliquer Ingredients_INCI par-dessus — la validation humaine prime toujours
+    const lignesDedupliquees = Object.values(dedupMap).map(l => {
+      const key = l.nom.toLowerCase();
+  if (inciValides[key]) {
+        return {
+          ...l,
+          inci:          inciValides[key].inci,
+          nomBotanique:  inciValides[key].nomBotanique || l.nomBotanique,
+          noteOlfactive: inciValides[key].noteOlfactive,
+          categorMaitre: inciValides[key].categorie || l.categorMaitre,
+          valide:        true
+        };
+      }
+      return { ...l, valide: false };
+    });
+
+    // Table de correspondance pour l'admin
+    const configRows = configData.slice(1).map((r, i) => ({
+      rowIndex:         i + 2,
+      categorieSource:  r[0] || '',
+      categorieMaitre:  r[1] || '',
+      sourceProvenance: r[2] || '',
+      confirme:         r[3] === 'oui'
+    }));
+
+    return { success: true, lignes: lignesDedupliquees, correspondance: configRows };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function validerIngredientInci(data) {
+  try {
+    const ss    = SpreadsheetApp.openById('16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0');
+    const sheet = ss.getSheetByName('Ingredients_INCI');
+    if (!sheet) return { success: false, message: 'Feuille Ingredients_INCI introuvable' };
+
+    const rows   = sheet.getDataRange().getValues();
+    const today  = Utilities.formatDate(new Date(), 'America/Toronto', 'yyyy-MM-dd');
+    const nom    = (data.nom          || '').trim();
+    const cat    = (data.categorie    || '').trim();
+    const inci   = (data.inci         || '').trim();
+    const bot    = (data.nomBotanique || '').trim();
+    const source = (data.source       || '').trim();
+    const note   = (data.noteOlfactive || '').trim();
+    const statut = inci ? '✅ Validé' : '🔴 À compléter';
+
+    // Chercher si la ligne existe déjà
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0].toString().trim() === cat &&
+          rows[i][1].toString().trim().toLowerCase() === nom.toLowerCase()) {
+        sheet.getRange(i + 1, 3).setValue(inci);
+        sheet.getRange(i + 1, 4).setValue(bot);
+        sheet.getRange(i + 1, 5).setValue(source);
+        sheet.getRange(i + 1, 6).setValue(today);
+        sheet.getRange(i + 1, 7).setValue(note);
+        sheet.getRange(i + 1, 8).setValue(statut);
+        return { success: true, action: 'mis_a_jour' };
+      }
+    }
+
+    // Nouvelle ligne
+    sheet.appendRow([cat, nom, inci, bot, source, today, note, statut]);
+    return { success: true, action: 'ajoute' };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function sauvegarderCorrespondanceInci(data) {
+  try {
+    const sheet = getConfigInciSheet();
+    sheet.clearContents();
+    sheet.appendRow(['Catégorie source', 'Catégorie maître', 'Source', 'Confirmé']);
+    sheet.getRange(1, 1, 1, 4).setFontWeight('bold').setBackground('#e8f5e9');
+    if (data.correspondance && data.correspondance.length > 0) {
+      const rows = data.correspondance.map(r => [
+        r.categorieSource,
+        r.categorieMaitre,
+        r.sourceProvenance || '',
+        r.confirme ? 'oui' : 'non'
+      ]);
+      sheet.getRange(2, 1, rows.length, 4).setValues(rows);
+    }
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function saveIngredientInci(data) {
+  try {
+    const ss = SpreadsheetApp.openById('16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0');
+    const sheet = getIngredientsInciSheet();
+    const rows = sheet.getDataRange().getValues();
+    const nom = (data.nom || '').trim();
+    const cat = (data.categorie || '').trim();
+    const url = (data.url || '').trim();
+    const s   = data.scraped || null;
+
+    if (!nom || !cat) return { success: false, message: 'Nom et catégorie requis.' };
+
+    // Vérifier doublon dans Ingredients_INCI
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0].toLowerCase() === cat.toLowerCase() && rows[i][1].toLowerCase() === nom.toLowerCase()) {
+        return { success: false, message: 'Ingrédient déjà existant.' };
+      }
+    }
+
+    const aujourd_hui = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+
+    // Écrire dans Ingredients_INCI
+    sheet.appendRow([cat, nom, '', '', 'Manuel', aujourd_hui, '', '🔴 À compléter']);
+
+    // Si données scrapées → écrire dans la sheet du fournisseur
+    if (s && url) {
+      let nomSheet = null;
+      if (url.indexOf('purearome.com')          !== -1) nomSheet = 'Scraping_PA';
+      else if (url.indexOf('lesmauvaisesherbes') !== -1) nomSheet = 'Scraping_MH';
+      else if (url.indexOf('arbressence.ca')     !== -1) nomSheet = 'Scraping_Arbressence';
+      else if (url.indexOf('divineessence.com')  !== -1) nomSheet = 'Scraping_DE';
+
+      if (nomSheet) {
+        const sheetScraping = ss.getSheetByName(nomSheet);
+        if (sheetScraping) {
+          sheetScraping.appendRow([
+            s.categorie || cat,
+            s.nom || nom,
+            s.inci || '',
+            s.nomBotanique || '',
+            s.texteBrut || '',
+            url,
+            'Manuel',
+            aujourd_hui,
+            s.inci ? 'Propre' : (s.nomBotanique ? 'Bot seul' : 'À valider')
+          ]);
+        }
+      }
+    }
+
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+
+function loggerChampsPremierProduit() {
+  const TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3NzM4MzYzMjcsImV4cCI6MTgwNTM3MjMyNywicm9sZXMiOlsiSVNfQVVUSEVOVElDQVRFRF9BTk9OWU1PVVNMWSJdLCJ1c2VybmFtZSI6ImE3MmRmN2RkLTc5MDItNDFlOC04ZmY4LTQ2MGUyYzk0ZDEzMCIsImlwIjoiMTU5LjIwMy4zNS40OSIsImlkZW50aXR5IjoiYTcyZGY3ZGQtNzkwMi00MWU4LThmZjgtNDYwZTJjOTRkMTMwIiwiY3VzdG9tZXJfc2Vzc2lvbl90b2tlbiI6ImYwMDg4ZjIxLTlhZGMtNDA0MS1hMGU3LTBkOTkzYTc5YjljZSIsInNob3BfaWQiOjEwNzV9.LxTFw_Hn0T4JvXCy23eKiU3T6Q8cuJebiSzySNrZzzCzXs4FxDqv5Yk91bpsRag8y-lDf_9lPop7W1NaJTPSEz8PIAQD-z8CUBGygaYW2MKCP4ijR0bM9loQZPnJROykpgCbg2b_jWpTZfqyiFrPQsLtWbPP42Z6twWMgVllbQY4r_MEPEUJ6CIL2hyYDe5cq_cpG8hLSEb7jg_7VBa1it-b7yTH4DmpwcO7kPoDH7rAg3QbvW4kWuFj79q1HhmV5f-S8AyWx-O4U97SnZTz17OorJ_iCxmtqdhfOEAsP1nG8kox3_DyVv2Tz61a7TWVuUvyyzpNxvFpG6lKUUU2wmirtzQRC5wjbydg4kL_DM64Q1AGyu4MD9QWVTLwAv08P3UYbV8mhnJ0hRjfTqNw04zjh8lIDYW4aR0lSADhba1FkjvhXraMDN4cKXzWOazRzJuA8mZsy_lj0nWX3p6Pxf1U5bc2u_7bHyYpk-qSwPRuHAnq67VeWF2kAmYZ4jdIg0pDHwG-Ggd30iy3o60buKljpwTvMtMBKdwRx0kSGa-YHnjMnSJyPgnAAQ_d_zrP_Y-AmpD3j2kRUTEg75ELFgahjq69SZXgqx7nFM2SuqyV-0gCB5ONQ0t2lm-fNQeIpnt61x4ZJ-4g5ycUd5N7-WAUrQJmHhRCI6Qof1qF1RU';
+
+  const url = 'https://api2.panierdachat.app/api/public/products?categoryId=14342&offset=0&limit=1&order%5Btitle%5D=asc';
+
+  const response = UrlFetchApp.fetch(url, {
+    method: 'GET',
+    headers: { 'Authorization': 'Bearer ' + TOKEN },
+    muteHttpExceptions: true
+  });
+
+  const json = JSON.parse(response.getContentText());
+  const produits = json.products || json.items || json.data || json || [];
+
+  if (produits.length > 0) {
+    Logger.log(JSON.stringify(produits[0], null, 2));
+  }
+}
+
+
+
+
+function loggerZoneInci() {
+  const url = 'https://www.purearome.com/fr/produit/acide-stearique';
+  const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  const html = response.getContentText();
+  
+  const idx = html.indexOf('INCI');
+  Logger.log('Position INCI: ' + idx);
+  if (idx > -1) {
+  Logger.log(html.substring(idx - 200, idx + 500));
+  const idx2 = html.indexOf('INCI', idx + 1);
+  Logger.log('Position INCI #2: ' + idx2);
+  if (idx2 > -1) Logger.log(html.substring(idx2 - 200, idx2 + 500));
+  }
+}
+
+
+function initialiserIngredientsInci() {
+  getIngredientsInciSheet();
+  Logger.log('Onglet Ingredients_INCI créé.');
+}
