@@ -1,16 +1,16 @@
 /* ═══════════════════════════════════════
    UNIVERS CARESSE — main.js
-   Mis à jour : 5 mars 2026
+   V2 — 6 avril 2026
    ═══════════════════════════════════════ */
- 
+
 // ─── CONFIGURATION ───
 const CONFIG = {
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz2PKZWUTyxDcfd2HH-RZmbPVEhgsSDooK1R4Cp3I90UA45ZD0DURfJtc23RukWlGkdSg/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec',
   MOT_DE_PASSE: '2026'
-}; 
+};
 
 
-// ─── COULEURS COLLECTIONS ───
+// ─── COULEURS COLLECTIONS (fallback si pas de couleur_hex dans la sheet) ───
 const COULEURS_COLLECTIONS = {
   'SAPONICA':    ['#4a9b6f', '#2d7a50'],
   'PETIT NUAGE': ['#a8c8e0', '#6a9ab8'],
@@ -19,7 +19,6 @@ const COULEURS_COLLECTIONS = {
   'ÉPURE':       ['#7a8c5a', '#4a5c32'],
   'KÉRYS':       ['#9b8ea0', '#6b5d72'],
   'CASA':        ['#d4a84b', '#a67c2a'],
- 
   'ANIMA':       ['#c4845a', '#8a5230'],
   'LUI':         ['#8a6040', '#5a3820']
 };
@@ -30,6 +29,7 @@ function couleurCollection(nom, hex) {
   const found = Object.keys(COULEURS_COLLECTIONS).find(k => k.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') === cle);
   return found ? COULEURS_COLLECTIONS[found] : ['#c44536', '#a02d20'];
 }
+
 function assombrirCouleur(hex) {
   hex = hex.replace('#', '');
   if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
@@ -43,16 +43,15 @@ function assombrirCouleur(hex) {
 // ─── ÉTAT ───
 let adminConnecte = false;
 let scrollObserver = null;
+let donneesCatalogue = null;
+let collectionEnAttente = null;
 
 // ─── INITIALISATION ───
-let donneesCatalogue = null;
-
 document.addEventListener('DOMContentLoaded', async () => {
   verifierSession();
   initNav();
   initScrollAnimations();
-  initSPA();
-  initSPA();
+  initSPA(); // une seule fois — bug V1 corrigé
   const resContenu = await appelAPI('getContenu');
   if (resContenu && resContenu.success) appliquerContenu(resContenu.contenu);
   appelAPI('getCatalogue').then(resCat => {
@@ -81,7 +80,7 @@ function initScrollAnimations() {
     });
   }, { threshold: 0.15 });
 
-document.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
+  document.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
 
   const mosaicObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -101,11 +100,8 @@ document.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserve
 
 // ─── SPA — NAVIGATION PAR SECTIONS ───
 function initSPA() {
-  // Lire le hash ou défaut = accueil
   const hash = window.location.hash.replace('#', '') || 'accueil';
   afficherSection(hash);
-
-  // Écouter les changements de hash (bouton retour navigateur)
   window.addEventListener('hashchange', () => {
     const h = window.location.hash.replace('#', '') || 'accueil';
     afficherSection(h);
@@ -113,51 +109,33 @@ function initSPA() {
 }
 
 function afficherSection(id) {
-  // Cacher toutes les sections
   document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-
-  // Afficher la bonne
   const cible = document.getElementById('section-' + id);
   if (cible) {
     cible.classList.add('active');
   } else {
-    // Fallback accueil
     const accueil = document.getElementById('section-accueil');
     if (accueil) accueil.classList.add('active');
   }
-
-  // Mettre à jour les liens actifs dans le nav
   document.querySelectorAll('.nav-links a').forEach(a => {
     a.classList.remove('active');
     if (a.getAttribute('href') === '#' + id) a.classList.add('active');
   });
-
-  // Fermer le menu mobile si ouvert
   const liens = document.getElementById('nav-links');
   if (liens) liens.classList.remove('ouvert');
-
-  // Scroller vers le haut
   window.scrollTo(0, 0);
-
-  // Rejouer les animations fade-in
   if (cible && scrollObserver) {
     cible.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => {
       el.classList.remove('visible');
       scrollObserver.observe(el);
     });
   }
-
-  // Charger le contenu dynamique selon la section
   if (id === 'accueil') {
     afficherCollectionsPublic();
     afficherNbProduits();
   }
-  if (id === 'catalogue') {
-    chargerCatalogue();
-  }
-  if (id === 'educatif') {
-    afficherEduSection(1);
-  }
+  if (id === 'catalogue') chargerCatalogue();
+  if (id === 'educatif')  afficherEduSection(1);
 }
 
 function naviguer(id) {
@@ -171,17 +149,14 @@ function afficherEduSection(num) {
   const cible = document.getElementById('edu-' + num);
   if (cible) {
     cible.classList.add('active');
-    cible.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => {
-      el.classList.remove('visible');
-    });
+    cible.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => el.classList.remove('visible'));
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      cible.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => {
-        scrollObserver.observe(el);
-      });
+      cible.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
     }));
   }
   window.scrollTo(0, 0);
 }
+
 // ─── SESSION ADMIN ───
 function verifierSession() {
   const session = sessionStorage.getItem('uc_admin');
@@ -210,7 +185,7 @@ function validerConnexion() {
   const mdp = document.getElementById('input-mdp').value;
   if (mdp === CONFIG.MOT_DE_PASSE) {
     sessionStorage.setItem('uc_admin', 'true');
-    window.location.href = '/universcaresse/admin/';
+    window.location.href = '/UC2/admin/';
   } else {
     document.getElementById('erreur-connexion').classList.remove('cache');
     document.getElementById('input-mdp').value = '';
@@ -221,13 +196,13 @@ function validerConnexion() {
 function seDeconnecter() {
   adminConnecte = false;
   sessionStorage.removeItem('uc_admin');
-  window.location.href = '/universcaresse/admin/';
+  window.location.href = '/UC2/admin/';
 }
 
 function afficherModeAdmin() {
-  const btnConnexion  = document.getElementById('btn-connexion');
+  const btnConnexion   = document.getElementById('btn-connexion');
   const btnDeconnexion = document.getElementById('btn-deconnexion');
-  const lienAdmin     = document.getElementById('nav-admin-link');
+  const lienAdmin      = document.getElementById('nav-admin-link');
   if (btnConnexion)   btnConnexion.classList.add('cache');
   if (btnDeconnexion) btnDeconnexion.classList.remove('cache');
   if (lienAdmin)      lienAdmin.classList.remove('cache');
@@ -241,9 +216,9 @@ function afficherMaintenance() {
 }
 
 function afficherModePublic() {
-  const btnConnexion  = document.getElementById('btn-connexion');
+  const btnConnexion   = document.getElementById('btn-connexion');
   const btnDeconnexion = document.getElementById('btn-deconnexion');
-  const lienAdmin     = document.getElementById('nav-admin-link');
+  const lienAdmin      = document.getElementById('nav-admin-link');
   if (btnConnexion)   btnConnexion.classList.remove('cache');
   if (btnDeconnexion) btnDeconnexion.classList.add('cache');
   if (lienAdmin)      lienAdmin.classList.add('cache');
@@ -305,16 +280,12 @@ async function appelAPI(action, params = {}) {
 async function appelAPIPost(action, data = {}) {
   try {
     const payload = JSON.stringify({ action, ...data });
- const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
       body: payload,
       redirect: 'follow'
     });
- 
- 
- 
- 
     if (!response.ok) throw new Error('Erreur réseau');
     return await response.json();
   } catch (err) {
@@ -333,22 +304,30 @@ function majuscules(texte) {
 }
 
 // ─── ACCUEIL — COLLECTIONS ───
+// V2 : infoCollections est un objet indexé par col_id
+// getCataloguePublic_v2 retourne : produits, infoCollections { col_id: { rang, nom, slogan, couleur_hex, ... } }
 function afficherCollectionsPublic() {
   if (!donneesCatalogue) { afficherCollectionsFallback(); return; }
-  const collections = donneesCatalogue.collections || [];
+
+  // Construire la liste des collections triées par rang depuis infoCollections
   const infoCollections = donneesCatalogue.infoCollections || {};
-  const strip = document.getElementById('collections-strip');
-  const count = document.getElementById('collections-count');
-  const statCol = document.getElementById('hero-stat-collections');
-  if (count) count.textContent = collections.length + ' collections';
+  const collections = Object.values(infoCollections).sort((a, b) => (a.rang || 99) - (b.rang || 99));
+
+  const strip    = document.getElementById('collections-strip');
+  const count    = document.getElementById('collections-count');
+  const statCol  = document.getElementById('hero-stat-collections');
+
+  if (count)   count.textContent = collections.length + ' collections';
   if (statCol) statCol.textContent = collections.length;
-  if (!strip) return;
+  if (!strip)  return;
+
   strip.innerHTML = '';
-  collections.forEach(nom => {
-    const info = infoCollections[nom] || {};
+  collections.forEach(info => {
+    const nom     = info.nom || '';
+    const col_id  = Object.keys(infoCollections).find(k => infoCollections[k] === info) || '';
     const couleurs = couleurCollection(nom, info.couleur_hex);
     strip.innerHTML += `
-      <a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('${nom}');" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
+      <a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('${col_id}');" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
         <div class="collection-tile-bg"></div>
         <div class="collection-tile-overlay"></div>
         <div class="collection-tile-content">
@@ -375,7 +354,6 @@ function afficherCollectionsFallback() {
     { nom: 'Épure',       slogan: 'Simplement la nature qui prend soin de vos mains' },
     { nom: 'Kérys',       slogan: 'Simplement la nature qui dorlotte vos cheveux' },
     { nom: 'Casa',        slogan: 'Simplement la nature qui prend soin de votre maison' },
-    
     { nom: 'Anima',       slogan: 'Simplement la nature pour pattes et museaux' }
   ];
   const strip = document.getElementById('collections-strip');
@@ -398,33 +376,295 @@ function afficherCollectionsFallback() {
 }
 
 // ─── CATALOGUE ───
-function afficherCatalogue() {
-  const conteneur = document.getElementById('catalogue-contenu');
-  if (!conteneur) return;
-  if (!donneesCatalogue || !donneesCatalogue.produits) {
-    conteneur.innerHTML = '<p style="padding:40px;">Aucun produit disponible.</p>';
-    return;
+let catalogueCharge = false;
+
+function chargerCatalogue() {
+  if (catalogueCharge) return;
+  catalogueCharge = true;
+  try {
+    if (donneesCatalogue && donneesCatalogue.produits) {
+      construireCatalogue();
+    } else {
+      appelAPI('getCatalogue').then(resCat => {
+        if (!resCat || !resCat.success || !resCat.produits) {
+          afficherErreurCatalogue('Impossible de charger le catalogue.');
+          return;
+        }
+        donneesCatalogue = resCat;
+        construireCatalogue();
+      });
+    }
+  } catch (err) {
+    afficherErreurCatalogue('Erreur de connexion.');
   }
-  const publics = donneesCatalogue.produits;
-  if (publics.length === 0) { conteneur.innerHTML = '<p style="padding:40px;">Aucun produit disponible.</p>'; return; }
-  conteneur.innerHTML = publics.map(p => carteProduit(p)).join('');
 }
 
+function afficherErreurCatalogue(msg) {
+  const el = document.getElementById('chargement');
+  if (el) el.innerHTML = `<p class="chargement-erreur">${msg}</p>`;
+}
 
+function construireCatalogue() {
+  const chargement = document.getElementById('chargement');
+  const body       = document.getElementById('catalogue-body');
+  if (chargement) chargement.classList.add('cache');
+  if (body)       body.classList.remove('cache');
+
+  const produits        = donneesCatalogue.produits || [];
+  const infoCollections = donneesCatalogue.infoCollections || {};
+
+  // Regrouper par col_id
+  const parCollection = {};
+  produits.forEach(p => {
+    const col_id = p.col_id || '';
+    if (!parCollection[col_id]) parCollection[col_id] = [];
+    parCollection[col_id].push(p);
+    // Collections secondaires
+    if (Array.isArray(p.collections_secondaires)) {
+      p.collections_secondaires.forEach(colSec => {
+        if (!parCollection[colSec]) parCollection[colSec] = [];
+        if (!parCollection[colSec].find(x => x.pro_id === p.pro_id)) {
+          parCollection[colSec].push(p);
+        }
+      });
+    }
+  });
+
+  // Ordre par rang
+  const ordre = Object.keys(infoCollections).sort((a, b) => {
+    return (infoCollections[a].rang || 99) - (infoCollections[b].rang || 99);
+  });
+
+  const filtresBar = document.getElementById('filtres-bar');
+
+  ordre.forEach(col_id => {
+    if (!parCollection[col_id]) return;
+    const info = infoCollections[col_id] || {};
+    const nom  = info.nom || col_id;
+    const btn  = document.createElement('button');
+    btn.className        = 'filtre-btn';
+    btn.dataset.filtre   = col_id;
+    btn.textContent      = nom;
+    btn.onclick          = () => filtrer(col_id);
+    filtresBar.appendChild(btn);
+  });
+
+  body.innerHTML = '';
+  ordre.forEach(col_id => {
+    if (!parCollection[col_id]) return;
+    const produitsColl = parCollection[col_id];
+    const info         = infoCollections[col_id] || {};
+    const nom          = info.nom || col_id;
+
+    // Regrouper par gamme
+    const parGamme  = {};
+    const ordreGammes = [];
+    produitsColl.forEach(p => {
+      const gamme = p.nom_gamme || '';
+      if (!parGamme[gamme]) { parGamme[gamme] = []; ordreGammes.push(gamme); }
+      parGamme[gamme].push(p);
+    });
+
+    const gammesHTML = ordreGammes.map(gamme => {
+      const prods = parGamme[gamme];
+      return `
+        <div class="ligne-groupe">
+          ${gamme ? `<div class="ligne-groupe-entete">
+            <div class="ligne-groupe-nom">${gamme.toUpperCase()}</div>
+          </div>` : ''}
+          <div class="produits-grille">${prods.map(p => carteProduit(p)).join('')}</div>
+        </div>`;
+    }).join('');
+
+    const couleurs = couleurCollection(nom, info.couleur_hex);
+    const section  = document.createElement('div');
+    section.className          = 'collection-section';
+    section.dataset.collection = col_id;
+    section.innerHTML = `
+      <div class="collection-entete fade-in">
+        <div>
+          <h2 class="collection-entete-nom">${nom.toUpperCase()}</h2>
+          <p class="collection-entete-slogan">${info.slogan || ''}</p>
+          <p class="collection-entete-desc">${info.description || ''}</p>
+        </div>
+        <div class="collection-entete-visuel">
+          <div class="collection-entete-bg" style="--col-hex: ${info.couleur_hex || couleurs[0]};">
+            ${info.photo_url
+              ? `<img src="${info.photo_url}" alt="${nom}" onerror="this.style.display='none'">`
+              : `<span class="entete-visuel-placeholder">Photo ambiance<br>à venir</span>`}
+          </div>
+        </div>
+      </div>
+      ${gammesHTML}`;
+    body.appendChild(section);
+    if (scrollObserver) {
+      section.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
+    }
+  });
+
+  if (collectionEnAttente) {
+    filtrer(collectionEnAttente);
+    collectionEnAttente = null;
+  }
+}
+
+// ─── CARTE PRODUIT ───
+// V2 : p.col_id, p.gam_id, p.nom_gamme, p.nom_collection, p.pro_id
+// Les formats sont dans p.formats (tableau {poids, unite, prix_vente})
+function couleurTexteContraste(hex) {
+  if (!hex || hex.length < 4) return 'carte-infos-clair';
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? 'carte-infos-fonce' : 'carte-infos-clair';
+}
+
+function carteProduit(p) {
+  const formats = Array.isArray(p.formats) && p.formats.length ? p.formats : [];
+  const prix = formats.length
+    ? formats.map(f => `${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $ / ${f.poids} ${f.unite}`).join('&nbsp;&nbsp;·&nbsp;&nbsp;')
+    : '';
+  const photoUrl = (window.modeSaisonnier && p.image_noel_url) ? p.image_noel_url : p.image_url;
+  const image    = photoUrl ? `<img src="${photoUrl}" alt="${p.nom}" onerror="this.style.display='none'">` : '';
+  const couleur  = p.couleur_hex || '#c44536';
+  return `
+    <div class="carte-produit" data-produit="${btoa(unescape(encodeURIComponent(JSON.stringify(p))))}" onclick="ouvrirModalFromCard(this)" style="--col-hex: ${couleur};">
+      <div class="carte-visuel">
+        <div class="carte-couleur">
+          ${image}
+          ${photoUrl ? `<div class="recette-couleur-overlay"></div>` : ''}
+          ${!photoUrl ? `<div class="carte-photo-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Photo à venir</div>` : ''}
+          <div class="carte-couleur-dot"></div>
+        </div>
+      </div>
+      <div class="carte-infos ${couleurTexteContraste(couleur)}">
+        <span class="carte-collection-badge">${(p.nom_collection || '').toUpperCase()}</span>
+        <div class="carte-nom">${(p.nom || '').toUpperCase()}</div>
+        <div class="carte-ligne">${(p.nom_gamme || '').toUpperCase()}</div>
+        <div class="carte-bas">
+          ${prix ? `<div class="carte-prix">${prix}</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function ouvrirModalFromCard(el) {
+  const produit = JSON.parse(decodeURIComponent(escape(atob(el.dataset.produit))));
+  ouvrirModal(produit);
+}
+
+function filtrerApresChargement(col_id) {
+  const sections = document.querySelectorAll('.collection-section');
+  if (sections.length > 0) {
+    filtrer(col_id);
+  } else {
+    collectionEnAttente = col_id;
+  }
+}
+
+function filtrer(col_id) {
+  document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('actif'));
+  const btn = document.querySelector(`[data-filtre="${col_id}"]`);
+  if (btn) btn.classList.add('actif');
+  document.querySelectorAll('.collection-section').forEach(s => {
+    s.classList.toggle('masquee', col_id !== 'tout' && s.dataset.collection !== col_id);
+  });
+  const cible = col_id === 'tout'
+    ? document.getElementById('catalogue-body')
+    : document.querySelector(`.collection-section[data-collection="${col_id}"]`);
+  if (cible) {
+    const filtresH = document.getElementById('filtres-bar').offsetHeight;
+    const navH     = document.getElementById('nav').offsetHeight;
+    const enteteH  = document.querySelector('#section-catalogue .page-entete')?.offsetHeight || 0;
+    const offset   = cible.getBoundingClientRect().top + window.scrollY - navH - filtresH - enteteH - 16;
+    window.scrollTo({ top: offset, behavior: 'smooth' });
+  }
+}
+
+// ─── MODAL PRODUIT ───
+// V2 : produit.nom_collection, produit.nom_gamme, produit.formats, produit.ingredients
+function ouvrirModal(produit) {
+  const couleur = produit.couleur_hex || '#c44536';
+  document.getElementById('modal-produit').style.setProperty('--col-hex', couleur);
+  document.getElementById('modal-nom').textContent        = produit.nom || '';
+  document.getElementById('modal-collection').textContent = produit.nom_collection || '';
+  document.getElementById('modal-ligne').textContent      = produit.nom_gamme || '';
+  document.getElementById('modal-desc').textContent       = produit.description || '';
+
+  const hex   = document.getElementById('modal-visuel-hex');
+  const photo = document.getElementById('modal-visuel-photo');
+  const imgExistante = photo.querySelector('img');
+  if (imgExistante) imgExistante.remove();
+
+  const photoModal = (window.modeSaisonnier && produit.image_noel_url) ? produit.image_noel_url : produit.image_url;
+  if (photoModal) {
+    hex.style.background = `linear-gradient(145deg, ${couleur}dd, ${couleur}88)`;
+    hex.classList.remove('cache');
+    photo.style.background = '';
+    const img = document.createElement('img');
+    img.src = photoModal;
+    img.onerror = () => img.remove();
+    photo.appendChild(img);
+  } else {
+    hex.classList.add('cache');
+    photo.style.background = `linear-gradient(145deg, ${couleur}dd, ${couleur}88)`;
+  }
+
+  // Formats V2 — tableau p.formats {poids, unite, prix_vente}
+  const formats    = Array.isArray(produit.formats) && produit.formats.length ? produit.formats : [];
+  const prixFormat = formats.length
+    ? formats.map(f => `${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $ / ${f.poids} ${f.unite}`).join('&nbsp;&nbsp;·&nbsp;&nbsp;')
+    : '';
+  const prixFormatEl = document.getElementById('modal-prix-format');
+  if (prixFormatEl) prixFormatEl.innerHTML = prixFormat;
+
+  // INCI — V2 : ingredients = [{ing_id, nom_ingredient, quantite_g}]
+  // La liste INCI vient de nom_ingredient — mais on affiche UNIQUEMENT le code INCI
+  // ⚠️ RÈGLE LÉGALE : jamais de nom_ingredient à la place de INCI
+  // En V2 les ingrédients publics n'ont pas de champ inci direct dans le catalogue
+  // On affiche uniquement si l'ingrédient a un INCI valide
+  const inciEl = document.getElementById('modal-inci');
+  if (inciEl) {
+    const ingredients = produit.ingredients || [];
+    const total = ingredients.reduce((s, i) => s + (parseFloat(i.quantite_g) || 0), 0);
+    if (total > 0) {
+      // En V2, le champ INCI n'est pas encore dans getCataloguePublic_v2
+      // À compléter quand Ingredients_INCI_v2 sera jointé dans le catalogue
+      inciEl.textContent = '';
+    } else {
+      inciEl.textContent = '';
+    }
+  }
+
+  document.getElementById('modal-produit').classList.add('ouvert');
+  document.body.style.overflow = 'hidden';
+}
+
+function fermerModal() {
+  document.getElementById('modal-produit').classList.remove('ouvert');
+  document.body.style.overflow = '';
+}
+
+function fermerModalProduit(e) {
+  if (e.target === document.getElementById('modal-produit')) fermerModal();
+}
 
 // ─── CONTENU DYNAMIQUE ───
+// inchangé — mêmes IDs HTML, même structure Contenu_v2
 function appliquerContenu(c) {
   try {
     if (!c) return;
     if (String(c.maintenance_active) === '1') { afficherMaintenance(); return; }
     window.modeSaisonnier = String(c.mode_saisonnier) === 'oui';
     const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
-    const setHtml = (id, val) => { const el = document.getElementById(id); if (el && val) el.innerHTML = val; };
 
     set('contenu-accueil-eyebrow', c.accueil_eyebrow);
-   set('contenu-accueil-cta', c.accueil_cta);
-const cta = document.querySelector('.hero-cta');
-if (cta) { cta.classList.remove('invisible'); cta.classList.add('fade-in-doux'); }
+    set('contenu-accueil-cta', c.accueil_cta);
+    const cta = document.querySelector('.hero-cta');
+    if (cta) { cta.classList.remove('invisible'); cta.classList.add('fade-in-doux'); }
     set('contenu-accueil-stat-label', c.accueil_stat_label);
     set('contenu-accueil-stat-valeur', c.accueil_stat_valeur);
     set('contenu-qui-eyebrow', c.qui_eyebrow);
@@ -470,7 +710,8 @@ if (cta) { cta.classList.remove('invisible'); cta.classList.add('fade-in-doux');
       set(`contenu-bas-commande-${nn}-texte`, c[`bas_commande_${nn}_texte`]);
       if (c[`bas_commande_${nn}_titre`]) document.getElementById(`card-bas-commande-${nn}`)?.classList.remove('cache');
     });
-// ─── SECTIONS ÉDUCATIVES ───
+
+    // ─── SECTIONS ÉDUCATIVES ─── inchangées
     const setEdu = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.textContent = val; };
     const setTitreEdu = (id, titre, titreEm) => {
       const el = document.getElementById(id);
@@ -480,7 +721,7 @@ if (cta) { cta.classList.remove('invisible'); cta.classList.add('fade-in-doux');
     // S1
     setEdu('edu-s1-surtitre', c.edu_s1_surtitre); setTitreEdu('edu-s1-titre-bloc', c.edu_s1_titre || '', c.edu_s1_titre_em);
     setEdu('edu-s1-accroche', c.edu_s1_accroche); setEdu('edu-s1-p1', c.edu_s1_p1); setEdu('edu-s1-p2', c.edu_s1_p2); setEdu('edu-s1-p3', c.edu_s1_p3);
-    setEdu('edu-s1-photo-legende', c.edu_s1_photo_legende); setEdu('edu-s1-section-titre', c.edu_s1_section_titre);
+    setEdu('edu-s1-section-titre', c.edu_s1_section_titre);
     [1,2,3,4,5].forEach(n => { setEdu(`edu-s1-card${n}-titre`, c[`edu_s1_card${n}_titre`]); setEdu(`edu-s1-card${n}-texte`, c[`edu_s1_card${n}_texte`]); });
     // S2
     setEdu('edu-s2-surtitre', c.edu_s2_surtitre); setTitreEdu('edu-s2-titre-bloc', c.edu_s2_titre || '', c.edu_s2_titre_em);
@@ -490,29 +731,28 @@ if (cta) { cta.classList.remove('invisible'); cta.classList.add('fade-in-doux');
     // S3
     setEdu('edu-s3-surtitre', c.edu_s3_surtitre); setTitreEdu('edu-s3-titre-bloc', c.edu_s3_titre || '', c.edu_s3_titre_em);
     setEdu('edu-s3-accroche', c.edu_s3_accroche); setEdu('edu-s3-p1', c.edu_s3_p1); setEdu('edu-s3-p2', c.edu_s3_p2); setEdu('edu-s3-p3', c.edu_s3_p3);
-    setEdu('edu-s3-photo-legende', c.edu_s3_photo_legende); setEdu('edu-s3-section-titre', c.edu_s3_section_titre); setEdu('edu-s3-astuce', c.edu_s3_astuce);
+    setEdu('edu-s3-section-titre', c.edu_s3_section_titre); setEdu('edu-s3-astuce', c.edu_s3_astuce);
     [1,2,3].forEach(n => { const pct = c[`edu_s3_niv${n}_pct`]; const el = document.getElementById(`edu-s3-niv${n}-pct`); if (el && pct !== undefined) el.textContent = Math.round(parseFloat(pct) * 100) + '%'; setEdu(`edu-s3-niv${n}-label`, c[`edu_s3_niv${n}_label`]); setEdu(`edu-s3-niv${n}-texte`, c[`edu_s3_niv${n}_texte`]); });
     // S4
     setEdu('edu-s4-surtitre', c.edu_s4_surtitre); setTitreEdu('edu-s4-titre-bloc', c.edu_s4_titre || '', c.edu_s4_titre_em);
     setEdu('edu-s4-accroche', c.edu_s4_accroche); setEdu('edu-s4-p1', c.edu_s4_p1); setEdu('edu-s4-p2', c.edu_s4_p2);
-    setEdu('edu-s4-photo-legende', c.edu_s4_photo_legende); setEdu('edu-s4-section-titre', c.edu_s4_section_titre);
-    setEdu('edu-s4-citation', c.edu_s4_citation); setEdu('edu-s4-citation-source', c.edu_s4_citation_source);
+    setEdu('edu-s4-section-titre', c.edu_s4_section_titre); setEdu('edu-s4-citation', c.edu_s4_citation); setEdu('edu-s4-citation-source', c.edu_s4_citation_source);
     [1,2,3,4,5,6].forEach(n => { setEdu(`edu-s4-h${n}-titre`, c[`edu_s4_h${n}_titre`]); setEdu(`edu-s4-h${n}-texte`, c[`edu_s4_h${n}_texte`]); });
     // S5
     setEdu('edu-s5-surtitre', c.edu_s5_surtitre); setTitreEdu('edu-s5-titre-bloc', c.edu_s5_titre || '', c.edu_s5_titre_em);
     setEdu('edu-s5-accroche', c.edu_s5_accroche); setEdu('edu-s5-p1', c.edu_s5_p1); setEdu('edu-s5-p2', c.edu_s5_p2);
-    setEdu('edu-s5-photo-legende', c.edu_s5_photo_legende); setEdu('edu-s5-section1-titre', c.edu_s5_section1_titre); setEdu('edu-s5-section2-titre', c.edu_s5_section2_titre);
+    setEdu('edu-s5-section1-titre', c.edu_s5_section1_titre); setEdu('edu-s5-section2-titre', c.edu_s5_section2_titre);
     [1,2,3,4,5].forEach(n => { setEdu(`edu-s5-a${n}-titre`, c[`edu_s5_a${n}_titre`]); setEdu(`edu-s5-a${n}-texte`, c[`edu_s5_a${n}_texte`]); });
     [1,2,3].forEach(n => { setEdu(`edu-s5-ad${n}-titre`, c[`edu_s5_ad${n}_titre`]); setEdu(`edu-s5-ad${n}-texte`, c[`edu_s5_ad${n}_texte`]); });
     // S6
     setEdu('edu-s6-surtitre', c.edu_s6_surtitre); setTitreEdu('edu-s6-titre-bloc', c.edu_s6_titre || '', c.edu_s6_titre_em);
     setEdu('edu-s6-accroche', c.edu_s6_accroche); setEdu('edu-s6-p1', c.edu_s6_p1); setEdu('edu-s6-p2', c.edu_s6_p2);
-    setEdu('edu-s6-photo-legende', c.edu_s6_photo_legende); setEdu('edu-s6-section-titre', c.edu_s6_section_titre); setEdu('edu-s6-precautions', c.edu_s6_precautions);
+    setEdu('edu-s6-section-titre', c.edu_s6_section_titre); setEdu('edu-s6-precautions', c.edu_s6_precautions);
     [1,2,3,4,5,6,7,8,9,10,11].forEach(n => { setEdu(`edu-s6-he${n}-titre`, c[`edu_s6_he${n}_titre`]); setEdu(`edu-s6-he${n}-texte`, c[`edu_s6_he${n}_texte`]); });
     // S7
     setEdu('edu-s7-surtitre', c.edu_s7_surtitre); setTitreEdu('edu-s7-titre-bloc', c.edu_s7_titre || '', c.edu_s7_titre_em);
     setEdu('edu-s7-accroche', c.edu_s7_accroche); setEdu('edu-s7-section1-titre', c.edu_s7_section1_titre);
-setEdu('edu-s7-astuce', c.edu_s7_astuce); setEdu('edu-s7-section2-titre', c.edu_s7_section2_titre); setEdu('edu-s7-section3-titre', c.edu_s7_section3_titre);
+    setEdu('edu-s7-astuce', c.edu_s7_astuce); setEdu('edu-s7-section2-titre', c.edu_s7_section2_titre); setEdu('edu-s7-section3-titre', c.edu_s7_section3_titre);
     [1,2,3,4,5].forEach(n => { setEdu(`edu-s7-peau${n}-titre`, c[`edu_s7_peau${n}_titre`]); setEdu(`edu-s7-peau${n}-signes`, c[`edu_s7_peau${n}_signes`]); setEdu(`edu-s7-peau${n}-aime`, c[`edu_s7_peau${n}_aime`]); });
     [1,2,3,4,5].forEach(n => { setEdu(`edu-s7-usage${n}-titre`, c[`edu_s7_usage${n}_titre`]); setEdu(`edu-s7-usage${n}-texte`, c[`edu_s7_usage${n}_texte`]); });
     [1,2,3,4].forEach(n => { setEdu(`edu-s7-ok${n}`, c[`edu_s7_ok${n}`]); setEdu(`edu-s7-non${n}`, c[`edu_s7_non${n}`]); });
@@ -536,7 +776,7 @@ setEdu('edu-s7-astuce', c.edu_s7_astuce); setEdu('edu-s7-section2-titre', c.edu_
       }).join('');
     }
 
-  document.querySelectorAll('.edu-sous-section-panel .fade-in, .edu-sous-section-panel .fade-in-doux').forEach(el => {
+    document.querySelectorAll('.edu-sous-section-panel .fade-in, .edu-sous-section-panel .fade-in-doux').forEach(el => {
       setTimeout(() => el.classList.add('visible'), 100);
     });
 
@@ -546,7 +786,7 @@ setEdu('edu-s7-astuce', c.edu_s7_astuce); setEdu('edu-s7-section2-titre', c.edu_
 }
 
 function toggleAccord(btn) {
-  const item = btn.parentElement;
+  const item   = btn.parentElement;
   const isOpen = item.classList.contains('ouvert');
   document.querySelectorAll('.edu-accord-item.ouvert').forEach(el => el.classList.remove('ouvert'));
   if (!isOpen) item.classList.add('ouvert');
@@ -559,7 +799,6 @@ async function envoyerFormulaire() {
   const courriel = document.getElementById('courriel')?.value.trim();
   const sujet    = document.getElementById('sujet')?.value;
   const message  = document.getElementById('message')?.value.trim();
-
   const msgSucces = document.getElementById('msg-succes');
   const msgErreur = document.getElementById('msg-erreur');
 
@@ -580,8 +819,6 @@ async function envoyerFormulaire() {
       sujet: sujet || 'Non précisé',
       message
     });
-
-   console.log('result:', JSON.stringify(result));
     if (result && result.success) {
       msgSucces.classList.remove('cache');
       msgErreur.classList.add('cache');
@@ -590,139 +827,9 @@ async function envoyerFormulaire() {
       throw new Error('Échec envoi');
     }
   } catch (err) {
-    msgErreur.textContent = 'Une erreur s\'est produite. Veuillez réessayer ou nous écrire directement.';
+    msgErreur.textContent = "Une erreur s'est produite. Veuillez réessayer ou nous écrire directement.";
     msgErreur.classList.remove('cache');
     btn.disabled = false;
     btn.textContent = 'Envoyer le message';
   }
-}
-
-function couleurTexteContraste(hex) {
-  const r = parseInt(hex.slice(1,3), 16);
-  const g = parseInt(hex.slice(3,5), 16);
-  const b = parseInt(hex.slice(5,7), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.5 ? 'carte-infos-fonce' : 'carte-infos-clair';
-}
-function carteProduit(p) {
-  const formats = Array.isArray(p.formats_complets) && p.formats_complets.length
-    ? p.formats_complets
-    : [];
-  const prix = formats.length
-    ? formats.map(f => `${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $ / ${f.poids} ${f.unite}`).join('&nbsp;&nbsp;·&nbsp;&nbsp;')
-    : '';
-  const photoUrl = (window.modeSaisonnier && p.image_url_noel) ? p.image_url_noel : p.image_url;
-  const image = photoUrl ? `<img src="${photoUrl}" alt="${p.nom}" onerror="this.style.display='none'">` : '';
-  return `
-    <div class="carte-produit" data-produit="${btoa(unescape(encodeURIComponent(JSON.stringify(p))))}" onclick="ouvrirModalFromCard(this)" style="--col-hex: ${p.couleur_hex};">
-      <div class="carte-visuel">
-        <div class="carte-couleur">
-          ${image}
-          ${p.image_url ? `<div class="recette-couleur-overlay"></div>` : ''}
-          ${!p.image_url ? `<div class="carte-photo-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            Photo à venir</div>` : ''}
-          <div class="carte-couleur-dot"></div>
-        </div>
-      </div>
-      <div class="carte-infos ${couleurTexteContraste(p.couleur_hex)}">
-        <span class="carte-collection-badge">${p.collection.toUpperCase()}</span>
-        <div class="carte-nom">${p.nom.toUpperCase()}</div>
-        <div class="carte-ligne">${p.ligne.toUpperCase()}</div>
-        <div class="carte-bas">
-          ${prix ? `<div class="carte-prix">${prix}</div>` : ''}
-        </div>
-      </div>
-    </div>`;
-}
-
-
-
-
-function ouvrirModalFromCard(el) {
-  const produit = JSON.parse(decodeURIComponent(escape(atob(el.dataset.produit))));
-  ouvrirModal(produit);
-}
-
-function filtrerApresChargement(collection) {
-  const sections = document.querySelectorAll('.collection-section');
-  if (sections.length > 0) {
-    filtrer(collection);
-  } else {
-    collectionEnAttente = collection;
-  }
-}
-
-function filtrer(collection) {
-  document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('actif'));
-  const btn = document.querySelector(`[data-filtre="${collection}"]`);
-  if (btn) btn.classList.add('actif');
-  document.querySelectorAll('.collection-section').forEach(s => {
-    s.classList.toggle('masquee', collection !== 'tout' && s.dataset.collection !== collection);
-  });
-  const cible = collection === 'tout'
-    ? document.getElementById('catalogue-body')
-    : document.querySelector(`.collection-section[data-collection="${collection}"]`);
-  if (cible) {
-   const filtresH = document.getElementById('filtres-bar').offsetHeight;
-    const navH = document.getElementById('nav').offsetHeight;
-    const enteteH = document.querySelector('#section-catalogue .page-entete')?.offsetHeight || 0;
-    const offset = cible.getBoundingClientRect().top + window.scrollY - navH - filtresH - enteteH - 16;
-    window.scrollTo({ top: offset, behavior: 'smooth' });
-  }
-}
-
-
-
-
-function ouvrirModal(produit) {
-  document.getElementById('modal-produit').style.setProperty('--col-hex', produit.couleur_hex);
-  document.getElementById('modal-nom').textContent = produit.nom;
-  document.getElementById('modal-collection').textContent = produit.collection;
-  document.getElementById('modal-ligne').textContent = produit.ligne;
-  document.getElementById('modal-desc').textContent = produit.description;
-  const hex = document.getElementById('modal-visuel-hex');
-  const photo = document.getElementById('modal-visuel-photo');
-  const imgExistante = photo.querySelector('img');
-  if (imgExistante) imgExistante.remove();
-
-  const photoModal = (window.modeSaisonnier && produit.image_url_noel) ? produit.image_url_noel : produit.image_url;
-  if (photoModal) {
-    hex.style.background = `linear-gradient(145deg, ${produit.couleur_hex}dd, ${produit.couleur_hex}88)`;
-    hex.classList.remove('cache');
-    photo.style.background = '';
-    const img = document.createElement('img');
-    img.src = photoModal;
-    img.onerror = () => img.remove();
-    photo.appendChild(img);
-  } else {
-    hex.classList.add('cache');
-    photo.style.background = `linear-gradient(145deg, ${produit.couleur_hex}dd, ${produit.couleur_hex}88)`;
-  }
-
-  const prixFormat = Array.isArray(produit.formats_complets) && produit.formats_complets.length
-    ? produit.formats_complets.map(f => `${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $ / ${f.poids} ${f.unite}`).join('&nbsp;&nbsp;·&nbsp;&nbsp;')
-    : '';
-  const prixFormatEl = document.getElementById('modal-prix-format');
-  if (prixFormatEl) prixFormatEl.innerHTML = prixFormat;
-
-  const inciEl = document.getElementById('modal-inci');
-  if (inciEl) {
-    const ingredients = produit.ingredients || [];
-    const total = ingredients.reduce((s, i) => s + (parseFloat(i.quantite_g) || 0), 0);
-    if (total > 0) {
-      const fragrances = ingredients.filter(i => i.type === 'Fragrances');
-      const autres = ingredients.filter(i => i.type !== 'Fragrances');
-      const plusDeUnPct = autres.filter(i => (i.quantite_g / total) > 0.01).sort((a, b) => b.quantite_g - a.quantite_g);
-      const unPctOuMoins = autres.filter(i => (i.quantite_g / total) <= 0.01);
-      const lignes = [...plusDeUnPct, ...unPctOuMoins].map(i => i.inci).filter(Boolean);
-      if (fragrances.length > 0) lignes.push('Fragrance');
-      inciEl.textContent = 'Ingrédients : ' + lignes.join(', ');
-    } else {
-      inciEl.textContent = '';
-    }
-  }
-
-  document.getElementById('modal-produit').classList.add('ouvert');
-  document.body.style.overflow = 'hidden';
 }
