@@ -234,7 +234,9 @@ function afficherCollections() {
   const loading = document.getElementById('loading-collections');
   const contenu = document.getElementById('contenu-collections');
   const vide    = document.getElementById('vide-collections');
+  const btnNew  = document.getElementById('btn-nouvelle-collection');
   if (loading) loading.classList.add('cache');
+  if (btnNew)  btnNew.classList.remove('cache');
   if (!contenu) return;
   contenu.innerHTML = '';
   if (vide) vide.classList.add('cache');
