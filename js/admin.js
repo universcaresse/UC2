@@ -372,6 +372,7 @@ async function ouvrirFicheGamme(gam_id) {
   window.scrollTo(0, 0);
 }
 
+function fermerFicheLigne() { fermerFicheGamme(); }
 function fermerFicheGamme() {
   document.getElementById('fiche-ligne').classList.remove('visible');
   document.getElementById('fiche-collection').classList.add('visible');
