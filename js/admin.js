@@ -380,7 +380,7 @@ async function supprimerFamille(fam_id) {
   });
 }
 
-function chargerCollections() {
+async function chargerCollections() {
   const [resCol, resGam] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getGammes')
