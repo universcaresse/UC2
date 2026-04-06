@@ -220,13 +220,14 @@ function stringToColor(str) {
 /* ════════════════════════════════
    COLLECTIONS V2
 ════════════════════════════════ */
-let donneesCollections = []; // [{col_id, rang, nom, slogan, description, couleur_hex, photo_url, photo_noel_url}]
-let donneesGammes      = []; // [{gam_id, col_id, rang, nom, description, couleur_hex, photo_url, photo_noel_url}]
+var donneesCollections = []; // [{col_id, rang, nom, slogan, description, couleur_hex, photo_url, photo_noel_url}]
+var donneesGammes      = []; // [{gam_id, col_id, rang, nom, description, couleur_hex, photo_url, photo_noel_url}]
 
-async /* ════════════════════════════════
+/* ════════════════════════════════
    FAMILLES V2
 ════════════════════════════════ */
-let donneesFamilles = [];
+var donneesFamilles = [];
+
 
 async function chargerFamilles() {
   const [resCol, resFam] = await Promise.all([
@@ -721,9 +722,9 @@ async function supprimerGamme(gam_id) {
 /* ════════════════════════════════
    PRODUITS V2 (ex-Recettes)
 ════════════════════════════════ */
-let donneesProduits   = []; // [{pro_id, col_id, gam_id, nom, statut, ...}]
-let produitActif      = null;
-let collectionsDisponibles = {};
+var donneesProduits   = []; // [{pro_id, col_id, gam_id, nom, statut, ...}]
+var produitActif      = null;
+var collectionsDisponibles = {};
 
 async function chargerProduitsData() {
   const res = await appelAPI('getProduits');
@@ -1217,9 +1218,9 @@ function supprimerProduit(pro_id) {
 // supprimerRecetteActive — défini plus haut
 
 // ─── CLOUDINARY ───
-let _mediaLibrary        = null;
-let _mediaLibraryChampId = null;
-let _mediaLibraryPreviewId = null;
+var _mediaLibrary        = null;
+var _mediaLibraryChampId = null;
+var _mediaLibraryPreviewId = null;
 
 function ajusterHauteurTextarea(el) {
   if (!el) return;
@@ -1269,7 +1270,7 @@ function ouvrirCloudinaryCollectionNoel(){ ouvrirMediaLibrary('fc-photo-url-noel
 function ouvrirCloudinaryLigne()         { ouvrirMediaLibrary('fc-photo-url-ligne', 'fc-photo-preview-ligne'); }
 
 // ─── MÉDIATHÈQUE — GESTION ───
-let _mediathequeDonnees = null;
+var _mediathequeDonnees = null;
 
 async function chargerMediatheque() {
   document.getElementById('med-chargement').classList.remove('cache');
@@ -1341,8 +1342,8 @@ async function mediathequeSupprimer(rowIndex, nom) {
 }
 
 // ─── MÉDIATHÈQUE — SÉLECTEUR ───
-let _mediathequeChampId   = null;
-let _mediathequePreviewId = null;
+var _mediathequeChampId   = null;
+var _mediathequePreviewId = null;
 
 async function ouvrirMediatheque(champId, previewId, categorie) {
   _mediathequeChampId   = champId;
@@ -1442,7 +1443,7 @@ function apercuCouleurRecette(input) {
 }
 
 // ─── INGRÉDIENTS PRODUIT ───
-let ingredientsRecette = [];
+var ingredientsRecette = [];
 
 function ajouterIngredientRecette(type='', nom='', quantite=0) {
   ingredientsRecette.push({ type, nom, quantite });
@@ -1481,7 +1482,7 @@ function rafraichirListeIngredientsRecette() {
 }
 
 // ─── FORMATS PRODUIT ───
-let formatsRecette = [];
+var formatsRecette = [];
 
 function ajouterFormatRecette(poids='', unite='g', prix='', desc='') {
   formatsRecette.push({ poids, unite, prix, desc });
@@ -1512,13 +1513,13 @@ function rafraichirListeFormatsRecette() {
 // CONFIG et appelAPI/appelAPIPost définis dans main.js
 
 // ─── LISTES DROPDOWN V2 ───
-let listesDropdown = { types: [], fullData: [], config: {}, fournisseurs: [], formats: [] };
+var listesDropdown = { types: [], fullData: [], config: {}, fournisseurs: [], formats: [] };
 
 /* ════════════════════════════════
    NOUVELLE FACTURE
 ════════════════════════════════ */
-let factureActive   = null;
-let produitsFacture = [];
+var factureActive   = null;
+var produitsFacture = [];
 
 function calculerPrixParG() {
   const prix  = parseFloat(document.getElementById('fp-prix-unitaire').value) || 0;
@@ -1896,7 +1897,7 @@ async function finaliserFacture() {
 /* ════════════════════════════════
    FACTURES V2
 ════════════════════════════════ */
-let toutesFactures = [];
+var toutesFactures = [];
 
 async function chargerFactures() {
   const loading = document.getElementById('loading-factures');
@@ -2078,7 +2079,7 @@ function supprimerFacture(ach_id) {
 /* ════════════════════════════════
    INVENTAIRE V2 (Stock)
 ════════════════════════════════ */
-let donneesInventaire = {};
+var donneesInventaire = {};
 
 async function chargerInventaire() {
   const loading = document.getElementById('loading-inventaire');
@@ -2148,8 +2149,8 @@ function reinitialiserFiltresInventaire() {
 /* ════════════════════════════════
    PAGE INCI V2
 ════════════════════════════════ */
-let inciDonnees      = [];
-let inciCategoriesUC = [];
+var inciDonnees      = [];
+var inciCategoriesUC = [];
 
 async function chargerInci() {
   document.getElementById('loading-inci').classList.remove('cache');
@@ -2299,7 +2300,7 @@ async function inciValider(id, nom_UC, cat_id, ing_id) {
 /* ════════════════════════════════
    DENSITÉS V2
 ════════════════════════════════ */
-let donneesDensites = [];
+var donneesDensites = [];
 
 async function chargerDensites() {
   const loading = document.getElementById('loading-densites');
@@ -2445,8 +2446,8 @@ async function sauvegarderContenuSite() {
 /* ════════════════════════════════
    IMPORT FACTURE PDF V2
 ════════════════════════════════ */
-let ifItems   = [];
-let ifMapping = [];
+var ifItems   = [];
+var ifMapping = [];
 
 async function ifChargerMapping() {
   if (ifMapping.length) return;
