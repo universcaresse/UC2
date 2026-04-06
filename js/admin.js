@@ -7,7 +7,7 @@
 
 var adminScrollObserver = null;
 
-function initScrollAnimations() {
+function initScrollAnimationsAdmin() {
   adminScrollObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -34,18 +34,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   document.getElementById('ecran-connexion')?.classList.add('cache');
-  const dateField = document.getElementById('nf-date');
-  if (dateField) dateField.value = new Date().toISOString().split('T')[0];
+ 
   initBurgerAdmin();
-  initScrollAnimations();
+  initScrollAnimationsAdmin();
   await chargerDonneesInitiales();
 });
 
 // V2 : getCollections + getGammes + getProduits + getIngredientsInci + getConfig
 async function chargerDonneesInitiales() {
-  const [resCol, resGam, resPro, resInci, resCfg] = await Promise.all([
+ const [resCol, resGam, resFam, resPro, resInci, resCfg] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getGammes'),
+    appelAPI('getFamilles'),
     appelAPI('getProduits'),
     appelAPI('getIngredientsInci'),
     appelAPI('getConfig')
@@ -54,8 +54,11 @@ async function chargerDonneesInitiales() {
   if (resCol && resCol.success) {
     donneesCollections = resCol.items || [];
   }
-  if (resGam && resGam.success) {
+if (resGam && resGam.success) {
     donneesGammes = resGam.items || [];
+  }
+  if (resFam && resFam.success) {
+    donneesFamilles = resFam.items || [];
   }
   if (resPro && resPro.success) {
     donneesProduits = (resPro.items || []).sort((a, b) => {
@@ -112,7 +115,8 @@ function afficherSection(id, bouton) {
 
   if (id === 'accueil')        afficherStatsAccueil();
   if (id === 'import-facture') ifChargerMapping();
-  if (id === 'collections')    afficherCollections();
+if (id === 'collections')    afficherCollections();
+  if (id === 'familles')       afficherFamilles();
   if (id === 'produits')       afficherProduits();       // V2 : recettes → produits
   if (id === 'inci')           chargerInci();
   if (id === 'densites')       chargerDensites();
@@ -219,7 +223,164 @@ function stringToColor(str) {
 let donneesCollections = []; // [{col_id, rang, nom, slogan, description, couleur_hex, photo_url, photo_noel_url}]
 let donneesGammes      = []; // [{gam_id, col_id, rang, nom, description, couleur_hex, photo_url, photo_noel_url}]
 
-async function chargerCollections() {
+async /* ════════════════════════════════
+   FAMILLES V2
+════════════════════════════════ */
+let donneesFamilles = [];
+
+async function chargerFamilles() {
+  const [resCol, resFam] = await Promise.all([
+    appelAPI('getCollections'),
+    appelAPI('getFamilles')
+  ]);
+  if (!resCol || !resCol.success) { afficherMsg('familles', 'Erreur lors du chargement.', 'erreur'); return; }
+  donneesCollections = resCol.items || [];
+  donneesFamilles    = (resFam && resFam.success) ? resFam.items || [] : [];
+  afficherFamilles();
+}
+
+function afficherFamilles() {
+  const loading = document.getElementById('loading-familles');
+  const contenu = document.getElementById('contenu-familles');
+  const vide    = document.getElementById('vide-familles');
+  const btnNew  = document.getElementById('btn-nouvelle-famille');
+  if (loading) loading.classList.add('cache');
+  if (btnNew)  btnNew.classList.remove('cache');
+  if (!contenu) return;
+  contenu.innerHTML = '';
+  if (vide) vide.classList.add('cache');
+  if (!donneesFamilles.length) { if (vide) vide.classList.remove('cache'); return; }
+
+  let html = '<div class="collections-grille">';
+  donneesFamilles.forEach(fam => {
+    const col     = donneesCollections.find(c => c.col_id === fam.col_id);
+    const couleurs = couleurCollection(fam.nom, fam.couleur_hex);
+    html += `
+      <div class="collection-carte" onclick="ouvrirFicheFamille('${fam.fam_id}')">
+        <div class="collection-carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
+        <div class="collection-carte-overlay"></div>
+        <div class="collection-carte-lignes-haut"><span class="collection-carte-ligne-tag">${(col?.nom || '—').toUpperCase()}</span></div>
+        <div class="collection-carte-contenu">
+          <span class="collection-carte-nom">${(fam.nom || '').toUpperCase()}</span>
+          <span class="collection-carte-slogan">${fam.description || ''}</span>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  contenu.innerHTML = html;
+}
+
+function ouvrirFicheFamille(fam_id) {
+  const fam = donneesFamilles.find(f => f.fam_id === fam_id);
+  if (!fam) return;
+  const col = donneesCollections.find(c => c.col_id === fam.col_id);
+  document.getElementById('fiche-famille-titre').textContent      = (fam.nom || '').toUpperCase();
+  document.getElementById('fiche-famille-collection').textContent = col?.nom || '—';
+  document.getElementById('fiche-famille-desc').textContent       = fam.description || '—';
+  document.getElementById('fiche-famille-modifier').onclick = () => {
+    fermerFicheFamille();
+    modifierFamille(fam_id);
+  };
+  document.getElementById('btn-supprimer-famille').onclick = () => supprimerFamille(fam_id);
+  document.getElementById('contenu-familles').classList.add('cache');
+  document.getElementById('btn-nouvelle-famille').classList.add('cache');
+  document.getElementById('fiche-famille').classList.add('visible');
+  window.scrollTo(0, 0);
+}
+
+function fermerFicheFamille() {
+  document.getElementById('fiche-famille').classList.remove('visible');
+  document.getElementById('contenu-familles').classList.remove('cache');
+  const btnNew = document.getElementById('btn-nouvelle-famille');
+  if (btnNew) btnNew.classList.remove('cache');
+}
+
+function ouvrirFormFamille() {
+  fermerFicheFamille();
+  document.getElementById('form-familles-titre').textContent = 'Nouvelle famille';
+  document.getElementById('ff-id').value          = '';
+  document.getElementById('ff-nom').value         = '';
+  document.getElementById('ff-desc').value        = '';
+  document.getElementById('ff-couleur-hex').value = '';
+  const sel = document.getElementById('ff-collection');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
+    const o = document.createElement('option');
+    o.value = col.col_id; o.textContent = col.nom; sel.appendChild(o);
+  });
+  sel.value = '';
+  document.getElementById('contenu-familles').classList.add('cache');
+  document.getElementById('btn-nouvelle-famille').classList.add('cache');
+  document.getElementById('form-familles').classList.add('visible');
+  window.scrollTo(0, 0);
+}
+}
+
+function fermerFormFamille() {
+  document.getElementById('form-familles').classList.remove('visible');
+  document.getElementById('contenu-familles').classList.remove('cache');
+  const btnNew = document.getElementById('btn-nouvelle-famille');
+  if (btnNew) btnNew.classList.remove('cache');
+}
+
+function modifierFamille(fam_id) {
+  const fam = donneesFamilles.find(f => f.fam_id === fam_id);
+  if (!fam) return;
+  document.getElementById('form-familles-titre').textContent = 'Modifier la famille';
+  document.getElementById('ff-id').value          = fam.fam_id;
+  document.getElementById('ff-nom').value         = fam.nom || '';
+  document.getElementById('ff-desc').value        = fam.description || '';
+  document.getElementById('ff-couleur-hex').value = fam.couleur_hex || '';
+  const sel = document.getElementById('ff-collection');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
+    const o = document.createElement('option');
+    o.value = col.col_id; o.textContent = col.nom; sel.appendChild(o);
+  });
+  sel.value = fam.col_id || '';
+  document.getElementById('contenu-familles').classList.add('cache');
+  document.getElementById('btn-nouvelle-famille').classList.add('cache');
+  document.getElementById('form-familles').classList.add('visible');
+  window.scrollTo(0, 0);
+}
+
+async function sauvegarderFamille() {
+  const id     = document.getElementById('ff-id').value;
+  const col_id = document.getElementById('ff-collection').value;
+  const nom    = document.getElementById('ff-nom').value.trim().toUpperCase();
+  if (!nom || !col_id) { afficherMsg('familles', 'Nom et collection requis.', 'erreur'); return; }
+  const d = {
+    fam_id:      id || ('FAM-' + Date.now()),
+    col_id,
+    rang:        1,
+    nom,
+    description: document.getElementById('ff-desc').value,
+    couleur_hex: document.getElementById('ff-couleur-hex').value
+  };
+  const res = await appelAPIPost('saveFamille', d);
+  if (res && res.success) {
+    fermerFormFamille();
+    afficherMsg('familles', id ? 'Famille mise à jour.' : 'Famille ajoutée.');
+    await chargerFamilles();
+  } else {
+    afficherMsg('familles', 'Erreur lors de la sauvegarde.', 'erreur');
+  }
+}
+
+async function supprimerFamille(fam_id) {
+  confirmerAction('Supprimer cette famille ?', async () => {
+    const res = await appelAPIPost('deleteFamille', { fam_id });
+    if (res && res.success) {
+      fermerFicheFamille();
+      afficherMsg('familles', 'Famille supprimée.');
+      await chargerFamilles();
+    } else {
+      afficherMsg('familles', 'Erreur lors de la suppression.', 'erreur');
+    }
+  });
+}
+
+function chargerCollections() {
   const [resCol, resGam] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getGammes')
@@ -312,10 +473,12 @@ function ouvrirFicheCollection(col_id) {
 }
 
 function fermerFicheCollection() {
-  const fiche = document.getElementById('fiche-collection');
-  if (fiche) fiche.classList.remove('visible');
+  const fiche   = document.getElementById('fiche-collection');
   const contenu = document.getElementById('contenu-collections');
+  const btnNew  = document.getElementById('btn-nouvelle-collection');
+  if (fiche)   fiche.classList.remove('visible');
   if (contenu) contenu.classList.remove('cache');
+  if (btnNew)  btnNew.classList.remove('cache');
 }
 
 function ouvrirFormCollection() {
@@ -377,6 +540,8 @@ async function ouvrirFicheGamme(gam_id) {
 function fermerFicheGamme() {
   document.getElementById('fiche-ligne').classList.remove('visible');
   document.getElementById('fiche-collection').classList.add('visible');
+  const btnNew = document.getElementById('btn-nouvelle-collection');
+  if (btnNew) btnNew.classList.remove('cache');
 }
 
 function ouvrirFormGamme(col_id) {
@@ -750,6 +915,16 @@ async function chargerCollectionsPourSelecteur() {
     const o = document.createElement('option');
     o.value = col.col_id; o.textContent = col.nom; sel.appendChild(o);
   });
+ // Famille
+  const selFam = document.getElementById('fr-famille');
+  if (selFam) {
+    selFam.innerHTML = '<option value="">— Aucune —</option>';
+    donneesFamilles.sort((a, b) => (a.nom || '').localeCompare(b.nom || '', 'fr')).forEach(fam => {
+      const o = document.createElement('option');
+      o.value = fam.fam_id; o.textContent = fam.nom; selFam.appendChild(o);
+    });
+  }
+
   // Collections secondaires
   const selSec = document.getElementById('fr-collections-secondaires');
   if (selSec) {
@@ -932,6 +1107,8 @@ async function modifierProduit(pro_id) {
   document.getElementById('fr-collection').value               = pro.col_id || '';
   await mettreAJourLignes();
   document.getElementById('fr-ligne').value                    = pro.gam_id || '';
+  const selFamProd = document.getElementById('fr-famille');
+  if (selFamProd) selFamProd.value = pro.fam_id || '';
   document.getElementById('fr-image-url').value                = pro.image_url || '';
   const preview = document.getElementById('fr-image-preview');
   if (preview) preview.innerHTML = pro.image_url ? `<img src="${pro.image_url}" class="photo-preview">` : '';
@@ -983,8 +1160,8 @@ async function sauvegarderRecette() {
   const d = {
     pro_id:      id || ('PRO-' + Date.now()),
     col_id,
-    gam_id,
-    fam_id:      '',
+  gam_id,
+    fam_id:      document.getElementById('fr-famille')?.value || '',
     nom:         document.getElementById('fr-nom').value.toUpperCase(),
     couleur_hex: document.getElementById('fr-couleur').value,
     nb_unites:   parseInt(document.getElementById('fr-unites').value) || 1,
