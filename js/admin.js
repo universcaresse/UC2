@@ -141,6 +141,17 @@ if (id === 'collections')    afficherCollections();
 }
 
 // ─── STATS ACCUEIL ───
+function validerConnexionAdmin() {
+  const mdp = document.getElementById('input-mdp-admin')?.value;
+  if (mdp === CONFIG.MOT_DE_PASSE) {
+    sessionStorage.setItem('uc_admin', 'true');
+    window.location.reload();
+  } else {
+    const err = document.getElementById('erreur-mdp-admin');
+    if (err) err.textContent = 'Mot de passe incorrect.';
+  }
+}
+
 function afficherStatsAccueil() {
   const nbPublics = donneesProduits.filter(p => p.statut === 'public').length;
   const statCol   = document.getElementById('admin-stat-collections');
@@ -538,6 +549,8 @@ async function ouvrirFicheGamme(gam_id) {
   window.scrollTo(0, 0);
 }
 
+function fermerFicheLigne() { fermerFicheGamme(); }
+
 function fermerFicheGamme() {
   document.getElementById('fiche-ligne').classList.remove('visible');
   document.getElementById('fiche-collection').classList.add('visible');
@@ -576,7 +589,15 @@ async function modifierGamme(gam_id) {
   document.getElementById('fc-desc-ligne').value       = gam.description || '';
   document.getElementById('fc-couleur-hex-ligne').value = gam.couleur_hex || '';
   document.getElementById('fc-photo-url-ligne').value  = gam.photo_url || '';
-  apercuCouleurCollection(document.getElementById('fc-couleur-hex-ligne'));
+apercuCouleurCollection(document.getElementById('fc-couleur-hex-ligne'));
+  const resBase = await appelAPI('getGammesIngredients', { gam_id });
+  ingredientsBase = (resBase && resBase.success ? resBase.items : []).map(i => ({
+    ing_id:   i.ing_id,
+    type:     (listesDropdown.fullData.find(d => d.ing_id === i.ing_id) || {}).cat_id || '',
+    nom:      i.nom_ingredient,
+    quantite: i.quantite_g
+  }));
+  rafraichirListeIngredientsBase();
   document.getElementById('form-collections').classList.add('visible');
   window.scrollTo(0, 0);
 }
@@ -632,10 +653,14 @@ async function sauvegarderCollection() {
       photo_url:   document.getElementById('fc-photo-url-ligne')?.value  || '',
       rowIndex:    rowIndex || null
     };
-    const res = rowIndex
+   const res = rowIndex
       ? await appelAPIPost('saveGamme', { ...d, rowIndex })
       : await appelAPIPost('saveGamme', d);
     if (res && res.success) {
+      await appelAPIPost('saveGammeIngredients', {
+        gam_id: d.gam_id,
+        ingredients: ingredientsBase.map(i => ({ ing_id: i.ing_id || '', nom_ingredient: i.nom, quantite_g: i.quantite }))
+      });
       if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
       fermerFormCollection();
       afficherMsg('collections', rowIndex ? 'Gamme mise à jour.' : 'Gamme ajoutée.');
@@ -1479,6 +1504,61 @@ function rafraichirListeIngredientsRecette() {
       <button class="btn btn-sm btn-danger" onclick="supprimerIngredientRecette(${i})">✕</button>
     </div>`;
   }).join('');
+}
+
+// ─── INGRÉDIENTS DE BASE GAMME ───
+var ingredientsBase = [];
+
+function ajouterIngredientBase(type='', nom='', quantite=0) {
+  ingredientsBase.push({ type, nom, quantite });
+  rafraichirListeIngredientsBase();
+}
+
+function supprimerIngredientBase(index) {
+  ingredientsBase.splice(index, 1);
+  rafraichirListeIngredientsBase();
+}
+
+function rafraichirListeIngredientsBase() {
+  const liste = document.getElementById('liste-ingredients-base');
+  if (!liste) return;
+  if (ingredientsBase.length === 0) { liste.innerHTML = ''; return; }
+  const cats = [...new Set(listesDropdown.fullData.map(d => d.cat_id))].filter(Boolean).sort();
+  liste.innerHTML = ingredientsBase.map((ing, i) => {
+    const ingsDeType = listesDropdown.fullData.filter(d => d.cat_id === ing.type);
+    const inciVal    = (listesDropdown.fullData.find(d => d.nom_UC === ing.nom) || {}).inci || '';
+    return `
+    <div class="ingredient-rangee">
+      <select class="form-ctrl ing-type" onchange="ingredientsBase[${i}].type=this.value; ingredientsBase[${i}].nom=''; rafraichirListeIngredientsBase()">
+        <option value="">— Type —</option>
+        ${cats.map(t => `<option value="${t}" ${ing.type===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <select class="form-ctrl ing-nom" onchange="ingredientsBase[${i}].nom=this.value; ingredientsBase[${i}].ing_id=(listesDropdown.fullData.find(d=>d.nom_UC===this.value)||{}).ing_id||''; rafraichirListeIngredientsBase()">
+        <option value="">— Ingrédient —</option>
+        ${ingsDeType.map(d => `<option value="${d.nom_UC}" ${ing.nom===d.nom_UC?'selected':''}>${d.nom_UC}</option>`).join('')}
+      </select>
+      <input type="text" class="form-ctrl ing-inci" readonly placeholder="INCI" value="${inciVal}">
+      <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${ing.quantite||''}" placeholder="g" onchange="ingredientsBase[${i}].quantite=parseFloat(this.value)||0">
+      <button class="btn btn-sm btn-danger" onclick="supprimerIngredientBase(${i})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+async function chargerIngredientsBaseRecette() {
+  const gam_id = document.getElementById('fr-ligne').value;
+  if (!gam_id) { ingredientsBase = []; rafraichirListeIngredientsBase(); return; }
+  const res = await appelAPI('getGammesIngredients', { gam_id });
+  ingredientsBase = (res && res.success ? res.items : []).map(i => ({
+    ing_id:   i.ing_id,
+    type:     (listesDropdown.fullData.find(d => d.ing_id === i.ing_id) || {}).cat_id || '',
+    nom:      i.nom_ingredient,
+    quantite: i.quantite_g
+  }));
+  if (!document.getElementById('fr-id').value) {
+    ingredientsRecette = [...ingredientsBase];
+    rafraichirListeIngredientsRecette();
+  }
+  rafraichirListeIngredientsBase();
 }
 
 // ─── FORMATS PRODUIT ───
