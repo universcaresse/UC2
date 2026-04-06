@@ -1035,7 +1035,7 @@ function supprimerProduit(pro_id) {
   });
 }
 
-const supprimerRecetteActive = supprimerProduit;
+// supprimerRecetteActive — alias défini plus haut
 
 // ─── CLOUDINARY ───
 let _mediaLibrary        = null;
