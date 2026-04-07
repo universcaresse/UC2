@@ -135,8 +135,7 @@ function afficherSection(id) {
     afficherNbProduits();
   }
   if (id === 'catalogue') {
-    const filtresGammes = document.getElementById('filtres-gammes');
-    if (filtresGammes) { filtresGammes.innerHTML = ''; filtresGammes.classList.add('cache'); }
+    
     document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('actif'));
     const btnTout = document.querySelector('[data-filtre="tout"]');
     if (btnTout) btnTout.classList.add('actif');
@@ -505,6 +504,10 @@ function construireCatalogue() {
           </div>
         </div>
       </div>
+   ${gammes.length > 1 ? `<div class="filtres-bar collection-filtres-gammes" data-collection-filtres="${col_id}">
+        <button class="filtre-btn actif" data-filtre-gamme="tout" onclick="filtrerGamme('tout', '${col_id}')">Toutes</button>
+        ${gammes.map(([gid, gnom]) => `<button class="filtre-btn" data-filtre-gamme="${gid}" onclick="filtrerGamme('${gid}', '${col_id}')">${gnom}</button>`).join('')}
+      </div>` : ''}
       ${gammesHTML}`;
     body.appendChild(section);
     if (scrollObserver) {
@@ -585,27 +588,7 @@ function filtrer(col_id, gam_id) {
     s.classList.toggle('masquee', col_id !== 'tout' && s.dataset.collection !== col_id);
   });
 
-  // Filtres gammes
-  const filtresGammes = document.getElementById('filtres-gammes');
-  if (filtresGammes) {
-    if (col_id === 'tout') {
-      filtresGammes.innerHTML = '';
-      filtresGammes.classList.add('cache');
-    } else {
-      const infoCollections = donneesCatalogue?.infoCollections || {};
-      const produitsColl = (donneesCatalogue?.produits || []).filter(p => p.col_id === col_id);
-      const gammes = [...new Map(produitsColl.filter(p => p.nom_gamme).map(p => [p.gam_id, p.nom_gamme])).entries()];
-      if (gammes.length > 1) {
-        filtresGammes.innerHTML =
-          `<button class="filtre-btn actif" data-filtre-gamme="tout" onclick="filtrerGamme('tout')">Toutes</button>` +
-          gammes.map(([gid, gnom]) => `<button class="filtre-btn" data-filtre-gamme="${gid}" onclick="filtrerGamme('${gid}')">${gnom}</button>`).join('');
-        filtresGammes.classList.remove('cache');
-      } else {
-        filtresGammes.innerHTML = '';
-        filtresGammes.classList.add('cache');
-      }
-    }
-  }
+  
 
   // Filtre gamme actif
   if (gam_id) filtrerGamme(gam_id);
@@ -622,13 +605,23 @@ function filtrer(col_id, gam_id) {
   }
 }
 
-function filtrerGamme(gam_id) {
-  document.querySelectorAll('[data-filtre-gamme]').forEach(b => b.classList.remove('actif'));
-  const btn = document.querySelector(`[data-filtre-gamme="${gam_id}"]`);
-  if (btn) btn.classList.add('actif');
-  document.querySelectorAll('.ligne-groupe').forEach(g => {
-    g.classList.toggle('masquee', gam_id !== 'tout' && g.dataset.gamme !== gam_id);
-  });
+function filtrerGamme(gam_id, col_id) {
+  const conteneur = col_id
+    ? document.querySelector(`.collection-filtres-gammes[data-collection-filtres="${col_id}"]`)
+    : document.querySelector('.collection-filtres-gammes');
+  if (conteneur) {
+    conteneur.querySelectorAll('[data-filtre-gamme]').forEach(b => b.classList.remove('actif'));
+    const btn = conteneur.querySelector(`[data-filtre-gamme="${gam_id}"]`);
+    if (btn) btn.classList.add('actif');
+  }
+  const section = col_id
+    ? document.querySelector(`.collection-section[data-collection="${col_id}"]`)
+    : document.querySelector('.collection-section');
+  if (section) {
+    section.querySelectorAll('.ligne-groupe').forEach(g => {
+      g.classList.toggle('masquee', gam_id !== 'tout' && g.dataset.gamme !== gam_id);
+    });
+  }
 }
 
 // ─── MODAL PRODUIT ───
