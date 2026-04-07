@@ -634,12 +634,12 @@ footer > * { position: relative; z-index: 1; }
 .filtre-btn { padding: 7px 18px; font-size: var(--texte-75); letter-spacing: 0.08em; border: 1px solid var(--beige); background: transparent; color: var(--gris); cursor: pointer; font-family: 'DM Sans', sans-serif; text-transform: uppercase; transition: all 0.2s; font-weight: 400; }
 .filtre-btn:hover { border-color: var(--primary); color: var(--primary); }
 .filtre-btn.actif { background: var(--primary); border-color: var(--primary); color: white; }
-.collection-filtres-gammes { padding: 24px var(--padding-page); display: flex; flex-direction: column; gap: 16px; align-items: flex-start; border-bottom: 1px solid var(--beige); background: var(--blanc); }
-.collection-filtres-gammes .page-entete-titre { font-size: 1.4rem; }
+.collection-filtres-gammes { padding: 24px 0 32px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+.collection-filtres-gammes .page-entete-titre { font-size: 1.4rem; text-align: left; }
 .collection-filtres-gammes .filtres-ligne { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.collection-filtres-gammes { padding: 0; }
 .catalogue-body { padding: 48px var(--padding-page) 80px; }
 .collection-section { margin-bottom: 72px; }
+.collection-section + .collection-section { padding-top: 48px; border-top: 3px solid var(--primary); border-image: linear-gradient(to right, var(--primary) 80px, transparent 80px) 1; }
 .collection-section { transition: opacity 0.4s ease; }
 .collection-section.masquee { display: none; opacity: 0; }
 .collection-entete { display: grid; grid-template-columns: 1fr 340px; gap: 48px; margin-bottom: 36px; padding-bottom: 28px; border-bottom: 1px solid var(--beige); align-items: center; }
@@ -677,7 +677,7 @@ footer > * { position: relative; z-index: 1; }
 
 .carte-infos.carte-infos-fonce .carte-prix { color: rgba(0,0,0,0.85); }
 .carte-collection-badge { display: inline-block; font-family: 'DM Sans', sans-serif; font-size: var(--texte-70); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; font-weight: 500; }
-.carte-nom { font-family: 'DM Sans', sans-serif; font-size: var(--texte-105); font-weight: 500; color: var(--gris-fonce); margin-bottom: 4px; line-height: 1.2; }
+.carte-nom { font-family: 'DM Sans', sans-serif; font-size: var(--texte-105); font-weight: 500; color: var(--gris-fonce); margin-bottom: 4px; line-height: 1.2; min-height: 2.52rem; }
 .carte-ligne { font-family: 'DM Sans', sans-serif; font-size: var(--texte-75); color: var(--gris); margin-bottom: 12px; font-weight: 300; }
 .carte-bas { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--beige); }
 .carte-statut-badge { position: absolute; top: 12px; left: 12px; z-index: 2; font-family: 'DM Sans', sans-serif; font-size: var(--texte-70); letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; font-weight: 500; background: rgba(255,255,255,0.85); color: var(--primary); }

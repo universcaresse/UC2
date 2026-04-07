@@ -868,7 +868,7 @@ async function afficherProduits() {
             <div class="carte-nom">${pro.nom || '—'}</div>
             <div class="carte-ligne">${gamNom}</div>
           <div class="carte-bas">
-              ${(pro.formats && pro.formats.length) ? `<div class="carte-formats">${pro.formats.map(f => `<div class="carte-format-tag"><span class="carte-format-prix">${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $</span><span class="carte-format-sep"></span><span class="carte-format-poids">${f.poids} ${f.unite}</span></div>`).join('')}</div>` : ''}
+              ${(pro.formats && pro.formats.length) ? `<div class="carte-formats">${[...pro.formats].sort((a, b) => parseFloat(a.poids) - parseFloat(b.poids)).map(f => `<div class="carte-format-tag"><span class="carte-format-prix">${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $</span><span class="carte-format-sep"></span><span class="carte-format-poids">${f.poids} ${f.unite}</span></div>`).join('')}</div>` : ''}
             </div>
           </div>`;
 		  

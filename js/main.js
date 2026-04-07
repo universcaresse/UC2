@@ -535,7 +535,7 @@ function couleurTexteContraste(hex) {
 }
 
 function carteProduit(p) {
-  const formats = Array.isArray(p.formats) && p.formats.length ? p.formats : [];
+  const formats = Array.isArray(p.formats) && p.formats.length ? [...p.formats].sort((a, b) => parseFloat(a.poids) - parseFloat(b.poids)) : [];
   const prix = formats.length
     ? `<div class="carte-formats">${formats.map(f => `<div class="carte-format-tag"><span class="carte-format-prix">${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $</span><span class="carte-format-sep"></span><span class="carte-format-poids">${f.poids} ${f.unite}</span></div>`).join('')}</div>`
     : '';
@@ -615,9 +615,7 @@ function filtrerGamme(gam_id, col_id) {
     const btn = conteneur.querySelector(`[data-filtre-gamme="${gam_id}"]`);
     if (btn) btn.classList.add('actif');
   }
-  const section = col_id
-    ? document.querySelector(`.collection-section[data-collection="${col_id}"]`)
-    : document.querySelector('.collection-section');
+  const section = document.querySelector(`.collection-section[data-collection="${col_id}"]`);
   if (section) {
     section.querySelectorAll('.ligne-groupe').forEach(g => {
       g.classList.toggle('masquee', gam_id !== 'tout' && g.dataset.gamme !== gam_id);
@@ -650,17 +648,22 @@ function ouvrirModal(produit) {
     img.onerror = () => img.remove();
     photo.appendChild(img);
   } else {
-    hex.classList.add('cache');
-    photo.style.background = `linear-gradient(145deg, ${couleur}dd, ${couleur}88)`;
+    photo.classList.add('cache');
+    hex.classList.remove('cache');
+    hex.style.background = `linear-gradient(145deg, ${couleur}dd, ${couleur}88)`;
+    hex.style.flex = '1';
   }
 
   // Formats V2 — tableau p.formats {poids, unite, prix_vente}
-  const formats    = Array.isArray(produit.formats) && produit.formats.length ? produit.formats : [];
+  const formats    = Array.isArray(produit.formats) && produit.formats.length ? [...produit.formats].sort((a, b) => parseFloat(a.poids) - parseFloat(b.poids)) : [];
   const prixFormat = formats.length
     ? formats.map(f => `${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $ / ${f.poids} ${f.unite}`).join('&nbsp;&nbsp;·&nbsp;&nbsp;')
     : '';
   const prixFormatEl = document.getElementById('modal-prix-format');
-  if (prixFormatEl) prixFormatEl.innerHTML = prixFormat;
+  if (prixFormatEl) {
+    prixFormatEl.innerHTML = prixFormat;
+    prixFormatEl.style.color = couleurTexteContraste(couleur) === 'carte-infos-fonce' ? 'rgba(0,0,0,0.85)' : 'white';
+  }
 
   // INCI — V2 : ingredients = [{ing_id, nom_ingredient, quantite_g}]
   // La liste INCI vient de nom_ingredient — mais on affiche UNIQUEMENT le code INCI
