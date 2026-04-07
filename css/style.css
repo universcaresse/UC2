@@ -752,7 +752,8 @@ footer > * { position: relative; z-index: 1; }
 .carte-ligne { font-family: 'DM Sans', sans-serif; font-size: var(--texte-xs); color: var(--gris); margin-bottom: 12px; font-weight: 300; }
 .carte-bas { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--beige); }
 .carte-prix { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; color: var(--primary); }
-.carte-formats { display: flex; flex-direction: row; gap: 0; width: 100%; }
+.carte-formats { display: flex; flex-direction: row; gap: 0; width: 100%; min-width: 0; }
+.carte-format-tag { min-width: 0; overflow: hidden; }
 .carte-format-tag { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 4px 2px; font-family: 'DM Sans', sans-serif; color: inherit; }
 .carte-format-prix { font-weight: 300; font-size: var(--texte-xs); letter-spacing: 0.02em; }
 .carte-format-sep { display: none; }
