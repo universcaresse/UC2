@@ -50,14 +50,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // V2 : getCollections + getGammes + getProduits + getIngredientsInci + getConfig
 async function chargerDonneesInitiales() {
-const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats] = await Promise.all([
+const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getGammes'),
     appelAPI('getFamilles'),
     appelAPI('getProduits'),
     appelAPI('getIngredientsInci'),
     appelAPI('getConfig'),
-    appelAPI('getCategoriesUC')
+    appelAPI('getCategoriesUC'),
+    appelAPI('getProduitsFormats')
   ]);
 
   if (resCol && resCol.success) {
@@ -69,6 +70,13 @@ if (resGam && resGam.success) {
   if (resFam && resFam.success) {
     donneesFamilles = resFam.items || [];
   }
+ const formatsMap = {};
+  if (resFmt && resFmt.success) {
+    (resFmt.items || []).forEach(f => {
+      if (!formatsMap[f.pro_id]) formatsMap[f.pro_id] = [];
+      formatsMap[f.pro_id].push({ poids: f.poids, unite: f.unite, prix_vente: f.prix_vente });
+    });
+  }
   if (resPro && resPro.success) {
     donneesProduits = (resPro.items || []).sort((a, b) => {
       const colA = donneesCollections.find(c => c.col_id === a.col_id);
@@ -76,7 +84,8 @@ if (resGam && resGam.success) {
       return ((colA?.rang || 99) - (colB?.rang || 99)) ||
              (a.nom_gamme || '').localeCompare(b.nom_gamme || '') ||
              (a.nom || '').localeCompare(b.nom || '');
-    });
+   });
+    donneesProduits = donneesProduits.map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
   }
   if (resInci && resInci.success) {
     listesDropdown.fullData = resInci.items || [];
@@ -857,8 +866,9 @@ async function afficherProduits() {
             <span class="carte-collection-badge">${col?.nom || '—'}</span>
             <div class="carte-nom">${pro.nom || '—'}</div>
             <div class="carte-ligne">${gamNom}</div>
-            <div class="carte-bas">
-              <span class="carte-statut-badge">${pro.statut === 'public' ? 'Public' : 'Test'}</span>
+          <div class="carte-bas">
+              ${(pro.formats && pro.formats.length) ? `<div class="carte-formats">${pro.formats.map(f => `<div class="carte-format-tag"><span class="carte-format-prix">${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $</span><span class="carte-format-sep"></span><span class="carte-format-poids">${f.poids} ${f.unite}</span></div>`).join('')}</div>` : ''}
+              <span class="carte-statut-badge${pro.statut !== 'public' ? ' test' : ''}">${pro.statut === 'public' ? 'Public' : 'Test'}</span>
             </div>
           </div>`;
 		  
@@ -914,11 +924,11 @@ function filtrerRecettes() {
   const gamme  = document.getElementById('filtre-recette-ligne')?.value;
   const statut = document.getElementById('filtre-recette-statut')?.value;
   const nom    = (document.getElementById('filtre-recette-nom')?.value || '').toLowerCase().trim();
-  const cartes = document.querySelectorAll('#grille-produits .recette-carte');
+  const cartes = document.querySelectorAll('#grille-produits .carte-produit');
   const vide   = document.getElementById('vide-produits');
   let visible  = 0;
   cartes.forEach(carte => {
-    const nomEl = carte.querySelector('.recette-nom');
+    const nomEl = carte.querySelector('.carte-nom');
     const pro   = donneesProduits.find(p => p.nom === nomEl?.textContent);
     if (!pro) return;
     const colObj = donneesCollections.find(c => c.col_id === pro.col_id);
@@ -933,7 +943,7 @@ function filtrerRecettes() {
   if (vide) vide.classList.toggle('cache', visible !== 0);
 
   document.querySelectorAll('#grille-produits .recette-section-ligne').forEach(sec => {
-    const aDesCartesVisibles = [...sec.querySelectorAll('.recette-carte')].some(c => !c.classList.contains('cache'));
+    const aDesCartesVisibles = [...sec.querySelectorAll('.carte-produit')].some(c => !c.classList.contains('cache'));
     sec.classList.toggle('cache', !aDesCartesVisibles);
   });
   document.querySelectorAll('#grille-produits .recette-section-collection').forEach(sec => {
