@@ -752,11 +752,12 @@ footer > * { position: relative; z-index: 1; }
 .carte-ligne { font-family: 'DM Sans', sans-serif; font-size: var(--texte-xs); color: var(--gris); margin-bottom: 12px; font-weight: 300; }
 .carte-bas { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--beige); }
 .carte-prix { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; color: var(--primary); }
-.carte-formats { display: flex; flex-direction: row; gap: 8px; align-items: stretch; flex: 1; }
-.carte-format-tag { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 4px 0; font-family: 'DM Sans', sans-serif; font-size: var(--texte-xs); color: inherit; }
-.carte-format-prix { font-weight: 600; font-size: var(--texte-sm); }
-.carte-format-sep { display: block; width: 100%; height: 1px; background: currentColor; opacity: 0.25; margin: 3px 0; }
-.carte-format-poids { font-size: var(--texte-micro); opacity: 0.75; }
+.carte-formats { display: flex; flex-direction: row; gap: 0; width: 100%; }
+.carte-format-tag { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 4px 6px; font-family: 'DM Sans', sans-serif; color: inherit; border-right: 1px solid currentColor; opacity: 0.9; }
+.carte-format-tag:last-child { border-right: none; }
+.carte-format-prix { font-weight: 300; font-size: var(--texte-xs); letter-spacing: 0.02em; }
+.carte-format-sep { display: block; width: 60%; height: 1px; background: currentColor; opacity: 0.3; margin: 2px 0; }
+.carte-format-poids { font-weight: 300; font-size: var(--texte-micro); opacity: 0.7; letter-spacing: 0.04em; }
 
 /* ═══════════════════════════════════════
    ADMIN — LAYOUT
