@@ -652,7 +652,7 @@ async function modifierCollection(col_id) {
 }
 
 async function sauvegarderCollection() {
-  const btnSauvegarder = document.querySelector('#form-collections .btn-primary');
+  const btnSauvegarder = document.querySelector('#form-collections .bouton');
   if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = '<span class="spinner"></span> Sauvegarde…'; }
   const rowIndex = document.getElementById('fc-rowIndex').value;
   const mode     = document.getElementById('fc-mode').value;
@@ -1205,7 +1205,7 @@ async function modifierProduit(pro_id) {
 function modifierRecette(id) { return modifierProduit(id); }
 
 async function sauvegarderRecette() {
-  const btnSauvegarder = document.querySelector('#form-recettes .btn-primary');
+  const btnSauvegarder = document.querySelector('#form-recettes .bouton');
   if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = '<span class="spinner"></span> Sauvegarde…'; }
 
   const id     = document.getElementById('fr-id').value;
@@ -1531,7 +1531,7 @@ function rafraichirListeIngredientsRecette() {
       </select>
       <input type="text" class="form-ctrl ing-inci" readonly placeholder="INCI" value="${inciVal}">
       <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${ing.quantite||''}" placeholder="g" onchange="ingredientsRecette[${i}].quantite=parseFloat(this.value)||0">
-      <button class="btn btn-sm btn-danger" onclick="supprimerIngredientRecette(${i})">✕</button>
+      <button class="bouton bouton-petit bouton-rouge" onclick="supprimerIngredientRecette(${i})">✕</button>
     </div>`;
   }).join('');
 }
@@ -1569,7 +1569,7 @@ function rafraichirListeIngredientsBase() {
       </select>
       <input type="text" class="form-ctrl ing-inci" readonly placeholder="INCI" value="${inciVal}">
       <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${ing.quantite||''}" placeholder="g" onchange="ingredientsBase[${i}].quantite=parseFloat(this.value)||0">
-      <button class="btn btn-sm btn-danger" onclick="supprimerIngredientBase(${i})">✕</button>
+      <button class="bouton bouton-petit bouton-rouge" onclick="supprimerIngredientBase(${i})">✕</button>
     </div>`;
   }).join('');
 }
@@ -1616,7 +1616,7 @@ function rafraichirListeFormatsRecette() {
         <option value="ml" ${f.unite==='ml'?'selected':''}>ml</option>
       </select>
       <input type="text" inputmode="decimal" class="form-ctrl" value="${f.prix||''}" placeholder="Prix $" onchange="formatsRecette[${i}].prix=parseFloat(this.value)||0">
-      <button class="btn btn-sm btn-danger" onclick="supprimerFormatRecette(${i})">✕</button>
+      <button class="bouton bouton-petit bouton-rouge" onclick="supprimerFormatRecette(${i})">✕</button>
     </div>`).join('');
 }
 
@@ -1978,7 +1978,7 @@ function calculerTotalFinal() {
 async function finaliserFacture() {
   if (!factureActive) { afficherMsg('final-msg', 'Aucune facture active.', 'erreur'); return; }
   if (produitsFacture.length === 0) { afficherMsg('final-msg', 'Aucun item à finaliser.', 'erreur'); return; }
-  const btnFinaliser = document.querySelector('.btn-finaliser');
+  const btnFinaliser = document.querySelector('.bouton-or');
   if (btnFinaliser) { btnFinaliser.disabled = true; btnFinaliser.innerHTML = '<span class="spinner"></span> Finalisation…'; }
   const sousTotal = parseFloat(document.getElementById('final-sous-total')?.value) || 0;
   const tps       = parseFloat(document.getElementById('final-tps')?.value)        || 0;
@@ -2169,7 +2169,7 @@ async function voirDetailFacture(ach_id) {
       <div class="facture-total-ligne facture-total-final">Total <span>${formaterPrix(total)}</span></div>
     </div>
     <div class="form-actions">
-      <button class="btn btn-danger" onclick="fermerModalFacture(); supprimerFacture('${ach_id}')">Supprimer</button>
+      <button class="bouton bouton-rouge" onclick="fermerModalFacture(); supprimerFacture('${ach_id}')">Supprimer</button>
     </div>`;
   document.getElementById('contenu-detail-facture').innerHTML = html;
 }
@@ -2394,7 +2394,7 @@ function inciRendreLigne(l, cat, uid) {
         <hr class="separateur">
         <div class="form-actions">
           <span></span>
-          <button class="btn btn-sm btn-primary" onclick="inciValider('${id}','${nomSafe}','${catSafe}','${l.ing_id||''}')">Sauvegarder</button>
+          <button class="bouton bouton-petit" onclick="inciValider('${id}','${nomSafe}','${catSafe}','${l.ing_id||''}')">Sauvegarder</button>
         </div>
       </td>
     </tr>`;
@@ -2537,8 +2537,8 @@ async function chargerContenuSite() {
   if (btnSaisonnier) {
     const actif = c.mode_saisonnier === 'oui';
     btnSaisonnier.textContent = actif ? '🌲 Mode saisonnier ON' : '🌲 Mode saisonnier OFF';
-    btnSaisonnier.classList.toggle('btn-primary', actif);
-    btnSaisonnier.classList.toggle('btn-secondary', !actif);
+    btnSaisonnier.classList.toggle('bouton', actif);
+    btnSaisonnier.classList.toggle('bouton-vert-pale', !actif);
   }
   if (corps) corps.classList.remove('cache');
 }
@@ -2552,7 +2552,7 @@ async function toggleModeSaisonnier() {
   if (data && data.success) {
     document.getElementById('btn-mode-saisonnier').textContent = nouveau === 'oui' ? '🌲 Mode saisonnier ON' : '🌲 Mode saisonnier OFF';
     document.getElementById('btn-mode-saisonnier').classList.toggle('btn-primary', nouveau === 'oui');
-    document.getElementById('btn-mode-saisonnier').classList.toggle('btn-secondary', nouveau !== 'oui');
+    document.getElementById('btn-mode-saisonnier').classList.toggle('bouton-vert-pale', nouveau !== 'oui');
     afficherMsg('contenu-site', nouveau === 'oui' ? 'Mode saisonnier activé.' : 'Mode saisonnier désactivé.');
   }
 }
@@ -3054,7 +3054,7 @@ async function sauvegarderLot() {
 function inciRendreUC() {
   if (inciCategoriesUC.length === 0) {
     return `<p class="form-valeur">Aucune catégorie définie.</p>
-      <button class="btn btn-sm btn-secondary" onclick="inciAjouterUC()">+ Ajouter une catégorie</button>`;
+      <button class="bouton bouton-petit bouton-vert-pale" onclick="inciAjouterUC()">+ Ajouter une catégorie</button>`;
   }
   const cartes = [...inciCategoriesUC].sort((a, b) => (a.nom || '').localeCompare(b.nom || '', 'fr')).map((c, i) => {
     const utilise = (listesDropdown.fullData || []).filter(d => d.cat_id === c.cat_id);
@@ -3074,7 +3074,7 @@ function inciRendreUC() {
     ${cartes}
     <hr class="separateur">
     <div class="form-actions">
-      <button class="btn btn-sm btn-secondary" onclick="inciAjouterUC()">+ Ajouter une catégorie</button>
+      <button class="bouton bouton-petit bouton-vert-pale" onclick="inciAjouterUC()">+ Ajouter une catégorie</button>
     </div>`;
 }
 

@@ -29,8 +29,12 @@
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Création <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
           <button class="nav-dropdown-item" onclick="afficherSection('collections', null)">Collections</button>
-         <button class="nav-dropdown-item" onclick="afficherSection('produits', null)">Produits</button>
+		  
           <button class="nav-dropdown-item" onclick="afficherSection('familles', null)">Familles</button>
+		  
+         <button class="nav-dropdown-item" onclick="afficherSection('produits', null)">Produits</button>
+		 
+		  
           <button class="nav-dropdown-item" onclick="afficherSection('import-recettes', null)">Import recettes</button>
           <button class="nav-dropdown-item bientot">Catalogue</button>
         </div>
@@ -95,8 +99,11 @@
       <div class="sidebar-groupe">
         <div class="sidebar-titre">Création</div>
         <button class="sidebar-lien actif" onclick="afficherSection('collections', this)">Collections</button>
+		
+		 <button class="sidebar-lien" onclick="afficherSection('familles', this)">Familles</button>
+		
  <button class="sidebar-lien" onclick="afficherSection('produits', this)">Produits</button>
-        <button class="sidebar-lien" onclick="afficherSection('familles', this)">Familles</button>
+       
         <button class="sidebar-lien" onclick="afficherSection('import-recettes', this)">Import recettes</button>
         <button class="sidebar-lien bientot">Catalogue</button>
       </div>
@@ -271,8 +278,8 @@
      <div class="section-admin" id="section-collections">
         <div class="page-entete fade-in">
           <div>
-            <div class="page-entete-eyebrow">Gérer les collections et leurs lignes de produits</div>
-            <div class="page-entete-titre">Collections <em>&amp; Lignes</em></div>
+            <div class="page-entete-eyebrow">Gérer les collections</div>
+            <div class="page-entete-titre">Collections</div>
           </div>
           <button class="btn btn-primary" id="btn-nouvelle-collection" onclick="ouvrirFormCollection()">+ Nouvelle collection</button>
         </div>
@@ -682,8 +689,8 @@
       <div class="chargement" id="loading-produits"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div class="recettes-grille cache" id="grille-produits"></div>
       <div class="vide cache" id="vide-produits">
-          <div class="vide-titre">Aucune recette</div>
-          <div class="vide-desc">Créez votre première recette</div>
+          <div class="vide-titre">Aucun produit</div>
+          <div class="vide-desc">Créez votre premier produit</div>
         </div>
       </div>
 
@@ -967,8 +974,8 @@
                       <th>Qté</th>
                       <th>Prix unit.</th>
                       <th>Total</th>
-                      <th>Nom UC</th>
                       <th>Type UC</th>
+                      <th>Nom UC</th>
                     </tr>
                   </thead>
                   <tbody id="if-tbody"></tbody>
@@ -1211,7 +1218,7 @@
           </div>
           <div class="form-actions">
             <button class="btn btn-primary" onclick="sauvegarderContenuSite()">Enregistrer</button>
-            <button class="btn btn-secondary" id="btn-mode-saisonnier" onclick="toggleModeSaisonnier()">🌲 Mode saisonnier est OFF</button>
+            
           </div>
         </div>
         <div class="msg-zone" id="msg-contenu-site"></div>
@@ -1222,12 +1229,16 @@
           <div class="form-panel visible">
             <div class="form-panel-header"><div class="form-panel-titre">Mode maintenance</div></div>
             <div class="form-body">
-              <div class="form-groupe">
+          <div class="form-groupe">
                 <label class="form-label">Activer le mode maintenance</label>
                 <select class="form-ctrl" id="cs-maintenance_active">
                   <option value="0">Non — site accessible</option>
                   <option value="1">Oui — afficher la page maintenance</option>
                 </select>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Mode saisonnier</label>
+                <button class="btn btn-secondary" id="btn-mode-saisonnier" onclick="toggleModeSaisonnier()">🌲 Mode saisonnier est OFF</button>
               </div>
             </div>
           </div>

@@ -52,15 +52,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   initNav();
   initScrollAnimations();
   initSPA(); // une seule fois — bug V1 corrigé
-  const resContenu = await appelAPI('getContenu');
+  const [resContenu, resCat] = await Promise.all([appelAPI('getContenu'), appelAPI('getCatalogue')]);
   if (resContenu && resContenu.success) appliquerContenu(resContenu.contenu);
-  appelAPI('getCatalogue').then(resCat => {
-    if (resCat && resCat.success) {
-      donneesCatalogue = resCat;
-      afficherCollectionsPublic();
-      afficherNbProduits();
-    }
-  });
+  if (resCat && resCat.success) {
+    donneesCatalogue = resCat;
+    afficherCollectionsPublic();
+    afficherNbProduits();
+  }
 });
 
 window.addEventListener('resize', () => {
