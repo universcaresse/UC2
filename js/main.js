@@ -80,20 +80,19 @@ function initScrollAnimations() {
 
   document.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
 
-  const mosaicObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const items = entry.target.querySelectorAll('.mosaic-item');
-        items.forEach((item, i) => {
-          setTimeout(() => item.classList.add('visible'), i * 200);
-        });
-        mosaicObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.2 });
-
-  const mosaic = document.querySelector('.hero-mosaic');
-  if (mosaic) mosaicObserver.observe(mosaic);
+  // Séquence hero
+  const seq = [
+    { sel: '.hero-logo-img',         delai: 0    },
+    { sel: '.bouton.hero-seq',        delai: 300  },
+    { sel: '.bouton .hero-seq',       delai: 600  },
+    { sel: '.mosaic-item.hero-seq:nth-child(1)', delai: 900  },
+    { sel: '.mosaic-item.hero-seq:nth-child(2)', delai: 1100 },
+    { sel: '.mosaic-item.hero-seq:nth-child(3)', delai: 1300 },
+  ];
+  seq.forEach(({ sel, delai }) => {
+    const el = document.querySelector(sel);
+    if (el) setTimeout(() => el.classList.add('visible'), delai);
+  });
 }
 
 // ─── SPA — NAVIGATION PAR SECTIONS ───
@@ -323,7 +322,7 @@ function afficherCollectionsPublic() {
   const statCol  = document.getElementById('hero-stat-collections');
 
   if (count)   count.textContent = collections.length + ' collections';
-  if (statCol) statCol.textContent = collections.length;
+  if (statCol) { statCol.textContent = collections.length; setTimeout(() => statCol.classList.add('visible'), 50); }
   if (!strip)  return;
 
   strip.innerHTML = '';
@@ -347,7 +346,7 @@ function afficherNbProduits() {
   if (!donneesCatalogue) return;
   const nb = (donneesCatalogue.produits || []).length;
   const statProd = document.getElementById('hero-stat-produits');
-  if (nb > 0 && statProd) statProd.textContent = nb + '+';
+  if (nb > 0 && statProd) { statProd.textContent = nb + '+'; setTimeout(() => statProd.classList.add('visible'), 50); }
 }
 
 function afficherCollectionsFallback() {
@@ -708,12 +707,13 @@ function appliquerContenu(c) {
     window.modeSaisonnier = String(c.mode_saisonnier) === 'oui';
     const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
 
-    set('contenu-accueil-eyebrow', c.accueil_eyebrow);
-    set('contenu-accueil-cta', c.accueil_cta);
-    const cta = document.querySelector('.hero-cta');
-    if (cta) { cta.classList.remove('invisible'); cta.classList.add('fade-in-doux'); }
+    const setSeq = (id, val) => {
+      const el = document.getElementById(id);
+      if (el && val) { el.textContent = val; setTimeout(() => el.classList.add('visible'), 50); }
+    };
+    setSeq('contenu-accueil-eyebrow', c.accueil_eyebrow);
     set('contenu-accueil-stat-label', c.accueil_stat_label);
-    set('contenu-accueil-stat-valeur', c.accueil_stat_valeur);
+    setSeq('contenu-accueil-stat-valeur', c.accueil_stat_valeur);
     set('contenu-qui-eyebrow', c.qui_eyebrow);
     set('contenu-qui-titre', c.qui_titre);
     set('contenu-qui-titre-em', c.qui_titre_em);

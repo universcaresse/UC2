@@ -62,28 +62,29 @@
   <!-- ══════════════════════════════════
        SECTION ACCUEIL
   ══════════════════════════════════ -->
+ <!-- ══════════════════════════════════
+       SECTION ACCUEIL
+  ══════════════════════════════════ -->
   <section id="section-accueil" class="page-section active">
 
     <div class="hero">
       <div class="hero-left">
-        <p class="hero-eyebrow fade-in" id="contenu-accueil-eyebrow"></p>
-        <img src="Images/Logofinal.png" alt="Univers Caresse" class="hero-logo-img fade-in delay-3">
-        <a href="#catalogue" class="bouton bouton-grand fade-in-doux delay-4 invisible"
-		onclick="naviguer('catalogue')">
-          <span id="contenu-accueil-cta"></span>
-         <!--  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>-->
+        <p class="hero-seq" id="contenu-accueil-eyebrow" style="min-height: 1.2rem;"></p>
+        <img src="Images/Logofinal.png" alt="Univers Caresse" class="hero-logo-img fade-in">
+        <a href="#catalogue" class="bouton bouton-grand hero-seq" onclick="naviguer('catalogue')">
+          <span class="hero-seq">Découvrir les collections</span>
         </a>
-        <div class="hero-stats fade-in delay-5">
+        <div class="hero-stats">
           <div class="hero-stat">
-            <div class="hero-stat-num" id="hero-stat-collections">—</div>
+            <div class="hero-stat-num hero-seq" id="hero-stat-collections">—</div>
             <div class="hero-stat-label">Collections</div>
           </div>
           <div class="hero-stat">
-            <div class="hero-stat-num" id="hero-stat-produits">—</div>
+            <div class="hero-stat-num hero-seq" id="hero-stat-produits">—</div>
             <div class="hero-stat-label">Produits</div>
           </div>
           <div class="hero-stat">
-            <div class="hero-stat-num" id="contenu-accueil-stat-valeur">—</div>
+            <div class="hero-stat-num hero-seq" id="contenu-accueil-stat-valeur">—</div>
             <div class="hero-stat-label">Artisanal</div>
           </div>
         </div>
@@ -91,27 +92,27 @@
 
       <div class="hero-right">
         <div class="hero-mosaic">
-          <div class="mosaic-item">
+          <div class="mosaic-item hero-seq">
             <div class="mosaic-soap mosaic-soap-accent">
-              <div class="mosaic-soap-label">
-                <span class="mosaic-soap-name">nouvelles</span>
-                <span class="mosaic-soap-col">livre</span>
+              <div class="mosaic-soap-label cache" id="mosaic-label-1">
+                <span class="mosaic-soap-name"></span>
+                <span class="mosaic-soap-col"></span>
               </div>
             </div>
           </div>
-          <div class="mosaic-item">
+          <div class="mosaic-item hero-seq">
             <div class="mosaic-soap mosaic-soap-primary">
-              <div class="mosaic-soap-label">
-                <span class="mosaic-soap-name">disponible</span>
-                <span class="mosaic-soap-col">en prod</span>
+              <div class="mosaic-soap-label cache" id="mosaic-label-2">
+                <span class="mosaic-soap-name"></span>
+                <span class="mosaic-soap-col"></span>
               </div>
             </div>
           </div>
-          <div class="mosaic-item">
+          <div class="mosaic-item hero-seq">
             <div class="mosaic-soap mosaic-soap-gris">
-              <div class="mosaic-soap-label">
-                <span class="mosaic-soap-name">a voir</span>
-                <span class="mosaic-soap-col">theme</span>
+              <div class="mosaic-soap-label cache" id="mosaic-label-3">
+                <span class="mosaic-soap-name"></span>
+                <span class="mosaic-soap-col"></span>
               </div>
             </div>
           </div>
