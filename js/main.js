@@ -83,11 +83,11 @@ function initScrollAnimations() {
   // Séquence hero
   const seq = [
     { sel: '.hero-logo-img',         delai: 0    },
-    { sel: '.bouton.hero-seq',        delai: 600  },
-    { sel: '.bouton .hero-seq',       delai: 1200 },
-    { sel: '.mosaic-item.hero-seq:nth-child(1)', delai: 1800 },
-    { sel: '.mosaic-item.hero-seq:nth-child(2)', delai: 2200 },
-    { sel: '.mosaic-item.hero-seq:nth-child(3)', delai: 2600 },
+    { sel: '.bouton.hero-seq',        delai: 800  },
+    { sel: '.bouton .hero-seq',       delai: 1600 },
+    { sel: '.mosaic-item.hero-seq:nth-child(1)', delai: 2200 },
+    { sel: '.mosaic-item.hero-seq:nth-child(2)', delai: 3000 },
+    { sel: '.mosaic-item.hero-seq:nth-child(3)', delai: 3800 },
   ];
   seq.forEach(({ sel, delai }) => {
     const el = document.querySelector(sel);
@@ -322,7 +322,7 @@ function afficherCollectionsPublic() {
   const statCol  = document.getElementById('hero-stat-collections');
 
   if (count)   count.textContent = collections.length + ' collections';
-  if (statCol) { statCol.textContent = collections.length; setTimeout(() => statCol.classList.add('visible'), 50); }
+  if (statCol) { statCol.textContent = collections.length; setTimeout(() => statCol.classList.add('visible'), 0); }
   if (!strip)  return;
 
   strip.innerHTML = '';
@@ -346,7 +346,7 @@ function afficherNbProduits() {
   if (!donneesCatalogue) return;
   const nb = (donneesCatalogue.produits || []).length;
   const statProd = document.getElementById('hero-stat-produits');
-  if (nb > 0 && statProd) { statProd.textContent = nb + '+'; setTimeout(() => statProd.classList.add('visible'), 50); }
+  if (nb > 0 && statProd) { statProd.textContent = nb + '+'; setTimeout(() => statProd.classList.add('visible'), 200); }
 }
 
 function afficherCollectionsFallback() {
@@ -713,7 +713,8 @@ function appliquerContenu(c) {
     };
     setSeq('contenu-accueil-eyebrow', c.accueil_eyebrow);
     set('contenu-accueil-stat-label', c.accueil_stat_label);
-    setSeq('contenu-accueil-stat-valeur', c.accueil_stat_valeur);
+    const statValeur = document.getElementById('contenu-accueil-stat-valeur');
+    if (statValeur && c.accueil_stat_valeur) { statValeur.textContent = c.accueil_stat_valeur; setTimeout(() => statValeur.classList.add('visible'), 400); }
     set('contenu-qui-eyebrow', c.qui_eyebrow);
     set('contenu-qui-titre', c.qui_titre);
     set('contenu-qui-titre-em', c.qui_titre_em);
