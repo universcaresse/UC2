@@ -241,7 +241,7 @@ function couleurTexteContraste(hex) {
   const g = parseInt(hex.slice(3,5), 16);
   const b = parseInt(hex.slice(5,7), 16);
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.6 ? 'carte-infos-fonce' : 'carte-infos-clair';
+  return luminance > 0.5 ? 'carte-infos-fonce' : 'carte-infos-clair';
 }
 
 function stringToColor(str) {
@@ -847,6 +847,7 @@ async function afficherProduits() {
         const col = donneesCollections.find(c => c.col_id === pro.col_id);
         div.innerHTML = `
           <div class="carte-visuel">
+            <span class="carte-statut-badge${pro.statut !== 'public' ? ' test' : ''}">${pro.statut === 'public' ? 'Public' : 'Test'}</span>
             <div class="carte-couleur">
               ${pro.image_url
                 ? `<img src="${pro.image_url}" alt="${pro.nom}" onerror="this.style.display='none'">`
@@ -868,7 +869,6 @@ async function afficherProduits() {
             <div class="carte-ligne">${gamNom}</div>
           <div class="carte-bas">
               ${(pro.formats && pro.formats.length) ? `<div class="carte-formats">${pro.formats.map(f => `<div class="carte-format-tag"><span class="carte-format-prix">${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $</span><span class="carte-format-sep"></span><span class="carte-format-poids">${f.poids} ${f.unite}</span></div>`).join('')}</div>` : ''}
-              <span class="carte-statut-badge${pro.statut !== 'public' ? ' test' : ''}">${pro.statut === 'public' ? 'Public' : 'Test'}</span>
             </div>
           </div>`;
 		  
