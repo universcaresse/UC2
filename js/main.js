@@ -149,10 +149,9 @@ function afficherEduSection(num) {
   const cible = document.getElementById('edu-' + num);
   if (cible) {
     cible.classList.add('active');
-    cible.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => el.classList.remove('visible'));
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      cible.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
-    }));
+    setTimeout(() => {
+      cible.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => el.classList.add('visible'));
+    }, 50);
   }
   window.scrollTo(0, 0);
 }
@@ -522,8 +521,8 @@ function couleurTexteContraste(hex) {
 
 function carteProduit(p) {
   const formats = Array.isArray(p.formats) && p.formats.length ? p.formats : [];
-  const prix = formats.length
-    ? formats.map(f => `${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $ / ${f.poids} ${f.unite}`).join('&nbsp;&nbsp;·&nbsp;&nbsp;')
+const prix = formats.length
+    ? `<div class="carte-formats">${formats.map(f => `<div class="carte-format-tag">${f.poids}&nbsp;${f.unite}&nbsp;&nbsp;${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')}$</div>`).join('')}</div>`
     : '';
   const photoUrl = (window.modeSaisonnier && p.image_noel_url) ? p.image_noel_url : p.image_url;
   const image    = photoUrl ? `<img src="${photoUrl}" alt="${p.nom}" onerror="this.style.display='none'">` : '';

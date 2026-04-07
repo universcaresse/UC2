@@ -752,8 +752,8 @@ footer > * { position: relative; z-index: 1; }
 .carte-ligne { font-family: 'DM Sans', sans-serif; font-size: var(--texte-xs); color: var(--gris); margin-bottom: 12px; font-weight: 300; }
 .carte-bas { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--beige); }
 .carte-prix { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; color: var(--primary); }
-.carte-formats { display: flex; gap: 4px; flex-wrap: wrap; }
-.carte-format-tag { padding: 3px 7px; font-family: 'DM Sans', sans-serif; font-size: var(--texte-micro); letter-spacing: 0.06em; border: 1px solid var(--beige); color: var(--gris); text-transform: uppercase; }
+.carte-formats { display: flex; flex-direction: column; gap: 6px; }
+.carte-format-tag { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-family: 'DM Sans', sans-serif; font-size: var(--texte-xs); border-bottom: 1px solid var(--beige-fonce, var(--beige)); color: var(--gris); }
 
 /* ═══════════════════════════════════════
    ADMIN — LAYOUT

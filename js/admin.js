@@ -42,13 +42,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // V2 : getCollections + getGammes + getProduits + getIngredientsInci + getConfig
 async function chargerDonneesInitiales() {
- const [resCol, resGam, resFam, resPro, resInci, resCfg] = await Promise.all([
+const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getGammes'),
     appelAPI('getFamilles'),
     appelAPI('getProduits'),
     appelAPI('getIngredientsInci'),
-    appelAPI('getConfig')
+    appelAPI('getConfig'),
+    appelAPI('getCategoriesUC')
   ]);
 
   if (resCol && resCol.success) {
@@ -72,6 +73,10 @@ if (resGam && resGam.success) {
   if (resInci && resInci.success) {
     listesDropdown.fullData = resInci.items || [];
     listesDropdown.types    = [...new Set(resInci.items.map(i => i.cat_id))].filter(Boolean);
+  }
+  if (resCats && resCats.success) {
+    listesDropdown.categoriesMap = {};
+    (resCats.items || []).forEach(c => { listesDropdown.categoriesMap[c.cat_id] = c.nom; });
   }
   if (resCfg && resCfg.success) {
     listesDropdown.config = {};
@@ -1493,7 +1498,7 @@ function rafraichirListeIngredientsRecette() {
     <div class="ingredient-rangee">
       <select class="form-ctrl ing-type" onchange="ingredientsRecette[${i}].type=this.value; ingredientsRecette[${i}].nom=''; rafraichirListeIngredientsRecette()">
         <option value="">— Type —</option>
-        ${cats.map(t => `<option value="${t}" ${ing.type===t?'selected':''}>${t}</option>`).join('')}
+     ${cats.map(t => `<option value="${t}" ${ing.type===t?'selected':''}>${listesDropdown.categoriesMap?.[t]||t}</option>`).join('')}
       </select>
       <select class="form-ctrl ing-nom" onchange="ingredientsRecette[${i}].nom=this.value; ingredientsRecette[${i}].ing_id=(listesDropdown.fullData.find(d=>d.nom_UC===this.value)||{}).ing_id||''; rafraichirListeIngredientsRecette()">
         <option value="">— Ingrédient —</option>
@@ -1531,7 +1536,7 @@ function rafraichirListeIngredientsBase() {
     <div class="ingredient-rangee">
       <select class="form-ctrl ing-type" onchange="ingredientsBase[${i}].type=this.value; ingredientsBase[${i}].nom=''; rafraichirListeIngredientsBase()">
         <option value="">— Type —</option>
-        ${cats.map(t => `<option value="${t}" ${ing.type===t?'selected':''}>${t}</option>`).join('')}
+        ${cats.map(t => `<option value="${t}" ${ing.type===t?'selected':''}>${listesDropdown.categoriesMap?.[t]||t}</option>`).join('')}
       </select>
       <select class="form-ctrl ing-nom" onchange="ingredientsBase[${i}].nom=this.value; ingredientsBase[${i}].ing_id=(listesDropdown.fullData.find(d=>d.nom_UC===this.value)||{}).ing_id||''; rafraichirListeIngredientsBase()">
         <option value="">— Ingrédient —</option>
@@ -1676,9 +1681,13 @@ function peuplerSelectType() {
   const sel = document.getElementById('item-type');
   if (!sel) return;
   sel.innerHTML = '<option value=""></option>';
-  [...listesDropdown.types].sort((a, b) => a.localeCompare(b, 'fr')).forEach(t => {
+ [...listesDropdown.types].sort((a, b) => {
+    const nA = listesDropdown.categoriesMap?.[a] || a;
+    const nB = listesDropdown.categoriesMap?.[b] || b;
+    return nA.localeCompare(nB, 'fr');
+  }).forEach(t => {
     const opt = document.createElement('option');
-    opt.value = t; opt.textContent = t;
+    opt.value = t; opt.textContent = listesDropdown.categoriesMap?.[t] || t;
     sel.appendChild(opt);
   });
 }
@@ -2269,9 +2278,10 @@ function inciConstruireAccordeons() {
 
   // Regrouper par cat_id
   const parCat = {};
-  inciDonnees.forEach(l => {
+inciDonnees.forEach(l => {
     if (recherche && !(l.nom_UC || '').toLowerCase().includes(recherche)) return;
-    const cat = l.cat_id || 'Sans catégorie';
+    const catObj = inciCategoriesUC.find(c => c.cat_id === l.cat_id);
+    const cat = catObj?.nom || l.cat_id || 'Sans catégorie';
     if (!parCat[cat]) parCat[cat] = [];
     parCat[cat].push(l);
   });
@@ -2652,12 +2662,16 @@ function afficherApercuItems(fournisseur) {
   tbody.innerHTML = '';
   ifItems.forEach((item, idx) => {
     const mapping  = trouverMappingItem(item.description, fournisseur);
-    const nom_UC   = mapping ? mapping.nom_UC : '';
-    const cat_UC   = mapping ? mapping.categorie_UC : '';
+  const nom_UC   = mapping ? mapping.nom_UC : '';
+    const catNom   = mapping ? mapping.categorie_UC : '';
+    const cat_UC   = catNom ? (Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === catNom) || '') : '';
     const total    = (item.prixUnitaire * item.quantite).toFixed(2);
     const rouge    = !nom_UC;
-    const ingsDeCat = cat_UC
-      ? listesDropdown.fullData.filter(d => d.cat_id === cat_UC).sort((a,b) => (a.nom_UC||'').localeCompare(b.nom_UC||'','fr'))
+ const catId = cat_UC
+      ? Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === cat_UC) || cat_UC
+      : '';
+    const ingsDeCat = catId
+      ? listesDropdown.fullData.filter(d => d.cat_id === catId).sort((a,b) => (a.nom_UC||'').localeCompare(b.nom_UC||'','fr'))
       : [];
     const tr = document.createElement('tr');
     tr.className = rouge ? 'ligne-rouge' : '';
@@ -2670,7 +2684,7 @@ function afficherApercuItems(fournisseur) {
       <td>
         <select class="form-ctrl" id="if-type-${idx}" onchange="ifFiltrerNoms(${idx})">
           <option value="">— Catégorie —</option>
-          ${listesDropdown.types.map(t => `<option value="${t}" ${t === cat_UC ? 'selected' : ''}>${t}</option>`).join('')}
+       ${listesDropdown.types.map(t => `<option value="${t}" ${t === cat_UC ? 'selected' : ''}>${listesDropdown.categoriesMap?.[t] || t}</option>`).join('')}
         </select>
       </td>
       <td>
@@ -2970,8 +2984,9 @@ async function sauvegarderLot() {
   d.setDate(d.getDate() + cure);
   const dateDispo = d.toISOString().split('T')[0];
 
+  const selFormat = document.getElementById('fab-format');
+  const formatVal = selFormat?.value ? JSON.parse(selFormat.value) : {};
   const lot_id = 'LOT-' + Date.now();
-  // V2 : saveLot
   const res = await appelAPIPost('saveLot', {
     lot_id,
     pro_id:             opt.value,
@@ -2979,6 +2994,8 @@ async function sauvegarderLot() {
     nb_unites:          nbUnites,
     date_fabrication:   dateFab,
     date_disponibilite: dateDispo,
+    format_poids:       formatVal.poids || '',
+    format_unite:       formatVal.unite || '',
     cout_ingredients:   0,
     cout_emballages:    0,
     cout_revient_total: 0,
