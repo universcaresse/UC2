@@ -504,9 +504,9 @@ function construireCatalogue() {
           </div>
         </div>
       </div>
-   ${gammes.length > 1 ? `<div class="filtres-bar collection-filtres-gammes" data-collection-filtres="${col_id}">
+   ${ordreGammes.filter(g => g).length > 1 ? `<div class="filtres-bar collection-filtres-gammes" data-collection-filtres="${col_id}">
         <button class="filtre-btn actif" data-filtre-gamme="tout" onclick="filtrerGamme('tout', '${col_id}')">Toutes</button>
-        ${gammes.map(([gid, gnom]) => `<button class="filtre-btn" data-filtre-gamme="${gid}" onclick="filtrerGamme('${gid}', '${col_id}')">${gnom}</button>`).join('')}
+        ${ordreGammes.filter(g => g).map(g => `<button class="filtre-btn" data-filtre-gamme="${parGamme[g][0]?.gam_id || ''}" onclick="filtrerGamme('${parGamme[g][0]?.gam_id || ''}', '${col_id}')">${g}</button>`).join('')}
       </div>` : ''}
       ${gammesHTML}`;
     body.appendChild(section);
