@@ -533,6 +533,7 @@ footer > * { position: relative; z-index: 1; }
 .section-collections { padding: var(--padding-page); background: var(--blanc); }
 .section-header { display: flex; align-items: baseline; gap: 24px; margin-bottom: 48px; }
 .section-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 400; color: var(--gris-fonce); }
+.section-title em { font-style: italic; color: var(--primary); }
 .section-line { flex: 1; height: 1px; background: var(--beige); margin-top: 24px; }
 .section-count { font-family: 'DM Sans', sans-serif; font-size: var(--texte-90); letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; }
 
