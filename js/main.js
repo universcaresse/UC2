@@ -68,6 +68,7 @@ window.addEventListener('resize', () => {
   if (filtres) filtres.classList.remove('cache-scroll');
 });
 
+
 function initScrollAnimations() {
   scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -80,20 +81,46 @@ function initScrollAnimations() {
 
   document.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
 
-  // Séquence hero
-  const seq = [
-    { id: 'hero-logo-stats',   delai: 200  },  // logo + labels stats
-    { id: 'hero-bouton',       delai: 1200 },  // bloc bouton vert
-    { id: 'hero-bouton-texte', delai: 2000 },  // texte bouton
-  ];
-  seq.forEach(({ id, delai }) => {
-    const el = document.getElementById(id);
-    if (el) setTimeout(() => el.classList.add('visible'), delai);
-  });
+  // Séquence hero — chainée sur les durées réelles
+  const T_ANIM   = 800;  // durée transition hero-seq
+  const T_TUILE  = 800;  // durée fondu tuile
+  const T_GAP    = 400;  // délai entre tuiles
 
-  // Tuiles — fondu une après l'autre
+  let t = 300;
+
+  // Étape 2 — logo + labels stats
+  setTimeout(() => document.getElementById('hero-logo-stats')?.classList.add('visible'), t);
+  t += T_ANIM;
+
+  // Étape 3 — bouton vert
+  setTimeout(() => document.getElementById('hero-bouton')?.classList.add('visible'), t);
+  t += T_ANIM;
+
+  // Étape 4 — tuiles une après l'autre
   const tuiles = document.querySelectorAll('.mosaic-item.hero-seq-fondu');
-  tuiles.forEach((el, i) => setTimeout(() => el.classList.add('visible'), 1800 + i * 400));
+  tuiles.forEach((el, i) => {
+    setTimeout(() => el.classList.add('visible'), t + i * T_GAP);
+  });
+  t += T_TUILE + (tuiles.length - 1) * T_GAP;
+
+  // Étape 5 — texte bouton
+  setTimeout(() => document.getElementById('hero-bouton-texte')?.classList.add('visible'), t);
+  t += T_ANIM;
+
+  // Étape 6 — eyebrow "Collections 2026"
+  setTimeout(() => document.getElementById('contenu-accueil-eyebrow')?.classList.add('visible'), t);
+  t += T_ANIM;
+
+  // Étape 7 — 3 stats une après l'autre
+  ['hero-stat-collections', 'hero-stat-produits', 'contenu-accueil-stat-valeur'].forEach((id, i) => {
+    setTimeout(() => document.getElementById(id)?.classList.add('visible'), t + i * 300);
+  });
+  t += T_ANIM + 2 * 300;
+
+  // Étape 8 — textes sur les tuiles
+  document.querySelectorAll('.mosaic-soap-label').forEach((el, i) => {
+    setTimeout(() => el.classList.remove('cache'), t + i * 300);
+  });
 }
 
 // ─── SPA — NAVIGATION PAR SECTIONS ───
