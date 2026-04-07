@@ -461,26 +461,35 @@ function construireCatalogue() {
     const info         = infoCollections[col_id] || {};
     const nom          = info.nom || col_id;
 
-    // Regrouper par gamme
-    const parGamme  = {};
-    const ordreGammes = [];
+    // Regrouper par famille puis par gamme
+    const parFamille = {};
+    const ordreFamilles = [];
     produitsColl.forEach(p => {
+      const fam = p.nom_famille || '';
+      if (!parFamille[fam]) { parFamille[fam] = {}; ordreFamilles.push(fam); }
       const gamme = p.nom_gamme || '';
-      if (!parGamme[gamme]) { parGamme[gamme] = []; ordreGammes.push(gamme); }
-      parGamme[gamme].push(p);
+      if (!parFamille[fam][gamme]) parFamille[fam][gamme] = [];
+      parFamille[fam][gamme].push(p);
     });
 
-    const gammesHTML = ordreGammes.map(gamme => {
-      const prods = parGamme[gamme];
-      const gam_id = prods[0]?.gam_id || '';
-      return `
-        <div class="ligne-groupe" data-gamme="${gam_id}">
-     ${gamme ? `<div class="ligne-groupe-entete">
-            <div class="ligne-groupe-nom">${gamme.toUpperCase()}</div>
-            ${prods[0]?.desc_gamme ? `<p class="ligne-groupe-desc">${prods[0].desc_gamme}</p>` : ''}
-          </div>` : ''}
-          <div class="produits-grille">${prods.map(p => carteProduit(p)).join('')}</div>
-        </div>`;
+    const gammesHTML = ordreFamilles.map(fam => {
+      const parGamme = parFamille[fam];
+      const ordreGammes = Object.keys(parGamme);
+      const gammesInterne = ordreGammes.map(gamme => {
+        const prods = parGamme[gamme];
+        const gam_id = prods[0]?.gam_id || '';
+        return `
+          <div class="ligne-groupe" data-gamme="${gam_id}">
+            ${gamme ? `<div class="ligne-groupe-entete">
+              <div class="ligne-groupe-nom">${gamme.toUpperCase()}</div>
+              ${prods[0]?.desc_gamme ? `<p class="ligne-groupe-desc">${prods[0].desc_gamme}</p>` : ''}
+            </div>` : ''}
+            <div class="produits-grille">${prods.map(p => carteProduit(p)).join('')}</div>
+          </div>`;
+      }).join('');
+      return fam
+        ? `<div class="famille-groupe"><div class="famille-groupe-titre">${fam.toUpperCase()}</div>${gammesInterne}</div>`
+        : gammesInterne;
     }).join('');
 
     const couleurs = couleurCollection(nom, info.couleur_hex);
@@ -502,13 +511,7 @@ function construireCatalogue() {
           </div>
         </div>
       </div>
-   ${ordreGammes.filter(g => g).length > 1 ? `<div class="filtres-bar collection-filtres-gammes" data-collection-filtres="${col_id}">
-        <h2 class="page-entete-titre">Gammes de la <em>collection ${nom}</em></h2>
-        <div class="filtres-ligne">
-        <button class="filtre-btn actif" data-filtre-gamme="tout" onclick="filtrerGamme('tout', '${col_id}')">Toutes</button>
-        ${ordreGammes.filter(g => g).map(g => `<button class="filtre-btn" data-filtre-gamme="${parGamme[g][0]?.gam_id || ''}" onclick="filtrerGamme('${parGamme[g][0]?.gam_id || ''}', '${col_id}')">${g}</button>`).join('')}
-        </div>
-      </div>` : ''}
+   ${(() => { const toutesGammes = ordreFamilles.flatMap(f => Object.keys(parFamille[f]).filter(g => g)); return toutesGammes.length > 1 ? `<div class="filtres-bar collection-filtres-gammes" data-collection-filtres="${col_id}"><h2 class="page-entete-titre">Gammes de la <em>collection ${nom}</em></h2><div class="filtres-ligne"><button class="filtre-btn actif" data-filtre-gamme="tout" onclick="filtrerGamme('tout', '${col_id}')">Toutes</button>${toutesGammes.map(g => { const prods = ordreFamilles.flatMap(f => parFamille[f][g] || []); const gam_id = prods[0]?.gam_id || ''; return `<button class="filtre-btn" data-filtre-gamme="${gam_id}" onclick="filtrerGamme('${gam_id}', '${col_id}')">${g}</button>`; }).join('')}</div></div>` : ''; })()}
       ${gammesHTML}`;
     body.appendChild(section);
     if (scrollObserver) {

@@ -440,6 +440,8 @@ select.form-control, select.form-ctrl { cursor: pointer; }
 .modal-desc-ligne { font-family: 'DM Sans', sans-serif; font-size: var(--texte-82); color: var(--gris); margin-bottom: 20px; font-weight: 300; font-style: italic; }
 .ligne-groupe { margin-bottom: 48px; }
 .ligne-groupe-entete { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--beige); }
+.famille-groupe { margin-bottom: 48px; }
+.famille-groupe-titre { font-family: 'Playfair Display', serif; font-size: var(--texte-150); font-weight: 600; color: var(--primary); margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid var(--beige); }
 .ligne-groupe-nom { font-family: 'Playfair Display', serif; font-size: var(--texte-130); font-weight: 600; color: var(--gris-fonce); margin-bottom: 0; }
 .ligne-groupe-desc { font-family: 'DM Sans', sans-serif; font-size: var(--texte-105); line-height: 1.7; color: var(--gris); font-weight: 300; margin-top: 8px; }
 .modal-desc { font-family: 'DM Sans', sans-serif; font-size: var(--texte-105); line-height: 1.85; color: var(--gris); font-weight: 300; margin-bottom: 24px; }
