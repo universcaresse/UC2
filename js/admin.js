@@ -27,6 +27,14 @@ function reobserverFadeIn(conteneur) {
   }));
 }
 
+window.addEventListener('popstate', (e) => {
+  if (e.state && e.state.section) {
+    afficherSection(e.state.section, null);
+  } else {
+    history.pushState({ section: 'accueil' }, '', '#accueil');
+  }
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
   const session = sessionStorage.getItem('uc_admin');
   if (session !== 'true') {
@@ -103,6 +111,7 @@ function toggleDropdownAdmin(el) {
 }
 
 function afficherSection(id, bouton) {
+  history.pushState({ section: id }, '', '#' + id);
   document.querySelectorAll('.nav-admin-item.ouvert').forEach(i => i.classList.remove('ouvert'));
   document.querySelectorAll('.section-admin').forEach(s => s.classList.remove('visible'));
   document.querySelectorAll('.sidebar-lien').forEach(l => l.classList.remove('actif'));
@@ -820,17 +829,19 @@ async function afficherProduits() {
 
       gammes[gamNom].forEach(pro => {
         const couleur = pro.couleur_hex || 'var(--gris)';
-        const div = document.createElement('div');
-        div.className = 'recette-carte';
+		
+		
+    const div = document.createElement('div');
+        div.className = 'carte-produit';
         div.onclick = () => ouvrirFicheProduit(pro.pro_id);
         div.style.setProperty('--col-hex', couleur);
         const col = donneesCollections.find(c => c.col_id === pro.col_id);
         div.innerHTML = `
-          <div class="recette-visuel">
-            <div class="recette-couleur">
+          <div class="carte-visuel">
+            <div class="carte-couleur">
               ${pro.image_url
                 ? `<img src="${pro.image_url}" alt="${pro.nom}" onerror="this.style.display='none'">`
-                : `<div class="recette-photo-placeholder">
+                : `<div class="carte-photo-placeholder">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                       <rect x="3" y="3" width="18" height="18" rx="2"/>
                       <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -839,17 +850,20 @@ async function afficherProduits() {
                     Photo à venir
                   </div>`}
               <div class="recette-couleur-overlay"></div>
-              <div class="recette-dot"></div>
+              <div class="carte-couleur-dot"></div>
             </div>
           </div>
-          <div class="recette-infos ${couleurTexteContraste(couleur)}">
-            <span class="recette-badge">${col?.nom || '—'} · ${pro.statut === 'public' ? 'Public' : 'Test'}</span>
-            <div class="recette-nom">${pro.nom || '—'}</div>
-            <div class="recette-ligne">${gamNom}</div>
-            <div class="recette-bas">
-              <span class="recette-prix"></span>
+          <div class="carte-infos ${couleurTexteContraste(couleur)}">
+            <span class="carte-collection-badge">${col?.nom || '—'}</span>
+            <div class="carte-nom">${pro.nom || '—'}</div>
+            <div class="carte-ligne">${gamNom}</div>
+            <div class="carte-bas">
+              <span class="carte-statut-badge">${pro.statut === 'public' ? 'Public' : 'Test'}</span>
             </div>
           </div>`;
+		  
+		  
+		  
         grilleInner.appendChild(div);
       });
 
