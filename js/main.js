@@ -466,8 +466,9 @@ function construireCatalogue() {
 
     const gammesHTML = ordreGammes.map(gamme => {
       const prods = parGamme[gamme];
+      const gam_id = prods[0]?.gam_id || '';
       return `
-        <div class="ligne-groupe">
+        <div class="ligne-groupe" data-gamme="${gam_id}">
           ${gamme ? `<div class="ligne-groupe-entete">
             <div class="ligne-groupe-nom">${gamme.toUpperCase()}</div>
           </div>` : ''}
@@ -564,13 +565,41 @@ function filtrerApresChargement(col_id) {
   }
 }
 
-function filtrer(col_id) {
+function filtrer(col_id, gam_id) {
   document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('actif'));
   const btn = document.querySelector(`[data-filtre="${col_id}"]`);
   if (btn) btn.classList.add('actif');
+
+  // Afficher/masquer les collections
   document.querySelectorAll('.collection-section').forEach(s => {
     s.classList.toggle('masquee', col_id !== 'tout' && s.dataset.collection !== col_id);
   });
+
+  // Filtres gammes
+  const filtresGammes = document.getElementById('filtres-gammes');
+  if (filtresGammes) {
+    if (col_id === 'tout') {
+      filtresGammes.innerHTML = '';
+      filtresGammes.classList.add('cache');
+    } else {
+      const infoCollections = donneesCatalogue?.infoCollections || {};
+      const produitsColl = (donneesCatalogue?.produits || []).filter(p => p.col_id === col_id);
+      const gammes = [...new Map(produitsColl.filter(p => p.nom_gamme).map(p => [p.gam_id, p.nom_gamme])).entries()];
+      if (gammes.length > 1) {
+        filtresGammes.innerHTML =
+          `<button class="filtre-btn actif" data-filtre-gamme="tout" onclick="filtrerGamme('tout')">Toutes</button>` +
+          gammes.map(([gid, gnom]) => `<button class="filtre-btn" data-filtre-gamme="${gid}" onclick="filtrerGamme('${gid}')">${gnom}</button>`).join('');
+        filtresGammes.classList.remove('cache');
+      } else {
+        filtresGammes.innerHTML = '';
+        filtresGammes.classList.add('cache');
+      }
+    }
+  }
+
+  // Filtre gamme actif
+  if (gam_id) filtrerGamme(gam_id);
+
   const cible = col_id === 'tout'
     ? document.getElementById('catalogue-body')
     : document.querySelector(`.collection-section[data-collection="${col_id}"]`);
@@ -581,6 +610,15 @@ function filtrer(col_id) {
     const offset   = cible.getBoundingClientRect().top + window.scrollY - navH - filtresH - enteteH - 16;
     window.scrollTo({ top: offset, behavior: 'smooth' });
   }
+}
+
+function filtrerGamme(gam_id) {
+  document.querySelectorAll('[data-filtre-gamme]').forEach(b => b.classList.remove('actif'));
+  const btn = document.querySelector(`[data-filtre-gamme="${gam_id}"]`);
+  if (btn) btn.classList.add('actif');
+  document.querySelectorAll('.ligne-groupe').forEach(g => {
+    g.classList.toggle('masquee', gam_id !== 'tout' && g.dataset.gamme !== gam_id);
+  });
 }
 
 // ─── MODAL PRODUIT ───
