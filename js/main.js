@@ -82,17 +82,18 @@ function initScrollAnimations() {
 
   // Séquence hero
   const seq = [
-    { sel: '.hero-logo-img',         delai: 0    },
-    { sel: '.bouton.hero-seq',        delai: 800  },
-    { sel: '.bouton .hero-seq',       delai: 1600 },
-    { sel: '.mosaic-item.hero-seq:nth-child(1)', delai: 2200 },
-    { sel: '.mosaic-item.hero-seq:nth-child(2)', delai: 3000 },
-    { sel: '.mosaic-item.hero-seq:nth-child(3)', delai: 3800 },
+    { id: 'hero-logo-stats',   delai: 200  },  // logo + labels stats
+    { id: 'hero-bouton',       delai: 1200 },  // bloc bouton vert
+    { id: 'hero-bouton-texte', delai: 2000 },  // texte bouton
   ];
-  seq.forEach(({ sel, delai }) => {
-    const el = document.querySelector(sel);
+  seq.forEach(({ id, delai }) => {
+    const el = document.getElementById(id);
     if (el) setTimeout(() => el.classList.add('visible'), delai);
   });
+
+  // Tuiles — fondu une après l'autre
+  const tuiles = document.querySelectorAll('.mosaic-item.hero-seq-fondu');
+  tuiles.forEach((el, i) => setTimeout(() => el.classList.add('visible'), 1800 + i * 400));
 }
 
 // ─── SPA — NAVIGATION PAR SECTIONS ───
@@ -322,7 +323,7 @@ function afficherCollectionsPublic() {
   const statCol  = document.getElementById('hero-stat-collections');
 
   if (count)   count.textContent = collections.length + ' collections';
-  if (statCol) { statCol.textContent = collections.length; setTimeout(() => statCol.classList.add('visible'), 0); }
+  if (statCol) { statCol.textContent = collections.length; setTimeout(() => statCol.classList.add('visible'), 3200); }
   if (!strip)  return;
 
   strip.innerHTML = '';
@@ -346,7 +347,7 @@ function afficherNbProduits() {
   if (!donneesCatalogue) return;
   const nb = (donneesCatalogue.produits || []).length;
   const statProd = document.getElementById('hero-stat-produits');
-  if (nb > 0 && statProd) { statProd.textContent = nb + '+'; setTimeout(() => statProd.classList.add('visible'), 200); }
+  if (nb > 0 && statProd) { statProd.textContent = nb + '+'; setTimeout(() => statProd.classList.add('visible'), 3400); }
 }
 
 function afficherCollectionsFallback() {
@@ -711,10 +712,11 @@ function appliquerContenu(c) {
       const el = document.getElementById(id);
       if (el && val) { el.textContent = val; setTimeout(() => el.classList.add('visible'), 50); }
     };
-    setSeq('contenu-accueil-eyebrow', c.accueil_eyebrow);
+    const eyebrow = document.getElementById('contenu-accueil-eyebrow');
+    if (eyebrow && c.accueil_eyebrow) { eyebrow.textContent = c.accueil_eyebrow; setTimeout(() => eyebrow.classList.add('visible'), 3000); }
     set('contenu-accueil-stat-label', c.accueil_stat_label);
     const statValeur = document.getElementById('contenu-accueil-stat-valeur');
-    if (statValeur && c.accueil_stat_valeur) { statValeur.textContent = c.accueil_stat_valeur; setTimeout(() => statValeur.classList.add('visible'), 400); }
+    if (statValeur && c.accueil_stat_valeur) { statValeur.textContent = c.accueil_stat_valeur; setTimeout(() => statValeur.classList.add('visible'), 3600); }
     set('contenu-qui-eyebrow', c.qui_eyebrow);
     set('contenu-qui-titre', c.qui_titre);
     set('contenu-qui-titre-em', c.qui_titre_em);

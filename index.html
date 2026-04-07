@@ -67,32 +67,34 @@
   ══════════════════════════════════ -->
   <section id="section-accueil" class="page-section active">
 
-    <div class="hero">
+   <div class="hero">
       <div class="hero-left">
         <p class="hero-seq" id="contenu-accueil-eyebrow" style="min-height: 1.2rem;"></p>
-        <img src="Images/Logofinal.png" alt="Univers Caresse" class="hero-logo-img fade-in">
-        <a href="#catalogue" class="bouton bouton-grand hero-seq" onclick="naviguer('catalogue')">
-          <span class="hero-seq">Découvrir les collections</span>
-        </a>
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <div class="hero-stat-num hero-seq" id="hero-stat-collections">—</div>
-            <div class="hero-stat-label">Collections</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num hero-seq" id="hero-stat-produits">—</div>
-            <div class="hero-stat-label">Produits</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num hero-seq" id="contenu-accueil-stat-valeur">—</div>
-            <div class="hero-stat-label">Artisanal</div>
+        <div class="hero-seq" id="hero-logo-stats">
+          <img src="Images/Logofinal.png" alt="Univers Caresse" class="hero-logo-img">
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-num hero-seq-stat" id="hero-stat-collections">—</div>
+              <div class="hero-stat-label">Collections</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num hero-seq-stat" id="hero-stat-produits">—</div>
+              <div class="hero-stat-label">Produits</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num hero-seq-stat" id="contenu-accueil-stat-valeur">—</div>
+              <div class="hero-stat-label">Artisanal</div>
+            </div>
           </div>
         </div>
+        <a href="#catalogue" class="bouton bouton-grand hero-seq" id="hero-bouton" onclick="naviguer('catalogue')">
+          <span class="hero-seq" id="hero-bouton-texte">Découvrir les collections</span>
+        </a>
       </div>
 
       <div class="hero-right">
         <div class="hero-mosaic">
-          <div class="mosaic-item hero-seq">
+          <div class="mosaic-item hero-seq-fondu">
             <div class="mosaic-soap mosaic-soap-accent">
               <div class="mosaic-soap-label cache" id="mosaic-label-1">
                 <span class="mosaic-soap-name"></span>
@@ -100,7 +102,7 @@
               </div>
             </div>
           </div>
-          <div class="mosaic-item hero-seq">
+          <div class="mosaic-item hero-seq-fondu">
             <div class="mosaic-soap mosaic-soap-primary">
               <div class="mosaic-soap-label cache" id="mosaic-label-2">
                 <span class="mosaic-soap-name"></span>
@@ -108,7 +110,7 @@
               </div>
             </div>
           </div>
-          <div class="mosaic-item hero-seq">
+          <div class="mosaic-item hero-seq-fondu">
             <div class="mosaic-soap mosaic-soap-gris">
               <div class="mosaic-soap-label cache" id="mosaic-label-3">
                 <span class="mosaic-soap-name"></span>
