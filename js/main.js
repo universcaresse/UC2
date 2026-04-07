@@ -53,12 +53,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   initScrollAnimations();
   initSPA(); // une seule fois — bug V1 corrigé
   const [resContenu, resCat] = await Promise.all([appelAPI('getContenu'), appelAPI('getCatalogue')]);
-  if (resContenu && resContenu.success) appliquerContenu(resContenu.contenu);
   if (resCat && resCat.success) {
     donneesCatalogue = resCat;
     afficherCollectionsPublic();
     afficherNbProduits();
   }
+  if (resContenu && resContenu.success) appliquerContenu(resContenu.contenu);
+  else heroSeqApresSheet();
 });
 
 window.addEventListener('resize', () => {
@@ -81,47 +82,60 @@ function initScrollAnimations() {
 
   document.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
 
-  // Séquence hero — chainée sur les durées réelles
-  const T_ANIM   = 800;  // durée transition hero-seq
-  const T_TUILE  = 800;  // durée fondu tuile
-  const T_GAP    = 400;  // délai entre tuiles
-
+  // Séquence hero — tout chainé, un seul endroit
+  const T = 800;   // durée transition
+  const G = 400;   // gap entre tuiles
   let t = 300;
 
   // Étape 2 — logo + labels stats
   setTimeout(() => document.getElementById('hero-logo-stats')?.classList.add('visible'), t);
-  t += T_ANIM;
+  t += T;
 
-  // Étape 3 — bouton vert
+  // Étape 3 — bouton vert (vide)
   setTimeout(() => document.getElementById('hero-bouton')?.classList.add('visible'), t);
-  t += T_ANIM;
+  t += T;
 
   // Étape 4 — tuiles une après l'autre
-  const tuiles = document.querySelectorAll('.mosaic-item.hero-seq-fondu');
-  tuiles.forEach((el, i) => {
-    setTimeout(() => el.classList.add('visible'), t + i * T_GAP);
-  });
-  t += T_TUILE + (tuiles.length - 1) * T_GAP;
+  const tuiles = document.querySelectorAll('.mosaic-item');
+  tuiles.forEach((el, i) => setTimeout(() => el.classList.add('visible'), t + i * G));
+  t += T + (tuiles.length > 0 ? (tuiles.length - 1) * G : 0);
 
   // Étape 5 — texte bouton
-  setTimeout(() => document.getElementById('hero-bouton-texte')?.classList.add('visible'), t);
-  t += T_ANIM;
+  setTimeout(() => {
+    const el = document.getElementById('hero-bouton-texte');
+    if (el) { el.textContent = 'Découvrir les collections'; el.classList.add('visible'); }
+  }, t);
+  t += T;
 
-  // Étape 6 — eyebrow "Collections 2026"
+  // Étapes 6, 7, 8 — dépendent du Sheet — gérées dans heroSeqApresSheet()
+  window.heroSeqT = t;
+}
+
+function heroSeqApresSheet() {
+  const T = 800;
+  const G = 300;
+  let t = window.heroSeqT || 4000;
+
+  // Étape 6 — eyebrow
   setTimeout(() => document.getElementById('contenu-accueil-eyebrow')?.classList.add('visible'), t);
-  t += T_ANIM;
+  t += T;
 
   // Étape 7 — 3 stats une après l'autre
   ['hero-stat-collections', 'hero-stat-produits', 'contenu-accueil-stat-valeur'].forEach((id, i) => {
-    setTimeout(() => document.getElementById(id)?.classList.add('visible'), t + i * 300);
+    setTimeout(() => document.getElementById(id)?.classList.add('visible'), t + i * G);
   });
-  t += T_ANIM + 2 * 300;
+  t += T + 2 * G;
 
-  // Étape 8 — textes sur les tuiles
+  // Étape 8 — textes tuiles
   document.querySelectorAll('.mosaic-soap-label').forEach((el, i) => {
-    setTimeout(() => el.classList.remove('cache'), t + i * 300);
+    setTimeout(() => {
+      el.classList.remove('invisible');
+      el.classList.add('visible');
+    }, t + i * G);
   });
 }
+
+
 
 // ─── SPA — NAVIGATION PAR SECTIONS ───
 function initSPA() {
@@ -350,7 +364,7 @@ function afficherCollectionsPublic() {
   const statCol  = document.getElementById('hero-stat-collections');
 
   if (count)   count.textContent = collections.length + ' collections';
-  if (statCol) { statCol.textContent = collections.length; setTimeout(() => statCol.classList.add('visible'), 3200); }
+  if (statCol) statCol.textContent = collections.length;
   if (!strip)  return;
 
   strip.innerHTML = '';
@@ -374,7 +388,7 @@ function afficherNbProduits() {
   if (!donneesCatalogue) return;
   const nb = (donneesCatalogue.produits || []).length;
   const statProd = document.getElementById('hero-stat-produits');
-  if (nb > 0 && statProd) { statProd.textContent = nb + '+'; setTimeout(() => statProd.classList.add('visible'), 3400); }
+  if (nb > 0 && statProd) statProd.textContent = nb + '+';
 }
 
 function afficherCollectionsFallback() {
@@ -740,10 +754,11 @@ function appliquerContenu(c) {
       if (el && val) { el.textContent = val; setTimeout(() => el.classList.add('visible'), 50); }
     };
     const eyebrow = document.getElementById('contenu-accueil-eyebrow');
-    if (eyebrow && c.accueil_eyebrow) { eyebrow.textContent = c.accueil_eyebrow; setTimeout(() => eyebrow.classList.add('visible'), 3000); }
+    if (eyebrow && c.accueil_eyebrow) eyebrow.textContent = c.accueil_eyebrow;
     set('contenu-accueil-stat-label', c.accueil_stat_label);
     const statValeur = document.getElementById('contenu-accueil-stat-valeur');
-    if (statValeur && c.accueil_stat_valeur) { statValeur.textContent = c.accueil_stat_valeur; setTimeout(() => statValeur.classList.add('visible'), 3600); }
+    if (statValeur && c.accueil_stat_valeur) statValeur.textContent = c.accueil_stat_valeur;
+    heroSeqApresSheet();
     set('contenu-qui-eyebrow', c.qui_eyebrow);
     set('contenu-qui-titre', c.qui_titre);
     set('contenu-qui-titre-em', c.qui_titre_em);
