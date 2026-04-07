@@ -1218,7 +1218,7 @@
           </div>
           <div class="form-actions">
             <button class="btn btn-primary" onclick="sauvegarderContenuSite()">Enregistrer</button>
-            <button class="btn btn-secondary" id="btn-mode-saisonnier" onclick="toggleModeSaisonnier()">🌲 Mode saisonnier est OFF</button>
+            
           </div>
         </div>
         <div class="msg-zone" id="msg-contenu-site"></div>
@@ -1229,12 +1229,16 @@
           <div class="form-panel visible">
             <div class="form-panel-header"><div class="form-panel-titre">Mode maintenance</div></div>
             <div class="form-body">
-              <div class="form-groupe">
+          <div class="form-groupe">
                 <label class="form-label">Activer le mode maintenance</label>
                 <select class="form-ctrl" id="cs-maintenance_active">
                   <option value="0">Non — site accessible</option>
                   <option value="1">Oui — afficher la page maintenance</option>
                 </select>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Mode saisonnier</label>
+                <button class="btn btn-secondary" id="btn-mode-saisonnier" onclick="toggleModeSaisonnier()">🌲 Mode saisonnier est OFF</button>
               </div>
             </div>
           </div>
