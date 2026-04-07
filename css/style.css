@@ -753,10 +753,9 @@ footer > * { position: relative; z-index: 1; }
 .carte-bas { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--beige); }
 .carte-prix { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; color: var(--primary); }
 .carte-formats { display: flex; flex-direction: row; gap: 0; width: 100%; }
-.carte-format-tag { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 4px 6px; font-family: 'DM Sans', sans-serif; color: inherit; border-right: 1px solid currentColor; opacity: 0.9; }
-.carte-format-tag:last-child { border-right: none; }
+.carte-format-tag { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 4px 2px; font-family: 'DM Sans', sans-serif; color: inherit; }
 .carte-format-prix { font-weight: 300; font-size: var(--texte-xs); letter-spacing: 0.02em; }
-.carte-format-sep { display: block; width: 60%; height: 1px; background: currentColor; opacity: 0.3; margin: 2px 0; }
+.carte-format-sep { display: none; }
 .carte-format-poids { font-weight: 300; font-size: var(--texte-micro); opacity: 0.7; letter-spacing: 0.04em; }
 
 /* ═══════════════════════════════════════
