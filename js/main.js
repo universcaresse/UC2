@@ -83,11 +83,11 @@ function initScrollAnimations() {
   // Séquence hero
   const seq = [
     { sel: '.hero-logo-img',         delai: 0    },
-    { sel: '.bouton.hero-seq',        delai: 300  },
-    { sel: '.bouton .hero-seq',       delai: 600  },
-    { sel: '.mosaic-item.hero-seq:nth-child(1)', delai: 900  },
-    { sel: '.mosaic-item.hero-seq:nth-child(2)', delai: 1100 },
-    { sel: '.mosaic-item.hero-seq:nth-child(3)', delai: 1300 },
+    { sel: '.bouton.hero-seq',        delai: 600  },
+    { sel: '.bouton .hero-seq',       delai: 1200 },
+    { sel: '.mosaic-item.hero-seq:nth-child(1)', delai: 1800 },
+    { sel: '.mosaic-item.hero-seq:nth-child(2)', delai: 2200 },
+    { sel: '.mosaic-item.hero-seq:nth-child(3)', delai: 2600 },
   ];
   seq.forEach(({ sel, delai }) => {
     const el = document.querySelector(sel);
