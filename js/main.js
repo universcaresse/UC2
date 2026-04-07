@@ -478,8 +478,9 @@ function construireCatalogue() {
       const gam_id = prods[0]?.gam_id || '';
       return `
         <div class="ligne-groupe" data-gamme="${gam_id}">
-          ${gamme ? `<div class="ligne-groupe-entete">
+     ${gamme ? `<div class="ligne-groupe-entete">
             <div class="ligne-groupe-nom">${gamme.toUpperCase()}</div>
+            ${prods[0]?.desc_gamme ? `<p class="ligne-groupe-desc">${prods[0].desc_gamme}</p>` : ''}
           </div>` : ''}
           <div class="produits-grille">${prods.map(p => carteProduit(p)).join('')}</div>
         </div>`;
