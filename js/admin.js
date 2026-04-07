@@ -120,13 +120,13 @@ function afficherSection(id, bouton) {
 
   if (id === 'accueil')        afficherStatsAccueil();
   if (id === 'import-facture') ifChargerMapping();
-if (id === 'collections')    afficherCollections();
+  if (id === 'collections')    afficherCollections();
   if (id === 'familles')       afficherFamilles();
-  if (id === 'produits')       afficherProduits();       // V2 : recettes → produits
-  if (id === 'inci')           chargerInci();
+  if (id === 'produits')       { reinitialiserFiltresRecettes(); afficherProduits(); }
+  if (id === 'inci')           { const r = document.getElementById('inci-recherche'); if (r) r.value = ''; chargerInci(); }
   if (id === 'densites')       chargerDensites();
-  if (id === 'inventaire')     chargerInventaire();
-  if (id === 'factures')       chargerFactures();
+  if (id === 'inventaire')     { const r = document.getElementById('inv-recherche'); if (r) r.value = ''; chargerInventaire(); }
+  if (id === 'factures')       { reinitialiserFiltres(); chargerFactures(); }
   if (id === 'contenu-site')   chargerContenuSite();
   if (id === 'mediatheque')    chargerMediatheque();
   if (id === 'fabrication') {
