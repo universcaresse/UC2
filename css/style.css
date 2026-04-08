@@ -14,7 +14,7 @@
   --accent:         #d4a445;
   --danger:         #c44536;
   --blanc:          #ffffff;
-  --beige:          #F2E1C1;
+  --beige:          #e8dcc8;
   --gris:           #8b8680;
   --gris-fonce:     #3d3b39;
   --logo:           #333333;
@@ -80,6 +80,10 @@
   --accent-90:      rgba(212,164,69,0.90);
 
   /* BEIGE */
+   --boite:          #F2F5F0;
+   
+   
+   
   --beige-08:       rgba(232,220,200,0.08);
   --beige-10:       rgba(232,220,200,0.10);
   --beige-15:       rgba(232,220,200,0.15);
@@ -769,11 +773,11 @@ footer > * { position: relative; z-index: 1; }
    ═══════════════════════════════════════ */
 .form-panel { display: none; background: white; border: 1px solid var(--beige); margin-bottom: 32px; overflow: hidden; position: relative; }
 .form-panel.visible { display: block; }
-.form-panel-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--beige); background: rgba(232,220,200,0.2); display: flex; align-items: center; gap: 16px; position: relative; }
+.form-panel-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--beige); background: var(--boite); display: flex; align-items: center; gap: 16px; position: relative; }
 .form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--gris-fonce); flex: 1; }
 .form-body { padding: 28px 28px 28px; }
 .form-body .form-actions { padding-top: 28px; padding-bottom: 28px; }
-.form-body-actions { border-top: 1px solid var(--beige); background: var(--beige-10); padding: 20px 28px 20px; }
+.form-body-actions { border-top: 1px solid var(--beige); background: var(--boite); padding: 20px 28px 20px; }
 #fiche-collection { display: none; }
 #fiche-collection.visible { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
 #fiche-collection .form-panel { display: block; margin-bottom: 0; }
