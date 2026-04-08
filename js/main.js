@@ -6,7 +6,7 @@
 // ─── CONFIGURATION ───
 const CONFIG = {
   APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec'
-};;
+};
 
 
 // ─── COULEURS COLLECTIONS (fallback si pas de couleur_hex dans la sheet) ───
@@ -401,8 +401,8 @@ function chargerCatalogue() {
   if (catalogueCharge && catalogueTimestamp && (maintenant - catalogueTimestamp) < CATALOGUE_TTL) return;
   catalogueCharge = true;
   catalogueTimestamp = maintenant;
-  donneesCatalogue = null;
-  try {
+  
+ try {
     if (donneesCatalogue && donneesCatalogue.produits) {
       construireCatalogue();
     } else {
