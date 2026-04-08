@@ -78,7 +78,7 @@ function initScrollAnimations() {
     });
   }, { threshold: 0.15 });
 
-  document.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
+  document.querySelectorAll('.fade-in, .fade-in-doux, .fade-in-lent').forEach(el => scrollObserver.observe(el));
 
   const mosaicObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -123,7 +123,7 @@ function afficherSection(id) {
   if (liens) liens.classList.remove('ouvert');
   window.scrollTo(0, 0);
   if (cible && scrollObserver) {
-    cible.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => {
+    cible.querySelectorAll('.fade-in, .fade-in-doux, .fade-in-lent').forEach(el => {
       el.classList.remove('visible');
       scrollObserver.observe(el);
     });
