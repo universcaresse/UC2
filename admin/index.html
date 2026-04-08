@@ -285,19 +285,20 @@
         </div>
         <div class="msg-zone" id="msg-collections"></div>
        <div class="form-panel" id="fiche-collection">
-          <button class="btn-fermer-panneau" onclick="fermerFicheCollection()" title="Fermer">✕</button>
           <div class="form-panel-header">
-            <div class="fiche-collection-bandeau" id="fiche-collection-bandeau">
+  <div class="fiche-collection-bandeau" id="fiche-collection-bandeau">
               <span class="form-panel-titre" id="fiche-collection-titre"></span>
               <span class="fiche-collection-slogan" id="fiche-collection-slogan"></span>
             </div>
+            <button class="btn-fermer-panneau" onclick="fermerFicheCollection()" title="Fermer">✕</button>
           </div>
           <div class="form-body">
-            <p class="fiche-collection-desc" id="fiche-collection-desc"></p>
             <div id="fiche-collection-extras"></div>
+            <p class="fiche-collection-desc" id="fiche-collection-desc"></p>
             <div class="section-label">Lignes de produits</div>
             <div id="fiche-collection-lignes"></div>
-            <hr class="separateur">
+          </div>
+          <div class="form-body form-body-actions">
             <div class="form-actions">
               <button class="bouton" id="fiche-collection-modifier">Modifier la collection</button>
               <button class="bouton bouton-rouge" id="btn-supprimer-collection">Supprimer la collection</button>
