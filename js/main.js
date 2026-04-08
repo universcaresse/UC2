@@ -619,9 +619,8 @@ function filtrer(col_id, gam_id) {
 }
 
 function filtrerGamme(gam_id, col_id) {
-  const conteneur = col_id
-    ? document.querySelector(`.collection-filtres-gammes[data-collection-filtres="${col_id}"]`)
-    : document.querySelector('.collection-filtres-gammes');
+  if (!col_id) return;
+  const conteneur = document.querySelector(`.collection-filtres-gammes[data-collection-filtres="${col_id}"]`);
   if (conteneur) {
     conteneur.querySelectorAll('[data-filtre-gamme]').forEach(b => b.classList.remove('actif'));
     const btn = conteneur.querySelector(`[data-filtre-gamme="${gam_id}"]`);

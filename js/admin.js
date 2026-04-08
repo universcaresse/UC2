@@ -149,8 +149,15 @@ function afficherSection(id, bouton) {
   if (id === 'mediatheque')    chargerMediatheque();
   if (id === 'fabrication') {
     if (!donneesProduits || donneesProduits.length === 0) {
-      appelAPI('getProduits').then(res => {
-        if (res && res.items) donneesProduits = res.items;
+      Promise.all([appelAPI('getProduits'), appelAPI('getProduitsFormats')]).then(([resPro, resFmt]) => {
+        const formatsMap = {};
+        if (resFmt && resFmt.success) {
+          (resFmt.items || []).forEach(f => {
+            if (!formatsMap[f.pro_id]) formatsMap[f.pro_id] = [];
+            formatsMap[f.pro_id].push({ poids: f.poids, unite: f.unite, prix_vente: f.prix_vente });
+          });
+        }
+        if (resPro && resPro.items) donneesProduits = resPro.items.map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
         chargerFabrication();
       });
     } else {
@@ -403,6 +410,11 @@ async function sauvegarderFamille() {
 }
 
 async function supprimerFamille(fam_id) {
+  const produitsLies = donneesProduits.filter(p => p.fam_id === fam_id);
+  if (produitsLies.length > 0) {
+    afficherMsg('familles', `Impossible — ${produitsLies.length} produit(s) référencent cette famille.`, 'erreur');
+    return;
+  }
   confirmerAction('Supprimer cette famille ?', async () => {
     const res = await appelAPIPost('deleteFamille', { fam_id });
     if (res && res.success) {
@@ -775,14 +787,24 @@ var produitActif      = null;
 var collectionsDisponibles = {};
 
 async function chargerProduitsData() {
-  const res = await appelAPI('getProduits');
-  if (!res || !res.success) { afficherMsg('produits', 'Erreur.', 'erreur'); return; }
-  donneesProduits = (res.items || []).sort((a, b) => {
+  const [resPro, resFmt] = await Promise.all([
+    appelAPI('getProduits'),
+    appelAPI('getProduitsFormats')
+  ]);
+  if (!resPro || !resPro.success) { afficherMsg('produits', 'Erreur.', 'erreur'); return; }
+  const formatsMap = {};
+  if (resFmt && resFmt.success) {
+    (resFmt.items || []).forEach(f => {
+      if (!formatsMap[f.pro_id]) formatsMap[f.pro_id] = [];
+      formatsMap[f.pro_id].push({ poids: f.poids, unite: f.unite, prix_vente: f.prix_vente });
+    });
+  }
+  donneesProduits = (resPro.items || []).sort((a, b) => {
     const colA = donneesCollections.find(c => c.col_id === a.col_id);
     const colB = donneesCollections.find(c => c.col_id === b.col_id);
     return ((colA?.rang || 99) - (colB?.rang || 99)) ||
            (a.nom || '').localeCompare(b.nom || '');
-  });
+  }).map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
   afficherProduits();
 }
 
@@ -2417,14 +2439,17 @@ function inciToggleAccordeon(header) {
 }
 
 async function inciValider(id, nom_UC, cat_id, ing_id) {
-  const inci         = document.getElementById(`${id}-inci`)?.value  || '';
-  const nomBotanique = document.getElementById(`${id}-bot`)?.value   || '';
-  const noteOlfactive = document.getElementById(`${id}-note`)?.value || '';
-
-  // V2 : validerIngredientInci reste dans le V1 code.gs
-  // En V2 on met à jour directement dans Ingredients_INCI_v2 via une action future
-  // Pour l'instant on appelle la même action — à adapter quand l'action V2 sera prête
-  afficherMsg('inci', '⚠ Validation INCI V2 à implémenter.', 'erreur');
+  const inci          = document.getElementById(`${id}-inci`)?.value  || '';
+  const nomBotanique  = document.getElementById(`${id}-bot`)?.value   || '';
+  const noteOlfactive = document.getElementById(`${id}-note`)?.value  || '';
+  if (!ing_id) { afficherMsg('inci', 'Ingrédient introuvable.', 'erreur'); return; }
+  const res = await appelAPIPost('saveIngredientInci', { ing_id, inci, nom_botanique: nomBotanique, note_olfactive: noteOlfactive });
+  if (res && res.success) {
+    afficherMsg('inci', '✅ INCI sauvegardé.');
+    listesDropdown.fullData = listesDropdown.fullData.map(d => d.ing_id === ing_id ? { ...d, inci, nom_botanique: nomBotanique, note_olfactive: noteOlfactive } : d);
+  } else {
+    afficherMsg('inci', res?.message || 'Erreur lors de la sauvegarde.', 'erreur');
+  }
 }
 
 /* ════════════════════════════════
@@ -2509,6 +2534,7 @@ async function sauvegarderDensite() {
   if (res && res.success) {
     fermerFormDensite();
     afficherMsg('densites', mode === 'modif' ? 'Densité mise à jour.' : 'Type ajouté.');
+    listesDropdown.config[type] = { densite, unite, margePertePct: marge_perte_pct };
     donneesDensites = [];
     chargerDensites();
   } else {
