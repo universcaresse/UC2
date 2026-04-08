@@ -124,11 +124,16 @@ function afficherSection(id) {
   const liens = document.getElementById('nav-links');
   if (liens) liens.classList.remove('ouvert');
   window.scrollTo(0, 0);
-  if (cible && scrollObserver) {
+  if (cible && scrollObserver && id !== 'accueil') {
     cible.querySelectorAll('.fade-in, .fade-in-doux, .fade-in-lent').forEach(el => {
       el.classList.remove('visible');
       scrollObserver.observe(el);
     });
+  } else if (cible && scrollObserver && id === 'accueil' && !accueilAnime) {
+    cible.querySelectorAll('.fade-in, .fade-in-doux, .fade-in-lent').forEach(el => {
+      scrollObserver.observe(el);
+    });
+    accueilAnime = true;
   }
   if (id === 'accueil') {
     afficherCollectionsPublic();
