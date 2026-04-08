@@ -449,7 +449,8 @@ select.form-control, select.form-ctrl { cursor: pointer; }
 .ligne-groupe { margin-bottom: 48px; }
 .ligne-groupe-entete { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--beige); }
 .famille-groupe { margin-bottom: 48px; }
-.famille-groupe-titre { font-family: 'Playfair Display', serif; font-size: var(--texte-150); font-weight: 600; color: var(--primary); margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid var(--beige); }
+.famille-groupe-titre { font-family: 'Playfair Display', serif; font-size: var(--texte-150); font-weight: 600; color: var(--primary); margin-bottom: 12px; padding-bottom: 12px; border-bottom: 2px solid var(--beige); }
+.famille-groupe-desc { font-family: 'DM Sans', sans-serif; font-size: var(--texte-105); line-height: 1.8; color: var(--gris); font-weight: 300; margin-bottom: 24px; }
 .ligne-groupe-nom { font-family: 'Playfair Display', serif; font-size: var(--texte-130); font-weight: 600; color: var(--gris-fonce); margin-bottom: 0; }
 .ligne-groupe-desc { font-family: 'DM Sans', sans-serif; font-size: var(--texte-105); line-height: 1.7; color: var(--gris); font-weight: 300; margin-top: 8px; }
 .modal-desc { font-family: 'DM Sans', sans-serif; font-size: var(--texte-105); line-height: 1.85; color: var(--gris); font-weight: 300; margin-bottom: 24px; }
@@ -1079,7 +1080,7 @@ tr.cliquable { cursor: pointer; }
   .filtres-bar { padding: 14px var(--padding-mobile); }
   .catalogue-body { padding: 28px var(--padding-mobile) 60px; }
   .collection-entete { grid-template-columns: 1fr; }
-  .collection-entete-visuel { aspect-ratio: 4/5; overflow: hidden; position: relative; width: 100%; }
+  .collection-entete-visuel { aspect-ratio: 1/1; overflow: hidden; position: relative; width: 100%; max-height: none; }
 
 .modal-produit { grid-template-columns: 1fr; max-height: 88vh; width: 92%; overflow-y: auto; }
   .modal-visuel { flex-direction: column; }

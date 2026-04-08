@@ -489,8 +489,9 @@ function construireCatalogue() {
             <div class="produits-grille">${prods.map(p => carteProduit(p)).join('')}</div>
           </div>`;
       }).join('');
+      const descFamille = Object.values(parGamme)[0]?.[0]?.desc_famille || '';
       return fam
-        ? `<div class="famille-groupe"><div class="famille-groupe-titre">${fam.toUpperCase()}</div>${gammesInterne}</div>`
+        ? `<div class="famille-groupe"><div class="famille-groupe-titre">${fam.toUpperCase()}</div>${descFamille ? `<p class="famille-groupe-desc">${descFamille}</p>` : ''}${gammesInterne}</div>`
         : gammesInterne;
     }).join('');
 
