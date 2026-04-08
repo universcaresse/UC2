@@ -739,7 +739,9 @@ async function sauvegarderCollection() {
 }
 
 async function supprimerCollection(col_id) {
-  const produitsLies = donneesProduits.filter(p => p.col_id === col_id);
+  const resPro = await appelAPI('getProduits');
+  const tousLesProduits = (resPro && resPro.success) ? resPro.items : donneesProduits;
+  const produitsLies = tousLesProduits.filter(p => p.col_id === col_id);
   if (produitsLies.length > 0) {
     afficherMsg('collections', `Impossible — ${produitsLies.length} produit(s) référencent cette collection.`, 'erreur');
     return;
