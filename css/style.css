@@ -334,7 +334,7 @@ main { padding-top: var(--nav-h); }
 .hero-stat-num { opacity: 0; transition: opacity 1.5s ease; }
 .hero-stat-num.visible { opacity: 1; }
 
-.btn-fermer-panneau { position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--gris); line-height: 1; padding: 4px 8px; }
+.btn-fermer-panneau { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.4rem; color: var(--gris); line-height: 1; padding: 4px 8px; }
 .btn-edit { background: var(--primary-08); color: var(--primary); padding: 6px 14px; font-size: 0.68rem; font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border: none; cursor: pointer; transition: background 0.2s; }
 .btn-suppr { background: var(--danger-08); color: var(--danger); padding: 6px 14px; font-size: 0.68rem; font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border: none; cursor: pointer; transition: background 0.2s; }
 
@@ -769,7 +769,7 @@ footer > * { position: relative; z-index: 1; }
    ═══════════════════════════════════════ */
 .form-panel { display: none; background: white; border: 1px solid var(--beige); margin-bottom: 32px; overflow: hidden; position: relative; }
 .form-panel.visible { display: block; }
-.form-panel-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--beige); background: rgba(232,220,200,0.2); display: flex; align-items: center; gap: 16px; }
+.form-panel-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--beige); background: rgba(232,220,200,0.2); display: flex; align-items: center; gap: 16px; position: relative; }
 .form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--gris-fonce); flex: 1; }
 .form-body { padding: 28px 28px 28px; }
 .form-body .form-actions { padding-top: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--beige); }
@@ -1134,9 +1134,8 @@ tr.cliquable { cursor: pointer; }
    ADMIN — FICHE COLLECTION
    ═══════════════════════════════════════ */
 .fiche-collection-bandeau {
-  padding: 20px 24px;
-  border-radius: 2px;
-  margin-bottom: 20px;
+  padding: 8px 0;
+  margin-bottom: 0;
 }
 .fiche-collection-bandeau .form-panel-titre { color: var(--gris-fonce); font-size: 1.3rem; display: block; }
 .fiche-collection-slogan { color: var(--gris);font-family: 'DM Sans', sans-serif; font-size: 0.82rem; display: block; margin-top: 4px; }

@@ -495,13 +495,12 @@ function ouvrirFicheCollection(col_id) {
   document.getElementById('fiche-collection-slogan').textContent = col.slogan || '';
   document.getElementById('fiche-collection-desc').textContent   = col.description || '';
 
-  let ficheExtrasHtml = '';
   let wrapHtml = '';
-  if (col.couleur_hex) wrapHtml += `<div class="fiche-collection-couleur" style="background:${col.couleur_hex}">${col.rang}</div>`;
-  if (col.photo_url)   wrapHtml += `<div class="fiche-collection-photo"><img src="${col.photo_url}" alt="Photo collection"></div>`;
-  if (wrapHtml) ficheExtrasHtml += `<div class="fiche-collection-extras-wrap">${wrapHtml}</div>`;
+  if (col.photo_url)       wrapHtml += `<img src="${col.photo_url}" class="fiche-visuel-photo">`;
+  if (col.photo_noel_url)  wrapHtml += `<img src="${col.photo_noel_url}" class="fiche-visuel-photo">`;
+  if (col.couleur_hex)     wrapHtml += `<div class="fiche-visuel-hex" style="background:${col.couleur_hex}"></div>`;
   const ficheExtras = document.getElementById('fiche-collection-extras');
-  if (ficheExtras) ficheExtras.innerHTML = ficheExtrasHtml;
+  if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class="fiche-visuel">${wrapHtml}</div>` : '';
 
   document.getElementById('fiche-collection-lignes').innerHTML = gammesHtml || '<p class="vide-desc">Aucune gamme</p>';
 
