@@ -1218,7 +1218,7 @@ async function sauvegarderRecette() {
   gam_id,
     fam_id:      document.getElementById('fr-famille')?.value || '',
     nom:         document.getElementById('fr-nom').value.toUpperCase(),
-    couleur_hex: document.getElementById('fr-couleur').value,
+    couleur_hex: document.getElementById('fr-couleur').value || document.getElementById('fr-couleur-visible').value || '',
     nb_unites:   parseInt(document.getElementById('fr-unites').value) || 1,
     cure:        parseInt(document.getElementById('fr-cure').value) || 0,
     description: document.getElementById('fr-description').value,
