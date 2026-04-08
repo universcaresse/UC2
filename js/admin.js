@@ -804,6 +804,7 @@ async function chargerProduitsData() {
     const colA = donneesCollections.find(c => c.col_id === a.col_id);
     const colB = donneesCollections.find(c => c.col_id === b.col_id);
     return ((colA?.rang || 99) - (colB?.rang || 99)) ||
+           (a.nom_gamme || '').localeCompare(b.nom_gamme || '') ||
            (a.nom || '').localeCompare(b.nom || '');
   }).map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
   afficherProduits();
@@ -1240,7 +1241,7 @@ async function sauvegarderRecette() {
     col_id,
   gam_id,
     fam_id:      document.getElementById('fr-famille')?.value || '',
-    nom:         document.getElementById('fr-nom').value.toUpperCase(),
+   nom: (document.getElementById('fr-nom')?.value || '').toUpperCase(),
     couleur_hex: document.getElementById('fr-couleur').value || document.getElementById('fr-couleur-visible').value || '',
     nb_unites:   parseInt(document.getElementById('fr-unites').value) || 1,
     cure:        parseInt(document.getElementById('fr-cure').value) || 0,
