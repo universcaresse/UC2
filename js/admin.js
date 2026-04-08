@@ -418,12 +418,9 @@ async function sauvegarderFamille() {
 async function supprimerFamille(fam_id) {
   const resPro = await appelAPI('getProduits');
   const tousLesProduits = (resPro && resPro.success) ? resPro.items : donneesProduits;
-  const produitsLies = tousLesProduits.filter(p => 
-    p.col_id === col_id || 
-    (Array.isArray(p.collections_secondaires) && p.collections_secondaires.includes(col_id))
-  );
+  const produitsLies = tousLesProduits.filter(p => p.fam_id === fam_id);
   if (produitsLies.length > 0) {
-    afficherMsg('collections', `Impossible — ${produitsLies.length} produit(s) sont liés à cette collection.`, 'erreur');
+    afficherMsg('familles', `Impossible — ${produitsLies.length} produit(s) sont liés à cette famille.`, 'erreur');
     return;
   }
   confirmerAction('Supprimer cette famille ?', async () => {
@@ -750,9 +747,12 @@ async function sauvegarderCollection() {
 async function supprimerCollection(col_id) {
   const resPro = await appelAPI('getProduits');
   const tousLesProduits = (resPro && resPro.success) ? resPro.items : donneesProduits;
-  const produitsLies = tousLesProduits.filter(p => p.col_id === col_id);
+ const produitsLies = tousLesProduits.filter(p => 
+    p.col_id === col_id || 
+    (Array.isArray(p.collections_secondaires) && p.collections_secondaires.includes(col_id))
+  );
   if (produitsLies.length > 0) {
-    afficherMsg('collections', `Impossible — ${produitsLies.length} produit(s) référencent cette collection.`, 'erreur');
+    afficherMsg('collections', `Impossible — ${produitsLies.length} produit(s) sont liés à cette collection.`, 'erreur');
     return;
   }
   const gammes = donneesGammes.filter(g => g.col_id === col_id);
@@ -815,11 +815,13 @@ async function chargerProduitsData() {
       formatsMap[f.pro_id].push({ poids: f.poids, unite: f.unite, prix_vente: f.prix_vente });
     });
   }
-  donneesProduits = (resPro.items || []).sort((a, b) => {
+donneesProduits = (resPro.items || []).sort((a, b) => {
     const colA = donneesCollections.find(c => c.col_id === a.col_id);
     const colB = donneesCollections.find(c => c.col_id === b.col_id);
+    const gamA = donneesGammes.find(g => g.gam_id === a.gam_id);
+    const gamB = donneesGammes.find(g => g.gam_id === b.gam_id);
     return ((colA?.rang || 99) - (colB?.rang || 99)) ||
-           (a.nom_gamme || '').localeCompare(b.nom_gamme || '') ||
+           ((gamA?.rang || 99) - (gamB?.rang || 99)) ||
            (a.nom || '').localeCompare(b.nom || '');
   }).map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
   afficherProduits();
@@ -850,32 +852,34 @@ async function afficherProduits() {
   const ordreCollections = [];
   donneesProduits.forEach(pro => {
     const col = donneesCollections.find(c => c.col_id === pro.col_id);
-    const colNom = col?.nom || pro.col_id || '—';
-    if (!parCollection[colNom]) { parCollection[colNom] = {}; ordreCollections.push(colNom); }
+    const colId = pro.col_id || '—';
+    if (!parCollection[colId]) { parCollection[colId] = { nom: col?.nom || colId, gammes: {} }; ordreCollections.push(colId); }
     const gam = donneesGammes.find(g => g.gam_id === pro.gam_id);
+    const gamId = pro.gam_id || '';
     const gamNom = gam?.nom || '';
-    if (!parCollection[colNom][gamNom]) parCollection[colNom][gamNom] = [];
-    parCollection[colNom][gamNom].push(pro);
+    if (!parCollection[colId].gammes[gamId]) parCollection[colId].gammes[gamId] = { nom: gamNom, rang: gam?.rang || 99, produits: [] };
+    parCollection[colId].gammes[gamId].produits.push(pro);
   });
 
-  ordreCollections.forEach(colNom => {
+  ordreCollections.forEach(colId => {
+    const colData = parCollection[colId];
     const secCol = document.createElement('div');
     secCol.className = 'recette-section-collection';
-    secCol.dataset.collection = colNom;
-    secCol.innerHTML = `<div class="recette-collection-titre">${colNom.toUpperCase()}</div>`;
+    secCol.dataset.collection = colData.nom;
+    secCol.innerHTML = `<div class="recette-collection-titre">${colData.nom.toUpperCase()}</div>`;
 
-    const gammes = parCollection[colNom];
-    Object.keys(gammes).forEach(gamNom => {
+    const gammesTriees = Object.values(colData.gammes).sort((a, b) => (a.rang || 99) - (b.rang || 99));
+    gammesTriees.forEach(gamData => {
       const secGam = document.createElement('div');
       secGam.className = 'recette-section-ligne';
-      secGam.dataset.ligne = gamNom;
-      if (gamNom) {
-        secGam.innerHTML = `<div class="recette-ligne-titre">${gamNom.toUpperCase()}</div>`;
+      secGam.dataset.ligne = gamData.nom;
+      if (gamData.nom) {
+        secGam.innerHTML = `<div class="recette-ligne-titre">${gamData.nom.toUpperCase()}</div>`;
       }
       const grilleInner = document.createElement('div');
       grilleInner.className = 'recette-cartes-grille';
 
-      gammes[gamNom].forEach(pro => {
+      gamData.produits.forEach(pro => {
         const couleur = pro.couleur_hex || 'var(--gris)';
 		
 		
@@ -906,7 +910,7 @@ async function afficherProduits() {
           <div class="carte-infos ${couleurTexteContraste(couleur)}">
             <span class="carte-collection-badge">${col?.nom || '—'}</span>
             <div class="carte-nom">${pro.nom || '—'}</div>
-            <div class="carte-ligne">${gamNom}</div>
+            <div class="carte-ligne">${gamData.nom}</div>
           <div class="carte-bas">
               ${(pro.formats && pro.formats.length) ? `<div class="carte-formats">${[...pro.formats].sort((a, b) => parseFloat(a.poids) - parseFloat(b.poids)).map(f => `<div class="carte-format-tag"><span class="carte-format-prix">${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $</span><span class="carte-format-sep"></span><span class="carte-format-poids">${f.poids} ${f.unite}</span></div>`).join('')}</div>` : ''}
             </div>
@@ -947,7 +951,7 @@ function onFiltreCollection() {
   if (colNom) {
     const col    = donneesCollections.find(c => c.nom === colNom);
     const gammes = col ? donneesGammes.filter(g => g.col_id === col.col_id) : [];
-    gammes.sort((a, b) => (a.nom || '').localeCompare(b.nom || '')).forEach(g => {
+    gammes.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(g => {
       const opt = document.createElement('option');
       opt.value = g.nom; opt.textContent = g.nom;
       selGamme.appendChild(opt);
@@ -1113,6 +1117,7 @@ function fermerFicheProduit() {
   document.getElementById('fiche-recette').classList.remove('visible');
   document.querySelector('#section-produits .filtres-bar')?.classList.remove('cache');
   document.getElementById('grille-produits').classList.remove('cache');
+  document.getElementById('btn-nouvelle-recette').classList.remove('cache');
   document.getElementById('filtre-recette-nom').value = '';
   filtrerRecettes();
   produitActif = null;
