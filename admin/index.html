@@ -1030,7 +1030,7 @@
           <select class="form-ctrl filtre-select" id="filtre-statut" onchange="filtrerFactures()">
             <option value="">Tous les statuts</option>
             <option value="En cours">En cours</option>
-            <option value="Finalisée">Finalisée</option>
+            <option value="Finalisé">Finalisé</option>
           </select>
           <input class="form-ctrl filtre-select" type="date" id="filtre-date-debut" onchange="filtrerFactures()">
           <input class="form-ctrl filtre-select" type="date" id="filtre-date-fin" onchange="filtrerFactures()">
@@ -1445,17 +1445,17 @@
           <div id="inci-filtres-avances" class="cache">
           <div class="filtres-ligne">
             <span class="filtre-label">Statut</span>
-            <button class="filtre-btn actif" data-filtre-statut="tout" onclick="inciAppliquerFiltres()">Tout</button>
-            <button class="filtre-btn" data-filtre-statut="a-valider" onclick="inciAppliquerFiltres()">À valider</button>
-            <button class="filtre-btn" data-filtre-statut="valide" onclick="inciAppliquerFiltres()">Validé</button>
+            <button class="filtre-btn actif" data-filtre-statut="tout" onclick="inciAppliquerFiltres(this, 'statut')">Tout</button>
+            <button class="filtre-btn" data-filtre-statut="a-valider" onclick="inciAppliquerFiltres(this, 'statut')">À valider</button>
+            <button class="filtre-btn" data-filtre-statut="valide" onclick="inciAppliquerFiltres(this, 'statut')">Validé</button>
           </div>
           <div class="filtres-ligne">
             <span class="filtre-label">Source</span>
-            <button class="filtre-btn actif" data-filtre-source="tout" onclick="inciAppliquerFiltres()">Tout</button>
-            <button class="filtre-btn" data-filtre-source="PA" onclick="inciAppliquerFiltres()">Purearome</button>
-            <button class="filtre-btn" data-filtre-source="MH" onclick="inciAppliquerFiltres()">Les Mauvaises Herbes</button>
-            <button class="filtre-btn" data-filtre-source="Arbressence" onclick="inciAppliquerFiltres()">Arbressence</button>
-            <button class="filtre-btn" data-filtre-source="DE" onclick="inciAppliquerFiltres()">Divine Essence</button>
+            <button class="filtre-btn actif" data-filtre-source="tout" onclick="inciAppliquerFiltres(this, 'source')">Tout</button>
+            <button class="filtre-btn" data-filtre-source="PA" onclick="inciAppliquerFiltres(this, 'source')">Purearome</button>
+            <button class="filtre-btn" data-filtre-source="MH" onclick="inciAppliquerFiltres(this, 'source')">Les Mauvaises Herbes</button>
+            <button class="filtre-btn" data-filtre-source="Arbressence" onclick="inciAppliquerFiltres(this, 'source')">Arbressence</button>
+            <button class="filtre-btn" data-filtre-source="DE" onclick="inciAppliquerFiltres(this, 'source')">Divine Essence</button>
           </div>
           </div>
           <div class="filtres-ligne">

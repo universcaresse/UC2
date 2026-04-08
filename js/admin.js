@@ -147,6 +147,7 @@ function afficherSection(id, bouton) {
   if (id === 'factures')       { reinitialiserFiltres(); chargerFactures(); }
   if (id === 'contenu-site')   chargerContenuSite();
   if (id === 'mediatheque')    chargerMediatheque();
+  if (id === 'inventaire-production') { afficherSection('inventaire', null); return; }
   if (id === 'fabrication') {
     if (!donneesProduits || donneesProduits.length === 0) {
       Promise.all([appelAPI('getProduits'), appelAPI('getProduitsFormats')]).then(([resPro, resFmt]) => {
@@ -1127,8 +1128,9 @@ function ouvrirFormProduit() {
   ['fr-nom','fr-couleur','fr-unites','fr-cure','fr-description','fr-instructions','fr-notes','fr-surgras']
     .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
   document.getElementById('fr-statut').value     = 'test';
-  document.getElementById('fr-collection').value = '';
+ document.getElementById('fr-collection').value = '';
   document.getElementById('fr-ligne').innerHTML  = '<option value="">— Choisir collection —</option>';
+  document.getElementById('fr-ligne').disabled = true;
   document.getElementById('fr-couleur-visible').value = '';
   document.getElementById('fr-image-url').value       = '';
   document.getElementById('fr-image-url-noel').value  = '';
@@ -2226,7 +2228,7 @@ function supprimerFacture(ach_id) {
 /* ════════════════════════════════
    INVENTAIRE V2 (Stock)
 ════════════════════════════════ */
-var donneesInventaire = {};
+var donneesInventaire = [];
 
 async function chargerInventaire() {
   const loading = document.getElementById('loading-inventaire');
@@ -2274,17 +2276,45 @@ async function chargerInventaire() {
       <div class="inv-total-label">Valeur totale de l'inventaire</div>
       <div class="inv-total-montant">${formaterPrix(total)}</div>
     </div>`;
+ donneesInventaire = items;
   if (contenu) contenu.innerHTML = html;
+
+  const types = [...new Set(items.map(i => i.cat_id).filter(Boolean))].sort();
+  const selType = document.getElementById('inv-filtre-type');
+  if (selType) {
+    const valType = selType.value;
+    selType.innerHTML = '<option value="">Tous les types</option>' +
+      types.map(t => `<option value="${t}">${listesDropdown.categoriesMap?.[t] || t}</option>`).join('');
+    selType.value = valType;
+  }
 }
 
 function filtrerInventaire() {
-  // Simplifié en V2 — recherche dans le HTML existant
-  const recherche = (document.getElementById('inv-recherche')?.value || '').toLowerCase();
-  document.querySelectorAll('#contenu-inventaire tbody tr:not(.inv-titre-rangee)').forEach(tr => {
-    const nomEl = tr.querySelector('td:first-child');
-    if (!nomEl) return;
-    tr.classList.toggle('cache', recherche && !nomEl.textContent.toLowerCase().includes(recherche));
+  const recherche  = (document.getElementById('inv-recherche')?.value || '').toLowerCase();
+  const typeFiltre = document.getElementById('inv-filtre-type')?.value || '';
+  const contenu    = document.getElementById('contenu-inventaire');
+  if (!contenu || !donneesInventaire.length) return;
+  const filtres = donneesInventaire.filter(i =>
+    (!recherche  || (i.nom_UC || '').toLowerCase().includes(recherche)) &&
+    (!typeFiltre || i.cat_id === typeFiltre)
+  );
+  const parCat = {};
+  filtres.forEach(item => {
+    const cat = item.cat_id || 'Sans catégorie';
+    if (!parCat[cat]) parCat[cat] = [];
+    parCat[cat].push(item);
   });
+  let html  = '<div class="tableau-wrap"><table><thead><tr><th>Ingrédient</th><th>Stock (g)</th><th>Prix/g réel</th><th>Dernière màj</th></tr></thead><tbody>';
+  let total = 0;
+  Object.keys(parCat).sort().forEach(cat => {
+    html += `<tr><td colspan="4" class="inv-titre-rangee">${cat}</td></tr>`;
+    parCat[cat].forEach(item => {
+      total += (item.qte_g || 0) * (item.prix_par_g_reel || 0);
+      html += `<tr><td>${item.nom_UC || item.ing_id}</td><td>${parseFloat(item.qte_g || 0).toFixed(0)} g</td><td>${item.prix_par_g_reel ? parseFloat(item.prix_par_g_reel).toFixed(4) + ' $/g' : '—'}</td><td>${item.date_derniere_maj || '—'}</td></tr>`;
+    });
+  });
+  html += `</tbody></table></div><div class="inv-total"><div class="inv-total-label">Valeur totale de l'inventaire</div><div class="inv-total-montant">${formaterPrix(total)}</div></div>`;
+  contenu.innerHTML = html;
 }
 
 function reinitialiserFiltresInventaire() {
@@ -2320,7 +2350,11 @@ async function chargerInci() {
   inciConstruireAccordeons();
 }
 
-function inciAppliquerFiltres() {
+function inciAppliquerFiltres(btn, groupe) {
+  if (btn && groupe) {
+    document.querySelectorAll(`[data-filtre-${groupe}]`).forEach(b => b.classList.remove('actif'));
+    btn.classList.add('actif');
+  }
   inciConstruireAccordeons();
 }
 
@@ -2351,8 +2385,14 @@ function inciConstruireAccordeons() {
 
   // Regrouper par cat_id
   const parCat = {};
-inciDonnees.forEach(l => {
+const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.dataset?.filtreStatut || 'tout';
+  const filtreSource = document.querySelector('[data-filtre-source].actif')?.dataset?.filtreSource || 'tout';
+
+  inciDonnees.forEach(l => {
     if (recherche && !(l.nom_UC || '').toLowerCase().includes(recherche)) return;
+    if (filtreStatut === 'a-valider' && l.inci) return;
+    if (filtreStatut === 'valide'    && !l.inci) return;
+    if (filtreSource !== 'tout'      && l.source !== filtreSource) return;
     const catObj = inciCategoriesUC.find(c => c.cat_id === l.cat_id);
     const cat = catObj?.nom || l.cat_id || 'Sans catégorie';
     if (!parCat[cat]) parCat[cat] = [];
