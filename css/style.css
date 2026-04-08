@@ -646,7 +646,7 @@ footer > * { position: relative; z-index: 1; }
 .filtre-btn:hover { border-color: var(--primary); color: var(--primary); }
 .filtre-btn.actif { background: var(--primary); border-color: var(--primary); color: white; }
 .collection-filtres-gammes { padding: 24px 0 32px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
-.collection-filtres-gammes .page-entete-titre { font-size: 1.4rem; text-align: left; }
+.collection-filtres-gammes .page-entete-titre { font-size: 1.4rem; text-align: left; width: 100%; }
 .collection-filtres-gammes .filtres-ligne { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .catalogue-body { padding: 48px var(--padding-page) 80px; }
 .collection-section { margin-bottom: 72px; }
