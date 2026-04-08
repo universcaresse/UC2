@@ -770,8 +770,8 @@ async function supprimerGamme(gam_id) {
     afficherMsg('collections', `Impossible — ${produitsLies.length} produit(s) référencent cette gamme.`, 'erreur');
     return;
   }
-  confirmerAction('Supprimer cette gamme ?', async () => {
-    const res = await appelAPIPost('deleteGamme', { gam_id });
+ confirmerAction('Supprimer cette gamme ?', async () => {
+    const res = await appelAPIPost('deleteGamme', { gam_id, col_id: gam.col_id });
     if (res && res.success) {
       fermerFicheGamme();
       fermerFicheCollection();
