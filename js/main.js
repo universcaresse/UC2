@@ -713,8 +713,8 @@ function appliquerContenu(c) {
     set('contenu-accueil-cta', c.accueil_cta);
 const ctaSpan = document.getElementById('contenu-accueil-cta');
 if (ctaSpan) setTimeout(() => { ctaSpan.classList.add('visible'); }, 50);
-    const cta = document.querySelector('.hero-cta');
-    if (cta) { cta.classList.remove('invisible'); cta.classList.add('fade-in-doux'); }
+    const ctaBouton = document.querySelector('a.bouton.invisible');
+    if (ctaBouton) ctaBouton.classList.remove('invisible');
     set('contenu-accueil-stat-label', c.accueil_stat_label);
     set('contenu-accueil-stat-valeur', c.accueil_stat_valeur);
     const statValeur = document.getElementById('contenu-accueil-stat-valeur');
