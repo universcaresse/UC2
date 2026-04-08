@@ -45,6 +45,7 @@ let adminConnecte = false;
 let scrollObserver = null;
 let donneesCatalogue = null;
 let collectionEnAttente = null;
+let accueilAnime = false;
 
 // ─── INITIALISATION ───
 document.addEventListener('DOMContentLoaded', async () => {
