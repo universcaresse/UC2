@@ -710,8 +710,8 @@ function appliquerContenu(c) {
 
     set('contenu-accueil-eyebrow', c.accueil_eyebrow);
     set('contenu-accueil-cta', c.accueil_cta);
-const cta = document.getElementById('contenu-accueil-cta');
-if (cta) setTimeout(() => { cta.classList.add('visible'); }, 50);
+const ctaSpan = document.getElementById('contenu-accueil-cta');
+if (ctaSpan) setTimeout(() => { ctaSpan.classList.add('visible'); }, 50);
     const cta = document.querySelector('.hero-cta');
     if (cta) { cta.classList.remove('invisible'); cta.classList.add('fade-in-doux'); }
     set('contenu-accueil-stat-label', c.accueil_stat_label);
