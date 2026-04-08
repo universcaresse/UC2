@@ -591,12 +591,7 @@ function ouvrirModalFromCard(el) {
 }
 
 function filtrerApresChargement(col_id) {
-  const sections = document.querySelectorAll('.collection-section');
-  if (sections.length > 0) {
-    filtrer(col_id);
-  } else {
-    collectionEnAttente = col_id;
-  }
+  collectionEnAttente = col_id;
 }
 
 function filtrer(col_id, gam_id) {
