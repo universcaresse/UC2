@@ -653,6 +653,7 @@ footer > * { position: relative; z-index: 1; }
 .collection-section + .collection-section { padding-top: 48px; border-top: 3px solid var(--primary); border-image: linear-gradient(to right, var(--primary) calc(100% - 340px - 48px), transparent calc(100% - 340px - 48px)) 1; }
 .collection-section { transition: opacity 0.4s ease; }
 .collection-section.masquee { display: none; opacity: 0; }
+.ligne-groupe.masquee { display: none; }
 .collection-entete { display: grid; grid-template-columns: 1fr 340px; gap: 48px; margin-bottom: 36px; padding-bottom: 28px; border-bottom: 1px solid var(--beige); align-items: center; }
 .collection-entete-nom { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 400; color: var(--gris-fonce); margin-bottom: 4px; }
 .collection-entete-slogan { font-family: 'Playfair Display', serif; font-size: var(--texte-105); font-style: italic; color: var(--accent); margin-bottom: 14px; }
