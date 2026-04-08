@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     donneesCatalogue = resCat;
     afficherCollectionsPublic();
     afficherNbProduits();
+    document.querySelectorAll('.hero-stat-num').forEach(el => setTimeout(() => el.classList.add('visible'), 50));
   }
 });
 
@@ -716,6 +717,8 @@ if (ctaSpan) setTimeout(() => { ctaSpan.classList.add('visible'); }, 50);
     if (cta) { cta.classList.remove('invisible'); cta.classList.add('fade-in-doux'); }
     set('contenu-accueil-stat-label', c.accueil_stat_label);
     set('contenu-accueil-stat-valeur', c.accueil_stat_valeur);
+    const statValeur = document.getElementById('contenu-accueil-stat-valeur');
+    if (statValeur) setTimeout(() => statValeur.classList.add('visible'), 50);
     set('contenu-qui-eyebrow', c.qui_eyebrow);
     set('contenu-qui-titre', c.qui_titre);
     set('contenu-qui-titre-em', c.qui_titre_em);
