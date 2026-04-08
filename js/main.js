@@ -674,14 +674,14 @@ function ouvrirModal(produit) {
   // ⚠️ RÈGLE LÉGALE : jamais de nom_ingredient à la place de INCI
   // En V2 les ingrédients publics n'ont pas de champ inci direct dans le catalogue
   // On affiche uniquement si l'ingrédient a un INCI valide
-  const inciEl = document.getElementById('modal-inci');
+ const inciEl = document.getElementById('modal-inci');
   if (inciEl) {
     const ingredients = produit.ingredients || [];
-    const total = ingredients.reduce((s, i) => s + (parseFloat(i.quantite_g) || 0), 0);
-    if (total > 0) {
-      // En V2, le champ INCI n'est pas encore dans getCataloguePublic_v2
-      // À compléter quand Ingredients_INCI_v2 sera jointé dans le catalogue
-      inciEl.textContent = '';
+    const avecInci = ingredients.filter(i => i.inci && i.inci.trim());
+    if (avecInci.length > 0) {
+      const total = avecInci.reduce((s, i) => s + (parseFloat(i.quantite_g) || 0), 0);
+      const tries = [...avecInci].sort((a, b) => (parseFloat(b.quantite_g) || 0) - (parseFloat(a.quantite_g) || 0));
+      inciEl.textContent = 'Ingrédients : ' + tries.map(i => i.inci.trim()).join(', ');
     } else {
       inciEl.textContent = '';
     }
