@@ -842,6 +842,7 @@ async function afficherProduits() {
 		
     const div = document.createElement('div');
         div.className = 'carte-produit';
+        div.dataset.proId = pro.pro_id;
         div.onclick = () => ouvrirFicheProduit(pro.pro_id);
         div.style.setProperty('--col-hex', couleur);
         const col = donneesCollections.find(c => c.col_id === pro.col_id);
@@ -928,8 +929,7 @@ function filtrerRecettes() {
   const vide   = document.getElementById('vide-produits');
   let visible  = 0;
   cartes.forEach(carte => {
-    const nomEl = carte.querySelector('.carte-nom');
-    const pro   = donneesProduits.find(p => p.nom === nomEl?.textContent);
+    const pro = donneesProduits.find(p => p.pro_id === carte.dataset.proId);
     if (!pro) return;
     const colObj = donneesCollections.find(c => c.col_id === pro.col_id);
     const gamObj = donneesGammes.find(g => g.gam_id === pro.gam_id);
