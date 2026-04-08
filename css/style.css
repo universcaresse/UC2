@@ -1079,7 +1079,7 @@ tr.cliquable { cursor: pointer; }
   .filtres-bar { padding: 14px var(--padding-mobile); }
   .catalogue-body { padding: 28px var(--padding-mobile) 60px; }
   .collection-entete { grid-template-columns: 1fr; }
-  .collection-entete-visuel { aspect-ratio: 4/5; overflow: hidden; position: relative; }
+  .collection-entete-visuel { aspect-ratio: 4/5; overflow: hidden; position: relative; width: 100%; }
 
 .modal-produit { grid-template-columns: 1fr; max-height: 88vh; width: 92%; overflow-y: auto; }
   .modal-visuel { flex-direction: column; }

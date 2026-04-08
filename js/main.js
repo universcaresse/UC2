@@ -133,13 +133,14 @@ function afficherSection(id) {
     afficherCollectionsPublic();
     afficherNbProduits();
   }
-  if (id === 'catalogue') {
-    
-    document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('actif'));
-    const btnTout = document.querySelector('[data-filtre="tout"]');
-    if (btnTout) btnTout.classList.add('actif');
-    document.querySelectorAll('.collection-section').forEach(s => s.classList.remove('masquee'));
-    document.querySelectorAll('.ligne-groupe').forEach(g => g.classList.remove('masquee'));
+ if (id === 'catalogue') {
+    if (!collectionEnAttente) {
+      document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('actif'));
+      const btnTout = document.querySelector('[data-filtre="tout"]');
+      if (btnTout) btnTout.classList.add('actif');
+      document.querySelectorAll('.collection-section').forEach(s => s.classList.remove('masquee'));
+      document.querySelectorAll('.ligne-groupe').forEach(g => g.classList.remove('masquee'));
+    }
     chargerCatalogue();
   }
   if (id === 'educatif')  afficherEduSection(1);
