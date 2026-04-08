@@ -512,7 +512,7 @@ function construireCatalogue() {
           </div>
         </div>
       </div>
-   ${(() => { const toutesGammes = ordreFamilles.flatMap(f => Object.keys(parFamille[f]).filter(g => g)); return toutesGammes.length > 1 ? `<div class="filtres-bar collection-filtres-gammes" data-collection-filtres="${col_id}"><h2 class="page-entete-titre">Gammes de la <em>collection ${nom}</em></h2><div class="filtres-ligne"><button class="filtre-btn actif" data-filtre-gamme="tout" onclick="filtrerGamme('tout', '${col_id}')">Toutes</button>${toutesGammes.map(g => { const prods = ordreFamilles.flatMap(f => parFamille[f][g] || []); const gam_id = prods[0]?.gam_id || ''; return `<button class="filtre-btn" data-filtre-gamme="${gam_id}" onclick="filtrerGamme('${gam_id}', '${col_id}')">${g}</button>`; }).join('')}</div></div>` : ''; })()}
+   ${(() => { const toutesGammes = []; const vus = new Set(); ordreFamilles.forEach(f => { Object.keys(parFamille[f]).filter(g => g).forEach(g => { const gam_id = parFamille[f][g][0]?.gam_id || ''; if (gam_id && !vus.has(gam_id)) { vus.add(gam_id); toutesGammes.push({ nom: g, gam_id }); } }); }); return toutesGammes.length > 1 ? `<div class="filtres-bar collection-filtres-gammes" data-collection-filtres="${col_id}"><h2 class="page-entete-titre">Gammes de la <em>collection ${nom}</em></h2><div class="filtres-ligne"><button class="filtre-btn actif" data-filtre-gamme="tout" onclick="filtrerGamme('tout', '${col_id}')">Toutes</button>${toutesGammes.map(g => `<button class="filtre-btn" data-filtre-gamme="${g.gam_id}" onclick="filtrerGamme('${g.gam_id}', '${col_id}')">${g.nom}</button>`).join('')}</div></div>` : ''; })()}
       ${gammesHTML}`;
     body.appendChild(section);
     if (scrollObserver) {
