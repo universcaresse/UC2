@@ -5,9 +5,8 @@
 
 // ─── CONFIGURATION ───
 const CONFIG = {
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec',
-  MOT_DE_PASSE: '2026'
-};
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec'
+};;
 
 
 // ─── COULEURS COLLECTIONS (fallback si pas de couleur_hex dans la sheet) ───
@@ -194,15 +193,19 @@ function fermerModalConnexion(e) {
   if (e.target === document.getElementById('modal-connexion')) fermerConnexion();
 }
 
-function validerConnexion() {
+async function validerConnexion() {
   const mdp = document.getElementById('input-mdp').value;
-  if (mdp === CONFIG.MOT_DE_PASSE) {
+  const btn = document.getElementById('btn-envoyer-connexion') || document.querySelector('#modal-connexion .bouton');
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  const res = await appelAPIPost('validerMotDePasse', { mdp });
+  if (res && res.success) {
     sessionStorage.setItem('uc_admin', 'true');
     window.location.href = '/UC2/admin/';
   } else {
     document.getElementById('erreur-connexion').classList.remove('cache');
     document.getElementById('input-mdp').value = '';
     document.getElementById('input-mdp').focus();
+    if (btn) { btn.disabled = false; btn.textContent = 'Entrer'; }
   }
 }
 
@@ -390,10 +393,15 @@ function afficherCollectionsFallback() {
 
 // ─── CATALOGUE ───
 let catalogueCharge = false;
+let catalogueTimestamp = null;
+const CATALOGUE_TTL = 30 * 60 * 1000;
 
 function chargerCatalogue() {
-  if (catalogueCharge) return;
+  const maintenant = Date.now();
+  if (catalogueCharge && catalogueTimestamp && (maintenant - catalogueTimestamp) < CATALOGUE_TTL) return;
   catalogueCharge = true;
+  catalogueTimestamp = maintenant;
+  donneesCatalogue = null;
   try {
     if (donneesCatalogue && donneesCatalogue.produits) {
       construireCatalogue();
@@ -714,7 +722,7 @@ function appliquerContenu(c) {
     if (!c) return;
     if (String(c.maintenance_active) === '1') { afficherMaintenance(); return; }
     window.modeSaisonnier = String(c.mode_saisonnier) === 'oui';
-    const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+ const set = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.textContent = val || ''; };
 
     set('contenu-accueil-eyebrow', c.accueil_eyebrow);
     set('contenu-accueil-cta', c.accueil_cta);

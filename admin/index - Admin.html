@@ -10,13 +10,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Birthstone&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css">
 </head>
-<body>
+<body> 
 
   <!-- ACCÈS REFUSÉ -->
   <div class="acces-refuse" id="acces-refuse">
     <div class="acces-refuse-titre">Accès restreint</div>
     <p class="acces-refuse-desc">Vous devez être connecté pour accéder à cette page.</p>
-    <a href="../index.html" class="btn btn-primary">Retour à l'accueil</a>
+    <a href="../index.html" class="bouton">Retour à l'accueil</a>
   </div>
 
   <!-- NAVIGATION -->
@@ -281,7 +281,7 @@
             <div class="page-entete-eyebrow">Gérer les collections</div>
             <div class="page-entete-titre">Collections</div>
           </div>
-          <button class="btn btn-primary" id="btn-nouvelle-collection" onclick="ouvrirFormCollection()">+ Nouvelle collection</button>
+          <button class="bouton" id="btn-nouvelle-collection" onclick="ouvrirFormCollection()">+ Nouvelle collection</button>
         </div>
         <div class="msg-zone" id="msg-collections"></div>
        <div class="form-panel" id="fiche-collection">
@@ -299,9 +299,9 @@
             <div id="fiche-collection-lignes"></div>
             <hr class="separateur">
             <div class="form-actions">
-              <button class="btn btn-primary" id="fiche-collection-modifier">Modifier la collection</button>
-              <button class="btn btn-danger" id="btn-supprimer-collection">Supprimer la collection</button>
-              <button class="btn btn-secondary" id="fiche-collection-ajouter-ligne">+ Ajouter une ligne</button>
+              <button class="bouton" id="fiche-collection-modifier">Modifier la collection</button>
+              <button class="bouton bouton-rouge" id="btn-supprimer-collection">Supprimer la collection</button>
+              <button class="bouton bouton-vert-pale" id="fiche-collection-ajouter-ligne">+ Ajouter une ligne</button>
             </div>
           </div>
        </div> 
@@ -331,8 +331,8 @@
             </div>
           <hr class="separateur">
           <div class="form-actions fiche-ligne-actions">
-              <button class="btn btn-primary" id="fiche-ligne-modifier">Modifier la ligne</button>
-              <button class="btn btn-danger" id="btn-supprimer-ligne-fiche">Supprimer la ligne</button>
+              <button class="bouton" id="fiche-ligne-modifier">Modifier la ligne</button>
+              <button class="bouton bouton-rouge" id="btn-supprimer-ligne-fiche">Supprimer la ligne</button>
             </div>
           </div>
         </div>
@@ -375,8 +375,8 @@
                   <label class="form-label">Photo collection</label>
                   <div class="cloudinary-zone">
                     <input type="text" class="form-ctrl" id="fc-photo-url">
-                    <button type="button" class="btn btn-secondary" onclick="ouvrirCloudinaryCollection()">Choisir une photo</button>
-<button type="button" class="btn btn-secondary" onclick="ouvrirMediatheque('fc-photo-url', 'fc-photo-preview', 'Collection')">Médiathèque</button>
+                    <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryCollection()">Choisir une photo</button>
+<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url', 'fc-photo-preview', 'Collection')">Médiathèque</button>
 
 
 
@@ -388,8 +388,8 @@
                   <label class="form-label">Photo collection — saisonnière</label>
                   <div class="cloudinary-zone">
                     <input type="text" class="form-ctrl" id="fc-photo-url-noel">
-                    <button type="button" class="btn btn-secondary" onclick="ouvrirCloudinaryCollectionNoel()">Choisir une photo</button>
-<button type="button" class="btn btn-secondary" onclick="ouvrirMediatheque('fc-photo-url-noel', 'fc-photo-preview-noel', 'Collection Noël')">Médiathèque</button>
+                    <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryCollectionNoel()">Choisir une photo</button>
+<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url-noel', 'fc-photo-preview-noel', 'Collection Noël')">Médiathèque</button>
                   </div>
                   <div id="fc-photo-preview-noel"></div>
                 </div>
@@ -420,15 +420,15 @@
                   <label class="form-label">Photo ligne</label>
                   <div class="cloudinary-zone">
                     <input type="text" class="form-ctrl" id="fc-photo-url-ligne">
-                    <button type="button" class="btn btn-secondary" onclick="ouvrirCloudinaryLigne()">Choisir une photo</button>
-<button type="button" class="btn btn-secondary" onclick="ouvrirMediatheque('fc-photo-url-ligne', 'fc-photo-preview-ligne', 'Collection')">Médiathèque</button>
+                    <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryLigne()">Choisir une photo</button>
+<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url-ligne', 'fc-photo-preview-ligne', 'Collection')">Médiathèque</button>
                   </div>
                   <div id="fc-photo-preview-ligne"></div>
                 </div>
                 <div class="form-groupe col-plein" id="zone-ingredients-base">
                   <label class="form-label">Ingrédients de base</label>
                   <div id="liste-ingredients-base"></div>
-                  <button type="button" class="btn btn-secondary btn-ajouter-ingredient" onclick="ajouterIngredientBase()">+ Ajouter un ingrédient</button>
+                  <button type="button" class="bouton bouton-vert-pale btn-ajouter-ingredient" onclick="ajouterIngredientBase()">+ Ajouter un ingrédient</button>
                 </div>
               </div>
             </div>
@@ -436,9 +436,9 @@
  
             <hr class="separateur">
             <div class="form-actions">
-              <button class="btn btn-primary" onclick="sauvegarderCollection()">Enregistrer</button>
-              <button class="btn btn-secondary" onclick="fermerFormCollection()">Annuler</button>
-              <button class="btn btn-danger cache" id="btn-supprimer-ligne">Supprimer la ligne</button>
+              <button class="bouton" onclick="sauvegarderCollection()">Enregistrer</button>
+              <button class="bouton bouton-vert-pale" onclick="fermerFormCollection()">Annuler</button>
+              <button class="bouton bouton-rouge cache" id="btn-supprimer-ligne">Supprimer la ligne</button>
             </div>
           </div>
         </div>
@@ -458,7 +458,7 @@
             <div class="page-entete-eyebrow">Gérer les familles de produits</div>
             <div class="page-entete-titre">Familles</div>
           </div>
-          <button class="btn btn-primary" id="btn-nouvelle-famille" onclick="ouvrirFormFamille()">+ Nouvelle famille</button>
+          <button class="bouton" id="btn-nouvelle-famille" onclick="ouvrirFormFamille()">+ Nouvelle famille</button>
         </div>
         <div class="msg-zone" id="msg-familles"></div>
         <div class="form-panel" id="fiche-famille">
@@ -477,8 +477,8 @@
             </div>
             <hr class="separateur">
             <div class="form-actions">
-              <button class="btn btn-primary" id="fiche-famille-modifier">Modifier</button>
-              <button class="btn btn-danger" id="btn-supprimer-famille">Supprimer</button>
+              <button class="bouton" id="fiche-famille-modifier">Modifier</button>
+              <button class="bouton bouton-rouge" id="btn-supprimer-famille">Supprimer</button>
             </div>
           </div>
         </div>
@@ -511,8 +511,8 @@
             </div>
             <hr class="separateur">
             <div class="form-actions">
-              <button class="btn btn-primary" onclick="sauvegarderFamille()">Enregistrer</button>
-              <button class="btn btn-secondary" onclick="fermerFormFamille()">Annuler</button>
+              <button class="bouton" onclick="sauvegarderFamille()">Enregistrer</button>
+              <button class="bouton bouton-vert-pale" onclick="fermerFormFamille()">Annuler</button>
             </div>
           </div>
         </div>
@@ -531,7 +531,7 @@
             <div class="page-entete-eyebrow">Gérer les produits</div>
             <div class="page-entete-titre">Produits</div>
           </div>
-          <button class="btn btn-primary" id="btn-nouvelle-recette" onclick="ouvrirFormRecette()">+ Nouvelle recette</button>
+          <button class="bouton" id="btn-nouvelle-recette" onclick="ouvrirFormRecette()">+ Nouvelle recette</button>
         </div>
        <div class="msg-zone" id="msg-produits"></div>
 	   
@@ -553,7 +553,7 @@
 			 <option value="complet">Complètes</option>
             <option value="incomplet">Incomplètes</option>
           </select>
-          <button class="btn btn-outline btn-sm" onclick="reinitialiserFiltresRecettes()">Réinitialiser</button>
+          <button class="bouton bouton-petit bouton-contour" onclick="reinitialiserFiltresRecettes()">Réinitialiser</button>
         </div>
         <div class="form-panel" id="fiche-recette">
           <button class="btn-fermer-panneau" onclick="fermerFicheRecette()" title="Fermer">✕</button>
@@ -563,8 +563,8 @@
           <div class="form-body" id="fiche-recette-contenu"></div>
           <hr class="separateur">
           <div class="form-actions">
-            <button class="btn btn-primary" onclick="basculerModeEditionRecette()">Modifier</button>
-            <button class="btn btn-danger" onclick="supprimerRecetteActive()">Supprimer</button>
+            <button class="bouton" onclick="basculerModeEditionRecette()">Modifier</button>
+            <button class="bouton bouton-rouge" onclick="supprimerRecetteActive()">Supprimer</button>
           </div>
         </div>
        
@@ -654,8 +654,8 @@
               <label class="form-label">Photo principale</label>
               <div class="cloudinary-zone">
                 <input type="text" class="form-ctrl" id="fr-image-url">
-                <button type="button" class="btn btn-secondary" onclick="ouvrirCloudinary()">Choisir une photo</button>
-<button type="button" class="btn btn-secondary" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">Médiathèque</button>
+                <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinary()">Choisir une photo</button>
+<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">Médiathèque</button>
               </div>
               <div id="fr-image-preview"></div>
             </div>
@@ -663,8 +663,8 @@
               <label class="form-label">Photo secondaire</label>
               <div class="cloudinary-zone">
                 <input type="text" class="form-ctrl" id="fr-image-url-noel">
-                <button type="button" class="btn btn-secondary" onclick="ouvrirMediaLibrary('fr-image-url-noel', 'fr-image-preview-noel')">Choisir une photo</button>
-<button type="button" class="btn btn-secondary" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">Médiathèque</button>
+                <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediaLibrary('fr-image-url-noel', 'fr-image-preview-noel')">Choisir une photo</button>
+<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">Médiathèque</button>
 
               </div>
               <div id="fr-image-preview-noel"></div>
@@ -672,17 +672,17 @@
            <div class="form-groupe col-plein" id="zone-ingredients-recette">
               <label class="form-label">Ingrédients</label>
               <div id="liste-ingredients-recette"></div>
-              <button type="button" class="btn btn-secondary btn-ajouter-ingredient" onclick="ajouterIngredientRecette()">+ Ajouter un ingrédient</button>
+              <button type="button" class="bouton bouton-vert-pale btn-ajouter-ingredient" onclick="ajouterIngredientRecette()">+ Ajouter un ingrédient</button>
             </div>
             <div class="form-groupe col-plein" id="zone-formats-recette">
               <label class="form-label">Formats disponibles</label>
               <div id="liste-formats-recette"></div>
-              <button type="button" class="btn btn-secondary btn-ajouter-ingredient" onclick="ajouterFormatRecette()">+ Ajouter un format</button>
+              <button type="button" class="bouton bouton-vert-pale btn-ajouter-ingredient" onclick="ajouterFormatRecette()">+ Ajouter un format</button>
             </div>
             <hr class="separateur">
             <div class="form-actions">
-              <button class="btn btn-primary" onclick="sauvegarderRecette()">Enregistrer</button>
-              <button class="btn btn-secondary" onclick="fermerFormRecette()">Annuler</button>
+              <button class="bouton" onclick="sauvegarderRecette()">Enregistrer</button>
+              <button class="bouton bouton-vert-pale" onclick="fermerFormRecette()">Annuler</button>
             </div>
           </div>
         </div>
@@ -762,7 +762,7 @@
 
         </div>
         <div class="form-actions">
-          <button class="btn btn-primary" onclick="wizardEtape2()">Suivant →</button>
+          <button class="bouton" onclick="wizardEtape2()">Suivant →</button>
         </div>
       </div>
     </div>
@@ -850,7 +850,7 @@
 
         </div>
         <div class="form-actions">
-          <button class="btn btn-primary" onclick="ajouterItem()">+ Ajouter</button>
+          <button class="bouton" onclick="ajouterItem()">+ Ajouter</button>
         </div>
       </div>
     </div>
@@ -860,9 +860,9 @@
 
     <!-- Navigation -->
     <div class="form-actions mt-24">
-      <button class="btn btn-outline" onclick="wizardEtape1()">← Retour</button>
-      <button class="btn btn-secondary" onclick="terminerPlusTard()">Terminer plus tard</button>
-      <button class="btn btn-primary" onclick="wizardEtape3()">Suivant →</button>
+      <button class="bouton bouton-contour" onclick="wizardEtape1()">← Retour</button>
+      <button class="bouton bouton-vert-pale" onclick="terminerPlusTard()">Terminer plus tard</button>
+      <button class="bouton" onclick="wizardEtape3()">Suivant →</button>
     </div>
 
   </div>
@@ -912,8 +912,8 @@
       </div>
 
       <div class="form-actions mt-24">
-        <button class="btn btn-outline" onclick="wizardEtape2()">← Retour</button>
-        <button class="btn btn-finaliser" onclick="finaliserFacture()">Finaliser</button>
+        <button class="bouton bouton-contour" onclick="wizardEtape2()">← Retour</button>
+        <button class="bouton bouton-or" onclick="finaliserFacture()">Finaliser</button>
       </div>
 
     </div>
@@ -945,7 +945,7 @@
             </div>
             <div class="form-actions">
               <span></span>
-              <button class="btn btn-primary" onclick="importerFacturePDF()">Lire le PDF</button>
+              <button class="bouton" onclick="importerFacturePDF()">Lire le PDF</button>
             </div>
           </div>
         </div>
@@ -1005,8 +1005,8 @@
               </div>
               <div id="if-validation" class="msg-zone" style="margin-top:0.5rem;"></div>
               <div class="form-actions" style="margin-top:1rem;">
-                <button class="btn btn-outline" onclick="document.getElementById('if-apercu').classList.add('cache')">Annuler</button>
-                <button class="btn btn-primary" id="if-btn-confirmer" onclick="confirmerImportFacture()">Confirmer l'import</button>
+                <button class="bouton bouton-contour" onclick="document.getElementById('if-apercu').classList.add('cache')">Annuler</button>
+                <button class="bouton" id="if-btn-confirmer" onclick="confirmerImportFacture()">Confirmer l'import</button>
               </div>
             </div>
           </div>
@@ -1083,7 +1083,7 @@
             <div class="page-entete-eyebrow">Stocks — factures finalisées seulement</div>
             <div class="page-entete-titre">Inventaire</div>
           </div>
-          <button class="btn btn-outline" onclick="chargerInventaire()">Actualiser</button>
+          <button class="bouton bouton-contour" onclick="chargerInventaire()">Actualiser</button>
         </div>
         <div class="msg-zone" id="msg-inventaire"></div>
         <div class="filtres-factures" id="filtres-inventaire">
@@ -1111,8 +1111,8 @@
             <div class="page-entete-eyebrow">Production</div>
             <div class="page-entete-titre">Fabrication</div>
           </div>
-          <button class="btn btn-primary" onclick="ouvrirFormFabrication()">+ Nouveau lot</button>
-          <button class="btn btn-outline" onclick="ouvrirFormFabrication(true)">Entrer un lot existant</button>
+          <button class="bouton" onclick="ouvrirFormFabrication()">+ Nouveau lot</button>
+          <button class="bouton bouton-contour" onclick="ouvrirFormFabrication(true)">Entrer un lot existant</button>
         </div>
         <div class="msg-zone" id="msg-fabrication"></div>
         <div class="chargement" id="loading-fabrication"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
@@ -1188,8 +1188,8 @@
             </div>
 
             <div class="form-actions">
-              <button class="btn btn-outline" onclick="fermerFormFabrication()">Annuler</button>
-              <button class="btn btn-primary" onclick="sauvegarderLot()">Confirmer</button>
+              <button class="bouton bouton-contour" onclick="fermerFormFabrication()">Annuler</button>
+              <button class="bouton" onclick="sauvegarderLot()">Confirmer</button>
             </div>
           </div>
         </div>
@@ -1217,7 +1217,7 @@
             <div class="page-entete-titre">Contenu du site</div>
           </div>
           <div class="form-actions">
-            <button class="btn btn-primary" onclick="sauvegarderContenuSite()">Enregistrer</button>
+            <button class="bouton" onclick="sauvegarderContenuSite()">Enregistrer</button>
             
           </div>
         </div>
@@ -1238,7 +1238,7 @@
               </div>
               <div class="form-groupe">
                 <label class="form-label">Mode saisonnier</label>
-                <button class="btn btn-secondary" id="btn-mode-saisonnier" onclick="toggleModeSaisonnier()">🌲 Mode saisonnier est OFF</button>
+                <button class="bouton bouton-vert-pale" id="btn-mode-saisonnier" onclick="toggleModeSaisonnier()">🌲 Mode saisonnier est OFF</button>
               </div>
             </div>
           </div>
@@ -1434,7 +1434,7 @@
             <div class="page-entete-eyebrow">Validation des sources</div>
             <div class="page-entete-titre">Ingrédients <em>INCI</em></div>
           </div>
-          <button class="btn btn-outline btn-sm cache" id="btn-retour-recette" onclick="retourRecetteDepuisInci()">← Retour à la recette</button>
+          <button class="bouton bouton-petit bouton-contour cache" id="btn-retour-recette" onclick="retourRecetteDepuisInci()">← Retour à la recette</button>
         </div>
         <div class="msg-zone" id="msg-inci"></div>
 
@@ -1485,8 +1485,8 @@
           <div class="form-groupe">
             <input type="file" class="cache" id="import-md-fichier" accept=".md" onchange="importLireFichier(this)">
             <input type="file" class="cache" id="import-md-lot" accept=".md" multiple onchange="importEnLot(this)">
-            <button class="btn btn-secondary" onclick="document.getElementById('import-md-fichier').click()">Choisir un fichier .md</button>
-            <button class="btn btn-primary" onclick="document.getElementById('import-md-lot').click()">Importer en lot</button>
+            <button class="bouton bouton-vert-pale" onclick="document.getElementById('import-md-fichier').click()">Choisir un fichier .md</button>
+            <button class="bouton" onclick="document.getElementById('import-md-lot').click()">Importer en lot</button>
           </div>
           <textarea class="cache" id="import-md-texte"></textarea>
         </div>
@@ -1563,8 +1563,8 @@
     </div>
   </div>
   <div class="form-actions">
-    <button class="btn btn-primary" onclick="importEnvoyer()">Importer</button>
-    <button class="btn btn-outline" onclick="importAnnuler()">Annuler</button>
+    <button class="bouton" onclick="importEnvoyer()">Importer</button>
+    <button class="bouton bouton-contour" onclick="importAnnuler()">Annuler</button>
   </div>
 </div>
       </div>
@@ -1576,7 +1576,7 @@
             <div class="page-entete-eyebrow">Facteurs de conversion ml → g par type d'ingrédient</div>
             <div class="page-entete-titre">Densités</div>
           </div>
-          <button class="btn btn-primary" id="btn-nouvelle-densite" onclick="ouvrirFormDensite()">+ Nouveau type</button>
+          <button class="bouton" id="btn-nouvelle-densite" onclick="ouvrirFormDensite()">+ Nouveau type</button>
         </div>
         <div class="msg-zone" id="msg-densites"></div>
        <div class="form-panel" id="form-densites">
@@ -1614,8 +1614,8 @@
             </div>
             <hr class="separateur">
             <div class="form-actions">
-              <button class="btn btn-primary" onclick="sauvegarderDensite()">Enregistrer</button>
-              <button class="btn btn-secondary" onclick="fermerFormDensite()">Annuler</button>
+              <button class="bouton" onclick="sauvegarderDensite()">Enregistrer</button>
+              <button class="bouton bouton-vert-pale" onclick="fermerFormDensite()">Annuler</button>
             </div>
           </div>
         </div>
@@ -1639,8 +1639,8 @@
       <div class="page-entete-titre">Médiathèque</div>
     </div>
     <div class="form-actions">
-      <button class="btn btn-primary" onclick="mediathequeOuvrirAjout()">+ Ajouter une photo</button>
-      <button class="btn btn-secondary" onclick="mediathequeSyncCloudinary()">↺ Synchroniser Cloudinary</button>
+      <button class="bouton" onclick="mediathequeOuvrirAjout()">+ Ajouter une photo</button>
+      <button class="bouton bouton-vert-pale" onclick="mediathequeSyncCloudinary()">↺ Synchroniser Cloudinary</button>
     </div>
   </div>
   <div class="msg-zone" id="msg-mediatheque"></div>
@@ -1669,8 +1669,8 @@
       </select>
     </div>
     <div class="form-actions">
-      <button class="btn btn-primary" onclick="mediathequeSauvegarder()">Sauvegarder</button>
-      <button class="btn btn-outline" onclick="mediathequeFermerAjout()">Annuler</button>
+      <button class="bouton" onclick="mediathequeSauvegarder()">Sauvegarder</button>
+      <button class="bouton bouton-contour" onclick="mediathequeFermerAjout()">Annuler</button>
     </div>
   </div>
   <div class="filtres-bar">
@@ -1697,7 +1697,7 @@
       <h2 class="connexion-titre">Administration</h2>
   <input type="password" id="input-mdp-admin" class="form-ctrl">
       <p id="erreur-mdp-admin" class="connexion-erreur"></p>
-      <button class="btn btn-primary" onclick="validerConnexionAdmin()">Entrer</button>
+      <button class="bouton" onclick="validerConnexionAdmin()">Entrer</button>
     </div>
   </div>
 
@@ -1738,8 +1738,8 @@
       </div>
       <div class="modal-admin-body">
         <div class="form-actions">
-          <button class="btn btn-outline btn-sm" onclick="fermerModalAjouterInci()">Annuler</button>
-          <button class="btn btn-primary btn-sm" id="modal-inci-btn-go" onclick="modalInciGo()">Go</button>
+          <button class="bouton bouton-petit bouton-contour" onclick="fermerModalAjouterInci()">Annuler</button>
+          <button class="bouton bouton-petit" id="modal-inci-btn-go" onclick="modalInciGo()">Go</button>
         </div>
       </div>
     </div>
@@ -1751,8 +1751,8 @@
         <div class="modal-admin-titre" id="modal-confirm-message"></div>
       </div>
       <div class="modal-admin-body" style="display:flex;gap:12px;justify-content:flex-end;padding:16px">
-        <button class="btn btn-outline btn-sm" onclick="fermerModalConfirm()">Annuler</button>
-        <button class="btn btn-danger btn-sm" id="modal-confirm-btn">Confirmer</button>
+        <button class="bouton bouton-petit bouton-contour" onclick="fermerModalConfirm()">Annuler</button>
+        <button class="bouton bouton-petit bouton-rouge" id="modal-confirm-btn">Confirmer</button>
       </div>
     </div>
   </div>
@@ -1769,8 +1769,8 @@
       </div>
       <div class="modal-admin-body">
         <div class="form-actions">
-          <button class="btn btn-outline btn-sm" onclick="fermerModalNomUC()">Annuler</button>
-          <button class="btn btn-primary btn-sm" onclick="confirmerModalNomUC()">Ajouter</button>
+          <button class="bouton bouton-petit bouton-contour" onclick="fermerModalNomUC()">Annuler</button>
+          <button class="bouton bouton-petit" onclick="confirmerModalNomUC()">Ajouter</button>
         </div>
       </div>
     </div>
@@ -1794,7 +1794,7 @@
     </div>
     <div class="modal-admin-body">
       <div class="form-actions">
-        <button class="btn btn-outline btn-sm" onclick="fermerModalMediatheque()">Annuler</button>
+        <button class="bouton bouton-petit bouton-contour" onclick="fermerModalMediatheque()">Annuler</button>
       </div>
     </div>
   </div>

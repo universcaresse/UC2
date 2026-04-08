@@ -171,9 +171,10 @@ function afficherSection(id, bouton) {
 }
 
 // ─── STATS ACCUEIL ───
-function validerConnexionAdmin() {
+async function validerConnexionAdmin() {
   const mdp = document.getElementById('input-mdp-admin')?.value;
-  if (mdp === CONFIG.MOT_DE_PASSE) {
+  const res = await appelAPIPost('validerMotDePasse', { mdp });
+  if (res && res.success) {
     sessionStorage.setItem('uc_admin', 'true');
     window.location.reload();
   } else {
@@ -1411,6 +1412,11 @@ async function mediathequeSauvegarder() {
 
 async function mediathequeSupprimer(rowIndex, nom) {
   if (!confirm(`Supprimer "${nom}" de la médiathèque?`)) return;
+  const resActuel = await appelAPI('getMediatheque');
+  if (resActuel && resActuel.success) {
+    const item = (resActuel.items || []).find(i => i.nom === nom);
+    if (item) rowIndex = item.rowIndex;
+  }
   const res = await appelAPIPost('supprimerMediatheque', { rowIndex });
   if (!res || !res.success) { afficherMsg('mediatheque', 'Erreur de suppression.', 'erreur'); return; }
   _mediathequeDonnees = null;
@@ -1909,8 +1915,8 @@ async function ajouterItem() {
     let qteEnG = qte;
     if (formatUnite === 'g')   qteEnG = qte;
     if (formatUnite === 'kg')  qteEnG = qte * 1000;
-    if (formatUnite === 'L')   qteEnG = qte * 1000 * (cfg.densite || 1);
-    if (formatUnite === 'ml')  qteEnG = qte * (cfg.densite || 1);
+    if (formatUnite === 'L')   qteEnG = qte * 1000;
+    if (formatUnite === 'ml')  qteEnG = qte;
     if (formatUnite === 'lbs') qteEnG = qte * 453.592;
     const prixParGBrut = qteEnG > 0 ? parseFloat(prixUnit) / qteEnG : null;
     prixParG = prixParGBrut !== null ? prixParGBrut * (1 + (perte / 100)) : null;
@@ -2057,7 +2063,7 @@ async function chargerFactures() {
   toutesFactures = (resAch.items || []).map(a => ({
     ...a,
     numero:      a.ach_id,
-    fournisseur: fournisseursMap[a.four_id] || a.four_id,
+    fournisseur: fournisseursMap[a.four_id] || a.four_id || '—',
     dateRaw:     a.date,
     total:       a.total,
     statut:      a.statut
@@ -2139,6 +2145,10 @@ function afficherFactures(liste) {
 }
 
 async function voirDetailFacture(ach_id) {
+  if (!listesDropdown.fullData || !listesDropdown.fullData.length) {
+    const resInci = await appelAPI('getIngredientsInci');
+    if (resInci && resInci.success) listesDropdown.fullData = resInci.items || [];
+  }
   const facture = toutesFactures.find(f => f.ach_id === ach_id);
   const modal   = document.getElementById('modal-facture');
   modal.classList.add('ouvert');
@@ -2836,10 +2846,10 @@ async function confirmerImportFacture() {
     let grammes  = item.formatQte;
     if (item.formatUnite === 'l')  grammes = item.formatQte * 1000;
     if (item.formatUnite === 'kg') grammes = item.formatQte * 1000;
-    if (item.formatUnite === 'ml') grammes = item.formatQte * (config.densite || 1);
+    if (item.formatUnite === 'ml') grammes = item.formatQte;
     const prixParG = grammes > 0 ? (item.prixUnitaire / grammes) : 0;
 
-    await appelAPIPost('addAchatLigne', {
+    const resLigne = await appelAPIPost('addAchatLigne', {
       ach_id,
       ing_id:       ingObj?.ing_id || '',
       format_qte:   item.formatQte,
@@ -2848,6 +2858,11 @@ async function confirmerImportFacture() {
       prix_par_g:   prixParG.toFixed(6),
       quantite:     item.quantite
     });
+    if (!resLigne || !resLigne.success) {
+      afficherMsg('import-facture', `❌ Erreur à l'item ${idx + 1} (${item.description}) — import annulé. Supprimer la facture ${ach_id} manuellement.`, 'erreur');
+      btn.disabled = false;
+      return;
+    }
   }
 
   await appelAPIPost('finaliserAchat', { ach_id, sous_total: sousTotal, tps, tvq, livraison });
