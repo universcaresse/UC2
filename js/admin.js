@@ -775,21 +775,14 @@ var produitActif      = null;
 var collectionsDisponibles = {};
 
 async function chargerProduitsData() {
-  const [resPro, resFmt] = await Promise.all([appelAPI('getProduits'), appelAPI('getProduitsFormats')]);
-  if (!resPro || !resPro.success) { afficherMsg('produits', 'Erreur.', 'erreur'); return; }
-  const formatsMap = {};
-  if (resFmt && resFmt.success) {
-    (resFmt.items || []).forEach(f => {
-      if (!formatsMap[f.pro_id]) formatsMap[f.pro_id] = [];
-      formatsMap[f.pro_id].push({ poids: f.poids, unite: f.unite, prix_vente: f.prix_vente });
-    });
-  }
-  donneesProduits = (resPro.items || []).sort((a, b) => {
+  const res = await appelAPI('getProduits');
+  if (!res || !res.success) { afficherMsg('produits', 'Erreur.', 'erreur'); return; }
+  donneesProduits = (res.items || []).sort((a, b) => {
     const colA = donneesCollections.find(c => c.col_id === a.col_id);
     const colB = donneesCollections.find(c => c.col_id === b.col_id);
     return ((colA?.rang || 99) - (colB?.rang || 99)) ||
            (a.nom || '').localeCompare(b.nom || '');
-  }).map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
+  });
   afficherProduits();
 }
 
