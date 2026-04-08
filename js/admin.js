@@ -81,9 +81,11 @@ if (resGam && resGam.success) {
     donneesProduits = (resPro.items || []).sort((a, b) => {
       const colA = donneesCollections.find(c => c.col_id === a.col_id);
       const colB = donneesCollections.find(c => c.col_id === b.col_id);
-      return ((colA?.rang || 99) - (colB?.rang || 99)) ||
-             (a.nom_gamme || '').localeCompare(b.nom_gamme || '') ||
-             (a.nom || '').localeCompare(b.nom || '');
+         const gamA = donneesGammes.find(g => g.gam_id === a.gam_id);
+    const gamB = donneesGammes.find(g => g.gam_id === b.gam_id);
+    return ((colA?.rang || 99) - (colB?.rang || 99)) ||
+           ((gamA?.rang || 99) - (gamB?.rang || 99)) ||
+           (a.nom || '').localeCompare(b.nom || '');
    });
     donneesProduits = donneesProduits.map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
   }
@@ -343,6 +345,7 @@ function ouvrirFormFamille() {
   fermerFicheFamille();
   document.getElementById('form-familles-titre').textContent = 'Nouvelle famille';
   document.getElementById('ff-id').value          = '';
+  document.getElementById('ff-rang').value        = '';
   document.getElementById('ff-nom').value         = '';
   document.getElementById('ff-desc').value        = '';
   document.getElementById('ff-couleur-hex').value = '';
@@ -371,7 +374,8 @@ function modifierFamille(fam_id) {
   const fam = donneesFamilles.find(f => f.fam_id === fam_id);
   if (!fam) return;
   document.getElementById('form-familles-titre').textContent = 'Modifier la famille';
-  document.getElementById('ff-id').value          = fam.fam_id;
+ document.getElementById('ff-id').value          = fam.fam_id;
+  document.getElementById('ff-rang').value        = fam.rang || '';
   document.getElementById('ff-nom').value         = fam.nom || '';
   document.getElementById('ff-desc').value        = fam.description || '';
   document.getElementById('ff-couleur-hex').value = fam.couleur_hex || '';
@@ -396,7 +400,7 @@ async function sauvegarderFamille() {
   const d = {
     fam_id:      id || ('FAM-' + Date.now()),
     col_id,
-    rang:        1,
+    rang:        parseInt(document.getElementById('ff-rang')?.value) || 99,
     nom,
     description: document.getElementById('ff-desc').value,
     couleur_hex: document.getElementById('ff-couleur-hex').value
@@ -412,9 +416,14 @@ async function sauvegarderFamille() {
 }
 
 async function supprimerFamille(fam_id) {
-  const produitsLies = donneesProduits.filter(p => p.fam_id === fam_id);
+  const resPro = await appelAPI('getProduits');
+  const tousLesProduits = (resPro && resPro.success) ? resPro.items : donneesProduits;
+  const produitsLies = tousLesProduits.filter(p => 
+    p.col_id === col_id || 
+    (Array.isArray(p.collections_secondaires) && p.collections_secondaires.includes(col_id))
+  );
   if (produitsLies.length > 0) {
-    afficherMsg('familles', `Impossible — ${produitsLies.length} produit(s) référencent cette famille.`, 'erreur');
+    afficherMsg('collections', `Impossible — ${produitsLies.length} produit(s) sont liés à cette collection.`, 'erreur');
     return;
   }
   confirmerAction('Supprimer cette famille ?', async () => {
@@ -601,7 +610,7 @@ function ouvrirFormGamme(col_id) {
   document.getElementById('fc-bloc-collection').classList.add('cache');
   document.getElementById('fc-bloc-ligne').classList.remove('cache');
   document.getElementById('fc-collection-ligne').value = col_id || '';
-  ['fc-ligne','fc-desc-ligne','fc-couleur-hex-ligne','fc-photo-url-ligne'].forEach(id => {
+ ['fc-rang-ligne','fc-ligne','fc-desc-ligne','fc-couleur-hex-ligne','fc-photo-url-ligne'].forEach(id => {
     const e = document.getElementById(id); if (e) e.value = '';
   });
   document.getElementById('contenu-collections').classList.add('cache');
@@ -621,7 +630,8 @@ async function modifierGamme(gam_id) {
   document.getElementById('fc-bloc-collection').classList.add('cache');
   document.getElementById('fc-bloc-ligne').classList.remove('cache');
   document.getElementById('fc-collection-ligne').value = gam.col_id || '';
-  document.getElementById('fc-ligne').value            = gam.nom || '';
+  document.getElementById('fc-rang-ligne').value        = gam.rang || '';
+  document.getElementById('fc-ligne').value             = gam.nom || '';
   document.getElementById('fc-desc-ligne').value       = gam.description || '';
   document.getElementById('fc-couleur-hex-ligne').value = gam.couleur_hex || '';
   document.getElementById('fc-photo-url-ligne').value  = gam.photo_url || '';
@@ -682,7 +692,7 @@ async function sauvegarderCollection() {
     const d = {
       gam_id:      rowIndex || ('GAM-' + Date.now()),
       col_id,
-      rang:        1,
+      rang:        parseInt(document.getElementById('fc-rang-ligne')?.value) || 99,
       nom,
       description: document.getElementById('fc-desc-ligne').value,
       couleur_hex: document.getElementById('fc-couleur-hex-ligne')?.value || '',
@@ -746,10 +756,11 @@ async function supprimerCollection(col_id) {
     return;
   }
   const gammes = donneesGammes.filter(g => g.col_id === col_id);
-  const msg = gammes.length > 0
-    ? `Cette collection contient ${gammes.length} gamme(s). Supprimer quand même ?`
-    : 'Supprimer cette collection ?';
-  confirmerAction(msg, async () => {
+  if (gammes.length > 0) {
+    afficherMsg('collections', `Impossible — ${gammes.length} gamme(s) sont liées à cette collection.`, 'erreur');
+    return;
+  }
+  confirmerAction('Supprimer cette collection ?', async () => {
     const res = await appelAPIPost('deleteCollection', { col_id });
     if (res && res.success) {
       fermerFicheCollection();
@@ -764,9 +775,11 @@ async function supprimerCollection(col_id) {
 async function supprimerGamme(gam_id) {
   const gam = donneesGammes.find(g => g.gam_id === gam_id);
   if (!gam) return;
-  const produitsLies = donneesProduits.filter(p => p.gam_id === gam_id);
+  const resPro = await appelAPI('getProduits');
+  const tousLesProduits = (resPro && resPro.success) ? resPro.items : donneesProduits;
+  const produitsLies = tousLesProduits.filter(p => p.gam_id === gam_id);
   if (produitsLies.length > 0) {
-    afficherMsg('collections', `Impossible — ${produitsLies.length} produit(s) référencent cette gamme.`, 'erreur');
+    afficherMsg('collections', `Impossible — ${produitsLies.length} produit(s) sont liés à cette gamme.`, 'erreur');
     return;
   }
  confirmerAction('Supprimer cette gamme ?', async () => {
@@ -1026,7 +1039,7 @@ async function mettreAJourLignes() {
   const col_id = document.getElementById('fr-collection').value;
   const sel    = document.getElementById('fr-ligne');
   sel.innerHTML = '<option value="">— Choisir —</option>';
-  const gammes = (collectionsDisponibles[col_id] || []).sort((a, b) => (a.nom || '').localeCompare(b.nom || ''));
+  const gammes = (collectionsDisponibles[col_id] || []).sort((a, b) => (a.rang || 99) - (b.rang || 99));
   if (!gammes.length) { sel.innerHTML = '<option value="">— Aucune gamme —</option>'; return; }
   gammes.forEach(g => {
     const o = document.createElement('option'); o.value = g.gam_id; o.textContent = g.nom; sel.appendChild(o);
@@ -1121,7 +1134,7 @@ function fermerFicheRecette() { fermerFicheProduit(); }
 
 function ouvrirFormRecette() { ouvrirFormProduit(); }
 
-function ouvrirFormProduit() {
+async function ouvrirFormProduit() {
   formatsRecette = [];
   ingredientsRecette = [];
   document.getElementById('form-recettes-titre').textContent = 'Nouveau produit';
@@ -1144,6 +1157,7 @@ function ouvrirFormProduit() {
   document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
   document.getElementById('grille-produits').classList.add('cache');
   document.getElementById('btn-nouvelle-recette').classList.add('cache');
+  await chargerCollectionsPourSelecteur();
   document.getElementById('form-recettes').classList.add('visible');
   rafraichirListeIngredientsRecette();
   rafraichirListeFormatsRecette();
@@ -1186,7 +1200,8 @@ async function modifierProduit(pro_id) {
   document.getElementById('fr-notes').value                    = pro.notes || '';
   document.getElementById('fr-surgras').value                  = pro.surgras || '';
   document.getElementById('fr-statut').value                   = pro.statut || 'test';
-  document.getElementById('fr-collection').value               = pro.col_id || '';
+ document.getElementById('fr-collection').value               = pro.col_id || '';
+  await chargerCollectionsPourSelecteur();
   await mettreAJourLignes();
   document.getElementById('fr-ligne').value                    = pro.gam_id || '';
   const selFamProd = document.getElementById('fr-famille');
@@ -1269,8 +1284,44 @@ async function sauvegarderRecette() {
     }))
   };
 
-  if (!d.nom) { afficherMsg('recettes', 'Le nom est requis.', 'erreur'); return; }
+  if (!d.nom) { afficherMsg('recettes', 'Le nom est requis.', 'erreur'); if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; } return; }
+  if (!d.col_id) { afficherMsg('recettes', 'La collection est requise.', 'erreur'); if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; } return; }
+  if (!d.gam_id) { afficherMsg('recettes', 'La gamme est requise.', 'erreur'); if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; } return; }
 
+  if (id && ingredientsRecette.length === 0) {
+    const resIngs = await appelAPI('getProduitsIngredients', { pro_id: id });
+    if (resIngs && resIngs.success && resIngs.items.length > 0) {
+      ingredientsRecette = resIngs.items.map(i => ({
+        ing_id:   i.ing_id,
+        type:     (listesDropdown.fullData.find(d => d.ing_id === i.ing_id) || {}).cat_id || '',
+        nom:      i.nom_ingredient,
+        quantite: i.quantite_g
+      }));
+      d.ingredients = ingredientsRecette.map(i => ({
+        ing_id:         i.ing_id || '',
+        nom_ingredient: i.nom,
+        quantite_g:     i.quantite
+      }));
+    }
+  }
+  if (id && formatsRecette.length === 0) {
+    const resFmts = await appelAPI('getProduitsFormats', { pro_id: id });
+    if (resFmts && resFmts.success && resFmts.items.length > 0) {
+      formatsRecette = resFmts.items.map(f => ({ poids: f.poids, unite: f.unite, prix: f.prix_vente, desc: '' }));
+      d.formats = formatsRecette.map(f => ({ poids: f.poids, unite: f.unite, prix_vente: f.prix, emb_id: '' }));
+    }
+  }
+  if (d.statut === 'public') {
+    const sansInci = ingredientsRecette.filter(i => {
+      const inciObj = listesDropdown.fullData.find(d => d.ing_id === i.ing_id);
+      return !inciObj || !inciObj.inci || !inciObj.inci.trim();
+    });
+    if (sansInci.length > 0) {
+      afficherMsg('recettes', `Impossible de publier — ${sansInci.length} ingrédient(s) n'ont pas de code INCI valide.`, 'erreur');
+      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+      return;
+    }
+  }
   const res = await appelAPIPost('saveProduit', d);
   if (res && res.success) {
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
@@ -1284,7 +1335,19 @@ async function sauvegarderRecette() {
   }
 }
 
-function supprimerProduit(pro_id) {
+async function supprimerProduit(pro_id) {
+ const resLots = await appelAPI('getLots');
+  const lotsLies = (resLots && resLots.success ? resLots.items : []).filter(l => l.pro_id === pro_id);
+  if (lotsLies.length > 0) {
+    afficherMsg('recettes', `Impossible — ${lotsLies.length} lot(s) de fabrication sont liés à ce produit.`, 'erreur');
+    return;
+  }
+  const resVentes = await appelAPI('getVentesLignes');
+  const ventesLiees = (resVentes && resVentes.success ? resVentes.items : []).filter(v => v.pro_id === pro_id);
+  if (ventesLiees.length > 0) {
+    afficherMsg('recettes', `Impossible — ${ventesLiees.length} vente(s) sont liées à ce produit.`, 'erreur');
+    return;
+  }
   confirmerAction('Supprimer ce produit ?', async () => {
     const res = await appelAPIPost('deleteProduit', { pro_id });
     if (res && res.success) {
@@ -1550,7 +1613,7 @@ function rafraichirListeIngredientsRecette() {
   const cats  = [...new Set(listesDropdown.fullData.map(d => d.cat_id))].filter(Boolean).sort();
   liste.innerHTML = ingredientsRecette.map((ing, i) => {
     const ingsDeType = listesDropdown.fullData.filter(d => d.cat_id === ing.type);
-    const inciVal    = (listesDropdown.fullData.find(d => d.nom_UC === ing.nom) || {}).inci || '';
+    const inciVal    = (listesDropdown.fullData.find(d => d.ing_id === ing.ing_id) || listesDropdown.fullData.find(d => d.nom_UC === ing.nom) || {}).inci || '';
     return `
     <div class="ingredient-rangee">
       <select class="form-ctrl ing-type" onchange="ingredientsRecette[${i}].type=this.value; ingredientsRecette[${i}].nom=''; rafraichirListeIngredientsRecette()">
