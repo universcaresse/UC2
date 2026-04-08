@@ -29,7 +29,7 @@ function couleurCollection(nom, hex) {
   const found = Object.keys(COULEURS_COLLECTIONS).find(k => k.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') === cle);
   return found ? COULEURS_COLLECTIONS[found] : ['#c44536', '#a02d20'];
 }
-
+ 
 function assombrirCouleur(hex) {
   hex = hex.replace('#', '');
   if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
@@ -53,13 +53,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   initScrollAnimations();
   initSPA(); // une seule fois — bug V1 corrigé
   const [resContenu, resCat] = await Promise.all([appelAPI('getContenu'), appelAPI('getCatalogue')]);
+  if (resContenu && resContenu.success) appliquerContenu(resContenu.contenu);
   if (resCat && resCat.success) {
     donneesCatalogue = resCat;
     afficherCollectionsPublic();
     afficherNbProduits();
   }
-  if (resContenu && resContenu.success) appliquerContenu(resContenu.contenu);
-  else heroSeqApresSheet();
 });
 
 window.addEventListener('resize', () => {
@@ -68,7 +67,6 @@ window.addEventListener('resize', () => {
   const filtres = document.getElementById('filtres-bar');
   if (filtres) filtres.classList.remove('cache-scroll');
 });
-
 
 function initScrollAnimations() {
   scrollObserver = new IntersectionObserver((entries) => {
@@ -82,60 +80,21 @@ function initScrollAnimations() {
 
   document.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
 
-  // Séquence hero — tout chainé, un seul endroit
-  const T = 800;   // durée transition
-  const G = 400;   // gap entre tuiles
-  let t = 300;
+  const mosaicObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const items = entry.target.querySelectorAll('.mosaic-item');
+        items.forEach((item, i) => {
+          setTimeout(() => item.classList.add('visible'), i * 200);
+        });
+        mosaicObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
 
-  // Étape 2 — logo + labels stats
-  setTimeout(() => document.getElementById('hero-logo-stats')?.classList.add('visible'), t);
-  t += T;
-
-  // Étape 3 — bouton vert (vide)
-  setTimeout(() => document.getElementById('hero-bouton')?.classList.add('visible'), t);
-  t += T;
-
-  // Étape 4 — tuiles une après l'autre
-  const tuiles = document.querySelectorAll('.mosaic-item');
-  tuiles.forEach((el, i) => setTimeout(() => el.classList.add('visible'), t + i * G));
-  t += T + (tuiles.length > 0 ? (tuiles.length - 1) * G : 0);
-
-  // Étape 5 — texte bouton
-  setTimeout(() => {
-    const el = document.getElementById('hero-bouton-texte');
-    if (el) { el.textContent = 'Découvrir les collections'; el.classList.add('visible'); }
-  }, t);
-  t += T;
-
-  // Étapes 6, 7, 8 — dépendent du Sheet — gérées dans heroSeqApresSheet()
-  window.heroSeqT = t;
+  const mosaic = document.querySelector('.hero-mosaic');
+  if (mosaic) mosaicObserver.observe(mosaic);
 }
-
-function heroSeqApresSheet() {
-  const T = 800;
-  const G = 300;
-  let t = window.heroSeqT || 4000;
-
-  // Étape 6 — eyebrow
-  setTimeout(() => document.getElementById('contenu-accueil-eyebrow')?.classList.add('visible'), t);
-  t += T;
-
-  // Étape 7 — 3 stats une après l'autre
-  ['hero-stat-collections', 'hero-stat-produits', 'contenu-accueil-stat-valeur'].forEach((id, i) => {
-    setTimeout(() => document.getElementById(id)?.classList.add('visible'), t + i * G);
-  });
-  t += T + 2 * G;
-
-  // Étape 8 — textes tuiles
-  document.querySelectorAll('.mosaic-soap-label').forEach((el, i) => {
-    setTimeout(() => {
-      el.classList.remove('invisible');
-      el.classList.add('visible');
-    }, t + i * G);
-  });
-}
-
-
 
 // ─── SPA — NAVIGATION PAR SECTIONS ───
 function initSPA() {
@@ -749,16 +708,12 @@ function appliquerContenu(c) {
     window.modeSaisonnier = String(c.mode_saisonnier) === 'oui';
     const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
 
-    const setSeq = (id, val) => {
-      const el = document.getElementById(id);
-      if (el && val) { el.textContent = val; setTimeout(() => el.classList.add('visible'), 50); }
-    };
-    const eyebrow = document.getElementById('contenu-accueil-eyebrow');
-    if (eyebrow && c.accueil_eyebrow) eyebrow.textContent = c.accueil_eyebrow;
+    set('contenu-accueil-eyebrow', c.accueil_eyebrow);
+    set('contenu-accueil-cta', c.accueil_cta);
+    const cta = document.querySelector('.hero-cta');
+    if (cta) { cta.classList.remove('invisible'); cta.classList.add('fade-in-doux'); }
     set('contenu-accueil-stat-label', c.accueil_stat_label);
-    const statValeur = document.getElementById('contenu-accueil-stat-valeur');
-    if (statValeur && c.accueil_stat_valeur) statValeur.textContent = c.accueil_stat_valeur;
-    heroSeqApresSheet();
+    set('contenu-accueil-stat-valeur', c.accueil_stat_valeur);
     set('contenu-qui-eyebrow', c.qui_eyebrow);
     set('contenu-qui-titre', c.qui_titre);
     set('contenu-qui-titre-em', c.qui_titre_em);

@@ -20,7 +20,7 @@
   --logo:           #333333;
   --nav-h:          72px;
   --padding-page:   80px;
-  --padding-mobile: 20px;
+  --padding-mobile: 20px; 
 
   /* PRIMARY */
   --primary-04:    rgba(90,138,58,0.04);
@@ -288,14 +288,6 @@ main { padding-top: var(--nav-h); }
    ANIMATIONS
    ═══════════════════════════════════════ */
 .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 2s ease, transform 2s ease; }
-.hero-seq { opacity: 0; transform: translateY(24px); transition: opacity 0.8s ease, transform 0.8s ease; }
-.hero-seq.visible { opacity: 1; transform: translateY(0); }
-.hero-seq-fondu { opacity: 0; transition: opacity 0.8s ease; }
-.hero-seq-fondu.visible { opacity: 1; }
-.hero-seq-stat { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
-.hero-seq-stat.visible { opacity: 1; transform: translateY(0); }
-.hero-seq-texte { opacity: 0; transition: opacity 0.8s ease; }
-.hero-seq-texte.visible { opacity: 1; }
 .fade-in.visible { opacity: 1; transform: translateY(0); }
 .fade-in-doux { opacity: 0; transform: translateY(6px); transition: opacity 1.8s ease, transform 1.8s ease; }
 .fade-in-doux.visible { opacity: 1; transform: translateY(0); }
@@ -524,16 +516,14 @@ footer > * { position: relative; z-index: 1; }
 .hero-logo-img { max-width: 325px; width: 100%; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto; }
 
 .hero-mosaic { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 100%; gap: 16px; padding: 16px; }
-.mosaic-item { overflow: hidden; position: relative; opacity: 0; transition: opacity 0.8s ease; }
-.mosaic-item.visible { opacity: 1; }
+.mosaic-item { overflow: hidden; position: relative; }
 .mosaic-item:first-child { grid-row: span 2; }
 .mosaic-soap { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; color: rgba(255,255,255,0.9); text-transform: uppercase; position: relative; overflow: hidden; transition: transform 0.6s; opacity: 0.82; }
 .mosaic-soap:hover { transform: scale(1.03); }
 .mosaic-soap-accent  { background: linear-gradient(var(--accent-60), var(--accent-60)), url('../Images/fond.png') center center / cover no-repeat; height: 100%; }
 .mosaic-soap-primary { background: linear-gradient(var(--primary-60), var(--primary-60)), url('../Images/fond.png') center center / cover no-repeat; height: 100%; }
 .mosaic-soap-gris    { background: linear-gradient(var(--gris-60), var(--gris-60)), url('../Images/fond.png') center center / cover no-repeat; height: 100%; }
-.mosaic-soap-label { position: relative; z-index: 1; text-align: center; opacity: 0; transform: translateY(10px); transition: opacity 0.8s ease, transform 0.8s ease; }
-.mosaic-soap-label.visible { opacity: 1; transform: translateY(0); }
+.mosaic-soap-label { position: relative; z-index: 1; text-align: center; }
 .mosaic-soap-name { font-size: 0.85rem; font-weight: 500; display: block; }
 .mosaic-soap-col { font-size: 0.62rem; opacity: 0.75; letter-spacing: 0.12em; }
 
@@ -543,7 +533,6 @@ footer > * { position: relative; z-index: 1; }
 .section-collections { padding: var(--padding-page); background: var(--blanc); }
 .section-header { display: flex; align-items: baseline; gap: 24px; margin-bottom: 48px; }
 .section-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 400; color: var(--gris-fonce); }
-.section-title em { font-style: italic; color: var(--primary); }
 .section-line { flex: 1; height: 1px; background: var(--beige); margin-top: 24px; }
 .section-count { font-family: 'DM Sans', sans-serif; font-size: var(--texte-90); letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; }
 

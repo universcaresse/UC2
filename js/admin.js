@@ -25,7 +25,7 @@ function reobserverFadeIn(conteneur) {
   requestAnimationFrame(() => requestAnimationFrame(() => {
     conteneur.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => adminScrollObserver.observe(el));
   }));
-}
+} 
 
 window.addEventListener('popstate', (e) => {
   if (e.state && e.state.section) {
