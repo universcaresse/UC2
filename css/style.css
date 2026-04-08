@@ -296,7 +296,8 @@ main { padding-top: var(--nav-h); }
 .preload { display: none; }
 @keyframes fadeIn { to { opacity: 1; transform: none; } }
 
-.mosaic-item { opacity: 1; }
+.mosaic-item { opacity: 0; transform: scale(0.92); transition: opacity 1.2s ease, transform 1.2s ease; }
+.mosaic-item.visible { opacity: 1; transform: scale(1); }
 .mosaic-soap-label { opacity: 0; transform: translateY(10px); transition: opacity 0.8s ease, transform 0.8s ease; }
 .mosaic-item.visible .mosaic-soap-label { opacity: 1; transform: translateY(0); }
 .delay-1 { animation-delay: 0.1s; }

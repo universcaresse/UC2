@@ -85,7 +85,7 @@ function initScrollAnimations() {
       if (entry.isIntersecting) {
         const items = entry.target.querySelectorAll('.mosaic-item');
         items.forEach((item, i) => {
-          setTimeout(() => item.classList.add('visible'), i * 200);
+          setTimeout(() => item.classList.add('visible'), i * 2000);
         });
         mosaicObserver.unobserve(entry.target);
       }
