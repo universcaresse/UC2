@@ -780,7 +780,7 @@ footer > * { position: relative; z-index: 1; }
 .form-panel { display: none; background: white; border: 1px solid var(--beige); margin-bottom: 32px; overflow: hidden; position: relative; }
 .form-panel.visible { display: block; }
 .form-panel-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--beige); background: var(--boite); display: flex; align-items: center; gap: 16px; position: relative; }
-.form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--white); flex: 1; }
+.form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--blanc); flex: 1; }
 .form-body { padding: 28px 28px 28px; }
 .form-body .form-actions { padding-top: 28px; padding-bottom: 28px; }
 .form-body-actions { border-top: 1px solid var(--beige); background: var(--boite); padding: 20px 28px 20px; }
@@ -882,7 +882,7 @@ tr.cliquable { cursor: pointer; }
 .recette-cartes-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
 .recette-couleur-overlay { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, color-mix(in srgb, var(--col-hex) 56%, transparent) 0%, color-mix(in srgb, var(--col-hex) 10%, transparent) 20%, transparent 35%); }
 .recette-section-collection { margin-bottom: 56px; }
-.recette-collection-titre { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 400; color: var(--gris-fonce); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--beige); }
+.recette-collection-titre { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 400; color: var(--blanc); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--beige); }
 .recette-section-ligne { margin-bottom: 40px; }
 .recette-ligne-titre { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gris); margin-bottom: 16px; font-weight: 500; }
 .recette-carte-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
@@ -1151,7 +1151,7 @@ tr.cliquable { cursor: pointer; }
   padding: 8px 0;
   margin-bottom: 0;
 }
-.fiche-collection-bandeau .form-panel-titre { color: var(--white); font-size: 1.3rem; display: block; }
+.fiche-collection-bandeau .form-panel-titre { color: var(--blanc); font-size: 1.3rem; display: block; }
 .fiche-collection-slogan { color: var(--gris); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; display: block; margin-top: 6px; }
 .fiche-collection-desc { font-family: 'DM Sans', sans-serif; font-size: 1rem; color: var(--gris); line-height: 1.7; margin-bottom: 24px; }
 .fp-ing-row { display: grid; grid-template-columns: 140px 1fr 80px; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--beige); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--gris); }
