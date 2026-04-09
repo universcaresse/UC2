@@ -785,7 +785,7 @@ footer > * { position: relative; z-index: 1; }
 .form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--blanc); flex: 1; }
 .form-body { padding: 28px 28px 28px; }
 .form-body .form-actions { padding-top: 28px; padding-bottom: 28px; }
-.form-body-actions { border-top: 1px solid var(--beige); background: var(--boite); padding: 20px 28px 20px; }
+.form-body-actions { border-top: 1px solid var(--beige); background: var(--boite); padding: 20px 20px 20px; }
 #fiche-collection { display: none; }
 #fiche-collection.visible { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
 #fiche-collection .form-panel { display: block; margin-bottom: 0; }
