@@ -280,7 +280,7 @@ nav.scrolled { box-shadow: none; }
 }
 
 .burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
-.burger span { display: block; width: 22px; height: 2px; background: var(--blanc:); transition: all 0.3s; }
+.burger span { display: block; width: 22px; height: 2px; background: var(--blanc); transition: all 0.3s; }
 
 /* ═══════════════════════════════════════
    MAIN & SPA
@@ -1153,7 +1153,7 @@ tr.cliquable { cursor: pointer; }
   padding: 8px 0;
   margin-bottom: 0;
 }
-.fiche-collection-bandeau .form-panel-titre { color: var(--white); font-size: 1.3rem; display: block; }
+.fiche-collection-bandeau .form-panel-titre { color: var(--blanc); font-size: 1.3rem; display: block; }
 .fiche-collection-slogan { color: var(--gris); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; display: block; margin-top: 6px; }
 .fiche-collection-desc { font-family: 'DM Sans', sans-serif; font-size: 1rem; color: var(--gris); line-height: 1.7; margin-bottom: 24px; }
 .fp-ing-row { display: grid; grid-template-columns: 140px 1fr 80px; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--beige); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--gris); }
@@ -1216,13 +1216,6 @@ tr.cliquable { cursor: pointer; }
 .login-row .login-input { flex: 1; border-radius: 4px 0 0 4px; }
 .login-row .login-btn { border-radius: 0 4px 4px 0; white-space: nowrap; }
 .connexion-erreur { color: var(--danger); font-size: 0.85rem; min-height: 20px; }
-
-
-
-/* ═══════════════════════════════════════
-  truc
-
-   ═══════════════════════════════════════ */
 
 .citation-guillemet { color: white; }
 
