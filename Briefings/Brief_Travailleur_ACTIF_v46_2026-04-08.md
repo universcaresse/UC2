@@ -1,7 +1,7 @@
 ⛔ PROTOCOLE OBLIGATOIRE — LIS CECI AVANT TOUT. SANS EXCEPTION.
 ÉTAPE 1 — AVANT DE RÉPONDRE
 
-Lis ce brief AU COMPLET.
+Lis ce brief AU COMPLET, ligne par ligne IMPORTANT.
 Lis CHAQUE fichier fourni AU COMPLET.
 Confirme à voix haute : "Brief lu. Fichiers lus. Prêt."
 Si tu n'as pas tout lu — tu te tais et tu lis.
@@ -15,7 +15,8 @@ Qu'est-ce qui existait avant et qui pourrait briser ?
 
 ÉTAPE 3 — AVANT DE CODER
 
-Tu attends un OUI explicite. Le mot OUI. Rien d'autre.
+Tu attends un OK explicite. Rien d'autre.
+**Expliquer en langage simple ce qu'on veut faire — pas en code — attendre le OK — puis livrer le trouve/remplace**
 Un seul changement à la fois. Un. Pas une liste.
 Livraison = trouve/remplace ciblé uniquement. Jamais le fichier complet sans permission explicite.
 Jamais de style inline dans le HTML ou le JS.

@@ -776,7 +776,7 @@ footer > * { position: relative; z-index: 1; }
 .form-panel { display: none; background: white; border: 1px solid var(--beige); margin-bottom: 32px; overflow: hidden; position: relative; }
 .form-panel.visible { display: block; }
 .form-panel-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--beige); background: var(--boite); display: flex; align-items: center; gap: 16px; position: relative; }
-.form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--gris-fonce); flex: 1; }
+.form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--blanc); flex: 1; }
 .form-body { padding: 28px 28px 28px; }
 .form-body .form-actions { padding-top: 28px; padding-bottom: 28px; }
 .form-body-actions { border-top: 1px solid var(--beige); background: var(--boite); padding: 20px 28px 20px; }
@@ -852,7 +852,7 @@ tr.cliquable { cursor: pointer; }
 .fiche-label-manquant { color: var(--danger); font-weight: 500; }
 .fiche-label-manquant::before { content: '⚠️ '; }
 .fiche-valeur { font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--gris-fonce); }
-.fiche-section-titre { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--gris-fonce); margin: 24px 0 8px; border-bottom: 1px solid var(--beige); padding-bottom: 6px; }
+.fiche-section-titre { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--blanc); margin: 24px 0 8px; border-bottom: 1px solid var(--beige); padding-bottom: 6px; }
 .fiche-texte { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--gris-fonce); white-space: pre-line; }
 .fiche-ingredients { display: flex; flex-direction: column; gap: 6px; }
 .fiche-ingredient { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--beige); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; }
@@ -878,9 +878,9 @@ tr.cliquable { cursor: pointer; }
 .recette-cartes-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
 .recette-couleur-overlay { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, color-mix(in srgb, var(--col-hex) 56%, transparent) 0%, color-mix(in srgb, var(--col-hex) 10%, transparent) 20%, transparent 35%); }
 .recette-section-collection { margin-bottom: 56px; }
-.recette-collection-titre { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 400; color: var(--gris-fonce); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--beige); }
+.recette-collection-titre { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 400; color: var(--blanc); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--beige); }
 .recette-section-ligne { margin-bottom: 40px; }
-.recette-ligne-titre { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gris); margin-bottom: 16px; font-weight: 500; }
+.recette-ligne-titre { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--blanc); margin-bottom: 16px; font-weight: 500; }
 .recette-carte-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
 .recette-statut-badge { display: inline-block; font-family: 'DM Sans', sans-serif; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; font-weight: 500; margin-left: 6px; }
 .recette-statut-public { background: rgba(90,138,58,0.1); color: var(--primary); }
@@ -910,7 +910,7 @@ tr.cliquable { cursor: pointer; }
    ADMIN — FACTURES
    ═══════════════════════════════════════ */
 .facture-active-banner { background: white; border: 1px solid var(--beige); border-left: 4px solid var(--primary); padding: 16px 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-.facture-active-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gris-fonce); }
+.facture-active-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--blanc); }
 .facture-active-info { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; color: var(--gris); margin-top: 2px; }
 .facture-sous-total { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary); }
 .facture-sous-total-label { font-family: 'DM Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gris); text-align: right; }
