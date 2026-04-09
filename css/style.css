@@ -884,7 +884,7 @@ tr.cliquable { cursor: pointer; }
 .recette-cartes-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
 .recette-couleur-overlay { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, color-mix(in srgb, var(--col-hex) 56%, transparent) 0%, color-mix(in srgb, var(--col-hex) 10%, transparent) 20%, transparent 35%); }
 .recette-section-collection { margin-bottom: 56px; }
-.recette-collection-titre { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 400; color: var(--blanc); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--beige); }
+.recette-collection-titre { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 400; color: var(--gris); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--beige); }
 .recette-section-ligne { margin-bottom: 40px; }
 .recette-ligne-titre { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--blanc); margin-bottom: 16px; font-weight: 500; }
 .recette-carte-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
