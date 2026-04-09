@@ -331,7 +331,7 @@ main { padding-top: var(--nav-h); }
 .bouton svg { width: 16px; height: 16px; transition: opacity 1.5s ease; }
 .bouton.invisible svg { opacity: 0; }
 .bouton:not(.invisible) svg { opacity: 1; }
-.bouton-vert-pale { background: var(--primary-70); color: var(--accent); }
+.bouton-vert-pale { background: var(--gris); color: var(--blanc); }
 .bouton-rouge { background: var(--danger); }
 .bouton-or { background: var(--accent); }
 .bouton-contour { background: transparent; color: var(--gris); border: 1px solid var(--beige); }
@@ -1154,7 +1154,7 @@ tr.cliquable { cursor: pointer; }
   margin-bottom: 0;
 }
 .fiche-collection-bandeau .form-panel-titre { color: var(--blanc); font-size: 1.3rem; display: block; }
-.fiche-collection-slogan { color: var(--gris); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; display: block; margin-top: 6px; }
+.fiche-collection-slogan { color: var(--blanc); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; display: block; margin-top: 6px; }
 .fiche-collection-desc { font-family: 'DM Sans', sans-serif; font-size: 1rem; color: var(--gris); line-height: 1.7; margin-bottom: 24px; }
 .fp-ing-row { display: grid; grid-template-columns: 140px 1fr 80px; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--beige); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--gris); }
 .import-ing-row { display: grid; grid-template-columns: 140px 1fr 80px; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--beige); }
