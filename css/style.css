@@ -328,7 +328,9 @@ main { padding-top: var(--nav-h); }
   text-decoration: none; background: var(--primary); color: white;
 }
 .bouton:disabled { opacity: 0.6; cursor: not-allowed; }
-.bouton svg { width: 16px; height: 16px; }
+.bouton svg { width: 16px; height: 16px; transition: opacity 1.5s ease; }
+.bouton.invisible svg { opacity: 0; }
+.bouton:not(.invisible) svg { opacity: 1; }
 .bouton-vert-pale { background: var(--primary-70); color: var(--accent); }
 .bouton-rouge { background: var(--danger); }
 .bouton-or { background: var(--accent); }
