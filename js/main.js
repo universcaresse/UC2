@@ -402,7 +402,7 @@ function chargerCatalogue() {
     if (collectionEnAttente) { filtrer(collectionEnAttente); collectionEnAttente = null; }
     return;
   }
-  }
+  
   catalogueCharge = true;
   catalogueTimestamp = maintenant;
   
@@ -423,6 +423,7 @@ function chargerCatalogue() {
     afficherErreurCatalogue('Erreur de connexion.');
   }
 }
+
 
 function afficherErreurCatalogue(msg) {
   const el = document.getElementById('chargement');
