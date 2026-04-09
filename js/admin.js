@@ -6,6 +6,8 @@
 // ─── INITIALISATION ───
 
 var adminScrollObserver = null;
+var donneesChargees = false;
+var sectionEnAttente = null;
 
 function initScrollAnimationsAdmin() {
   adminScrollObserver = new IntersectionObserver((entries) => {
@@ -110,6 +112,8 @@ if (resGam && resGam.success) {
   if (statCol)  statCol.textContent  = donneesCollections.length;
   if (statProd && nbPublics > 0) statProd.textContent = nbPublics + '+';
 
+  donneesChargees = true;
+  if (sectionEnAttente) { afficherSection(sectionEnAttente, null); sectionEnAttente = null; }
   afficherCollections();
 }
 
@@ -142,7 +146,10 @@ function afficherSection(id, bouton) {
   if (id === 'import-facture') ifChargerMapping();
   if (id === 'collections')    afficherCollections();
   if (id === 'familles')       afficherFamilles();
-  if (id === 'produits')       { reinitialiserFiltresRecettes(); afficherProduits(); }
+  if (id === 'produits') {
+    if (!donneesChargees) { sectionEnAttente = 'produits'; return; }
+    reinitialiserFiltresRecettes(); afficherProduits();
+  }
   if (id === 'inci')           { const r = document.getElementById('inci-recherche'); if (r) r.value = ''; chargerInci(); }
   if (id === 'densites')       chargerDensites();
   if (id === 'inventaire')     { const r = document.getElementById('inv-recherche'); if (r) r.value = ''; chargerInventaire(); }
