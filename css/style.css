@@ -287,7 +287,7 @@ nav.scrolled { box-shadow: none; }
 main { padding-top: var(--nav-h); }
 .page-section { display: none; }
 .page-section.active { display: block; }
-.page-section .page-entete { padding: 80px var(--padding-page) 48px; }
+.page-section .page-entete { padding: 96px var(--padding-page) 48px; }
 
 /* ═══════════════════════════════════════
    ANIMATIONS
