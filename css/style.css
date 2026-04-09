@@ -1146,7 +1146,7 @@ tr.cliquable { cursor: pointer; }
   padding: 8px 0;
   margin-bottom: 0;
 }
-.fiche-collection-bandeau .form-panel-titre { color: var(--gris-fonce); font-size: 1.3rem; display: block; }
+.fiche-collection-bandeau .form-panel-titre { color: var(--white); font-size: 1.3rem; display: block; }
 .fiche-collection-slogan { color: var(--gris); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; display: block; margin-top: 6px; }
 .fiche-collection-desc { font-family: 'DM Sans', sans-serif; font-size: 1rem; color: var(--gris); line-height: 1.7; margin-bottom: 24px; }
 .fp-ing-row { display: grid; grid-template-columns: 140px 1fr 80px; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--beige); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--gris); }
