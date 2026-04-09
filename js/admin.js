@@ -1205,8 +1205,8 @@ async function modifierProduit(pro_id) {
   document.getElementById('fr-notes').value                    = pro.notes || '';
   document.getElementById('fr-surgras').value                  = pro.surgras || '';
   document.getElementById('fr-statut').value                   = pro.statut || 'test';
- document.getElementById('fr-collection').value               = pro.col_id || '';
-  await chargerCollectionsPourSelecteur();
+await chargerCollectionsPourSelecteur();
+  document.getElementById('fr-collection').value               = pro.col_id || '';
   await mettreAJourLignes();
   document.getElementById('fr-ligne').value                    = pro.gam_id || '';
   const selFamProd = document.getElementById('fr-famille');
