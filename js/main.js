@@ -398,7 +398,11 @@ const CATALOGUE_TTL = 30 * 60 * 1000;
 
 function chargerCatalogue() {
   const maintenant = Date.now();
-  if (catalogueCharge && catalogueTimestamp && (maintenant - catalogueTimestamp) < CATALOGUE_TTL) return;
+ if (catalogueCharge && catalogueTimestamp && (maintenant - catalogueTimestamp) < CATALOGUE_TTL) {
+    if (collectionEnAttente) { filtrer(collectionEnAttente); collectionEnAttente = null; }
+    return;
+  }
+  }
   catalogueCharge = true;
   catalogueTimestamp = maintenant;
   
