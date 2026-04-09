@@ -229,11 +229,6 @@ function afficherMaintenance() {
   document.getElementById('nav').classList.add('cache');
   const burger = document.getElementById('burger');
   if (burger) burger.classList.add('cache');
-  const main = document.querySelector('main');
-  if (main) main.classList.add('cache');
-  const footer = document.querySelector('footer');
-  if (footer) footer.classList.add('cache');
-  document.body.style.overflow = 'hidden';
 }
 
 function afficherModePublic() {
