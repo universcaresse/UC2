@@ -373,7 +373,7 @@ select.form-control, select.form-ctrl { cursor: pointer; }
 .form-ctrl[readonly] { background: rgba(232,220,200,0.3); color: var(--gris); }
 
 .form-erreur { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; color: var(--danger); margin-bottom: 16px; }
-.form-actions { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+.form-actions { display: flex; gap: 10px;  flex-wrap: wrap; }
 .form-submit { margin-top: 8px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .form-note { font-family: 'DM Sans', sans-serif; font-size: 0.72rem; color: var(--gris); font-weight: 300; }
 
