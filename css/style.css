@@ -483,22 +483,26 @@ select.form-control, select.form-ctrl { cursor: pointer; }
    CHARGEMENT / SPINNER
    ═══════════════════════════════════════ */
 .chargement { text-align: center; padding: 80px 20px; font-family: 'DM Sans', sans-serif; color: var(--gris); font-size: 0.9rem; }
-.chargement-spinner { display: flex; gap: 7px; align-items: center; justify-content: center; height: 48px; margin: 0 auto 16px; }
-.chargement-spinner span { background: var(--primary); border-radius: 50%; animation: bulle 1.4s ease-in-out infinite; }
-.chargement-spinner span:nth-child(1) { width: 8px;  height: 8px;  animation-delay: 0s; }
-.chargement-spinner span:nth-child(2) { width: 12px; height: 12px; animation-delay: 0.15s; }
-.chargement-spinner span:nth-child(3) { width: 16px; height: 16px; animation-delay: 0.3s; }
-.chargement-spinner span:nth-child(4) { width: 12px; height: 12px; animation-delay: 0.45s; }
-.chargement-spinner span:nth-child(5) { width: 8px;  height: 8px;  animation-delay: 0.6s; }
-.spinner { display: inline-flex; gap: 5px; align-items: center; margin-right: 10px; vertical-align: middle; }
-.spinner span { background: var(--accent); border-radius: 50%; animation: bulle 1.4s ease-in-out infinite; }
-.spinner span:nth-child(1) { width: 5px;  height: 5px;  animation-delay: 0s; }
-.spinner span:nth-child(2) { width: 7px;  height: 7px;  animation-delay: 0.15s; }
-.spinner span:nth-child(3) { width: 9px;  height: 9px;  animation-delay: 0.3s; }
-.spinner span:nth-child(4) { width: 7px;  height: 7px;  animation-delay: 0.45s; }
-.spinner span:nth-child(5) { width: 5px;  height: 5px;  animation-delay: 0.6s; }
+.chargement-spinner { position: relative; display: flex; align-items: flex-end; justify-content: center; height: 80px; margin: 0 auto 16px; }
+.chargement-spinner span { position: absolute; bottom: 0; left: 50%; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.6), transparent 60%); border: 2px solid #5a8a3a; box-shadow: inset 0 0 6px rgba(90,138,58,0.3), 0 0 4px rgba(90,138,58,0.15); opacity: 0; animation: flotter var(--dur) ease-in infinite; animation-delay: var(--delay); }
+.chargement-spinner span:nth-child(1) { width:14px; height:14px; --tx:-40px; --drift:8px;   --dur:2.2s; --delay:0s;   }
+.chargement-spinner span:nth-child(2) { width:20px; height:20px; --tx:20px;  --drift:-12px; --dur:2.5s; --delay:0.3s; }
+.chargement-spinner span:nth-child(3) { width:10px; height:10px; --tx:-10px; --drift:6px;   --dur:1.9s; --delay:0.6s; }
+.chargement-spinner span:nth-child(4) { width:18px; height:18px; --tx:50px;  --drift:-8px;  --dur:2.7s; --delay:0.9s; }
+.chargement-spinner span:nth-child(5) { width:12px; height:12px; --tx:-55px; --drift:10px;  --dur:2.1s; --delay:1.2s; }
+.chargement-spinner span:nth-child(6) { width:22px; height:22px; --tx:5px;   --drift:-6px;  --dur:2.8s; --delay:1.5s; }
+.chargement-spinner span:nth-child(7) { width:9px;  height:9px;  --tx:35px;  --drift:14px;  --dur:1.8s; --delay:1.8s; }
+.chargement-spinner span:nth-child(8) { width:16px; height:16px; --tx:-25px; --drift:-10px; --dur:2.4s; --delay:2.1s; }
+.spinner { position: relative; display: inline-block; width: 50px; height: 30px; vertical-align: middle; margin-right: 10px; }
+.spinner span { position: absolute; bottom: 0; left: 50%; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.5), transparent 60%); border: 1.5px solid #5a8a3a; opacity: 0; animation: flotter-sm var(--dur) ease-in infinite; animation-delay: var(--delay); }
+.spinner span:nth-child(1) { width:7px;  height:7px;  --tx:-10px; --drift:4px;  --dur:1.8s; --delay:0s;    }
+.spinner span:nth-child(2) { width:10px; height:10px; --tx:8px;   --drift:-5px; --dur:2.0s; --delay:0.35s; }
+.spinner span:nth-child(3) { width:6px;  height:6px;  --tx:-3px;  --drift:3px;  --dur:1.6s; --delay:0.7s;  }
+.spinner span:nth-child(4) { width:9px;  height:9px;  --tx:18px;  --drift:-4px; --dur:2.2s; --delay:1.05s; }
+.spinner span:nth-child(5) { width:7px;  height:7px;  --tx:-18px; --drift:6px;  --dur:1.9s; --delay:1.4s;  }
 .chargement-erreur { color: var(--gris); font-family: 'DM Sans', sans-serif; }
-@keyframes bulle { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.5); opacity: 1; } }
+@keyframes flotter { 0% { transform: translateX(var(--tx)) translateY(0) scale(0.4); opacity: 0; } 10% { opacity: 0.85; } 80% { opacity: 0.6; } 100% { transform: translateX(calc(var(--tx) + var(--drift))) translateY(-90px) scale(1.05); opacity: 0; } }
+@keyframes flotter-sm { 0% { transform: translateX(var(--tx)) translateY(0) scale(0.3); opacity: 0; } 10% { opacity: 0.9; } 80% { opacity: 0.5; } 100% { transform: translateX(calc(var(--tx) + var(--drift))) translateY(-32px) scale(1.05); opacity: 0; } }
 
 /* ═══════════════════════════════════════
    FOOTER
