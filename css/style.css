@@ -776,7 +776,7 @@ footer > * { position: relative; z-index: 1; }
 .form-panel { display: none; background: white; border: 1px solid var(--beige); margin-bottom: 32px; overflow: hidden; position: relative; }
 .form-panel.visible { display: block; }
 .form-panel-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--beige); background: var(--boite); display: flex; align-items: center; gap: 16px; position: relative; }
-.form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--gris-fonce); flex: 1; }
+.form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--white); flex: 1; }
 .form-body { padding: 28px 28px 28px; }
 .form-body .form-actions { padding-top: 28px; padding-bottom: 28px; }
 .form-body-actions { border-top: 1px solid var(--beige); background: var(--boite); padding: 20px 28px 20px; }
