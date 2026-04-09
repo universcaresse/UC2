@@ -233,6 +233,7 @@ function afficherMaintenance() {
   if (main) main.classList.add('cache');
   const footer = document.querySelector('footer');
   if (footer) footer.classList.add('cache');
+  document.body.style.overflow = 'hidden';
 }
 
 function afficherModePublic() {
