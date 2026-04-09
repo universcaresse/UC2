@@ -1173,7 +1173,7 @@ tr.cliquable { cursor: pointer; }
 .collection-carte-lignes { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
 .collection-carte-lignes-haut { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; z-index: 1; }
 .collection-carte-ligne-tag { font-family: 'DM Sans', sans-serif; font-size: 0.62rem; letter-spacing: 0.08em; color: #fff; background: rgba(0,0,0,0.3); padding: 2px 8px; display: block; width: fit-content;}
-.section-label { font-family: 'DM Sans', sans-serif; font-size: 0.82rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gris-fonce); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--beige); margin-top: 24px; }
+.section-label { font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gris-fonce); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--beige); margin-top: 24px; }
 .section-texte-photo-16-9 { width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden; margin-top: 32px; }
 .section-texte-photo-3-4 { width: 100%; aspect-ratio: 3/4; position: relative; overflow: hidden; margin-top: 32px; }
 .section-texte-photo-auto { width: 100%; position: relative; overflow: hidden; align-self: stretch; min-height: 400px; }

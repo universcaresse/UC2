@@ -302,7 +302,7 @@
             <div class="form-body">
               <div id="fiche-collection-extras"></div>
               <p class="fiche-collection-desc" id="fiche-collection-desc"></p>
-              <div class="section-label">Lignes de produits</div>
+              <div class="section-label">Gammes de produits</div>
               <div id="fiche-collection-lignes"></div>
             </div>
           </div>
@@ -388,7 +388,7 @@
                   <div class="cloudinary-zone">
                     <input type="text" class="form-ctrl" id="fc-photo-url">
                     <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryCollection()">Choisir une photo</button>
-<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url', 'fc-photo-preview', 'Collection')">Médiathèque</button>
+					<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url', 'fc-photo-preview', 'Collection')">Médiathèque</button>
 
 
 
@@ -401,7 +401,7 @@
                   <div class="cloudinary-zone">
                     <input type="text" class="form-ctrl" id="fc-photo-url-noel">
                     <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryCollectionNoel()">Choisir une photo</button>
-<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url-noel', 'fc-photo-preview-noel', 'Collection Noël')">Médiathèque</button>
+					<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url-noel', 'fc-photo-preview-noel', 'Collection Noël')">Médiathèque</button>
                   </div>
                   <div id="fc-photo-preview-noel"></div>
                 </div>
@@ -420,20 +420,20 @@
                   <input type="text" inputmode="decimal" class="form-ctrl" id="fc-rang-ligne">
                 </div>
                 <div class="form-groupe">
-                  <label class="form-label">Nom de la ligne</label>
+                  <label class="form-label">Nom de la gamme</label>
                   <input type="text" class="form-ctrl" id="fc-ligne">
                 </div>
                 
                 <div class="form-groupe col-plein">
-                  <label class="form-label">Description ligne</label>
+                  <label class="form-label">Description de la gamme</label>
                   <textarea class="form-ctrl" id="fc-desc-ligne"></textarea>
                 </div>
                <div class="form-groupe cache">
-                  <label class="form-label">Couleur HEX ligne</label>
+                  <label class="form-label">Couleur HEX gamme/label>
                   <input type="text" class="form-ctrl" id="fc-couleur-hex-ligne" oninput="apercuCouleurCollection(this)"><div id="fc-couleur-apercu-ligne" class="couleur-apercu"></div>
                 </div>
               <div class="form-groupe cache">
-                  <label class="form-label">Photo ligne</label>
+                  <label class="form-label">Photo gamme</label>
                   <div class="cloudinary-zone">
                     <input type="text" class="form-ctrl" id="fc-photo-url-ligne">
                     <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryLigne()">Choisir une photo</button>
@@ -560,7 +560,7 @@
             <option value="">Collections</option>
           </select>
           <select class="form-ctrl filtre-select" id="filtre-recette-ligne" onchange="filtrerRecettes()" disabled>
-            <option value="">Lignes</option>
+            <option value="">Gammes</option>
           </select>
           <select class="form-ctrl filtre-select" id="filtre-recette-statut" onchange="filtrerRecettes()">
             <option value="">Statuts</option>
@@ -610,7 +610,7 @@
 			  
 			  
              <div class="form-groupe">
-                <label class="form-label">Ligne</label>
+                <label class="form-label">Gammes</label>
                 <select class="form-ctrl" id="fr-ligne" onchange="chargerIngredientsBaseRecette()">
                   <option value="">— Choisir collection —</option>
                 </select>
@@ -675,7 +675,7 @@
               <div class="cloudinary-zone">
                 <input type="text" class="form-ctrl" id="fr-image-url">
                 <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinary()">Choisir une photo</button>
-<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">Médiathèque</button>
+				<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">Médiathèque</button>
               </div>
               <div id="fr-image-preview"></div>
             </div>
@@ -684,7 +684,7 @@
               <div class="cloudinary-zone">
                 <input type="text" class="form-ctrl" id="fr-image-url-noel">
                 <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediaLibrary('fr-image-url-noel', 'fr-image-preview-noel')">Choisir une photo</button>
-<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">Médiathèque</button>
+				<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">Médiathèque</button>
 
               </div>
               <div id="fr-image-preview-noel"></div>
