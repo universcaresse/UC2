@@ -250,6 +250,7 @@ nav.scrolled { box-shadow: none; }
 .nav-links a:hover::after { transform: scaleX(1); }
 .nav-links a.active { color: var(--primary); }
 .nav-links a.active::after { transform: scaleX(1); }
+.nav-links a:visited { color: var(--gris); }
 
 .nav-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 
