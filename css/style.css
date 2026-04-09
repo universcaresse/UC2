@@ -342,7 +342,7 @@ main { padding-top: var(--nav-h); }
 .hero-stat-num { opacity: 0; transition: opacity 1.5s ease; }
 .hero-stat-num.visible { opacity: 1; }
 
-.btn-fermer-panneau { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.4rem; color: var(--gris); line-height: 1; padding: 4px 8px; }
+.btn-fermer-panneau { position: absolute; top: 50%; right: 16px; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.4rem; color: var(--gris); line-height: 1; padding: 4px 8px; }
 .btn-edit { background: var(--primary-08); color: var(--primary); padding: 6px 14px; font-size: 0.68rem; font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border: none; cursor: pointer; transition: background 0.2s; }
 .btn-suppr { background: var(--danger-08); color: var(--danger); padding: 6px 14px; font-size: 0.68rem; font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border: none; cursor: pointer; transition: background 0.2s; }
 
