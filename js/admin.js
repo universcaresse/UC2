@@ -231,7 +231,7 @@ function btnSpinner(btn, actif) {
   if (actif) {
     btn.dataset.texteOriginal = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span> En cours…';
+  btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> En cours…';
   } else {
     btn.disabled = false;
     btn.innerHTML = btn.dataset.texteOriginal || 'Enregistrer';
