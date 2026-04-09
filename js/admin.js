@@ -226,6 +226,18 @@ function fermerSidebarMobile() {
 }
 
 // ─── MESSAGES ───
+function btnSpinner(btn, actif) {
+  if (!btn) return;
+  if (actif) {
+    btn.dataset.texteOriginal = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span> En cours…';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = btn.dataset.texteOriginal || 'Enregistrer';
+  }
+}
+
 function afficherMsg(zone, texte, type = 'succes') {
   const el = document.getElementById('msg-' + zone);
   if (el) {
@@ -673,7 +685,7 @@ async function modifierCollection(col_id) {
 
 async function sauvegarderCollection() {
   const btnSauvegarder = document.querySelector('#form-collections .bouton');
-  if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = '<span class="spinner"></span> Sauvegarde…'; }
+  btnSpinner(btnSauvegarder, true);
   const rowIndex = document.getElementById('fc-rowIndex').value;
   const mode     = document.getElementById('fc-mode').value;
 
@@ -682,7 +694,7 @@ async function sauvegarderCollection() {
     const col_id = document.getElementById('fc-collection-ligne').value;
     const nom    = document.getElementById('fc-ligne').value.toUpperCase();
     if (!col_id || !nom) {
-      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+      btnSpinner(btnSauvegarder, false);
       afficherMsg('collections', 'Le nom de la gamme est requis.', 'erreur');
       return;
     }
@@ -704,13 +716,13 @@ async function sauvegarderCollection() {
         gam_id: d.gam_id,
         ingredients: ingredientsBase.map(i => ({ ing_id: i.ing_id || '', nom_ingredient: i.nom, quantite_g: i.quantite }))
       });
-      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+      btnSpinner(btnSauvegarder, false);
       fermerFormCollection();
       afficherMsg('collections', rowIndex ? 'Gamme mise à jour.' : 'Gamme ajoutée.');
       await chargerCollections();
     } else {
-      afficherMsg('collections', 'Erreur lors de la sauvegarde.', 'erreur');
-      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+   afficherMsg('collections', 'Erreur lors de la sauvegarde.', 'erreur');
+      btnSpinner(btnSauvegarder, false);
     }
     return;
   }
@@ -728,19 +740,19 @@ async function sauvegarderCollection() {
     rowIndex:    rowIndex || null
   };
   if (!d.nom) {
-    if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    btnSpinner(btnSauvegarder, false);
     afficherMsg('collections', 'Le nom de la collection est requis.', 'erreur');
     return;
   }
   const res = await appelAPIPost('saveCollection', d);
   if (res && res.success) {
-    if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    btnSpinner(btnSauvegarder, false);
     fermerFormCollection();
     afficherMsg('collections', rowIndex ? 'Collection mise à jour.' : 'Collection ajoutée.');
     chargerCollections();
   } else {
     afficherMsg('collections', 'Erreur lors de la sauvegarde.', 'erreur');
-    if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    btnSpinner(btnSauvegarder, false);
   }
 }
 
@@ -1182,6 +1194,8 @@ function fermerFormRecette() { fermerFormProduit(); }
 async function modifierProduit(pro_id) {
   const pro = donneesProduits.find(p => p.pro_id === pro_id);
   if (!pro) return;
+  const btnModifier = document.getElementById('btn-modifier-produit');
+  btnSpinner(btnModifier, true);
 
   // Charger les formats et ingrédients
   const [resFormats, resIngs] = await Promise.all([
@@ -1243,6 +1257,7 @@ await chargerCollectionsPourSelecteur();
   document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
   document.getElementById('grille-produits').classList.add('cache');
   document.getElementById('form-recettes').classList.add('visible');
+  btnSpinner(btnModifier, false);
   rafraichirListeIngredientsRecette();
   rafraichirListeFormatsRecette();
   window.scrollTo(0, 0);
@@ -1252,8 +1267,8 @@ await chargerCollectionsPourSelecteur();
 function modifierRecette(id) { return modifierProduit(id); }
 
 async function sauvegarderRecette() {
-  const btnSauvegarder = document.querySelector('#form-recettes .bouton');
-  if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = '<span class="spinner"></span> Sauvegarde…'; }
+ const btnSauvegarder = document.querySelector('#form-recettes .bouton');
+  btnSpinner(btnSauvegarder, true);
 
   const id     = document.getElementById('fr-id').value;
   const col_id = document.getElementById('fr-collection').value;
@@ -1289,9 +1304,9 @@ async function sauvegarderRecette() {
     }))
   };
 
-  if (!d.nom) { afficherMsg('recettes', 'Le nom est requis.', 'erreur'); if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; } return; }
-  if (!d.col_id) { afficherMsg('recettes', 'La collection est requise.', 'erreur'); if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; } return; }
-  if (!d.gam_id) { afficherMsg('recettes', 'La gamme est requise.', 'erreur'); if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; } return; }
+  if (!d.nom) { afficherMsg('recettes', 'Le nom est requis.', 'erreur'); btnSpinner(btnSauvegarder, false); return; }
+  if (!d.col_id) { afficherMsg('recettes', 'La collection est requise.', 'erreur'); btnSpinner(btnSauvegarder, false); return; }
+  if (!d.gam_id) { afficherMsg('recettes', 'La gamme est requise.', 'erreur'); btnSpinner(btnSauvegarder, false); return; }
 
   if (id && ingredientsRecette.length === 0) {
     const resIngs = await appelAPI('getProduitsIngredients', { pro_id: id });
@@ -1323,20 +1338,20 @@ async function sauvegarderRecette() {
     });
     if (sansInci.length > 0) {
       afficherMsg('recettes', `Impossible de publier — ${sansInci.length} ingrédient(s) n'ont pas de code INCI valide.`, 'erreur');
-      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+      btnSpinner(btnSauvegarder, false);
       return;
     }
   }
   const res = await appelAPIPost('saveProduit', d);
   if (res && res.success) {
-    if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    btnSpinner(btnSauvegarder, false);
     fermerFormProduit();
      afficherMsg('recettes', id ? 'Produit mis à jour.' : 'Produit créé.');
     await chargerProduitsData();
     document.querySelector('.admin-contenu')?.scrollTo(0, 0);
   } else {
     afficherMsg('recettes', 'Erreur.', 'erreur');
-    if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    btnSpinner(btnSauvegarder, false);
   }
 }
 
