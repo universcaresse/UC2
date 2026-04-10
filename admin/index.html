@@ -144,7 +144,21 @@
 
 
 
-      <!-- ACCUEIL -->
+   <!-- ════════════════════════════════════════
+     ACCUEIL — Tableau de bord
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherSection()
+       afficherStatsAccueil()
+
+     CSS (style.css)
+       .accueil-admin, .accueil-gauche, .accueil-droite
+       .accueil-grande-tuile, .accueil-tuile
+       .tuile-icone, .tuile-nom
+       .hero-stat-num, .hero-stat-label, .hero-logo-img
+       .accueil-chantal, .accueil-bonjour
+     ════════════════════════════════════════ -->
    <div class="section-admin" id="section-accueil">
         <div class="accueil-admin">
       <div class="accueil-gauche">
@@ -276,7 +290,30 @@
 </div>
         </div>
       </div>
-      <!-- COLLECTIONS -->
+	  
+	  
+	  
+	  
+	  
+     <!-- ════════════════════════════════════════
+     COLLECTIONS — Liste, fiche et formulaire
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherCollections()
+       ouvrirFormCollection() / fermerFormCollection()
+       fermerFicheCollection()
+       sauvegarderCollection()
+       supprimerCollection()
+       ouvrirCloudinaryCollection() / ouvrirCloudinaryCollectionNoel()
+
+     CSS (style.css)
+       .collection-section
+       .fiche-collection-bandeau, .fiche-collection-slogan
+       .fiche-collection-desc, .fiche-collection-extras-wrap
+       .fiche-collection-couleur, .fiche-collection-photo
+       .fiche-ligne-item, .fiche-ligne-info, .fiche-ligne-nom
+     ════════════════════════════════════════ -->
      <div class="section-admin visible" id="section-collections">
         <div class="page-entete fade-in">
           <div>
@@ -290,6 +327,19 @@
 		
 		
 		
+      <!-- ════════════════════════════════════════
+     COLLECTIONS — Fiche d'une collection
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFicheCollection()
+       fermerFicheCollection()
+
+     CSS (style.css)
+       .fiche-collection-bandeau, .fiche-collection-slogan
+       .fiche-collection-desc, .fiche-collection-extras-wrap
+       .fiche-collection-couleur, .fiche-collection-photo
+     ════════════════════════════════════════ -->
        <div id="fiche-collection">
           <div class="form-panel">
             <div class="form-panel-header">
@@ -319,6 +369,20 @@
 	   
 	   
 	   
+        <!-- ════════════════════════════════════════
+     COLLECTIONS — Fiche d'une gamme
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFicheGamme()
+       fermerFicheGamme() / fermerFicheLigne()
+
+     CSS (style.css)
+       .fiche-collection-bandeau, .fiche-collection-slogan
+       .fiche-ligne-actions
+       .fiche-ligne-item, .fiche-ligne-info
+       .fiche-ligne-nom, .fiche-ligne-format, .fiche-ligne-desc
+     ════════════════════════════════════════ -->
         <div class="form-panel" id="fiche-ligne">
           <div class="form-panel-header">
             <div class="fiche-collection-bandeau" id="fiche-ligne-bandeau">
@@ -351,6 +415,22 @@
         </div>
 		
 		
+		<!-- ════════════════════════════════════════
+     COLLECTIONS — Formulaire nouvelle/modifier collection
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFormCollection()
+       fermerFormCollection()
+       sauvegarderCollection()
+       apercuCouleurCollection()
+       ouvrirCloudinaryCollection() / ouvrirCloudinaryCollectionNoel()
+       ouvrirMediatheque()
+
+     CSS (style.css)
+       .cloudinary-zone
+       .couleur-apercu
+     ════════════════════════════════════════ -->
 		<div class="form-panel" id="form-collections">
           <div class="form-panel-header">
             <div class="form-panel-titre" id="form-collections-titre">Nouvelle collection</div>
@@ -417,13 +497,34 @@
 		
 		
 		
-        <div class="chargement" id="loading-collections"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+      <!-- ════════════════════════════════════════
+     COLLECTIONS — Liste des collections
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherCollections()
+
+     CSS (style.css)
+       .collection-section
+       .collection-carte, .collection-carte-bg, .collection-carte-overlay
+       .collection-carte-contenu, .collection-carte-nom, .collection-carte-slogan
+       .collection-carte-actions, .collection-carte-lignes
+     ════════════════════════════════════════ -->
+        <div class="chargement" id="loading-collections">
+		
+		
+		<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div id="contenu-collections"></div>
         <div class="vide cache" id="vide-collections">
           <div class="vide-titre">Aucune collection</div>
           <div class="vide-desc">Créez votre première entrée</div>
         </div>
         </div>
+  
+          <div class="form-panel" id="fiche-famille">
+  
+  
+  
   
 
      <!-- FAMILLES -->
@@ -436,6 +537,23 @@
           <button class="bouton" id="btn-nouvelle-famille" onclick="ouvrirFormFamille()">+ Nouvelle famille</button>
         </div>
         <div class="msg-zone" id="msg-familles"></div>
+		
+		
+		
+		
+        <!-- ════════════════════════════════════════
+     FAMILLES — Fiche d'une famille
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFicheFamille()
+       fermerFicheFamille()
+       modifierFamille()
+       supprimerFamille()
+
+     CSS (style.css)
+       .famille-groupe, .famille-groupe-titre, .famille-groupe-desc
+     ════════════════════════════════════════ -->
         <div class="form-panel" id="fiche-famille">
           <button class="btn-fermer-panneau" onclick="fermerFicheFamille()" title="Fermer">✕</button>
           <div class="form-panel-header">
@@ -457,6 +575,24 @@
             </div>
           </div>
         </div>
+		
+		
+		
+		
+		
+		
+        <!-- ════════════════════════════════════════
+     FAMILLES — Formulaire nouvelle/modifier famille
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFormFamille()
+       fermerFormFamille()
+       sauvegarderFamille()
+
+     CSS (style.css)
+       .famille-groupe, .famille-groupe-titre, .famille-groupe-desc
+     ════════════════════════════════════════ -->
         <div class="form-panel" id="form-familles">
           <button class="btn-fermer-panneau" onclick="fermerFormFamille()" title="Fermer">✕</button>
           <div class="form-panel-header">
@@ -495,13 +631,33 @@
             </div>
           </div>
         </div>
-        <div class="chargement" id="loading-familles"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+		
+		
+		
+        <!-- ════════════════════════════════════════
+     FAMILLES — Liste des familles
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherFamilles()
+       chargerFamilles()
+
+     CSS (style.css)
+       .famille-groupe, .famille-groupe-titre, .famille-groupe-desc
+     ════════════════════════════════════════ -->
+        <div class="chargement" id="loading-familles">
+		
+		
+		
+		<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div id="contenu-familles"></div>
         <div class="vide cache" id="vide-familles">
           <div class="vide-titre">Aucune famille</div>
           <div class="vide-desc">Créez votre première famille</div>
         </div>
       </div>
+	  
+	  
 
       <!-- GAMMES -->
       <div class="section-admin" id="section-gammes">
@@ -513,6 +669,22 @@
           <button class="bouton" id="btn-nouvelle-gamme" onclick="ouvrirFormGamme(null)">+ Nouvelle gamme</button>
         </div>
         <div class="msg-zone" id="msg-gammes"></div>
+		
+		
+		
+      <!-- ════════════════════════════════════════
+     GAMMES — Fiche d'une gamme
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFicheGamme() / ouvrirFicheGamme2()
+       fermerFicheGamme() / fermerFicheLigne()
+       modifierGamme()
+       supprimerGamme()
+
+     CSS (style.css)
+       .fiche-collection-desc
+     ════════════════════════════════════════ -->
         <div id="fiche-gamme" class="form-panel">
           <button class="btn-fermer-panneau" onclick="fermerFicheGamme2()" title="Fermer">✕</button>
           <div class="form-panel-header">
@@ -527,6 +699,20 @@
             <button class="bouton bouton-rouge" id="btn-supprimer-gamme">Supprimer</button>
           </div>
         </div>
+		
+		
+      <!-- ════════════════════════════════════════
+     GAMMES — Formulaire nouvelle/modifier gamme
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFormGamme()
+       fermerFormGamme2()
+       sauvegarderGamme2()
+
+     CSS (style.css)
+       .couleur-apercu
+     ════════════════════════════════════════ -->
         <div class="form-panel" id="form-gammes">
           <div class="form-panel-header">
             <div class="form-panel-titre" id="form-gammes-titre">Nouvelle gamme</div>
@@ -564,13 +750,31 @@
             <button class="bouton bouton-contour" onclick="fermerFormGamme2()">Annuler</button>
           </div>
         </div>
-        <div class="chargement" id="loading-gammes"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+		
+		
+        <!-- ════════════════════════════════════════
+     GAMMES — Liste des gammes
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherGammes()
+
+     CSS (style.css)
+       .collection-section
+     ════════════════════════════════════════ -->
+        <div class="chargement" id="loading-gammes">
+		
+		<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div id="contenu-gammes"></div>
         <div class="vide cache" id="vide-gammes">
           <div class="vide-titre">Aucune gamme</div>
           <div class="vide-desc">Créez votre première gamme</div>
         </div>
       </div>
+
+
+
+
 
 <!-- RECETTES -->
       <div class="section-admin" id="section-produits">
@@ -582,8 +786,28 @@
           </div>
           <button class="bouton" id="btn-nouvelle-recette" onclick="ouvrirFormRecette()">+ Nouveau produit</button>
         </div>
+		
+		
+		
        <div class="msg-zone" id="msg-produits"></div>
 	   
+    <!-- ════════════════════════════════════════
+     PRODUITS — Liste des produits + filtres
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherProduits()
+       filtrerRecettes()
+       peuplerFiltresRecettes()
+       reinitialiserFiltresRecettes()
+       onFiltreCollection()
+
+     CSS (style.css)
+       .filtres-bar, .filtre-select, .filtre-recherche
+       .recette-cartes-grille, .recette-section-collection
+       .recette-collection-titre, .recette-section-ligne
+       .recette-ligne-titre, .recette-carte-actions
+     ════════════════════════════════════════ -->
         <div class="filtres-bar">
           <select class="form-ctrl filtre-select" id="filtre-recette-collection" onchange="onFiltreCollection()">
             <option value="">Collections</option>
@@ -604,6 +828,24 @@
           </select>
           <button class="bouton bouton-petit bouton-contour" onclick="reinitialiserFiltresRecettes()">Réinitialiser</button>
         </div>
+		
+		
+		
+		
+		
+<!-- ════════════════════════════════════════
+     PRODUITS — Fiche d'un produit
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFicheProduit()
+       fermerFicheProduit() / fermerFicheRecette()
+       basculerModeEditionRecette()
+       supprimerRecetteActive()
+
+     CSS (style.css)
+       .recette-statut-badge, .recette-statut-public, .recette-statut-test
+     ════════════════════════════════════════ -->
         <div class="form-panel" id="fiche-recette">
           <button class="btn-fermer-panneau" onclick="fermerFicheRecette()" title="Fermer">✕</button>
           <div class="form-panel-header">
@@ -617,6 +859,28 @@
           </div>
         </div>
        
+         <!-- ════════════════════════════════════════
+     PRODUITS — Formulaire nouveau/modifier produit
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFormProduit() / ouvrirFormRecette()
+       fermerFormProduit() / fermerFormRecette()
+       sauvegarderRecette()
+       modifierProduit()
+       apercuCouleurRecette()
+       ajouterIngredientRecette() / supprimerIngredientRecette()
+       rafraichirListeIngredientsRecette()
+       ajouterFormatRecette() / supprimerFormatRecette()
+       rafraichirListeFormatsRecette()
+       chargerIngredientsBaseRecette()
+       mettreAJourLignes()
+       ouvrirMediatheque()
+
+     CSS (style.css)
+       .couleur-apercu, .cloudinary-zone
+       .filtres-bar
+     ════════════════════════════════════════ -->
          <div class="form-panel" id="form-recettes">
           <div class="form-panel-header">
             <div class="form-panel-titre" id="form-recettes-titre">Nouvelle recette</div>
@@ -735,6 +999,20 @@
             </div>
           </div>
         </div>
+      <!-- ════════════════════════════════════════
+     PRODUITS — Grille des produits
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherProduits()
+
+     CSS (style.css)
+       .recette-cartes-grille
+       .recette-section-collection, .recette-collection-titre
+       .recette-section-ligne, .recette-ligne-titre
+       .recette-carte-actions
+       .recette-statut-badge, .recette-statut-public, .recette-statut-test
+     ════════════════════════════════════════ -->
       <div class="chargement" id="loading-produits"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div class="recettes-grille cache" id="grille-produits"></div>
       <div class="vide cache" id="vide-produits">
@@ -783,6 +1061,19 @@
   <!-- ══════════════════════════════
        ÉTAPE 1 — EN-TÊTE FACTURE
   ══════════════════════════════ -->
+  <!-- ════════════════════════════════════════
+     NOUVELLE FACTURE — Étape 1 : En-tête facture
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       initialiserNouvelleFacture()
+       wizardEtape2()
+       onChangeFournisseur()
+
+     CSS (style.css)
+       .wizard-etapes, .wizard-etape, .wizard-cercle
+       .wizard-label, .wizard-trait
+     ════════════════════════════════════════ -->
   <div id="wizard-step-1" class="wizard-step">
     <div class="form-panel visible">
       <div class="form-panel-header">
@@ -820,6 +1111,22 @@
   <!-- ══════════════════════════════
        ÉTAPE 2 — ITEMS
   ══════════════════════════════ -->
+  <!-- ════════════════════════════════════════
+     NOUVELLE FACTURE — Étape 2 : Items
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       wizardEtape2()
+       wizardEtape3()
+       afficherBanniereFacture()
+       afficherItemsFacture()
+       onChangeType()
+       onChangeIngredient()
+       onChangeFormat()
+
+     CSS (style.css)
+       .facture-active-banner, .facture-active-titre, .facture-active-info
+     ════════════════════════════════════════ -->
   <div id="wizard-step-2" class="wizard-step cache">
 
     <!-- Bannière facture active -->
@@ -919,6 +1226,18 @@
   <!-- ══════════════════════════════
        ÉTAPE 3 — FINALISATION
   ══════════════════════════════ -->
+  <!-- ════════════════════════════════════════
+     NOUVELLE FACTURE — Étape 3 : Finalisation
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       wizardEtape3()
+       calculerTotalFinal()
+       finaliserFacture()
+
+     CSS (style.css)
+       .finalisation-panel, .finalisation-titre
+     ════════════════════════════════════════ -->
   <div id="wizard-step-3" class="wizard-step cache">
 
     <div class="finalisation-panel">
@@ -972,6 +1291,20 @@
       </div>
 
       <!-- FACTURES -->
+      <!-- ════════════════════════════════════════
+     IMPORT FACTURE PDF
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       importerFacturePDF()
+       parserFacturePA()
+       afficherApercuItems()
+       confirmerImportFacture()
+
+     CSS (style.css)
+       .tableau-admin, .tableau-wrap
+       .form-grille-2
+     ════════════════════════════════════════ -->
       <div class="section-admin" id="section-import-facture">
         <div class="page-entete">
           <div class="page-entete-titre">Import <em>facture PDF</em></div>
@@ -1062,6 +1395,25 @@
         </div>
       </div>
 
+      <!-- ════════════════════════════════════════
+     LES FACTURES — Liste et détail
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerFactures()
+       filtrerFactures()
+       reinitialiserFiltres()
+       afficherFactures()
+       voirDetailFacture()
+       fermerModalFacture()
+       supprimerFacture()
+
+     CSS (style.css)
+       .filtres-bar, .factures-compte
+       .tableau-admin, .tableau-wrap
+       .facture-sous-total, .facture-sous-total-label
+       .inv-total, .inv-total-label, .inv-total-montant
+     ════════════════════════════════════════ -->
       <div class="section-admin" id="section-factures">
         <div class="page-entete fade-in">
           <div>
@@ -1126,6 +1478,20 @@
       </div>
 
       <!-- INVENTAIRE -->
+      <!-- ════════════════════════════════════════
+     INVENTAIRE — Stocks ingrédients
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerInventaire()
+       filtrerInventaire()
+       reinitialiserFiltresInventaire()
+
+     CSS (style.css)
+       .filtres-bar
+       .inv-section, .inv-header, .inv-titre, .inv-line
+       .inv-total, .inv-total-label, .inv-total-montant
+     ════════════════════════════════════════ -->
       <div class="section-admin" id="section-inventaire">
         <div class="page-entete fade-in">
           <div>
@@ -1154,6 +1520,22 @@
       </div>
 
 <!-- FABRICATION -->
+      <!-- ════════════════════════════════════════
+     FABRICATION — Lots de production
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerFabrication()
+       afficherTableauFabrication()
+       ouvrirFormFabrication()
+       fermerFormFabrication()
+       fabFiltrerRecettes()
+       fabFiltrerFormats()
+       calculerApercuLot()
+
+     CSS (style.css)
+       .carte-admin, .carte-admin-entete
+     ════════════════════════════════════════ -->
       <div class="section-admin" id="section-fabrication">
         <div class="page-entete fade-in">
           <div class="page-entete-gauche">
@@ -1246,6 +1628,17 @@
       </div>
 
     <!-- INVENTAIRE PRODUCTION -->
+      <!-- ════════════════════════════════════════
+     INVENTAIRE PRODUCTION — Lots fabriqués
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ⚠️ Cette section redirige vers section-inventaire
+       afficherSection('inventaire')
+
+     CSS (style.css)
+       .inv-section, .inv-header, .inv-titre, .inv-line
+     ════════════════════════════════════════ -->
       <div class="section-admin" id="section-inventaire-production">
         <div class="page-entete fade-in">
           <div class="page-entete-gauche">
@@ -1259,6 +1652,19 @@
       </div>
 
     <!-- CONTENU DU SITE -->
+      <!-- ════════════════════════════════════════
+     CONTENU DU SITE — Textes du site public
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerContenuSite()
+       sauvegarderContenuSite()
+       toggleModeSaisonnier()
+
+     CSS (style.css)
+       .form-panel, .form-panel-header, .form-panel-titre
+       .form-grille, .form-groupe, .form-ctrl
+     ════════════════════════════════════════ -->
       <div class="section-admin" id="section-contenu-site">
         <div class="page-entete fade-in">
           <div>
@@ -1477,6 +1883,24 @@
 	
 
       <!-- INCI -->
+      <!-- ════════════════════════════════════════
+     INCI — Ingrédients et validation
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+     ⚠️ LÉGAL — Ne jamais afficher un nom à la place d'un code INCI
+
+     JS (admin.js)
+       chargerInci()
+       inciAppliquerFiltres()
+       inciGetFiltres()
+       inciConstruireAccordeons()
+       inciRendreLigne()
+       inciToggleDetail() / inciToggleAccordeon()
+       inciValider()
+       retourRecetteDepuisInci()
+
+     CSS (style.css)
+       .filtres-bar, .filtre-btn, .filtre-label
+     ════════════════════════════════════════ -->
       <div class="section-admin" id="section-inci">
         <div class="page-entete fade-in">
           <div>
@@ -1521,6 +1945,20 @@
       </div>
 
       <!-- IMPORT RECETTES -->
+      <!-- ════════════════════════════════════════
+     IMPORT RECETTES — Importer via fichier .md
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       importLireFichier()
+       importEnLot()
+       importParserMD()
+       importEnvoyer()
+       importAnnuler()
+
+     CSS (style.css)
+       .carte-admin, .carte-admin-entete
+     ════════════════════════════════════════ -->
       <div class="section-admin" id="section-import-recettes">
         <div class="page-entete fade-in">
           <div class="page-entete-gauche">
@@ -1619,6 +2057,20 @@
       </div>
 
       <!-- DENSITÉS -->
+     <!-- ════════════════════════════════════════
+     DENSITÉS — Facteurs de conversion ml → g
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerDensites()
+       ouvrirFormDensite()
+       fermerFormDensite()
+       modifierDensite()
+       sauvegarderDensite()
+
+     CSS (style.css)
+       .tableau-admin, .tableau-wrap
+     ════════════════════════════════════════ -->
       <div class="section-admin" id="section-densites">
         <div class="page-entete fade-in">
           <div>
@@ -1681,6 +2133,28 @@
       </div>
 
 
+   <!-- ════════════════════════════════════════
+     MÉDIATHÈQUE — Photos Cloudinary
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerMediatheque()
+       medFiltrer()
+       mediathequeOuvrirAjout()
+       mediathequeFermerAjout()
+       mediathequeSauvegarder()
+       mediathequeSyncCloudinary()
+       mediathequeSupprimer()
+       ouvrirMediatheque()
+       filtrerMediatheque()
+       peuplerFiltresCategoriesMediatheque()
+       selectionnerPhotoMediatheque()
+       fermerModalMediatheque()
+
+     CSS (style.css)
+       .carte-admin, .carte-admin-entete
+       .filtres-bar
+     ════════════════════════════════════════ -->
     <div class="section-admin" id="section-mediatheque">
   <div class="page-entete fade-in">
     <div class="page-entete-gauche">
