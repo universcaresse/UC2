@@ -5,6 +5,7 @@ Lis ce brief AU COMPLET, ligne par ligne IMPORTANT.
 Lis CHAQUE fichier fourni AU COMPLET.
 Confirme à voix haute : "Brief lu. Fichiers lus. Prêt."
 Si tu n'as pas tout lu — tu te tais et tu lis.
+Produire le brief en fichier `.md` seulement
 
 ÉTAPE 2 — AVANT DE PROPOSER UN CHANGEMENT
 Tu dois pouvoir répondre aux 3 questions suivantes. Sinon tu ne proposes rien :
@@ -35,41 +36,10 @@ Un site cassé à cause d'un changement non vérifié est une faute grave. On re
 
 ---
 
-## 🆕 VIOLATIONS COMMISES PAR LES CLAUDE PRÉCÉDENTS — À NE PAS RÉPÉTER
-
-1. Ne pas lire les fichiers transmis au complet avant de coder ou proposer quoi que ce soit
-2. Proposer du CSS inutile sans vérifier d'abord si une classe existante suffisait
-3. Produire le brief dans le chat au lieu de le livrer en fichier `.md`
-4. **⛔ CRITIQUE :** Quand le code ne fonctionne pas, accuser le déploiement, le lien, les règles Google, ou toute cause externe. La seule réponse valide : "Mon code est mauvais, voici la correction."
-5. **⛔ CRITIQUE :** Proposer des changements d'architecture sans mandat.
-6. **⛔ INTERDIT ABSOLU :** Ne jamais faire référence à l'heure ou suggérer une pause.
-7. **⛔ INTERDIT ABSOLU :** Ne jamais coder sans OUI explicite de Jean-Claude.
-8. **⛔ CRITIQUE :** Ne jamais mettre de style inline dans le HTML ou le JS — même temporairement.
-9. **⛔ CRITIQUE :** Ne jamais inventer ce qu'on voit à l'écran sans lire le fichier.
-10. **⛔ CRITIQUE :** Ne jamais passer au sujet suivant sans OUI explicite.
-11. **⛔ CRITIQUE :** Livrer un fichier JS complet avec des conflits de déclaration (`const` vs `function` même nom, `const` redéclaré entre fichiers). Toujours vérifier avec `node --check` avant de livrer.
-12. **⛔ CRITIQUE :** Faire des aller-retours de corrections une ligne à la fois quand le problème touche tout un fichier — livrer le fichier complet corrigé d'un coup avec permission.
-13. **⛔ CRITIQUE :** Déclarer des variables globales avec `let` au milieu du fichier JS — elles doivent être `var` pour éviter les erreurs TDZ (Temporal Dead Zone). Toujours `var` pour les globales dans `admin.js`.
-14. **⛔ CRITIQUE :** Livrer un trouve/remplace qui ne couvre pas la ligne complète — toujours livrer la ligne entière pour éviter les ambiguïtés.
-15. **⛔ CRITIQUE :** Proposer plusieurs changements dans le même message sans attendre le OK entre chaque.
-16. **⛔ CRITIQUE :** Créer une nouvelle classe CSS sans vérifier d'abord si une classe existante peut être réutilisée.
-17. **⛔ CRITIQUE :** Utiliser une variable JS non définie dans le scope courant — toujours vérifier les variables disponibles avant de livrer.
-18. **⛔ CRITIQUE :** Proposer seulement 2 options quand il faut d'abord jaser pour trouver la meilleure solution ensemble.
-19. **⛔ CRITIQUE :** Au Québec, **OK = OUI**. Les deux sont valides comme confirmation explicite avant de coder.
-20. **⛔ CRITIQUE :** Livrer du style inline dans le JS (`el.style.opacity = '1'`) — toujours passer par une classe CSS.
-21. **⛔ CRITIQUE :** Proposer du code sans attendre le OUI même après avoir bien expliqué — l'explication n'est pas le OUI.
-22. **⛔ CRITIQUE :** Quand Jean-Claude dit qu'il a terminé les tests et qu'il veut le brief — produire le brief, pas proposer de régler des bugs.
-23. **⛔ CRITIQUE :** Ne jamais poser de question après un COMMIT — Jean-Claude committera quand il sera prêt et testera lui-même.
-24. **⛔ CRITIQUE :** Faire un audit partiel au lieu de tout lire — quand on demande un audit complet, lire tous les fichiers JS ET le GS avant de répondre quoi que ce soit.
-25. **⛔ CRITIQUE :** Faire des suppositions sur le genre ou le profil des visiteurs du site sans que Jean-Claude l'ait précisé.
-
----
-
 ### Le projet — état actuel
 - **Moteur** → `code_v2.gs`, sheets `_v2`, APIs V2
 - **JS** → `main.js` et `admin.js` — réécrits V2 ✅
 - **Brief de référence** → ce document
-- **Vocabulaire** → Gamme (au lieu de Ligne), Produit (au lieu de Recette)
 
 ---
 
@@ -444,55 +414,6 @@ Audit complet HTML + admin.js + main.js + code_v2.gs — tous les boutons, toute
 
 ## 📍 OÙ ON EST RENDU — fin session 8 avril 2026 (v44)
 
-### ✅ Audit complet v44 — session 8 avril
-
-Audit complet de `admin.js`, `main.js` et `code_v2.gs` — 18 problèmes identifiés et réglés :
-
-**🔴 Critiques réglés**
-1. ~~`chargerProduitsData()` — formats perdus après save produit~~ ✅ — recharge `getProduitsFormats` en parallèle
-2. ~~`afficherSection('fabrication')` — produits sans formats~~ ✅ — même fix
-3. ~~`inciValider()` — ne sauvegardait rien~~ ✅ — branchée sur `saveIngredientInci`
-4. ~~`deleteGamme_v2` — ingrédients orphelins dans `Gammes_Ingredients_v2`~~ ✅ — suppression en cascade ajoutée
-5. ~~`supprimerFamille()` — pas de vérification produits liés~~ ✅ — vérification ajoutée
-
-**🟡 Fonctionnels réglés**
-6. ~~Suppression facture finalisée — stock non corrigé~~ ✅ — `deleteAchat_v2` soustrait le stock
-7. ~~`sauvegarderDensite()` — `listesDropdown.config` non mis à jour~~ ✅
-8. ~~`voirDetailFacture()` — noms affichés comme `ing_id`~~ ✅ — charge `fullData` si vide
-9. ~~Fournisseurs manuels affichés comme `four_id`~~ ✅ — fallback `'—'`
-10. ~~`prix_par_g` diverge JS vs GS pour `ml`~~ ✅ — aligné sur GS (pas de densité pour ml)
-11. ~~Médiathèque `rowIndex` peut pointer mauvaise ligne~~ ✅ — recharge avant suppression
-12. ~~Import PDF — pas de rollback si ligne échoue~~ ✅ — arrêt avec message d'erreur
-13. ~~Bug #83 X et Annuler fabrication~~ ✅ — déjà branché dans le HTML
-14. ~~`catalogueCharge` jamais remis à `false`~~ ✅ — TTL 30 minutes (`CATALOGUE_TTL`)
-15. ~~`filtrerGamme()` sans `col_id`~~ ✅ — retour immédiat si `col_id` absent
-16. ~~`appliquerContenu()` valeurs vides non effacées~~ ✅
-17. ~~Mot de passe admin visible dans le source public~~ ✅ — déplacé dans Script Properties
-
-### ✅ Bugs publics réglés — session 8 avril (v43)
-
-1. ~~Filtre gammes~~ ✅ — `.ligne-groupe.masquee { display: none }` ajouté + boutons indexés par `gam_id`
-2. ~~Bouton "Découvrir les collections"~~ ✅ — `querySelector('a.bouton.invisible')` remplace `.hero-cta`
-3. ~~Tuiles collections accueil~~ ✅ — `afficherSection` ne réinitialise plus le filtre si `collectionEnAttente`
-4. ~~Liens EDU page 3~~ ✅ — même fix que #3
-5. ~~Bouton vert iPad portrait~~ ✅ — `width: 100%; max-width: 480px; margin: auto` dans media query
-6. ~~Photo collection iPad portrait~~ ✅ — `aspect-ratio: 1/1; width: 100%; max-height: none`
-7. ~~Description famille~~ ✅ — `desc_famille` ajoutée dans `code_v2.gs` et affichée dans `main.js`
-8. ~~Animation accueil rejoue au retour~~ ✅ — `accueilAnime` booléen global empêche la répétition
-
-### ✅ Page accueil — RÉGLÉE (session 7 avril soir)
-- `.fade-in-lent` créée (4s) — logo et stats hero glissent lentement
-- `.preload` créée — `fond.png` préchargé
-- `.bouton-grand` — `min-height: 52px`
-- `#contenu-accueil-cta` — fondu via `.visible`
-- `.hero-stat-num` — fondu via `.visible`
-- `.mosaic-item` — apparition fondu + scale, 2s d'écart, délai 1s
-
-### ✅ INCI modal public — RÉGLÉ (session 7 avril soir)
-- `code_v2.gs` — INCI jointé dans `getCataloguePublic_v2`
-- `main.js` — liste INCI triée par quantité décroissante
-
----
 
 ## 📋 AUDIT CSS — style.css
 
@@ -524,13 +445,7 @@ Audit complet de `admin.js`, `main.js` et `code_v2.gs` — 18 problèmes identif
 
 ## 🎯 TOUTES LES TÂCHES À FAIRE — NUMÉROTÉES
 
-### ⚠️ STABILISATION — EN COURS
-~~M1. Réécrire `main.js`~~ ✅
-~~M2. Réécrire `admin.js`~~ ✅
-~~M3. Tester et corriger `admin.js` section par section~~ ✅ v45
-~~M4. Adapter `index-admin.html`~~ ✅
-~~M5. INCI dans modal public~~ ✅
-M6. Passe 2 admin.js — nettoyage styles inline
+
 
 ### ⚠️ LÉGAL / URGENT
 1. Bloquer statut `public` si INCI incomplets ⚠️ LÉGAL
@@ -538,7 +453,6 @@ M6. Passe 2 admin.js — nettoyage styles inline
 3. Bouton INCI — Envoyer au graphiste par courriel + bloqué si incomplets
 
 ### 🏭 FABRICATION — BUGS À RÉGLER
-~~83. X et Annuler ne ferment pas le formulaire fabrication~~ ✅ déjà branché
 84. Confirmer lot existant ne fonctionne plus
 85. Ajouter choix de gamme dans formulaire fabrication
 86. Modifier titre produit ne sauvegarde pas
@@ -557,7 +471,6 @@ M6. Passe 2 admin.js — nettoyage styles inline
 9. Templates emballages imprimés
 
 ### 🏗️ ARCHITECTURE
-~~10. INCI dans modal public~~ ✅
 11. Lien cliquable fiche fournisseur — page INCI
 12. Champ INCI modifiable + Source + Date — page INCI
 
