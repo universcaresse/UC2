@@ -30,7 +30,8 @@
         <div class="nav-dropdown">
           <button class="nav-dropdown-item" onclick="afficherSection('collections', null)">Collections</button>
 		  
-          <button class="nav-dropdown-item" onclick="afficherSection('familles', null)">Familles</button>
+          <button class="nav-dropdown-item" onclick="afficherSection('gammes', null)">Gammes</button>
+<button class="nav-dropdown-item" onclick="afficherSection('familles', null)">Familles</button>
 		  
          <button class="nav-dropdown-item" onclick="afficherSection('produits', null)">Produits</button>
 		 
@@ -100,7 +101,8 @@
         <div class="sidebar-titre">Création</div>
         <button class="sidebar-lien actif" onclick="afficherSection('collections', this)">Collections</button>
 		
-		 <button class="sidebar-lien" onclick="afficherSection('familles', this)">Familles</button>
+		 <button class="sidebar-lien" onclick="afficherSection('gammes', this)">Gammes</button>
+<button class="sidebar-lien" onclick="afficherSection('familles', this)">Familles</button>
 		
  <button class="sidebar-lien" onclick="afficherSection('produits', this)">Produits</button>
        
@@ -310,7 +312,7 @@
             <div class="form-actions">
               <button class="bouton" id="fiche-collection-modifier">Modifier la collection</button>
               <button class="bouton bouton-rouge" id="btn-supprimer-collection">Supprimer la collection</button>
-              <button class="bouton bouton-vert-pale" id="fiche-collection-ajouter-ligne">+ Ajouter une gammeaaa</button>
+              
             </div>
           </div>
        </div>
@@ -353,7 +355,7 @@
           <div class="form-panel-header">
             <div class="form-panel-titre" id="form-collections-titre">Nouvelle collection</div>
             <div class="td-actions">
-              <button class="btn btn-sm btn-outline" id="fc-toggle-mode" onclick="basculerModeFormCollection()">+ Ajouter une gammeee</button>
+             
             </div>
           </div>
           <div class="form-body">
@@ -544,8 +546,78 @@
         </div>
       </div>
 
-      <!-- RECETTES -->
+      <!-- GAMMES -->
+      <div class="section-admin" id="section-gammes">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Gérer les gammes</div>
+            <div class="page-entete-titre">Gammes</div>
+          </div>
+          <button class="bouton" id="btn-nouvelle-gamme" onclick="ouvrirFormGamme(null)">+ Nouvelle gamme</button>
+        </div>
+        <div class="msg-zone" id="msg-gammes"></div>
+        <div id="fiche-gamme" class="form-panel">
+          <button class="btn-fermer-panneau" onclick="fermerFicheGamme2()" title="Fermer">✕</button>
+          <div class="form-panel-header">
+            <div class="form-panel-titre" id="fiche-gamme-titre"></div>
+          </div>
+          <div class="form-body">
+            <div class="form-valeur" id="fiche-gamme-collection"></div>
+            <p class="fiche-collection-desc" id="fiche-gamme-desc"></p>
+          </div>
+          <div class="form-actions">
+            <button class="bouton" id="fiche-gamme-modifier">Modifier</button>
+            <button class="bouton bouton-rouge" id="btn-supprimer-gamme">Supprimer</button>
+          </div>
+        </div>
+        <div class="form-panel" id="form-gammes">
+          <div class="form-panel-header">
+            <div class="form-panel-titre" id="form-gammes-titre">Nouvelle gamme</div>
+            <button class="btn-fermer-panneau" onclick="fermerFormGamme2()" title="Fermer">✕</button>
+          </div>
+          <div class="form-body">
+            <input type="hidden" id="fg-id">
+            <div class="form-grille">
+              <div class="form-groupe col-demi">
+                <label class="form-label">Nom</label>
+                <input type="text" class="form-ctrl" id="fg-nom">
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Collection</label>
+                <select class="form-ctrl" id="fg-collection">
+                  <option value="">— Choisir —</option>
+                </select>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Rang</label>
+                <input type="text" inputmode="decimal" class="form-ctrl" id="fg-rang">
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Couleur HEX</label>
+                <input type="text" class="form-ctrl" id="fg-couleur-hex">
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Description</label>
+                <textarea class="form-ctrl" id="fg-desc" rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="bouton" onclick="sauvegarderGamme2()">Enregistrer</button>
+            <button class="bouton bouton-contour" onclick="fermerFormGamme2()">Annuler</button>
+          </div>
+        </div>
+        <div class="chargement" id="loading-gammes"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div id="contenu-gammes"></div>
+        <div class="vide cache" id="vide-gammes">
+          <div class="vide-titre">Aucune gamme</div>
+          <div class="vide-desc">Créez votre première gamme</div>
+        </div>
+      </div>
+
+<!-- RECETTES -->
       <div class="section-admin" id="section-produits">
+	  ¸
         <div class="page-entete fade-in">
           <div>
             <div class="page-entete-eyebrow">Gérer les produits</div>

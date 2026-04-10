@@ -858,7 +858,7 @@ tr.cliquable { cursor: pointer; }
 .fiche-label-manquant { color: var(--danger); font-weight: 500; }
 .fiche-label-manquant::before { content: '⚠️ '; }
 .fiche-valeur { font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--gris-fonce); }
-.fiche-section-titre { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--blanc); margin: 24px 0 8px; border-bottom: 1px solid var(--beige); padding-bottom: 6px; }
+.fiche-section-titre { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--gris); margin: 24px 0 8px; border-bottom: 1px solid var(--beige); padding-bottom: 6px; }
 .fiche-texte { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--gris-fonce); white-space: pre-line; }
 .fiche-ingredients { display: flex; flex-direction: column; gap: 6px; }
 .fiche-ingredient { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--beige); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; }

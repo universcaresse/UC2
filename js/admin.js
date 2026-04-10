@@ -141,7 +141,8 @@ function afficherSection(id, bouton) {
   if (id === 'accueil')        afficherStatsAccueil();
   if (id === 'import-facture') ifChargerMapping();
   if (id === 'collections')    afficherCollections();
-  if (id === 'familles')       afficherFamilles();
+  if (id === 'gammes')         afficherGammes();
+if (id === 'familles')       afficherFamilles();
   if (id === 'produits')       { reinitialiserFiltresRecettes(); afficherProduits(); }
   if (id === 'inci')           { const r = document.getElementById('inci-recherche'); if (r) r.value = ''; chargerInci(); }
   if (id === 'densites')       chargerDensites();
@@ -796,8 +797,84 @@ async function supprimerGamme(gam_id) {
 }
 
 /* ════════════════════════════════
-   PRODUITS V2 (ex-Recettes)
+   GAMMES V2
 ════════════════════════════════ */
+function afficherGammes() {
+  const loading = document.getElementById('loading-gammes');
+  const contenu = document.getElementById('contenu-gammes');
+  const vide    = document.getElementById('vide-gammes');
+  const btnNew  = document.getElementById('btn-nouvelle-gamme');
+  if (loading) loading.classList.add('cache');
+  if (btnNew)  btnNew.classList.remove('cache');
+  if (!contenu) return;
+  contenu.innerHTML = '';
+  if (vide) vide.classList.add('cache');
+  if (!donneesGammes.length) { if (vide) vide.classList.remove('cache'); return; }
+
+  let html = '<div class="collections-grille">';
+  donneesGammes.forEach(gam => {
+    const col     = donneesCollections.find(c => c.col_id === gam.col_id);
+    const couleurs = couleurCollection(gam.nom, gam.couleur_hex);
+    html += `
+      <div class="collection-carte" onclick="ouvrirFicheGamme2('${gam.gam_id}')">
+        <div class="collection-carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
+        <div class="collection-carte-overlay"></div>
+        <div class="collection-carte-lignes-haut"><span class="collection-carte-ligne-tag">${(col?.nom || '—').toUpperCase()}</span></div>
+        <div class="collection-carte-contenu">
+          <span class="collection-carte-nom">${(gam.nom || '').toUpperCase()}</span>
+          <span class="collection-carte-slogan">${gam.description || ''}</span>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  contenu.innerHTML = html;
+}
+
+function ouvrirFicheGamme2(gam_id) {
+  const gam = donneesGammes.find(g => g.gam_id === gam_id);
+  if (!gam) return;
+  const col = donneesCollections.find(c => c.col_id === gam.col_id);
+  document.getElementById('fiche-gamme-titre').textContent      = (gam.nom || '').toUpperCase();
+  document.getElementById('fiche-gamme-collection').textContent = col?.nom || '—';
+  document.getElementById('fiche-gamme-desc').textContent       = gam.description || '—';
+  document.getElementById('fiche-gamme-modifier').onclick = () => { fermerFicheGamme2(); modifierGamme2(gam_id); };
+  document.getElementById('btn-supprimer-gamme').onclick  = () => supprimerGamme2(gam_id);
+  document.getElementById('contenu-gammes').classList.add('cache');
+  document.getElementById('btn-nouvelle-gamme').classList.add('cache');
+  document.getElementById('fiche-gamme').classList.add('visible');
+  window.scrollTo(0, 0);
+}
+
+function fermerFicheGamme2() {
+  document.getElementById('fiche-gamme').classList.remove('visible');
+  document.getElementById('contenu-gammes').classList.remove('cache');
+  const btnNew = document.getElementById('btn-nouvelle-gamme');
+  if (btnNew) btnNew.classList.remove('cache');
+}
+
+function ouvrirFormGamme(col_id) {
+  fermerFicheGamme2();
+  document.getElementById('form-gammes-titre').textContent = 'Nouvelle gamme';
+  document.getElementById('fg-id').value          = '';
+  document.getElementById('fg-nom').value         = '';
+  document.getElementById('fg-rang').value        = '';
+  document.getElementById('fg-desc').value        = '';
+  document.getElementById('fg-couleur-hex').value = '';
+  const sel = document.getElementById('fg-collection');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
+    const o = document.createElement('option');
+    o.value = col.col_id; o.textContent = col.nom; sel.appendChild(o);
+  });
+  if (col_id) sel.value = col_id;
+  document.getElementById('contenu-gammes').classList.add('cache');
+  document.getElementById('btn-nouvelle-gamme').classList.add('cache');
+  document.getElementById('form-gammes').classList.add('visible');
+  window.scrollTo(0, 0);
+}
+
+function fermerFormGamme2() {
+  document.getElementById('form-gammes').classList.remove('visible'
 var donneesProduits   = []; // [{pro_id, col_id, gam_id, nom, statut, ...}]
 var produitActif      = null;
 var collectionsDisponibles = {};
