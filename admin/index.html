@@ -722,41 +722,49 @@
      CSS (style.css)
        .couleur-apercu
      ════════════════════════════════════════ -->
-        <div class="form-panel" id="form-gammes">
-          <div class="form-panel-header">
-            <div class="form-panel-titre" id="form-gammes-titre">Nouvelle gamme</div>
-            <button class="btn-fermer-panneau" onclick="fermerFormGamme2()" title="Fermer">✕</button>
+       <div id="form-gammes" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="form-gammes-bandeau">
+                <span class="form-panel-titre" id="form-gammes-titre">Nouvelle gamme</span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFormGamme2()" title="Fermer">✕</button>
+            </div>
           </div>
-          <div class="form-body">
-            <input type="hidden" id="fg-id">
-            <div class="form-grille">
-              <div class="form-groupe col-demi">
-                <label class="form-label">Nom</label>
-                <input type="text" class="form-ctrl" id="fg-nom">
-              </div>
-              <div class="form-groupe">
-                <label class="form-label">Collection</label>
-                <select class="form-ctrl" id="fg-collection">
-                  <option value="">— Choisir —</option>
-                </select>
-              </div>
-              <div class="form-groupe">
-                <label class="form-label">Rang</label>
-                <input type="text" inputmode="decimal" class="form-ctrl" id="fg-rang">
-              </div>
-              <div class="form-groupe">
-                <label class="form-label">Couleur HEX</label>
-                <input type="text" class="form-ctrl" id="fg-couleur-hex">
-              </div>
-              <div class="form-groupe col-plein">
-                <label class="form-label">Description</label>
-                <textarea class="form-ctrl" id="fg-desc" rows="3"></textarea>
+          <div class="form-panel">
+            <div class="form-body">
+              <input type="hidden" id="fg-id">
+              <div class="form-grille">
+                <div class="form-groupe col-demi">
+                  <label class="form-label">Nom</label>
+                  <input type="text" class="form-ctrl" id="fg-nom">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Collection</label>
+                  <select class="form-ctrl" id="fg-collection">
+                    <option value="">— Choisir —</option>
+                  </select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Rang</label>
+                  <input type="text" inputmode="decimal" class="form-ctrl" id="fg-rang">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Couleur HEX</label>
+                  <input type="text" class="form-ctrl" id="fg-couleur-hex">
+                </div>
+                <div class="form-groupe col-plein">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-ctrl textarea-auto" id="fg-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
+                </div>
               </div>
             </div>
           </div>
-          <div class="form-actions">
-            <button class="bouton" onclick="sauvegarderGamme2()">Enregistrer</button>
-            <button class="bouton bouton-contour" onclick="fermerFormGamme2()">Annuler</button>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" onclick="sauvegarderCollection()">Enregistrer</button>
+              <button class="bouton bouton-contour" onclick="fermerFormGamme2()">Annuler</button>
+            </div>
           </div>
         </div>
 		

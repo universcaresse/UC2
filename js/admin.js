@@ -878,6 +878,8 @@ function ouvrirFormGamme(col_id) {
   if (col_id) sel.value = col_id;
   document.getElementById('contenu-gammes').classList.add('cache');
   document.getElementById('btn-nouvelle-gamme').classList.add('cache');
+  document.getElementById('form-gammes').classList.remove('cache');
+  document.getElementById('form-gammes').classList.remove('cache');
   document.getElementById('form-gammes').classList.add('visible');
   window.scrollTo(0, 0);
 }
