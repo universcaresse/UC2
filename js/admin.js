@@ -629,30 +629,22 @@ function ouvrirFormGamme(col_id) {
 async function modifierGamme(gam_id) {
   const gam = donneesGammes.find(g => g.gam_id === gam_id);
   if (!gam) return;
-  document.getElementById('fiche-collection').classList.remove('visible');
-  document.getElementById('contenu-collections').classList.add('cache');
-  document.getElementById('form-collections-titre').textContent = 'Modifier la gamme';
-  document.getElementById('fc-rowIndex').value         = gam.gam_id;
-  document.getElementById('fc-mode').value             = 'ligne';
-  document.getElementById('fc-bloc-collection').classList.add('cache');
-  document.getElementById('fc-bloc-ligne').classList.remove('cache');
-  document.getElementById('fc-collection-ligne').value = gam.col_id || '';
-  document.getElementById('fc-rang-ligne').value        = gam.rang || '';
-  document.getElementById('fc-ligne').value             = gam.nom || '';
-  document.getElementById('fc-desc-ligne').value       = gam.description || '';
-  document.getElementById('fc-couleur-hex-ligne').value = gam.couleur_hex || '';
-  document.getElementById('fc-photo-url-ligne').value  = gam.photo_url || '';
-apercuCouleurCollection(document.getElementById('fc-couleur-hex-ligne'));
-  const resBase = await appelAPI('getGammesIngredients', { gam_id });
-  ingredientsBase = (resBase && resBase.success ? resBase.items : []).map(i => ({
-    ing_id:   i.ing_id,
-    type:     (listesDropdown.fullData.find(d => d.ing_id === i.ing_id) || {}).cat_id || '',
-    nom:      i.nom_ingredient,
-    quantite: i.quantite_g
-  }));
-  rafraichirListeIngredientsBase();
-  document.getElementById('form-collections').classList.remove('cache');
-  document.getElementById('form-collections').classList.add('visible');
+  document.getElementById('form-gammes-titre').textContent = 'Modifier la gamme';
+  document.getElementById('fg-id').value          = gam.gam_id;
+  document.getElementById('fg-nom').value         = gam.nom || '';
+  document.getElementById('fg-desc').value        = gam.description || '';
+  document.getElementById('fg-couleur-hex').value = gam.couleur_hex || '';
+  const sel = document.getElementById('fg-collection');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
+    const o = document.createElement('option');
+    o.value = col.col_id; o.textContent = col.nom; sel.appendChild(o);
+  });
+  sel.value = gam.col_id || '';
+  peuplerPositionGamme(gam.col_id, gam.rang);
+  document.getElementById('contenu-gammes').classList.add('cache');
+  document.getElementById('btn-nouvelle-gamme').classList.add('cache');
+  document.getElementById('form-gammes').classList.remove('cache');
   window.scrollTo(0, 0);
 }
 
