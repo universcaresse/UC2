@@ -107,10 +107,8 @@ if (resGam && resGam.success) {
   const nbPublics = donneesProduits.filter(p => p.statut === 'public').length;
   const statCol   = document.getElementById('admin-stat-collections');
   const statProd  = document.getElementById('admin-stat-produits');
-if (statCol)  statCol.textContent  = donneesCollections.length;
-  if (statProd && nbPublics > 0) statProd.textContent = nbPublics + '+';
-
-  afficherSection('collections', document.querySelector('.sidebar-lien[onclick*="\'collections\'"]'));
+	if (statCol)  statCol.textContent  = donneesCollections.length;
+	if (statProd && nbPublics > 0) statProd.textContent = nbPublics + '+';
 }
 
 // ─── NAVIGATION SIDEBAR ───
