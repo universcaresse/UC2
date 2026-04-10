@@ -645,8 +645,6 @@ apercuCouleurCollection(document.getElementById('fc-couleur-hex-ligne'));
 async function modifierCollection(col_id) {
   const col = donneesCollections.find(c => c.col_id === col_id);
   if (!col) return;
-  document.getElementById('fc-bloc-collection').classList.remove('cache');
-  document.getElementById('fc-bloc-ligne').classList.add('cache');
   document.getElementById('fc-mode').value             = 'collection';
   document.getElementById('form-collections-titre').textContent = 'Modifier la collection';
   document.getElementById('fc-rowIndex').value         = col.col_id;
