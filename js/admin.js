@@ -515,10 +515,7 @@ function ouvrirFicheCollection(col_id) {
     document.getElementById('fiche-collection').classList.remove('visible');
     modifierCollection(col_id);
   };
-  document.getElementById('fiche-collection-ajouter-ligne').onclick = () => {
-    fermerFicheCollection();
-    ouvrirFormGamme(col_id);
-  };
+ 
   document.getElementById('btn-supprimer-collection').onclick = () => supprimerCollection(col_id);
 
   document.getElementById('contenu-collections').classList.add('cache');
