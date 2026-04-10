@@ -802,12 +802,13 @@ async function supprimerGamme(gam_id) {
  confirmerAction('Supprimer cette gamme ?', async () => {
     const res = await appelAPIPost('deleteGamme', { gam_id, col_id: gam.col_id });
     if (res && res.success) {
-      fermerFicheGamme();
-      fermerFicheCollection();
-      afficherMsg('collections', 'Gamme supprimée.');
-      await chargerCollections();
+      fermerFicheGamme2();
+      afficherMsg('gammes', 'Gamme supprimée.');
+      const resGam = await appelAPI('getGammes');
+      if (resGam && resGam.success) donneesGammes = resGam.items || [];
+      afficherGammes();
     } else {
-      afficherMsg('collections', 'Erreur.', 'erreur');
+      afficherMsg('gammes', 'Erreur.', 'erreur');
     }
   });
 }
