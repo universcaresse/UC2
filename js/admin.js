@@ -468,15 +468,11 @@ function afficherCollections() {
   donneesCollections.forEach(col => {
     const couleurs = couleurCollection(col.nom, col.couleur_hex);
     // Gammes de cette collection
-    const gammes = donneesGammes.filter(g => g.col_id === col.col_id);
-    const gammesHtml = gammes.map(g =>
-      `<span class="collection-carte-ligne-tag">${(g.nom || '').toUpperCase()}</span>`
-    ).join('');
     html += `
       <div class="collection-carte" onclick="ouvrirFicheCollection('${col.col_id}')">
         <div class="collection-carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
         <div class="collection-carte-overlay"></div>
-        <div class="collection-carte-lignes-haut">${gammesHtml}</div>
+        <div class="collection-carte-lignes-haut"></div>
         <div class="collection-carte-contenu">
           <span class="collection-carte-nom">${(col.nom || '').toUpperCase()}</span>
           <span class="collection-carte-slogan">${col.slogan || ''}</span>
@@ -806,29 +802,39 @@ function afficherGammes() {
   const contenu = document.getElementById('contenu-gammes');
   const vide    = document.getElementById('vide-gammes');
   const btnNew  = document.getElementById('btn-nouvelle-gamme');
-  if (loading) loading.classList.add('cache');
-  if (btnNew)  btnNew.classList.remove('cache');
   if (!contenu) return;
   contenu.innerHTML = '';
   if (vide) vide.classList.add('cache');
-  if (!donneesGammes.length) { if (vide) vide.classList.remove('cache'); return; }
+  if (!donneesGammes.length) {
+    if (loading) loading.classList.add('cache');
+    if (btnNew)  btnNew.classList.remove('cache');
+    if (vide) vide.classList.remove('cache');
+    return;
+  }
+  if (loading) loading.classList.add('cache');
+  if (btnNew)  btnNew.classList.remove('cache');
 
-  let html = '<div class="collections-grille">';
-  donneesGammes.forEach(gam => {
-    const col     = donneesCollections.find(c => c.col_id === gam.col_id);
-    const couleurs = couleurCollection(gam.nom, gam.couleur_hex);
-    html += `
-      <div class="collection-carte" onclick="ouvrirFicheGamme2('${gam.gam_id}')">
-        <div class="collection-carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
-        <div class="collection-carte-overlay"></div>
-        <div class="collection-carte-lignes-haut"><span class="collection-carte-ligne-tag">${(col?.nom || '—').toUpperCase()}</span></div>
-        <div class="collection-carte-contenu">
-          <span class="collection-carte-nom">${(gam.nom || '').toUpperCase()}</span>
-          <span class="collection-carte-slogan">${gam.description || ''}</span>
-        </div>
-      </div>`;
+  let html = '';
+  donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
+    const gammesDeLaCol = donneesGammes.filter(g => g.col_id === col.col_id).sort((a, b) => (a.rang || 99) - (b.rang || 99));
+    if (!gammesDeLaCol.length) return;
+    html += `<div class="recette-collection-titre">${col.nom.toUpperCase()}</div>`;
+    html += '<div class="collections-grille">';
+    gammesDeLaCol.forEach(gam => {
+      const couleurs = couleurCollection(gam.nom, gam.couleur_hex);
+      html += `
+        <div class="collection-carte" onclick="ouvrirFicheGamme2('${gam.gam_id}')">
+          <div class="collection-carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
+          <div class="collection-carte-overlay"></div>
+          <div class="collection-carte-lignes-haut"></div>
+          <div class="collection-carte-contenu">
+            <span class="collection-carte-nom">${(gam.nom || '').toUpperCase()}</span>
+            <span class="collection-carte-slogan">${gam.description || ''}</span>
+          </div>
+        </div>`;
+    });
+    html += '</div>';
   });
-  html += '</div>';
   contenu.innerHTML = html;
 }
 
