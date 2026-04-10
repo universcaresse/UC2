@@ -107,10 +107,10 @@ if (resGam && resGam.success) {
   const nbPublics = donneesProduits.filter(p => p.statut === 'public').length;
   const statCol   = document.getElementById('admin-stat-collections');
   const statProd  = document.getElementById('admin-stat-produits');
-  if (statCol)  statCol.textContent  = donneesCollections.length;
+if (statCol)  statCol.textContent  = donneesCollections.length;
   if (statProd && nbPublics > 0) statProd.textContent = nbPublics + '+';
 
-  afficherCollections();
+  afficherSection('collections', document.querySelector('.sidebar-lien[onclick*="\'collections\'"]'));
 }
 
 // ─── NAVIGATION SIDEBAR ───
@@ -452,12 +452,17 @@ function afficherCollections() {
   const contenu = document.getElementById('contenu-collections');
   const vide    = document.getElementById('vide-collections');
   const btnNew  = document.getElementById('btn-nouvelle-collection');
-  if (loading) loading.classList.add('cache');
-  if (btnNew)  btnNew.classList.remove('cache');
   if (!contenu) return;
   contenu.innerHTML = '';
   if (vide) vide.classList.add('cache');
-  if (!donneesCollections.length) { if (vide) vide.classList.remove('cache'); return; }
+  if (!donneesCollections.length) {
+    if (loading) loading.classList.add('cache');
+    if (btnNew)  btnNew.classList.remove('cache');
+    if (vide) vide.classList.remove('cache');
+    return;
+  }
+  if (loading) loading.classList.add('cache');
+  if (btnNew)  btnNew.classList.remove('cache');
 
   let html = '<div class="collections-grille">';
   donneesCollections.forEach(col => {
