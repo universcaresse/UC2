@@ -308,10 +308,10 @@
        ouvrirCloudinaryCollection() / ouvrirCloudinaryCollectionNoel()
 
      CSS (style.css)
-       .collection-section
-       .fiche-collection-bandeau, .fiche-collection-slogan
-       .fiche-collection-desc, .fiche-collection-extras-wrap
-       .fiche-collection-couleur, .fiche-collection-photo
+     .collection-section
+       .fiche-bandeau, .fiche-slogan
+       .fiche-desc, .fiche-extras-wrap
+       .fiche-couleur, .fiche-photo
        .fiche-ligne-item, .fiche-ligne-info, .fiche-ligne-nom
      ════════════════════════════════════════ -->
      <div class="section-admin visible" id="section-collections">
@@ -336,16 +336,16 @@
        fermerFicheCollection()
 
      CSS (style.css)
-       .fiche-collection-bandeau, .fiche-collection-slogan
-       .fiche-collection-desc, .fiche-collection-extras-wrap
-       .fiche-collection-couleur, .fiche-collection-photo
+       .fiche-bandeau, .fiche-slogan
+       .fiche-desc, .fiche-extras-wrap
+       .fiche-couleur, .fiche-photo
      ════════════════════════════════════════ -->
        <div id="fiche-collection">
           <div class="form-panel">
             <div class="form-panel-header">
-              <div class="fiche-collection-bandeau" id="fiche-collection-bandeau">
+              <div class="fiche-bandeau" id="fiche-collection-bandeau">
                 <span class="form-panel-titre" id="fiche-collection-titre"></span>
-                <span class="fiche-collection-slogan" id="fiche-collection-slogan"></span>
+                <span class="fiche-slogan" id="fiche-collection-slogan"></span>
               </div>
               <button class="btn-fermer-panneau" onclick="fermerFicheCollection()" title="Fermer">✕</button>
             </div>
@@ -353,7 +353,7 @@
           <div class="form-panel">
             <div class="form-body">
               <div id="fiche-collection-extras"></div>
-              <p class="fiche-collection-desc" id="fiche-collection-desc"></p>
+              <p class="fiche-desc" id="fiche-collection-desc"></p>
               <div class="section-label">Gammes de produits</div>
               <div id="fiche-collection-lignes"></div>
             </div>
@@ -385,9 +385,9 @@
      ════════════════════════════════════════ -->
         <div class="form-panel" id="fiche-ligne">
           <div class="form-panel-header">
-            <div class="fiche-collection-bandeau" id="fiche-ligne-bandeau">
+            <div class="fiche-bandeau" id="fiche-ligne-bandeau">
               <span class="form-panel-titre" id="fiche-ligne-titre"></span>
-              <span class="fiche-collection-slogan" id="fiche-ligne-format"></span>
+              <span class="fiche-slogan" id="fiche-ligne-format"></span>
             </div>
           </div>
           <div class="form-body">
@@ -431,12 +431,17 @@
        .cloudinary-zone
        .couleur-apercu
      ════════════════════════════════════════ -->
-		<div class="form-panel" id="form-collections">
-          <div class="form-panel-header">
-            <div class="form-panel-titre" id="form-collections-titre">Nouvelle collection</div>
-            <button class="btn-fermer-panneau" onclick="fermerFormCollection()" title="Fermer">✕</button>
+		<div id="form-collections">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="form-collections-bandeau">
+                <span class="form-panel-titre" id="form-collections-titre">Nouvelle collection</span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFormCollection()" title="Fermer">✕</button>
+            </div>
           </div>
-          <div class="form-body">
+          <div class="form-panel">
+            <div class="form-body">
             <input type="hidden" id="fc-rowIndex">
             <input type="hidden" id="fc-mode" value="collection">
             <div class="form-grille">
@@ -481,7 +486,8 @@
               </div>
             </div>
           </div>
-          <div class="form-panel-header">
+          </div>
+          <div class="form-panel form-body-actions">
             <div class="form-actions">
               <button class="bouton" onclick="sauvegarderCollection()">Enregistrer</button>
               <button class="bouton bouton-contour" onclick="fermerFormCollection()">Annuler</button>
@@ -692,7 +698,7 @@
           </div>
           <div class="form-body">
             <div class="form-valeur" id="fiche-gamme-collection"></div>
-            <p class="fiche-collection-desc" id="fiche-gamme-desc"></p>
+            <p class="fiche-desc" id="fiche-gamme-desc"></p>
           </div>
           <div class="form-actions">
             <button class="bouton" id="fiche-gamme-modifier">Modifier</button>
