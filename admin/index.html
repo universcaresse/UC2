@@ -744,14 +744,17 @@
                 </div>
                 <div class="form-groupe">
                   <label class="form-label">Collection</label>
-                  <select class="form-ctrl" id="fg-collection">
+                  <select class="form-ctrl" id="fg-collection" onchange="peuplerPositionGamme(this.value, null)">
                     <option value="">— Choisir —</option>
                   </select>
                 </div>
                 <div class="form-groupe">
-                  <label class="form-label">Rang</label>
-                  <input type="text" inputmode="decimal" class="form-ctrl" id="fg-rang">
+                  <label class="form-label">Position</label>
+                  <select class="form-ctrl" id="fg-position" onchange="">
+                    <option value="0">En premier</option>
+                  </select>
                 </div>
+                <input type="hidden" id="fg-rang">
                 <div class="form-groupe">
                   <label class="form-label">Couleur HEX</label>
                   <input type="text" class="form-ctrl" id="fg-couleur-hex">
@@ -765,7 +768,7 @@
           </div>
           <div class="form-panel form-body-actions">
             <div class="form-actions">
-              <button class="bouton" onclick="sauvegarderCollection()">Enregistrer</button>
+              <button class="bouton" onclick="sauvegarderGamme2()">Enregistrer</button>
               <button class="bouton bouton-contour" onclick="fermerFormGamme2()">Annuler</button>
             </div>
           </div>

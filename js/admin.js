@@ -901,10 +901,63 @@ function ouvrirFormGamme(col_id) {
     o.value = col.col_id; o.textContent = col.nom; sel.appendChild(o);
   });
   if (col_id) sel.value = col_id;
+  peuplerPositionGamme(col_id, null);
   document.getElementById('contenu-gammes').classList.add('cache');
   document.getElementById('btn-nouvelle-gamme').classList.add('cache');
    document.getElementById('form-gammes').classList.remove('cache');
   window.scrollTo(0, 0);
+}
+
+async function sauvegarderGamme2() {
+  const btnSauvegarder = document.querySelector('#form-gammes .bouton');
+  if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = '<span class="spinner"></span> Sauvegarde…'; }
+  const rowIndex = document.getElementById('fg-id').value;
+  const col_id   = document.getElementById('fg-collection').value;
+  const nom      = document.getElementById('fg-nom').value.toUpperCase();
+  if (!col_id || !nom) {
+    if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    afficherMsg('gammes', 'Le nom et la collection sont requis.', 'erreur');
+    return;
+  }
+  const positionChoisie = parseInt(document.getElementById('fg-position')?.value) || 0;
+  const rangCalcule = positionChoisie + 1;
+  const d = {
+    gam_id:      rowIndex || ('GAM-' + Date.now()),
+    col_id,
+    rang:        rangCalcule,
+    nom,
+    description: document.getElementById('fg-desc').value,
+    couleur_hex: document.getElementById('fg-couleur-hex').value || '',
+    rowIndex:    rowIndex || null
+  };
+  const res = await appelAPIPost('saveGamme', d);
+  if (res && res.success) {
+    if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    fermerFormGamme2();
+    afficherMsg('gammes', rowIndex ? 'Gamme mise à jour.' : 'Gamme ajoutée.');
+    const resGam = await appelAPI('getGammes');
+    if (resGam && resGam.success) donneesGammes = resGam.items || [];
+    afficherGammes();
+  } else {
+    afficherMsg('gammes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+  }
+}
+
+function peuplerPositionGamme(col_id, rangActuel) {
+  const selPos = document.getElementById('fg-position');
+  if (!selPos) return;
+  selPos.innerHTML = '<option value="0">En premier</option>';
+  if (!col_id) return;
+  donneesGammes.filter(g => g.col_id === col_id)
+    .sort((a, b) => (a.rang || 99) - (b.rang || 99))
+    .forEach(g => {
+      const o = document.createElement('option');
+      o.value = g.rang;
+      o.textContent = 'Après ' + g.nom;
+      if (rangActuel && g.rang === rangActuel - 1) o.selected = true;
+      selPos.appendChild(o);
+    });
 }
 
 function fermerFormGamme2() {
