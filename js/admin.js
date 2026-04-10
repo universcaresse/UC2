@@ -874,7 +874,12 @@ function ouvrirFormGamme(col_id) {
 }
 
 function fermerFormGamme2() {
-  document.getElementById('form-gammes').classList.remove('visible'
+  document.getElementById('form-gammes').classList.remove('visible');
+  document.getElementById('contenu-gammes').classList.remove('cache');
+  const btnNew = document.getElementById('btn-nouvelle-gamme');
+  if (btnNew) btnNew.classList.remove('cache');
+}
+
 var donneesProduits   = []; // [{pro_id, col_id, gam_id, nom, statut, ...}]
 var produitActif      = null;
 var collectionsDisponibles = {};
