@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Catalogue Univers Caresse — Aperçu v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Birthstone&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary:      #5a8a3a;
+    --primary-dark: #4a6e2e;
+    --accent:       #d4a445;
+    --danger:       #c44536;
+    --blanc:        #f9f7f4;
+    --beige:        #e8dcc8;
+    --gris:         #8b8680;
+    --gris-fonce:   #3d3b39;
+    --logo:         #333333;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #2a2826;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    padding: 40px 20px;
+  }
+
+  .controls {
+    text-align: center;
+    margin-bottom: 32px;
+    color: rgba(255,255,255,0.4);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+
+  .controls button {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 9px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-left: 16px;
+    transition: all 0.2s;
+  }
+
+  .controls button:hover {
+    background: var(--accent);
+    color: white;
+  }
+
+  /* ── PAGE 11×17 ── */
+  .page {
+    width: 1122px;
+    min-height: 1683px;
+    background: var(--blanc);
+    margin: 0 auto 80px;
+    box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ════════════════════════════════
+     PAGE 1 — RECTO
+  ════════════════════════════════ */
+
+  /* Couverture hero — 1/3 de la page */
+  .cover-hero {
+    height: 540px;
+    background: var(--gris-fonce);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* Texture subtile */
+  .cover-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 70% 50%, rgba(90,138,58,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse at 20% 80%, rgba(212,164,69,0.12) 0%, transparent 50%);
+  }
+
+  /* Ligne déco verticale */
+  .cover-hero::after {
+    content: '';
+    position: absolute;
+    left: 60px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+    opacity: 0.4;
+  }
+
+  .cover-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 80px;
+  }
+
+  .cover-surtitre {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  .cover-marque {
+    font-family: 'Playfair Display', serif;
+    font-size: 72px;
+    font-weight: 400;
+    color: var(--blanc);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+
+  .cover-tagline {
+    font-family: 'Birthstone', cursive;
+    font-size: 44px;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 40px;
+  }
+
+  .cover-saison {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(249,247,244,0.45);
+  }
+
+  .cover-saison::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.6;
+  }
+
+  /* Bloc collection couleurs — côté droit */
+  .cover-collections-strip {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cover-col-strip-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover-col-strip-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.85;
+  }
+
+  .cover-col-strip-item:nth-child(1)::before { background: #5a8a3a; }
+  .cover-col-strip-item:nth-child(2)::before { background: #d4a445; }
+  .cover-col-strip-item:nth-child(3)::before { background: #c44536; }
+  .cover-col-strip-item:nth-child(4)::before { background: #3d3b39; }
+
+  .cover-col-strip-nom {
+    position: relative;
+    z-index: 1;
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(249,247,244,0.9);
+    letter-spacing: 0.04em;
+    font-style: italic;
+  }
+
+  /* ── CORPS PAGE 1 ── */
+  .page-body {
+    flex: 1;
+    padding: 52px 64px 0;
+  }
+
+  /* Section titre élégant */
+  .section-entete {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--beige);
+    margin-bottom: 36px;
+  }
+
+  .section-entete-gauche {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+  }
+
+  .section-titre {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gris);
+  }
+
+  .section-sous-titre {
+    font-family: 'Birthstone', cursive;
+    font-size: 26px;
+    color: var(--primary);
+    line-height: 1;
+  }
+
+  .section-entete-droite {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gris);
+  }
+
+  /* Grille produits — style magazine */
+  .produits-magazine {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--beige);
+    margin-bottom: 48px;
+    border: 1px solid var(--beige);
+  }
+
+  .produit-carte {
+    background: var(--blanc);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .produit-carte-visuel {
+    width: 100%;
+    height: 140px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  .produit-carte-visuel-fond {
+    position: absolute;
+    inset: 0;
+    opacity: 0.12;
+  }
+
+  .produit-carte-photo-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .placeholder-cercle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    opacity: 0.2;
+  }
+
+  .placeholder-texte {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.3;
+    font-weight: 400;
+  }
+
+  .produit-carte-badge {
+    position: relative;
+    z-index: 1;
+    background: var(--accent);
+    color: white;
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    margin: 0 0 4px 0;
+    align-self: flex-end;
+  }
+
+  .produit-collection-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .produit-nom {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--gris-fonce);
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+
+  .produit-desc {
+    font-size: 10.5px;
+    color: var(--gris);
+    line-height: 1.65;
+    font-weight: 300;
+    flex: 1;
+    margin-bottom: 16px;
+  }
+
+  .produit-bas {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid var(--beige);
+    padding-top: 12px;
+  }
+
+  .produit-format {
+    font-size: 10px;
+    color: var(--gris);
+    font-weight: 300;
+    letter-spacing: 0.04em;
+  }
+
+  .produit-prix {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--primary-dark);
+  }
+
+  /* Séparateur collection */
+  .collection-separateur {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 36px 0 24px;
+  }
+
+  .collection-separateur-ligne {
+    flex: 1;
+    height: 1px;
+    background: var(--beige);
+  }
+
+  .collection-separateur-nom {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--gris);
+    white-space: nowrap;
+  }
+
+  .collection-separateur-point {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── FOOTER ── */
+  .page-footer {
+    margin-top: auto;
+    padding: 20px 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--beige);
+  }
+
+  .footer-marque {
+    font-family: 'Birthstone', cursive;
+    font-size: 22px;
+    color: var(--accent);
+  }
+
+  .footer-centre {
+    font-size: 10px;
+    color: var(--gris);
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    text-align: center;
+  }
+
+  .footer-page {
+    font-size: 10px;
+    color: var(--gris);
+    font-weight: 300;
+    letter-spacing: 0.1em;
+  }
+
+  /* ════════════════════════════════
+     PAGE 2 — VERSO
+  ════════════════════════════════ */
+
+  .verso-layout {
+    flex: 1;
+    display: grid;
+    grid-template-rows: 1fr auto;
+  }
+
+  .verso-collections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .verso-col-bloc {
+    padding: 52px 56px;
+    border-right: 1px solid var(--beige);
+    border-bottom: 1px solid var(--beige);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .verso-col-bloc:nth-child(2n) { border-right: none; }
+  .verso-col-bloc:nth-child(3),
+  .verso-col-bloc:nth-child(4) { border-bottom: none; }
+
+  .verso-col-couleur-trait {
+    width: 24px;
+    height: 2px;
+    margin-bottom: 20px;
+  }
+
+  .verso-col-nom {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--gris-fonce);
+    margin-bottom: 4px;
+    line-height: 1;
+  }
+
+  .verso-col-sous {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gris);
+    margin-bottom: 24px;
+  }
+
+  /* Bloc photo ambiance */
+  .verso-ambiance {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .verso-ambiance-fond {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+  }
+
+  .verso-ambiance-texte {
+    position: relative;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.35;
+    color: var(--gris-fonce);
+  }
+
+  /* Traits déco dans ambiance */
+  .verso-ambiance::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid currentColor;
+    opacity: 0.08;
+  }
+
+  .verso-col-desc {
+    font-size: 11.5px;
+    color: var(--gris);
+    line-height: 1.75;
+    font-weight: 300;
+    margin-bottom: 24px;
+    flex: 1;
+  }
+
+  .verso-produits-liste {
+    list-style: none;
+    border-top: 1px solid var(--beige);
+    padding-top: 16px;
+  }
+
+  .verso-produits-liste li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(232,220,200,0.35);
+  }
+
+  .verso-produits-liste li:last-child { border-bottom: none; }
+
+  .li-nom {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--gris-fonce);
+  }
+
+  .li-format {
+    font-size: 10px;
+    color: var(--gris);
+    font-weight: 300;
+    margin: 0 12px;
+    flex: 1;
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+
+  .li-prix {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--primary-dark);
+    white-space: nowrap;
+  }
+
+  /* ── BANDE COORDONNÉES ── */
+  .coordonnees {
+    background: var(--gris-fonce);
+    padding: 44px 64px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .coord-bloc-titre {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(249,247,244,0.35);
+    margin-bottom: 10px;
+  }
+
+  .coord-valeur {
+    font-size: 13px;
+    font-weight: 300;
+    color: rgba(249,247,244,0.75);
+    line-height: 1.8;
+  }
+
+  .coord-centre {
+    text-align: center;
+    border-left: 1px solid rgba(255,255,255,0.08);
+    border-right: 1px solid rgba(255,255,255,0.08);
+    padding: 0 60px;
+  }
+
+  .coord-centre-marque {
+    font-family: 'Birthstone', cursive;
+    font-size: 52px;
+    color: var(--accent);
+    line-height: 1;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .coord-centre-sep {
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+    margin: 8px auto;
+  }
+
+  .coord-centre-sub {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(249,247,244,0.3);
+    font-weight: 300;
+  }
+
+  .coord-droite { text-align: right; }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: white; padding: 0; }
+    .controls { display: none; }
+    .page {
+      width: 100%;
+      min-height: 0;
+      box-shadow: none;
+      margin: 0;
+      page-break-after: always;
+    }
+    .page:last-child { page-break-after: auto; }
+    @page { size: 11in 17in; margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  Aperçu statique — données fictives &nbsp;·&nbsp; Palette & fontes Univers Caresse
+  <button onclick="window.print()">Imprimer / Exporter PDF</button>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 1 — RECTO
+══════════════════════════════════════════════ -->
+<div class="page">
+
+  <!-- Hero couverture -->
+  <div class="cover-hero">
+    <div class="cover-content">
+      <div class="cover-surtitre">Savonnerie artisanale · Québec</div>
+      <div class="cover-marque">Univers Caresse</div>
+      <div class="cover-tagline">l'art du soin naturel</div>
+      <div class="cover-saison">Collection Printemps · Été 2026</div>
+    </div>
+
+    <div class="cover-collections-strip">
+      <div class="cover-col-strip-item">
+        <div class="cover-col-strip-nom">Forêt Boréale</div>
+      </div>
+      <div class="cover-col-strip-item">
+        <div class="cover-col-strip-nom">Miel & Avoine</div>
+      </div>
+      <div class="cover-col-strip-item">
+        <div class="cover-col-strip-nom">Argile & Rose</div>
+      </div>
+      <div class="cover-col-strip-item">
+        <div class="cover-col-strip-nom">Charbon Détox</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Corps -->
+  <div class="page-body">
+
+    <!-- Forêt Boréale -->
+    <div class="collection-separateur" style="margin-top: 0;">
+      <div class="collection-separateur-point" style="background:#5a8a3a;"></div>
+      <div class="collection-separateur-nom">Forêt Boréale</div>
+      <div class="collection-separateur-ligne"></div>
+      <div style="font-size:10px;color:var(--gris);font-weight:300;letter-spacing:0.08em;">6 produits</div>
+    </div>
+
+    <div class="produits-magazine">
+
+      <div class="produit-carte">
+        <div class="produit-carte-visuel">
+          <div class="produit-carte-visuel-fond" style="background:#5a8a3a;"></div>
+          <div class="produit-carte-photo-placeholder" style="color:#5a8a3a;">
+            <div class="placeholder-cercle"></div>
+            <div class="placeholder-texte">Photo produit</div>
+          </div>
+          <div class="produit-carte-badge">Nouveau</div>
+        </div>
+        <div class="produit-collection-label" style="color:#5a8a3a;">Savon · Soin corps</div>
+        <div class="produit-nom">Savon Cèdre & Épinette</div>
+        <div class="produit-desc">Huile essentielle de cèdre de l'Atlas, épinette noire, poudre d'argile verte. Pain froid saponifié.</div>
+        <div class="produit-bas">
+          <div class="produit-format">100g / 200g</div>
+          <div class="produit-prix">8 $ / 14 $</div>
+        </div>
+      </div>
+
+      <div class="produit-carte">
+        <div class="produit-carte-visuel">
+          <div class="produit-carte-visuel-fond" style="background:#4a6e2e;"></div>
+          <div class="produit-carte-photo-placeholder" style="color:#4a6e2e;">
+            <div class="placeholder-cercle"></div>
+            <div class="placeholder-texte">Photo produit</div>
+          </div>
+        </div>
+        <div class="produit-collection-label" style="color:#5a8a3a;">Soin corps</div>
+        <div class="produit-nom">Baume Mousse de Lichen</div>
+        <div class="produit-desc">Beurre de shea, cire d'abeille, extrait de lichen des bois. Idéal mains et pieds secs.</div>
+        <div class="produit-bas">
+          <div class="produit-format">60ml</div>
+          <div class="produit-prix">16 $</div>
+        </div>
+      </div>
+
+      <div class="produit-carte">
+        <div class="produit-carte-visuel">
+          <div class="produit-carte-visuel-fond" style="background:#6a9e48;"></div>
+          <div class="produit-carte-photo-placeholder" style="color:#6a9e48;">
+            <div class="placeholder-cercle"></div>
+            <div class="placeholder-texte">Photo produit</div>
+          </div>
+        </div>
+        <div class="produit-collection-label" style="color:#5a8a3a;">Soin corps</div>
+        <div class="produit-nom">Sel de Bain Boréal</div>
+        <div class="produit-desc">Sel de l'Himalaya, sel d'Epsom, buds de sapin baumier, huile essentielle d'épinette noire.</div>
+        <div class="produit-bas">
+          <div class="produit-format">250g</div>
+          <div class="produit-prix">18 $</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Miel & Avoine -->
+    <div class="collection-separateur">
+      <div class="collection-separateur-point" style="background:#d4a445;"></div>
+      <div class="collection-separateur-nom">Miel & Avoine</div>
+      <div class="collection-separateur-ligne"></div>
+      <div style="font-size:10px;color:var(--gris);font-weight:300;letter-spacing:0.08em;">5 produits</div>
+    </div>
+
+    <div class="produits-magazine">
+
+      <div class="produit-carte">
+        <div class="produit-carte-visuel">
+          <div class="produit-carte-visuel-fond" style="background:#d4a445;"></div>
+          <div class="produit-carte-photo-placeholder" style="color:#d4a445;">
+            <div class="placeholder-cercle"></div>
+            <div class="placeholder-texte">Photo produit</div>
+          </div>
+        </div>
+        <div class="produit-collection-label" style="color:#d4a445;">Savon · Soin visage</div>
+        <div class="produit-nom">Savon Miel Sauvage</div>
+        <div class="produit-desc">Miel cru du Québec, lait de chèvre, huile de coco. Pain surgras 8% — douceur intense.</div>
+        <div class="produit-bas">
+          <div class="produit-format">100g</div>
+          <div class="produit-prix">9 $</div>
+        </div>
+      </div>
+
+      <div class="produit-carte">
+        <div class="produit-carte-visuel">
+          <div class="produit-carte-visuel-fond" style="background:#c4943a;"></div>
+          <div class="produit-carte-photo-placeholder" style="color:#c4943a;">
+            <div class="placeholder-cercle"></div>
+            <div class="placeholder-texte">Photo produit</div>
+          </div>
+        </div>
+        <div class="produit-collection-label" style="color:#d4a445;">Exfoliant</div>
+        <div class="produit-nom">Exfoliant Avoine & Miel</div>
+        <div class="produit-desc">Flocons d'avoine moulus, miel, extrait de propolis. Gommage doux 2–3 fois par semaine.</div>
+        <div class="produit-bas">
+          <div class="produit-format">80g</div>
+          <div class="produit-prix">11 $</div>
+        </div>
+      </div>
+
+      <div class="produit-carte">
+        <div class="produit-carte-visuel">
+          <div class="produit-carte-visuel-fond" style="background:#e4b460;"></div>
+          <div class="produit-carte-photo-placeholder" style="color:#e4b460;">
+            <div class="placeholder-cercle"></div>
+            <div class="placeholder-texte">Photo produit</div>
+          </div>
+          <div class="produit-carte-badge">Nouveau</div>
+        </div>
+        <div class="produit-collection-label" style="color:#d4a445;">Soin mains</div>
+        <div class="produit-nom">Crème Mains Karité</div>
+        <div class="produit-desc">Karité pressé à froid, miel, aloe vera bio. Texture non grasse, absorption rapide.</div>
+        <div class="produit-bas">
+          <div class="produit-format">120ml</div>
+          <div class="produit-prix">19 $</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /page-body -->
+
+  <div class="page-footer">
+    <div class="footer-marque">Univers Caresse</div>
+    <div class="footer-centre">Tous nos produits sont fabriqués artisanalement au Québec · Ingrédients naturels · Sans sulfate ni paraben</div>
+    <div class="footer-page">1 / 2</div>
+  </div>
+
+</div><!-- /page 1 -->
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 2 — VERSO
+══════════════════════════════════════════════ -->
+<div class="page">
+
+  <div class="verso-layout">
+
+    <div class="verso-collections">
+
+      <!-- Argile & Rose -->
+      <div class="verso-col-bloc">
+        <div class="verso-col-couleur-trait" style="background:#c44536;"></div>
+        <div class="verso-col-nom">Argile & Rose</div>
+        <div class="verso-col-sous">Soins purifiants · Peaux mixtes</div>
+        <div class="verso-ambiance" style="color:#c44536;">
+          <div class="verso-ambiance-fond" style="background:#c44536;"></div>
+          <div class="verso-ambiance-texte">Photo ambiance collection</div>
+        </div>
+        <div class="verso-col-desc">
+          Inspirée des soins hammam traditionnels, cette collection allie l'efficacité purifiante de l'argile rose à la délicatesse florale. Idéale pour les peaux mixtes à grasses qui cherchent l'équilibre naturel.
+        </div>
+        <ul class="verso-produits-liste">
+          <li>
+            <span class="li-nom">Savon Argile Rose du Maroc</span>
+            <span class="li-format">100g</span>
+            <span class="li-prix">10 $</span>
+          </li>
+          <li>
+            <span class="li-nom">Eau Florale Rose Musquée</span>
+            <span class="li-format">100ml</span>
+            <span class="li-prix">14 $</span>
+          </li>
+          <li>
+            <span class="li-nom">Masque Argile & Pétales</span>
+            <span class="li-format">60ml</span>
+            <span class="li-prix">17 $</span>
+          </li>
+          <li>
+            <span class="li-nom">Huile Rosier Musqué</span>
+            <span class="li-format">30ml</span>
+            <span class="li-prix">24 $</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Charbon Détox -->
+      <div class="verso-col-bloc">
+        <div class="verso-col-couleur-trait" style="background:#3d3b39;"></div>
+        <div class="verso-col-nom">Charbon Détox</div>
+        <div class="verso-col-sous">Détox en profondeur · Peaux urbaines</div>
+        <div class="verso-ambiance" style="color:#3d3b39;">
+          <div class="verso-ambiance-fond" style="background:#3d3b39;"></div>
+          <div class="verso-ambiance-texte">Photo ambiance collection</div>
+        </div>
+        <div class="verso-col-desc">
+          Le charbon actif de bambou absorbe les impuretés en profondeur. Collection intense pour les peaux citadines exposées à la pollution, complétée par l'argile verte et le tea tree certifié bio.
+        </div>
+        <ul class="verso-produits-liste">
+          <li>
+            <span class="li-nom">Savon Charbon & Tea Tree</span>
+            <span class="li-format">100g</span>
+            <span class="li-prix">9 $</span>
+          </li>
+          <li>
+            <span class="li-nom">Masque Détox Charbon</span>
+            <span class="li-format">80ml</span>
+            <span class="li-prix">18 $</span>
+          </li>
+          <li>
+            <span class="li-nom">Barre Shampooing Détox</span>
+            <span class="li-format">75g</span>
+            <span class="li-prix">13 $</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Forêt Boréale suite -->
+      <div class="verso-col-bloc">
+        <div class="verso-col-couleur-trait" style="background:#5a8a3a;"></div>
+        <div class="verso-col-nom">Forêt Boréale</div>
+        <div class="verso-col-sous">Suite de la collection</div>
+        <ul class="verso-produits-liste" style="margin-top: 8px;">
+          <li>
+            <span class="li-nom">Savon Cèdre & Épinette</span>
+            <span class="li-format">100g / 200g</span>
+            <span class="li-prix">8 $ / 14 $</span>
+          </li>
+          <li>
+            <span class="li-nom">Baume Mousse de Lichen</span>
+            <span class="li-format">60ml</span>
+            <span class="li-prix">16 $</span>
+          </li>
+          <li>
+            <span class="li-nom">Huile Sèche Forêt</span>
+            <span class="li-format">100ml</span>
+            <span class="li-prix">22 $</span>
+          </li>
+          <li>
+            <span class="li-nom">Sel de Bain Boréal</span>
+            <span class="li-format">250g</span>
+            <span class="li-prix">18 $</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Miel & Avoine suite -->
+      <div class="verso-col-bloc">
+        <div class="verso-col-couleur-trait" style="background:#d4a445;"></div>
+        <div class="verso-col-nom">Miel & Avoine</div>
+        <div class="verso-col-sous">Suite de la collection</div>
+        <ul class="verso-produits-liste" style="margin-top: 8px;">
+          <li>
+            <span class="li-nom">Savon Miel Sauvage</span>
+            <span class="li-format">100g</span>
+            <span class="li-prix">9 $</span>
+          </li>
+          <li>
+            <span class="li-nom">Exfoliant Avoine & Miel</span>
+            <span class="li-format">80g</span>
+            <span class="li-prix">11 $</span>
+          </li>
+          <li>
+            <span class="li-nom">Crème Mains Karité</span>
+            <span class="li-format">120ml</span>
+            <span class="li-prix">19 $</span>
+          </li>
+          <li>
+            <span class="li-nom">Lait Corps Avoine</span>
+            <span class="li-format">200ml</span>
+            <span class="li-prix">21 $</span>
+          </li>
+        </ul>
+      </div>
+
+    </div><!-- /verso-collections -->
+
+    <!-- Coordonnées -->
+    <div class="coordonnees">
+      <div>
+        <div class="coord-bloc-titre">Commandes & informations</div>
+        <div class="coord-valeur">universcaresse@outlook.com<br>universcaresse.ca</div>
+      </div>
+      <div class="coord-centre">
+        <span class="coord-centre-marque">Univers Caresse</span>
+        <div class="coord-centre-sep"></div>
+        <div class="coord-centre-sub">Savonnerie artisanale · Québec</div>
+      </div>
+      <div class="coord-droite">
+        <div class="coord-bloc-titre">Chantal Mondor, artisane</div>
+        <div class="coord-valeur">Fabriqué à la main<br>Ingrédients naturels sélectionnés<br>Sans sulfate · Sans paraben</div>
+      </div>
+    </div>
+
+  </div><!-- /verso-layout -->
+
+  <div class="page-footer">
+    <div class="footer-marque">Univers Caresse</div>
+    <div class="footer-centre">Prix suggérés au détail · Taxes applicables en sus · Disponibilité selon saison</div>
+    <div class="footer-page">2 / 2</div>
+  </div>
+
+</div><!-- /page 2 -->
+
+</body>
+</html>
