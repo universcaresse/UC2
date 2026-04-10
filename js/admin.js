@@ -871,7 +871,7 @@ function ouvrirFicheGamme2(gam_id) {
   document.getElementById('fiche-gamme-titre').textContent      = (gam.nom || '').toUpperCase();
   document.getElementById('fiche-gamme-collection').textContent = col?.nom || '—';
   document.getElementById('fiche-gamme-desc').textContent       = gam.description || '—';
-  document.getElementById('fiche-gamme-modifier').onclick = () => { fermerFicheGamme2(); modifierGamme2(gam_id); };
+  document.getElementById('fiche-gamme-modifier').onclick = () => { fermerFicheGamme2(); modifierGamme(gam_id); };
   document.getElementById('btn-supprimer-gamme').onclick  = () => supprimerGamme(gam_id);
   document.getElementById('contenu-gammes').classList.add('cache');
   document.getElementById('btn-nouvelle-gamme').classList.add('cache');
