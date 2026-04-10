@@ -447,9 +447,12 @@
             <div id="fc-bloc-collection">
             <div class="form-grille">
               <div class="form-groupe col-petit">
-                <label class="form-label">Rang</label>
-                <input type="text" inputmode="decimal" class="form-ctrl" id="fc-rang">
+                <label class="form-label">Position</label>
+                <select class="form-ctrl" id="fc-position">
+                  <option value="0">En premier</option>
+                </select>
               </div>
+              <input type="hidden" id="fc-rang">
               <div class="form-groupe">
                 <label class="form-label">Collection</label>
                 <input type="text" class="form-ctrl" id="fc-collection">

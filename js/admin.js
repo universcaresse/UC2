@@ -539,6 +539,16 @@ function ouvrirFormCollection() {
   document.getElementById('fc-mode').value     = 'collection';
   document.getElementById('fc-bloc-collection').classList.remove('cache');
   document.getElementById('fc-bloc-ligne').classList.add('cache');
+  const selPos = document.getElementById('fc-position');
+  if (selPos) {
+    selPos.innerHTML = '<option value="0">En premier</option>';
+    donneesCollections.slice().sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
+      const o = document.createElement('option');
+      o.value = col.rang;
+      o.textContent = 'Après ' + col.nom;
+      selPos.appendChild(o);
+    });
+  }
   ['fc-rang','fc-collection','fc-slogan','fc-desc-col','fc-couleur-hex','fc-photo-url']
     .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
   ['fc-photo-preview','fc-photo-preview-noel'].forEach(id => {
@@ -653,6 +663,19 @@ async function modifierCollection(col_id) {
   document.getElementById('form-collections-titre').textContent = 'Modifier la collection';
   document.getElementById('fc-rowIndex').value         = col.col_id;
   document.getElementById('fc-rang').value             = col.rang || '';
+  const selPos = document.getElementById('fc-position');
+  if (selPos) {
+    selPos.innerHTML = '<option value="0">En premier</option>';
+    donneesCollections.slice().sort((a, b) => (a.rang || 99) - (b.rang || 99))
+      .filter(c => c.col_id !== col.col_id)
+      .forEach(c => {
+        const o = document.createElement('option');
+        o.value = c.rang;
+        o.textContent = 'Après ' + c.nom;
+        if (c.rang === (col.rang || 99) - 1) o.selected = true;
+        selPos.appendChild(o);
+      });
+  }
   document.getElementById('fc-collection').value       = col.nom || '';
   document.getElementById('fc-slogan').value           = col.slogan || '';
   const descCol = document.getElementById('fc-desc-col');
@@ -716,9 +739,11 @@ async function sauvegarderCollection() {
   }
 
   // Collection V2
+  const positionChoisie = parseInt(document.getElementById('fc-position')?.value) || 0;
+  const rangCalcule = positionChoisie + 1;
   const d = {
     col_id:      rowIndex || ('COL-' + Date.now()),
-    rang:        parseInt(document.getElementById('fc-rang').value) || 99,
+    rang:        rangCalcule,
     nom:         document.getElementById('fc-collection').value.toUpperCase(),
     slogan:      document.getElementById('fc-slogan').value,
     description: document.getElementById('fc-desc-col').value,
