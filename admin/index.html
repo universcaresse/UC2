@@ -349,116 +349,74 @@
             </div>
           </div>
         </div>
-      <div class="form-panel" id="form-collections">
+		
+		
+		<div class="form-panel" id="form-collections">
           <div class="form-panel-header">
             <div class="form-panel-titre" id="form-collections-titre">Nouvelle collection</div>
             <button class="btn-fermer-panneau" onclick="fermerFormCollection()" title="Fermer">✕</button>
-            <div class="td-actions">
-             
-            </div>
           </div>
           <div class="form-body">
             <input type="hidden" id="fc-rowIndex">
             <input type="hidden" id="fc-mode" value="collection">
-
-            <!-- BLOC COLLECTION -->
-            <div id="fc-bloc-collection">
-              <div class="form-grille">
-                <div class="form-groupe col-petit">
-                  <label class="form-label">Rang</label>
-                  <input type="text" inputmode="decimal" class="form-ctrl" id="fc-rang">
+            <div class="form-grille">
+              <div class="form-groupe col-petit">
+                <label class="form-label">Rang</label>
+                <input type="text" inputmode="decimal" class="form-ctrl" id="fc-rang">
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Collection</label>
+                <input type="text" class="form-ctrl" id="fc-collection">
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Slogan</label>
+                <input type="text" class="form-ctrl" id="fc-slogan">
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Description collection</label>
+                <textarea class="form-ctrl textarea-auto" id="fc-desc-col" rows="5" oninput="ajusterHauteurTextarea(this)"></textarea>
+              </div>
+              <div class="form-groupe col-petit">
+                <label class="form-label">Couleur HEX</label>
+                <input type="text" class="form-ctrl" id="fc-couleur-hex" oninput="apercuCouleurCollection(this)">
+                <div id="fc-couleur-apercu" class="couleur-apercu"></div>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Photo collection</label>
+                <div class="cloudinary-zone">
+                  <input type="text" class="form-ctrl" id="fc-photo-url">
+                  <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryCollection()">Choisir une photo</button>
+                  <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url', 'fc-photo-preview', 'Collection')">Médiathèque</button>
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Collection</label>
-                  <input type="text" class="form-ctrl" id="fc-collection">
+                <div id="fc-photo-preview"></div>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Photo collection — saisonnière</label>
+                <div class="cloudinary-zone">
+                  <input type="text" class="form-ctrl" id="fc-photo-url-noel">
+                  <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryCollectionNoel()">Choisir une photo</button>
+                  <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url-noel', 'fc-photo-preview-noel', 'Collection Noël')">Médiathèque</button>
                 </div>
-                <div class="form-groupe col-plein">
-                  <label class="form-label">Slogan</label>
-                  <input type="text" class="form-ctrl" id="fc-slogan">
-                </div>
-                <div class="form-groupe col-plein">
-                  <label class="form-label">Description collection</label>
-                 <textarea class="form-ctrl textarea-auto" id="fc-desc-col" rows="5" oninput="ajusterHauteurTextarea(this)"></textarea>
-                </div>
-               <div class="form-groupe col-petit">
-                  <label class="form-label">Couleur HEX</label>
-                <input type="text" class="form-ctrl" id="fc-couleur-hex" oninput="apercuCouleurCollection(this)"><div id="fc-couleur-apercu" class="couleur-apercu"></div>
-                </div>
-                <div class="form-groupe col-plein">
-                  <label class="form-label">Photo collection</label>
-                  <div class="cloudinary-zone">
-                    <input type="text" class="form-ctrl" id="fc-photo-url">
-                    <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryCollection()">Choisir une photo</button>
-					<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url', 'fc-photo-preview', 'Collection')">Médiathèque</button>
-
-
-
-
-                  </div>
-                  <div id="fc-photo-preview"></div>
-                </div>
-                <div class="form-groupe col-plein">
-                  <label class="form-label">Photo collection — saisonnière</label>
-                  <div class="cloudinary-zone">
-                    <input type="text" class="form-ctrl" id="fc-photo-url-noel">
-                    <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryCollectionNoel()">Choisir une photo</button>
-					<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url-noel', 'fc-photo-preview-noel', 'Collection Noël')">Médiathèque</button>
-                  </div>
-                  <div id="fc-photo-preview-noel"></div>
-                </div>
+                <div id="fc-photo-preview-noel"></div>
               </div>
             </div>
-
-            <!-- BLOC LIGNE (caché par défaut) -->
-            <div id="fc-bloc-ligne" class="cache">
-              <div class="form-grille">
-                <div class="form-groupe">
-                  <label class="form-label">Collection</label>
-                  <input type="text" class="form-ctrl" id="fc-collection-ligne" readonly>
-                </div>
-                <div class="form-groupe col-petit">
-                  <label class="form-label">Rang</label>
-                  <input type="text" inputmode="decimal" class="form-ctrl" id="fc-rang-ligne">
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">Nom de la gamme</label>
-                  <input type="text" class="form-ctrl" id="fc-ligne">
-                </div>
-                
-                <div class="form-groupe col-plein">
-                  <label class="form-label">Description de la gamme</label>
-                  <textarea class="form-ctrl" id="fc-desc-ligne"></textarea>
-                </div>
-               <div class="form-groupe cache">
-                  <label class="form-label">Couleur HEX gamme/label>
-                  <input type="text" class="form-ctrl" id="fc-couleur-hex-ligne" oninput="apercuCouleurCollection(this)"><div id="fc-couleur-apercu-ligne" class="couleur-apercu"></div>
-                </div>
-              <div class="form-groupe cache">
-                  <label class="form-label">Photo gamme</label>
-                  <div class="cloudinary-zone">
-                    <input type="text" class="form-ctrl" id="fc-photo-url-ligne">
-                    <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryLigne()">Choisir une photo</button>
-<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url-ligne', 'fc-photo-preview-ligne', 'Collection')">Médiathèque</button>
-                  </div>
-                  <div id="fc-photo-preview-ligne"></div>
-                </div>
-                <div class="form-groupe col-plein" id="zone-ingredients-base">
-                  <label class="form-label">Ingrédients de base</label>
-                  <div id="liste-ingredients-base"></div>
-                  <button type="button" class="bouton bouton-vert-pale btn-ajouter-ingredient" onclick="ajouterIngredientBase()">+ Ajouter un ingrédient</button>
-                </div>
-              </div>
-            </div>
-			 
- 
-            <hr class="separateur">
+          </div>
+          <div class="form-panel-header">
             <div class="form-actions">
               <button class="bouton" onclick="sauvegarderCollection()">Enregistrer</button>
-              <button class="bouton bouton-vert-pale" onclick="fermerFormCollection()">Annuler</button>
-              <button class="bouton bouton-rouge cache" id="btn-supprimer-ligne">Supprimer la ligne</button>
+              <button class="bouton bouton-contour" onclick="fermerFormCollection()">Annuler</button>
             </div>
           </div>
         </div>
+		
+		
+    
+		
+		
+		
+		
+		
+		
         <div class="chargement" id="loading-collections"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div id="contenu-collections"></div>
         <div class="vide cache" id="vide-collections">
