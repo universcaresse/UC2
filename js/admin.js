@@ -549,6 +549,7 @@ function ouvrirFormCollection() {
   });
   document.getElementById('contenu-collections').classList.add('cache');
   document.getElementById('btn-nouvelle-collection').classList.add('cache');
+  document.getElementById('form-collections').classList.remove('cache');
   document.getElementById('form-collections').classList.add('visible');
   window.scrollTo(0, 0);
 }
@@ -567,6 +568,7 @@ function fermerFormCollection() {
   document.getElementById('contenu-collections').classList.remove('cache');
   document.getElementById('btn-nouvelle-collection').classList.remove('cache');
   document.getElementById('form-collections').classList.remove('visible');
+  document.getElementById('form-collections').classList.add('cache');
 }
 
 // ─── GAMMES (ex-Lignes) ───
@@ -609,6 +611,7 @@ function ouvrirFormGamme(col_id) {
   });
   document.getElementById('contenu-collections').classList.add('cache');
   document.getElementById('btn-nouvelle-collection').classList.add('cache');
+  document.getElementById('form-collections').classList.remove('cache');
   document.getElementById('form-collections').classList.add('visible');
   window.scrollTo(0, 0);
 }
@@ -638,6 +641,7 @@ apercuCouleurCollection(document.getElementById('fc-couleur-hex-ligne'));
     quantite: i.quantite_g
   }));
   rafraichirListeIngredientsBase();
+  document.getElementById('form-collections').classList.remove('cache');
   document.getElementById('form-collections').classList.add('visible');
   window.scrollTo(0, 0);
 }
@@ -660,8 +664,9 @@ async function modifierCollection(col_id) {
   if (preview) preview.innerHTML = col.photo_url ? `<img src="${col.photo_url}" class="photo-preview">` : '';
   const previewNoel = document.getElementById('fc-photo-preview-noel');
   if (previewNoel) previewNoel.innerHTML = col.photo_noel_url ? `<img src="${col.photo_noel_url}" class="photo-preview">` : '';
-  document.getElementById('contenu-collections').classList.add('cache');
+   document.getElementById('contenu-collections').classList.add('cache');
   document.getElementById('btn-nouvelle-collection').classList.add('cache');
+  document.getElementById('form-collections').classList.remove('cache');
   document.getElementById('form-collections').classList.add('visible');
   window.scrollTo(0, 0);
 }
