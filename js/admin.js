@@ -3108,14 +3108,11 @@ function ifOuvrirModalNouvelIngredient(idx, fournisseur) {
   };
   selNom.onchange = () => {
     if (selNom.value === '__nouveau__') {
-      const nom = prompt('Nouveau nom UC :');
-      if (nom) {
-        const opt = document.createElement('option');
-        opt.value = nom; opt.textContent = nom; opt.selected = true;
-        selNom.appendChild(opt);
-      } else {
-        selNom.value = '';
-      }
+      document.getElementById('modal-if-nouveau-nom-groupe').classList.remove('cache');
+      document.getElementById('modal-if-nouveau-nom').focus();
+    } else {
+      document.getElementById('modal-if-nouveau-nom-groupe').classList.add('cache');
+      document.getElementById('modal-if-nouveau-nom').value = '';
     }
   };
   modal.dataset.idx = idx;
@@ -3140,8 +3137,12 @@ async function modalIfConfirmer() {
     listesDropdown.categoriesMap[cat] = nouvelleCat;
     listesDropdown.types.push(cat);
   }
-  const nom        = document.getElementById('modal-if-nomuc')?.value;
-  if (!cat || cat === '__nouvelle_cat__' || !nom || nom === '__nouveau__') { afficherMsg('import-facture', 'Catégorie et nom UC requis.', 'erreur'); return; }
+  let nom = document.getElementById('modal-if-nomuc')?.value;
+  if (nom === '__nouveau__') {
+    nom = document.getElementById('modal-if-nouveau-nom')?.value.trim();
+    if (!nom) { afficherMsg('import-facture', 'Nouveau nom UC requis.', 'erreur'); return; }
+  }
+  if (!cat || cat === '__nouvelle_cat__' || !nom) { afficherMsg('import-facture', 'Catégorie et nom UC requis.', 'erreur'); return; }
   const ingExistant = listesDropdown.fullData.find(d => d.nom_UC === nom && d.cat_id === cat);
   let ing_id = ingExistant?.ing_id || '';
   if (!ingExistant) {
