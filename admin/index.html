@@ -1129,10 +1129,14 @@
        .wizard-label, .wizard-trait
      ════════════════════════════════════════ -->
   <div id="wizard-step-1" class="wizard-step">
-    <div class="form-panel visible">
+    <div class="form-panel">
       <div class="form-panel-header">
-        <span class="form-panel-titre">Informations de la facture</span>
+        <div class="fiche-bandeau">
+          <span class="form-panel-titre">Informations de la facture</span>
+        </div>
       </div>
+    </div>
+    <div class="form-panel">
       <div class="form-body">
         <div class="form-grille">
 
@@ -1155,9 +1159,11 @@
           </div>
 
         </div>
-        <div class="form-actions">
-          <button class="bouton" onclick="wizardEtape2()">Suivant →</button>
-        </div>
+      </div>
+    </div>
+    <div class="form-panel form-body-actions">
+      <div class="form-actions">
+        <button class="bouton" onclick="wizardEtape2()">Suivant →</button>
       </div>
     </div>
   </div>
