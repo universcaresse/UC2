@@ -1,0 +1,113 @@
+/* ═══════════════════════════════════════
+   UNIVERS CARESSE — parsers.js
+   Parsers de factures PDF par fournisseur
+   ═══════════════════════════════════════ */
+
+// ─── PURE ARÔME ───
+function parserFacturePA(texte) {
+  const facture = { numeroFacture: '', date: '', items: [], tps: 0, tvq: 0, livraison: 0, sousTotal: 0, total: 0 };
+  const mNum  = texte.match(/Détails de la commande[\s\S]{0,20}?(\d{4,6})/i);
+  if (mNum) facture.numeroFacture = mNum[1].trim();
+  const mDate = texte.match(/(\d{2}-\d{2}-\d{4})/);
+  if (mDate) { const p = mDate[1].split('-'); facture.date = `${p[2]}-${p[1]}-${p[0]}`; }
+  const mTps   = texte.match(/TPS\s*[:\s]+([\d\s,\.]+)\s*\$/i);
+  if (mTps) facture.tps = parseFloat(mTps[1].replace(/\s/g,'').replace(',','.'));
+  const mTvq   = texte.match(/TVQ\s*[:\s]+([\d\s,\.]+)\s*\$/i);
+  if (mTvq) facture.tvq = parseFloat(mTvq[1].replace(/\s/g,'').replace(',','.'));
+  const mSous  = texte.match(/Sous-total\s*[:\s]+([\d\s,\.]+)\s*\$/i);
+  if (mSous) facture.sousTotal = parseFloat(mSous[1].replace(/\s/g,'').replace(',','.'));
+  const mTotal = texte.match(/Total de la commande\s*[:\s]+([\d\s,\.]+)\s*\$/i);
+  if (mTotal) facture.total = parseFloat(mTotal[1].replace(/\s/g,'').replace(',','.'));
+  const mLiv   = texte.match(/Livraison\s*[:\s]+([\d\s,\.]+)\s*\$/i);
+  if (mLiv && !/gratuite/i.test(mLiv[0])) facture.livraison = parseFloat(mLiv[1].replace(/\s/g,'').replace(',','.'));
+  const ligneItem = /([A-ZÀ-Ÿa-zà-ÿ][A-ZÀ-Ÿa-zà-ÿ\s\/&\(\)\-\']+)\s*\((\d+)\)\s*([\d]+(?:ml|g|L|kg|oz)[^\n]*?)?\s*([\d,\.\s]+)\s*\$\s*CAD/gi;
+  let m;
+  while ((m = ligneItem.exec(texte)) !== null) {
+    const desc = m[1].trim();
+    const qte  = parseInt(m[2]);
+    const fmt  = (m[3] || '').trim();
+    const prix = parseFloat(m[4].replace(/\s/g,'').replace(',', '.'));
+    if (!desc || isNaN(prix) || prix <= 0) continue;
+    const fmtMatch = fmt.match(/^([\d\.]+)\s*(ml|g|L|kg)/i) || desc.match(/([\d\.]+)\s*(ml|g|L|kg)/i);
+    facture.items.push({
+      description:  desc,
+      formatQte:    fmtMatch ? parseFloat(fmtMatch[1]) : 0,
+      formatUnite:  fmtMatch ? fmtMatch[2].toLowerCase() : 'unité',
+      prixUnitaire: prix,
+      quantite:     qte
+    });
+  }
+  return facture;
+}
+
+// ─── AMAZON ───
+function parserFactureAmazon(texte) {
+  const facture = { numeroFacture: '', date: '', items: [], tps: 0, tvq: 0, livraison: 0, sousTotal: 0, total: 0 };
+
+  // Numéro de facture
+  const mNum = texte.match(/Invoice\s*#\s*\/\s*#\s*de\s*facture[:\s]+([A-Z0-9]+)/i);
+  if (mNum) facture.numeroFacture = mNum[1].trim();
+
+  // Date — format "DD Month YYYY" ou "DD December 2025"
+  const moisMap = { january:'01', february:'02', march:'03', april:'04', may:'05', june:'06', july:'07', august:'08', september:'09', october:'10', november:'11', december:'12' };
+  const mDate = texte.match(/Invoice date[^:]*:\s*(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/i);
+  if (mDate) {
+    const jour = mDate[1].padStart(2, '0');
+    const mois = moisMap[mDate[2].toLowerCase()] || '01';
+    facture.date = `${mDate[3]}-${mois}-${jour}`;
+  }
+
+  // Sous-total
+  const mSous = texte.match(/Invoice subtotal[^$]*\$([\d\.]+)/i);
+  if (mSous) facture.sousTotal = parseFloat(mSous[1]) || 0;
+
+  // TPS et TVQ — totaux de la page 2
+  const mTps = texte.match(/Federal tax[^$\n]*\$([\d\.]+)\s*Provincial/i);
+  if (mTps) facture.tps = parseFloat(mTps[1]) || 0;
+  const mTvq = texte.match(/Provincial tax[^$\n]*\$([\d\.]+)\s*Tax subtotal/i);
+  if (mTvq) facture.tvq = parseFloat(mTvq[1]) || 0;
+
+  // Items — chaque item se termine par ASIN: XXXXX
+  // Pattern : description multiligne + ASIN + quantité + prix unitaire + ... + sous-total item
+  const asinBlocs = texte.split(/ASIN:\s*[A-Z0-9]+/i);
+  for (let i = 0; i < asinBlocs.length - 1; i++) {
+    const bloc = asinBlocs[i];
+    // Chercher la ligne avec quantité et prix : N $XX.XX $0.00 $X.XX $X.XX $XX.XX
+    const mLigne = bloc.match(/(\d+)\s+\$([\d\.]+)\s+\$[\d\.]+\s+\$([\d\.]+)\s+\$([\d\.]+)\s+\$([\d\.]+)\s*$/);
+    if (!mLigne) continue;
+    const qte         = parseInt(mLigne[1]) || 1;
+    const prixUnit    = parseFloat(mLigne[2]) || 0;
+    const tpsItem     = parseFloat(mLigne[3]) || 0;
+    const tvqItem     = parseFloat(mLigne[4]) || 0;
+    if (prixUnit <= 0) continue;
+
+    // Description — prendre le texte avant la ligne de prix, nettoyer
+    const descBrut = bloc.replace(/(\d+)\s+\$([\d\.]+)\s+\$[\d\.]+\s+\$([\d\.]+)\s+\$([\d\.]+)\s+\$([\d\.]+)\s*$/, '').trim();
+    // Garder seulement la partie anglaise — avant le "/" qui sépare EN/FR
+    const descParts = descBrut.split(/\s*\/\s*/);
+    const desc = (descParts[0] || descBrut).trim().replace(/\s+/g, ' ');
+    if (!desc) continue;
+
+    // Format dans la description — ex: 1.6 L, 118ML, 110gm, 473.6g
+    const fmtMatch = desc.match(/([\d\.]+)\s*(ml|g|L|kg|oz|lb|lbs)/i);
+
+    facture.items.push({
+      description:  desc,
+      formatQte:    fmtMatch ? parseFloat(fmtMatch[1]) : 0,
+      formatUnite:  fmtMatch ? fmtMatch[2].toLowerCase() : 'unité',
+      prixUnitaire: prixUnit,
+      quantite:     qte
+    });
+
+    // Accumuler TPS et TVQ si pas trouvés globalement
+    facture.tps += tpsItem;
+    facture.tvq += tvqItem;
+  }
+
+  // Si les totaux globaux ont été trouvés, ne pas doubler
+  if (mTps) facture.tps = parseFloat(mTps[1]) || 0;
+  if (mTvq) facture.tvq = parseFloat(mTvq[1]) || 0;
+
+  facture.total = facture.sousTotal + facture.tps + facture.tvq + facture.livraison;
+  return facture;
+}

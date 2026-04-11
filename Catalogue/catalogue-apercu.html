@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Catalogue Univers Caresse — Aperçu</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Birthstone&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:      #5a8a3a;
+  --primary-dark: #4a6e2e;
+  --accent:       #d4a445;
+  --blanc:        #f9f7f4;
+  --beige:        #e8dcc8;
+  --beige-clair:  #f2ece0;
+  --gris:         #8b8680;
+  --gris-fonce:   #3d3b39;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: #0e0d0b;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  padding: 40px 20px;
+  color: var(--gris-fonce);
+}
+
+.controles {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.controles button {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid rgba(212,164,69,0.4);
+  padding: 10px 32px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.page-label {
+  text-align: center;
+  color: rgba(255,255,255,0.15);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  margin-top: 40px;
+}
+
+/* PAGE — 8.5×11 à 96dpi */
+.page {
+  width: 816px;
+  height: 1056px;
+  background: var(--blanc);
+  margin: 0 auto 4px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* PIED COMMUN */
+.pied {
+  padding: 10px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--beige);
+  flex-shrink: 0;
+}
+.pied-marque { font-family:'Birthstone',cursive; font-size:17px; color:var(--accent); }
+.pied-centre { font-size:9px; color:var(--gris); letter-spacing:.06em; }
+.pied-no { font-size:9px; color:var(--gris); letter-spacing:.1em; }
+
+/* ═══════════════════════════════
+   P1 — COUVERTURE
+═══════════════════════════════ */
+.p-cover {
+  background: #1a1712;
+}
+
+.cover-photo {
+  position: absolute; inset: 0;
+  background: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1774629257/rustic-pine-wood-shelving-units-filled-w_nwviwu8US0-S9GgJSsz-5Q_tHOMx3yvRTKbYUxTQjN3Bw_ykdd4h.jpg') center/cover no-repeat;
+  opacity: 0.25;
+}
+
+.cover-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(26,23,18,0.95) 0%, rgba(26,23,18,0.4) 50%, rgba(26,23,18,0.2) 100%);
+}
+
+.cover-bande {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+  background: linear-gradient(to bottom, var(--primary), var(--accent) 50%, var(--primary-dark));
+}
+
+.cover-corps {
+  position: relative; z-index: 2;
+  padding: 0 64px 60px;
+  margin-top: auto;
+}
+
+.cover-eyebrow {
+  font-size: 9px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.cover-eyebrow::before { content:''; width:20px; height:1px; background:var(--accent); display:block; }
+
+.cover-nom {
+  font-family: 'Playfair Display', serif;
+  font-size: 72px; font-weight: 400; color: var(--blanc);
+  line-height: .95; letter-spacing: -.01em; margin-bottom: 10px;
+}
+
+.cover-tagline {
+  font-family: 'Birthstone', cursive;
+  font-size: 48px; color: var(--accent); line-height: 1; margin-bottom: 40px;
+}
+
+.cover-phrase {
+  font-size: 12px; font-weight: 300; color: rgba(249,247,244,.38);
+  line-height: 1.9; font-style: italic; max-width: 380px;
+}
+
+.cover-cols {
+  position: absolute; top: 48px; right: 64px; z-index: 2;
+  display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
+}
+.cover-col { display: flex; align-items: center; gap: 9px; }
+.cover-col-nom { font-family:'Playfair Display',serif; font-size:10px; font-style:italic; color:rgba(249,247,244,.3); }
+.cover-col-dot { width:5px; height:5px; border-radius:50%; }
+
+/* ═══════════════════════════════
+   P2 — CHANTAL
+═══════════════════════════════ */
+.p-chantal {
+  background: var(--beige-clair);
+  flex-direction: row;
+}
+
+.chantal-photo {
+  width: 360px; flex-shrink: 0; position: relative; overflow: hidden;
+  background: #1e2418;
+}
+.chantal-photo img { width:100%; height:100%; object-fit:cover; opacity:.8; }
+.chantal-photo::after {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(to right, transparent 55%, var(--beige-clair));
+}
+
+.chantal-texte {
+  flex: 1; padding: 56px 44px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+.chantal-eyebrow {
+  font-size: 8px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase;
+  color: var(--primary); margin-bottom: 14px;
+}
+
+.chantal-titre {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 400; color: var(--gris-fonce);
+  line-height: 1.15; margin-bottom: 6px;
+}
+.chantal-titre em { font-style:italic; color:var(--primary); }
+
+.chantal-sig {
+  font-family: 'Birthstone', cursive;
+  font-size: 32px; color: var(--accent); line-height: 1; margin-bottom: 24px;
+}
+
+.chantal-corps {
+  font-size: 12px; color: var(--gris); line-height: 1.9; font-weight: 300; margin-bottom: 24px;
+}
+
+.chantal-citation {
+  border-left: 2px solid var(--accent); padding-left: 14px;
+  font-family: 'Playfair Display', serif;
+  font-size: 12.5px; font-style: italic; color: var(--gris-fonce); line-height: 1.7;
+}
+
+/* ═══════════════════════════════
+   PAGES COLLECTIONS — STRUCTURE COMMUNE
+═══════════════════════════════ */
+.col-page {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hero collection */
+.col-hero {
+  height: 220px;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.col-hero-photo {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.col-hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.72) 100%);
+}
+
+.col-hero-contenu {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 0 48px 24px;
+  z-index: 2;
+}
+
+.col-hero-trait {
+  width: 28px; height: 2px; margin-bottom: 10px;
+}
+
+.col-hero-nom {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px; font-weight: 400; color: var(--blanc);
+  line-height: 1; margin-bottom: 5px;
+}
+
+.col-hero-slogan {
+  font-size: 10px; font-weight: 300; letter-spacing: .14em; text-transform: uppercase;
+  color: rgba(249,247,244,0.55);
+}
+
+/* Corps collection */
+.col-corps {
+  flex: 1;
+  padding: 20px 36px 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Grille produits */
+.grille {
+  display: grid;
+  gap: 10px;
+  flex: 1;
+}
+
+.grille-4 { grid-template-columns: repeat(4, 1fr); }
+.grille-3 { grid-template-columns: repeat(3, 1fr); }
+
+.carte {
+  display: flex;
+  flex-direction: column;
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.03);
+}
+
+.carte-photo {
+  aspect-ratio: 1;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.carte-photo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.carte-photo-fond {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0.35;
+}
+
+.carte-info {
+  padding: 6px 8px;
+  flex: 1;
+}
+
+.carte-nom {
+  font-family: 'Playfair Display', serif;
+  font-size: 9.5px; font-weight: 600;
+  color: var(--gris-fonce);
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.carte-prix {
+  font-size: 8.5px; font-weight: 500;
+  letter-spacing: .04em;
+}
+
+.carte-format {
+  font-size: 7.5px; color: var(--gris); font-weight: 300;
+}
+
+/* Grille compacte 4×4 — cartes plus petites */
+.grille-4 .carte-nom { font-size: 8.5px; }
+.grille-4 .carte-info { padding: 4px 6px; }
+
+/* ═══════════════════════════════
+   PAGE PARTAGÉE — 2 ou 3 petites collections
+═══════════════════════════════ */
+.p-partage {
+  display: flex;
+  flex-direction: column;
+}
+
+.col-mini {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--beige);
+  overflow: hidden;
+}
+.col-mini:last-of-type { border-bottom: none; }
+
+.col-mini-entete {
+  padding: 14px 48px 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.col-mini-trait {
+  width: 16px; height: 2px; flex-shrink: 0; margin-top: 6px;
+}
+
+.col-mini-nom {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 400; color: var(--gris-fonce);
+}
+
+.col-mini-slogan {
+  font-size: 8px; font-weight: 300; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--gris); margin-left: auto;
+}
+
+.col-mini-grille {
+  padding: 0 48px 10px;
+  display: grid;
+  gap: 8px;
+  flex: 1;
+}
+
+.col-mini-grille.g3 { grid-template-columns: repeat(3, 1fr); }
+.col-mini-grille.g4 { grid-template-columns: repeat(4, 1fr); }
+.col-mini-grille.g5 { grid-template-columns: repeat(5, 1fr); }
+
+.mini-carte {
+  display: flex;
+  flex-direction: column;
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.03);
+}
+
+.mini-carte-photo {
+  aspect-ratio: 1;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mini-carte-photo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.mini-carte-fond {
+  width: 100%; height: 100%;
+  opacity: 0.3;
+}
+
+.mini-carte-info {
+  padding: 4px 6px;
+}
+
+.mini-carte-nom {
+  font-family: 'Playfair Display', serif;
+  font-size: 8px; font-weight: 600;
+  color: var(--gris-fonce); line-height: 1.2;
+}
+
+.mini-carte-prix {
+  font-size: 7.5px; font-weight: 500;
+}
+
+/* ═══════════════════════════════
+   PHILOSOPHIE
+═══════════════════════════════ */
+.p-philo {
+  background: var(--gris-fonce);
+  justify-content: center;
+  align-items: center;
+}
+
+.philo-contenu {
+  padding: 64px;
+  text-align: center;
+  max-width: 560px;
+  z-index: 2;
+}
+
+.philo-trait {
+  width: 32px; height: 1px; background: var(--accent); margin: 0 auto 20px;
+}
+
+.philo-eyebrow {
+  font-size: 9px; font-weight: 500; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 28px;
+}
+
+.philo-citation {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-style: italic; color: var(--blanc);
+  line-height: 1.7; margin-bottom: 20px;
+}
+
+.philo-sig {
+  font-family: 'Birthstone', cursive;
+  font-size: 30px; color: var(--accent); display: block; margin-bottom: 4px;
+}
+
+.philo-sous {
+  font-size: 9px; color: var(--gris); letter-spacing: .12em; text-transform: uppercase;
+  margin-bottom: 48px;
+}
+
+.philo-valeurs {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  text-align: left;
+}
+
+.philo-valeur-titre {
+  font-family: 'Playfair Display', serif;
+  font-size: 12px; font-weight: 600; color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.philo-valeur-desc {
+  font-size: 10px; color: rgba(249,247,244,.5);
+  line-height: 1.7; font-weight: 300;
+}
+
+/* ═══════════════════════════════
+   DOS DE COUVERTURE
+═══════════════════════════════ */
+.p-dos {
+  background: var(--blanc);
+  justify-content: center;
+  align-items: center;
+}
+
+.dos-corps {
+  text-align: center; padding: 48px;
+}
+
+.dos-marque {
+  font-family: 'Birthstone', cursive;
+  font-size: 52px; color: var(--accent); margin-bottom: 6px;
+}
+
+.dos-sous {
+  font-size: 9px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--gris); margin-bottom: 32px;
+}
+
+.dos-sep {
+  width: 40px; height: 1px; background: var(--beige); margin: 0 auto 32px;
+}
+
+.dos-coords {
+  margin-bottom: 28px;
+}
+
+.dos-coord {
+  font-size: 12px; color: var(--gris-fonce); letter-spacing: .04em;
+  margin-bottom: 6px;
+}
+
+.dos-note {
+  font-size: 10px; color: var(--gris); line-height: 1.8;
+  font-style: italic; max-width: 340px; margin: 0 auto 40px;
+}
+
+.dos-dots {
+  display: flex; gap: 8px; justify-content: center;
+}
+
+.dos-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+
+/* ═══════════════════════════════
+   PRINT
+═══════════════════════════════ */
+@media print {
+  body { background: white; padding: 0; margin: 0; }
+  .controles { display: none; }
+  .page-label { display: none; }
+  .page {
+    width: 8.5in;
+    height: 11in;
+    margin: 0;
+    page-break-after: always;
+    overflow: hidden;
+  }
+  @page { size: 8.5in 11in; margin: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="controles">
+  <button onclick="window.print()">IMPRIMER</button>
+</div>
+
+<!-- ══════════════════════════════
+  P1 — COUVERTURE
+══════════════════════════════ -->
+<div class="page-label">Page 1 — Couverture</div>
+<div class="page p-cover">
+  <div class="cover-photo"></div>
+  <div class="cover-overlay"></div>
+  <div class="cover-bande"></div>
+
+  <div class="cover-cols">
+    <div class="cover-col">
+      <div class="cover-col-nom">Saponica</div>
+      <div class="cover-col-dot" style="background:#8A7A4A;"></div>
+    </div>
+    <div class="cover-col">
+      <div class="cover-col-nom">Petit Nuage</div>
+      <div class="cover-col-dot" style="background:#E8D8E0;"></div>
+    </div>
+    <div class="cover-col">
+      <div class="cover-col-nom">Caprin</div>
+      <div class="cover-col-dot" style="background:#957A6A;"></div>
+    </div>
+    <div class="cover-col">
+      <div class="cover-col-nom">Émolia</div>
+      <div class="cover-col-dot" style="background:#C4956A;"></div>
+    </div>
+    <div class="cover-col">
+      <div class="cover-col-nom">Épure</div>
+      <div class="cover-col-dot" style="background:#6A6A50;"></div>
+    </div>
+    <div class="cover-col">
+      <div class="cover-col-nom">Kérys</div>
+      <div class="cover-col-dot" style="background:#5A9A7A;"></div>
+    </div>
+    <div class="cover-col">
+      <div class="cover-col-nom">Casa</div>
+      <div class="cover-col-dot" style="background:#9AAF60;"></div>
+    </div>
+    <div class="cover-col">
+      <div class="cover-col-nom">Lui</div>
+      <div class="cover-col-dot" style="background:#3A5A6A;"></div>
+    </div>
+    <div class="cover-col">
+      <div class="cover-col-nom">Anima</div>
+      <div class="cover-col-dot" style="background:#C4845A;"></div>
+    </div>
+  </div>
+
+  <div class="cover-corps">
+    <div class="cover-eyebrow">Catalogue de produits</div>
+    <div class="cover-nom">Univers<br>Caresse</div>
+    <div class="cover-tagline">Simplement la nature</div>
+    <div class="cover-phrase">Savonnerie artisanale · Fabriqué à la main au Québec · 100% naturel</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+  P2 — CHANTAL
+══════════════════════════════ -->
+<div class="page-label">Page 2 — Mot de Chantal</div>
+<div class="page p-chantal">
+  <div class="chantal-photo">
+    <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774627932/a-warm-inviting-photograph-of-an-artisan_uCbddMjKSkWQWJrd_XQJdg_VTqWCfYYQ_Kna8JgcGw28A_lmm3kj.jpg" alt="Atelier Univers Caresse">
+  </div>
+  <div class="chantal-texte">
+    <div class="chantal-eyebrow">Un mot de l'artisane</div>
+    <div class="chantal-titre">Fait avec <em>intention</em>,<br>offert avec cœur</div>
+    <div class="chantal-sig">Chantal Mondor</div>
+    <div class="chantal-corps">
+      Univers Caresse est né d'une conviction simple : ce qu'on met sur sa peau mérite la même attention que ce qu'on met dans son assiette. Chaque savon, chaque baume, chaque produit de cette collection a été pensé, testé, reformulé — jusqu'à ce qu'il soit exactement ce qu'il promet.
+      <br><br>
+      Pas de compromis sur les ingrédients. Pas de raccourcis dans la fabrication. Juste la nature, honnêtement transformée.
+    </div>
+    <div class="chantal-citation">
+      « Chaque ingrédient est choisi pour ce qu'il apporte vraiment — fabriqué à la main, en petites séries, sans compromis. »
+    </div>
+  </div>
+  <div class="pied">
+    <div class="pied-marque">Univers Caresse</div>
+    <div class="pied-centre">universcaresse.ca</div>
+    <div class="pied-no">2</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+  P3 — SAPONICA (16 produits — grille 4×4)
+══════════════════════════════ -->
+<div class="page-label">Page 3 — SAPONICA</div>
+<div class="page col-page" style="background:#faf8f4;">
+  <div class="col-hero">
+    <div class="col-hero-photo" style="background-image:url('https://res.cloudinary.com/dfasrauyy/image/upload/v1773699699/saponica_yvg3if.jpg');"></div>
+    <div class="col-hero-overlay" style="background:linear-gradient(to bottom, rgba(138,122,74,0.1) 0%, rgba(40,35,20,0.85) 100%);"></div>
+    <div class="col-hero-contenu">
+      <div class="col-hero-trait" style="background:#8A7A4A;"></div>
+      <div class="col-hero-nom">Saponica</div>
+      <div class="col-hero-slogan">Simplement la nature qui prend soin de vous</div>
+    </div>
+  </div>
+  <div class="col-corps">
+    <div class="grille grille-4" style="padding-bottom:8px;">
+      <!-- 16 produits SAPONICA -->
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773448451/Boisdecaractere_hbi5xd.jpg" alt="Bois de Caractère"></div>
+        <div class="carte-info"><div class="carte-nom">Bois de Caractère</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/Bor%C3%A9al_iemqim.jpg" alt="Boréal"></div>
+        <div class="carte-info"><div class="carte-nom">Boréal</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/Brisedeslagunes_nurrcu.jpg" alt="Brise des Lagunes"></div>
+        <div class="carte-info"><div class="carte-nom">Brise des Lagunes</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773449731/Clubprive_vatlos.jpg" alt="Club Privé"></div>
+        <div class="carte-info"><div class="carte-nom">Club Privé</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773418761/Doucepensee_jgnf8a.jpg" alt="Douce Pensée"></div>
+        <div class="carte-info"><div class="carte-nom">Douce Pensée</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/D%C3%A9licat_vdewef.jpg" alt="Délicat"></div>
+        <div class="carte-info"><div class="carte-nom">Délicat</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773448368/Feudautomne_etjdou.jpg" alt="Feu d'Automne"></div>
+        <div class="carte-info"><div class="carte-nom">Feu d'Automne</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773449232/Jardindaurore_vtpqvp.jpg" alt="Jardin d'Aurore"></div>
+        <div class="carte-info"><div class="carte-nom">Jardin d'Aurore</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773448370/Jardideroses_c0mjii.jpg" alt="Jardin de Roses"></div>
+        <div class="carte-info"><div class="carte-nom">Jardin de Roses</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773418762/Nuagedelavande_kwncrq.jpg" alt="Nuage de Lavande"></div>
+        <div class="carte-info"><div class="carte-nom">Nuage de Lavande</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773448369/Soleildeprovence_pue3as.jpg" alt="Soleil de Provence"></div>
+        <div class="carte-info"><div class="carte-nom">Soleil de Provence</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773448369/Voiledepoire_ue6ufc.jpg" alt="Voile de Poire"></div>
+        <div class="carte-info"><div class="carte-nom">Voile de Poire</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">95 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773448653/Eclatdemer_gn5fap.jpg" alt="Éclat de Mer"></div>
+        <div class="carte-info"><div class="carte-nom">Éclat de Mer</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773448829/Eclatfloral_rqh0ry.jpg" alt="Éclat Floral"></div>
+        <div class="carte-info"><div class="carte-nom">Éclat Floral</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773448785/Eclatfloral_lg1ysi.jpg" alt="Éclat Tropical"></div>
+        <div class="carte-info"><div class="carte-nom">Éclat Tropical</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+      <div class="carte">
+        <div class="carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773418762/etreinte_nknqua.jpg" alt="Étreinte Gourmande"></div>
+        <div class="carte-info"><div class="carte-nom">Étreinte Gourmande</div><div class="carte-prix" style="color:#8A7A4A;">7,00 $</div><div class="carte-format">90 g</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="pied">
+    <div class="pied-marque">Univers Caresse</div>
+    <div class="pied-centre">universcaresse.ca</div>
+    <div class="pied-no">3</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+  P4 — CAPRIN (6) + PETIT NUAGE (5)
+══════════════════════════════ -->
+<div class="page-label">Page 4 — CAPRIN + PETIT NUAGE</div>
+<div class="page p-partage">
+
+  <!-- CAPRIN -->
+  <div class="col-mini" style="background:#faf7f5;">
+    <div class="col-mini-entete">
+      <div class="col-mini-trait" style="background:#957A6A;"></div>
+      <div class="col-mini-nom" style="color:#957A6A;">Caprin</div>
+      <div class="col-mini-slogan">Simplement la nature et la douceur de la chèvre</div>
+    </div>
+    <div class="col-mini-grille g3" style="grid-template-columns:repeat(6,1fr);">
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#957A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Caprice Fraisé</div><div class="mini-carte-prix" style="color:#957A6A;">7,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#957A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Cerise de Velours</div><div class="mini-carte-prix" style="color:#957A6A;">7,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#957A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Fraîcheur de Melon</div><div class="mini-carte-prix" style="color:#957A6A;">7,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#957A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Orange Sauvage</div><div class="mini-carte-prix" style="color:#957A6A;">7,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#957A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Pomme d'Émeraude</div><div class="mini-carte-prix" style="color:#957A6A;">7,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#957A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Éclosion de Soie</div><div class="mini-carte-prix" style="color:#957A6A;">7,00 $</div></div></div>
+    </div>
+  </div>
+
+  <!-- PETIT NUAGE -->
+  <div class="col-mini" style="background:#fdf5f7;">
+    <div class="col-mini-entete">
+      <div class="col-mini-trait" style="background:#E8D8E0;"></div>
+      <div class="col-mini-nom" style="color:#c4a0b0;">Petit Nuage</div>
+      <div class="col-mini-slogan">Simplement la nature qui dorlote vos tout-petits</div>
+    </div>
+    <div class="col-mini-grille g5" style="grid-template-columns:repeat(5,1fr);">
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773083581/univers-caresse/produits/ywvtdsbkjhww65hyhrcv.jpg" alt="Bonbon"></div><div class="mini-carte-info"><div class="mini-carte-nom">Petit Nuage Bonbon</div><div class="mini-carte-prix" style="color:#c4a0b0;">5,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773083346/univers-caresse/produits/vw5bdqa4j1dumkwjodzr.jpg" alt="Câlin"></div><div class="mini-carte-info"><div class="mini-carte-nom">Petit Nuage Câlin</div><div class="mini-carte-prix" style="color:#c4a0b0;"></div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773083394/univers-caresse/produits/gncwgz5xektcburqtpzr.jpg" alt="Douce Baie"></div><div class="mini-carte-info"><div class="mini-carte-nom">Petit Nuage Douce Baie</div><div class="mini-carte-prix" style="color:#c4a0b0;"></div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773083428/univers-caresse/produits/qiea1clad0wsqu8x4v1r.jpg" alt="Fleuri"></div><div class="mini-carte-info"><div class="mini-carte-nom">Petit Nuage Fleuri</div><div class="mini-carte-prix" style="color:#c4a0b0;"></div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773083525/univers-caresse/produits/kdrgqwki1vaclkhjln4c.jpg" alt="Rosé"></div><div class="mini-carte-info"><div class="mini-carte-nom">Petit Nuage Rosé</div><div class="mini-carte-prix" style="color:#c4a0b0;"></div></div></div>
+    </div>
+  </div>
+
+  <div class="pied">
+    <div class="pied-marque">Univers Caresse</div>
+    <div class="pied-centre">universcaresse.ca</div>
+    <div class="pied-no">4</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+  P5 — ÉMOLIA (19 produits — grille 4×5)
+══════════════════════════════ -->
+<div class="page-label">Page 5 — ÉMOLIA</div>
+<div class="page col-page" style="background:#fdf8f4;">
+  <div class="col-hero">
+    <div class="col-hero-photo" style="background-image:url('https://res.cloudinary.com/dfasrauyy/image/upload/v1774629279/a-minimalist-still-life-photograph-featu_OmMoSBO5T2WkphsZCBhDQA_DSW-Hw_cTSqI_Is56u75Dg_aesvzs.jpg');"></div>
+    <div class="col-hero-overlay" style="background:linear-gradient(to bottom, rgba(196,149,106,0.1) 0%, rgba(60,35,15,0.85) 100%);"></div>
+    <div class="col-hero-contenu">
+      <div class="col-hero-trait" style="background:#C4956A;"></div>
+      <div class="col-hero-nom">Émolia</div>
+      <div class="col-hero-slogan">Simplement la nature dédiée à votre bien-être</div>
+    </div>
+  </div>
+  <div class="col-corps">
+    <div class="grille grille-4" style="padding-bottom:8px; grid-template-rows: repeat(5, 1fr);">
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Effluve Apaisant</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Baume</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Petit Bouclier</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Baume</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Bombe Brise des Lagunes</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Bombe de bain</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Bombe Douce Pensée</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Bombe de bain</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Bombe Délicat</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Bombe de bain</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Bombe Nuage de Lavande</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Bombe de bain</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Bombe Vanille et Citron</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Bombe de bain</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Bombes Petit Nuage</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Bombe de bain</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Boréal</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Baume à lèvres</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Baiser Fruité</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Baume à lèvres</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Fraise et Basilic</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Baume à lèvres</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Lavande - Romarin</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Baume à lèvres</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Menthe Poivrée</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Baume à lèvres</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Nuage Fraise</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Baume à lèvres</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Petit Nuage Douillet</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Baume à lèvres</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Souffle d'Hiver</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Baume à lèvres</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Souffle d'Été</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Baume à lèvres</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Vent Frais</div><div class="carte-prix" style="color:#C4956A;">7,00 $</div><div class="carte-format">125 g · Savon</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#C4956A;"></div></div><div class="carte-info"><div class="carte-nom">Brume de Rosée</div><div class="carte-prix" style="color:#C4956A;"></div><div class="carte-format">Savon exfoliant</div></div></div>
+    </div>
+  </div>
+  <div class="pied">
+    <div class="pied-marque">Univers Caresse</div>
+    <div class="pied-centre">universcaresse.ca</div>
+    <div class="pied-no">5</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+  P6 — ÉPURE (4) + KÉRYS (6)
+══════════════════════════════ -->
+<div class="page-label">Page 6 — ÉPURE + KÉRYS</div>
+<div class="page p-partage">
+
+  <!-- ÉPURE -->
+  <div class="col-mini" style="background:#f8f8f4;">
+    <div class="col-mini-entete">
+      <div class="col-mini-trait" style="background:#6A6A50;"></div>
+      <div class="col-mini-nom" style="color:#6A6A50;">Épure</div>
+      <div class="col-mini-slogan">Simplement la nature entre vos mains</div>
+    </div>
+    <div class="col-mini-grille" style="grid-template-columns:repeat(4,1fr);">
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773085030/univers-caresse/produits/dgskttwylxoqxh1x689n.jpg" alt="Grain d'Acier"></div><div class="mini-carte-info"><div class="mini-carte-nom">Grain d'Acier</div><div class="mini-carte-prix" style="color:#6A6A50;">7,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773085101/univers-caresse/produits/p0dsiibm02qrmhuluhok.jpg" alt="Herbe Douce"></div><div class="mini-carte-info"><div class="mini-carte-nom">Herbe Douce</div><div class="mini-carte-prix" style="color:#6A6A50;">7,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773085149/univers-caresse/produits/gewk6wpfn1tet13vzsnc.jpg" alt="Mousse d'Espresso"></div><div class="mini-carte-info"><div class="mini-carte-nom">Mousse d'Espresso</div><div class="mini-carte-prix" style="color:#6A6A50;">7,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773085196/univers-caresse/produits/m5gjwtn5cfdctygdzawl.jpg" alt="Murmure d'Oliva"></div><div class="mini-carte-info"><div class="mini-carte-nom">Murmure d'Oliva</div><div class="mini-carte-prix" style="color:#6A6A50;">7,00 $</div></div></div>
+    </div>
+  </div>
+
+  <!-- KÉRYS -->
+  <div class="col-mini" style="background:#f4faf7;">
+    <div class="col-mini-entete">
+      <div class="col-mini-trait" style="background:#5A9A7A;"></div>
+      <div class="col-mini-nom" style="color:#5A9A7A;">Kérys</div>
+      <div class="col-mini-slogan">Simplement la nature qui veille sur vos cheveux</div>
+    </div>
+    <div class="col-mini-grille" style="grid-template-columns:repeat(6,1fr);">
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773084533/univers-caresse/produits/dk74oyfcggmp3qgcmhpl.png" alt="Brise Matinale"></div><div class="mini-carte-info"><div class="mini-carte-nom">Brise Matinale</div><div class="mini-carte-prix" style="color:#5A9A7A;"></div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773084403/univers-caresse/produits/yihx6ik4giouqmror9qx.png" alt="Pure Harmonie"></div><div class="mini-carte-info"><div class="mini-carte-nom">Pure Harmonie</div><div class="mini-carte-prix" style="color:#5A9A7A;">10,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#5A9A7A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Clarté Verte</div><div class="mini-carte-prix" style="color:#5A9A7A;">10,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#5A9A7A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Rayon Lumineux</div><div class="mini-carte-prix" style="color:#5A9A7A;">19,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773084252/univers-caresse/produits/ftivtqm8akpeeij6zdxg.jpg" alt="Botanica"></div><div class="mini-carte-info"><div class="mini-carte-nom">Botanica</div><div class="mini-carte-prix" style="color:#5A9A7A;">10,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#5A9A7A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Douceur des Îles</div><div class="mini-carte-prix" style="color:#5A9A7A;">10,00 $</div></div></div>
+    </div>
+  </div>
+
+  <div class="pied">
+    <div class="pied-marque">Univers Caresse</div>
+    <div class="pied-centre">universcaresse.ca</div>
+    <div class="pied-no">6</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+  P7 — CASA (16 produits)
+══════════════════════════════ -->
+<div class="page-label">Page 7 — CASA</div>
+<div class="page col-page" style="background:#f8faf4;">
+  <div class="col-hero">
+    <div class="col-hero-photo" style="background-image:url('https://res.cloudinary.com/dfasrauyy/image/upload/v1774629280/a-serene-still-life-photograph-capturing_eNdcu-T-QwOlCQFoxMnZoA_QGE0w6WwRdKH6816Kjky-w_oxu2k1.jpg');"></div>
+    <div class="col-hero-overlay" style="background:linear-gradient(to bottom, rgba(154,175,96,0.1) 0%, rgba(30,45,15,0.85) 100%);"></div>
+    <div class="col-hero-contenu">
+      <div class="col-hero-trait" style="background:#9AAF60;"></div>
+      <div class="col-hero-nom">Casa</div>
+      <div class="col-hero-slogan">Simplement la nature pour votre maison</div>
+    </div>
+  </div>
+  <div class="col-corps">
+    <div class="grille grille-4" style="padding-bottom:8px;">
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Bruine Agrumes et Romarin</div><div class="carte-prix" style="color:#9AAF60;"></div><div class="carte-format">Bruine d'ambiance</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Bruine Brise des Lagunes</div><div class="carte-prix" style="color:#9AAF60;"></div><div class="carte-format">Bruine d'ambiance</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Bruine Lavande</div><div class="carte-prix" style="color:#9AAF60;"></div><div class="carte-format">Bruine d'ambiance</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Bruine Poire</div><div class="carte-prix" style="color:#9AAF60;"></div><div class="carte-format">Bruine d'ambiance</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Lessive Fraîche</div><div class="carte-prix" style="color:#9AAF60;"></div><div class="carte-format">Bruine d'ambiance</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Éclat Citronné</div><div class="carte-prix" style="color:#9AAF60;">20,00 $</div><div class="carte-format">230 g · Cake vaisselle</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Eau de Linge Lavande</div><div class="carte-prix" style="color:#9AAF60;"></div><div class="carte-format">Eau de linge</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Eau de Linge Sérénité Pure</div><div class="carte-prix" style="color:#9AAF60;"></div><div class="carte-format">Eau de linge</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Grand Air</div><div class="carte-prix" style="color:#9AAF60;"></div><div class="carte-format">Eau de linge</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Lessive Fraîche</div><div class="carte-prix" style="color:#9AAF60;"></div><div class="carte-format">Eau de linge</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Bougie Feu d'Automne</div><div class="carte-prix" style="color:#9AAF60;">1,00 $</div><div class="carte-format">Bougie</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Bougie Lessive Fraîche</div><div class="carte-prix" style="color:#9AAF60;">1,00 $</div><div class="carte-format">Bougie</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Bougie Nuage de Lavande</div><div class="carte-prix" style="color:#9AAF60;">1,00 $</div><div class="carte-format">Bougie</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Bougie Pivoine et Poire</div><div class="carte-prix" style="color:#9AAF60;">1,00 $</div><div class="carte-format">Bougie</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Brise des Lagunes</div><div class="carte-prix" style="color:#9AAF60;">1,00 $</div><div class="carte-format">Bougie</div></div></div>
+      <div class="carte"><div class="carte-photo"><div class="carte-photo-fond" style="background:#9AAF60;"></div></div><div class="carte-info"><div class="carte-nom">Souffle de Sapin</div><div class="carte-prix" style="color:#9AAF60;">7,00 $</div><div class="carte-format">125 g · Savon du pays</div></div></div>
+    </div>
+  </div>
+  <div class="pied">
+    <div class="pied-marque">Univers Caresse</div>
+    <div class="pied-centre">universcaresse.ca</div>
+    <div class="pied-no">7</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+  P8 — LUI (6) + ANIMA (1)
+══════════════════════════════ -->
+<div class="page-label">Page 8 — LUI + ANIMA</div>
+<div class="page p-partage">
+
+  <!-- LUI -->
+  <div class="col-mini" style="background:#f2f6f8; flex:2;">
+    <div class="col-mini-entete">
+      <div class="col-mini-trait" style="background:#3A5A6A;"></div>
+      <div class="col-mini-nom" style="color:#3A5A6A;">Lui</div>
+      <div class="col-mini-slogan">Simplement la nature au masculin</div>
+    </div>
+    <div class="col-mini-grille" style="grid-template-columns:repeat(6,1fr);">
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#3A5A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Esker</div><div class="mini-carte-prix" style="color:#3A5A6A;">7,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#3A5A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">L'Élixir du Matin</div><div class="mini-carte-prix" style="color:#3A5A6A;"></div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#3A5A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Lichen</div><div class="mini-carte-prix" style="color:#3A5A6A;">7,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#3A5A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Nordet</div><div class="mini-carte-prix" style="color:#3A5A6A;">7,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#3A5A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Club Privé (Savon à barbe)</div><div class="mini-carte-prix" style="color:#3A5A6A;">30,00 $</div></div></div>
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#3A5A6A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">L'Instant du Barbier</div><div class="mini-carte-prix" style="color:#3A5A6A;">30,00 $</div></div></div>
+    </div>
+  </div>
+
+  <!-- ANIMA -->
+  <div class="col-mini" style="background:#faf5f2;">
+    <div class="col-mini-entete">
+      <div class="col-mini-trait" style="background:#C4845A;"></div>
+      <div class="col-mini-nom" style="color:#C4845A;">Anima</div>
+      <div class="col-mini-slogan">Simplement la nature pour pattes et museaux</div>
+    </div>
+    <div class="col-mini-grille" style="grid-template-columns:repeat(3,1fr);">
+      <div class="mini-carte"><div class="mini-carte-photo"><div class="mini-carte-fond" style="background:#C4845A;"></div></div><div class="mini-carte-info"><div class="mini-carte-nom">Pattes Blanches</div><div class="mini-carte-prix" style="color:#C4845A;">7,00 $</div></div></div>
+    </div>
+  </div>
+
+  <div class="pied">
+    <div class="pied-marque">Univers Caresse</div>
+    <div class="pied-centre">universcaresse.ca</div>
+    <div class="pied-no">8</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+  P9 — PHILOSOPHIE
+══════════════════════════════ -->
+<div class="page-label">Page 9 — Philosophie</div>
+<div class="page p-philo">
+  <div class="philo-contenu">
+    <div class="philo-trait"></div>
+    <div class="philo-eyebrow">Notre philosophie</div>
+    <div class="philo-citation">
+      « Chaque ingrédient est choisi pour ce qu'il apporte vraiment — fabriqué à la main, en petites séries, sans compromis. »
+    </div>
+    <span class="philo-sig">Chantal Mondor</span>
+    <div class="philo-sous">Artisane savonnière · Québec</div>
+    <div class="philo-valeurs">
+      <div>
+        <div class="philo-valeur-titre">100% Naturel</div>
+        <div class="philo-valeur-desc">Aucun sulfate, paraben, silicone ou colorant synthétique. Juste la nature.</div>
+      </div>
+      <div>
+        <div class="philo-valeur-titre">Fait à la main</div>
+        <div class="philo-valeur-desc">Chaque produit est coulé, démoulé et préparé manuellement en petites séries.</div>
+      </div>
+      <div>
+        <div class="philo-valeur-titre">Fièrement québécois</div>
+        <div class="philo-valeur-desc">Ingrédients locaux privilégiés, fabriqué au Québec, sans huile de palme.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+  P10 — DOS
+══════════════════════════════ -->
+<div class="page-label">Page 10 — Dos de couverture</div>
+<div class="page p-dos">
+  <div class="dos-corps">
+    <div class="dos-marque">Univers Caresse</div>
+    <div class="dos-sous">Savonnerie artisanale · Québec</div>
+    <div class="dos-sep"></div>
+    <div class="dos-coords">
+      <div class="dos-coord">universcaresse.ca</div>
+      <div class="dos-coord">info@universcaresse.ca</div>
+    </div>
+    <div class="dos-note">
+      Disponible en ligne et dans les marchés locaux.<br>
+      Toutes les collections sont fabriquées à la main en petites séries — disponibilité selon la saison.
+    </div>
+    <div class="dos-dots">
+      <div class="dos-dot" style="background:#8A7A4A;"></div>
+      <div class="dos-dot" style="background:#E8D8E0;"></div>
+      <div class="dos-dot" style="background:#957A6A;"></div>
+      <div class="dos-dot" style="background:#C4956A;"></div>
+      <div class="dos-dot" style="background:#6A6A50;"></div>
+      <div class="dos-dot" style="background:#5A9A7A;"></div>
+      <div class="dos-dot" style="background:#9AAF60;"></div>
+      <div class="dos-dot" style="background:#3A5A6A;"></div>
+      <div class="dos-dot" style="background:#C4845A;"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
