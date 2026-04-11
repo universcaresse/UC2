@@ -383,31 +383,36 @@
        .fiche-ligne-item, .fiche-ligne-info
        .fiche-ligne-nom, .fiche-ligne-format, .fiche-ligne-desc
      ════════════════════════════════════════ -->
-        <div class="form-panel" id="fiche-ligne">
-          <div class="form-panel-header">
-            <div class="fiche-bandeau" id="fiche-ligne-bandeau">
-              <span class="form-panel-titre" id="fiche-ligne-titre"></span>
-              <span class="fiche-slogan" id="fiche-ligne-format"></span>
+      <div id="fiche-ligne" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="fiche-ligne-bandeau">
+                <span class="form-panel-titre" id="fiche-ligne-titre"></span>
+                <span class="fiche-slogan" id="fiche-ligne-format"></span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFicheLigne()" title="Fermer">✕</button>
             </div>
           </div>
-          <div class="form-body">
-            <div class="form-grille">
-              <div class="form-groupe">
-                <label class="form-label">Collection</label>
-                <div class="form-valeur" id="fiche-ligne-collection"></div>
+          <div class="form-panel">
+            <div class="form-body">
+              <div class="form-grille">
+                <div class="form-groupe">
+                  <label class="form-label">Collection</label>
+                  <div class="form-valeur" id="fiche-ligne-collection"></div>
+                </div>
               </div>
-              
+              <div class="form-groupe">
+                <label class="form-label">Description de la gamme</label>
+                <div class="form-valeur" id="fiche-ligne-desc"></div>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Ingrédients de base</label>
+                <div id="fiche-ligne-ingredients"></div>
+              </div>
             </div>
-            <div class="form-groupe">
-              <label class="form-label">Description de la gamme</label>
-              <div class="form-valeur" id="fiche-ligne-desc"></div>
-            </div>
-            <div class="form-groupe">
-              <label class="form-label">Ingrédients de base</label>
-              <div id="fiche-ligne-ingredients"></div>
-            </div>
-          <hr class="separateur">
-          <div class="form-actions fiche-ligne-actions">
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
               <button class="bouton" id="fiche-ligne-modifier">Modifier la gamme</button>
               <button class="bouton bouton-rouge" id="btn-supprimer-ligne-fiche">Supprimer la gamme</button>
             </div>

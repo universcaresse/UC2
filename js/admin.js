@@ -613,7 +613,7 @@ async function ouvrirFicheGamme(gam_id) {
   document.getElementById('btn-supprimer-ligne-fiche').onclick = () => supprimerGamme(gam_id);
   document.getElementById('fiche-ligne-ingredients').innerHTML  = '<span class="form-valeur">—</span>';
   document.getElementById('fiche-collection').classList.remove('visible');
-  document.getElementById('fiche-ligne').classList.add('visible');
+  document.getElementById('fiche-ligne').classList.remove('cache');
   document.getElementById('contenu-collections').classList.add('cache');
   window.scrollTo(0, 0);
 }
@@ -621,7 +621,7 @@ async function ouvrirFicheGamme(gam_id) {
 function fermerFicheLigne() { fermerFicheGamme(); }
 
 function fermerFicheGamme() {
-  document.getElementById('fiche-ligne').classList.remove('visible');
+  document.getElementById('fiche-ligne').classList.add('cache');
   document.getElementById('fiche-collection').classList.add('visible');
   const btnNew = document.getElementById('btn-nouvelle-collection');
   if (btnNew) btnNew.classList.remove('cache');
