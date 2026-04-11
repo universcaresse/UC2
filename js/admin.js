@@ -3094,12 +3094,17 @@ function ifOuvrirModalNouvelIngredient(idx, fournisseur) {
   selCat.onchange = () => {
     if (selCat.value === '__nouvelle_cat__') {
       document.getElementById('modal-if-nouvelle-cat-groupe').classList.remove('cache');
+      document.getElementById('modal-if-nouveau-nom-groupe').classList.remove('cache');
       document.getElementById('modal-if-nouvelle-cat').focus();
-      selNom.innerHTML = '<option value="">— Choisir ou créer —</option>';
+      selNom.classList.add('cache');
       return;
     }
     document.getElementById('modal-if-nouvelle-cat-groupe').classList.add('cache');
     document.getElementById('modal-if-nouvelle-cat').value = '';
+    document.getElementById('modal-if-nouveau-nom-groupe').classList.remove('cache');
+    document.getElementById('modal-if-nouveau-nom').value = '';
+    document.getElementById('modal-if-nouveau-nom').focus();
+    selNom.classList.add('cache');
     const cat = selCat.value;
     const ings = cat ? listesDropdown.fullData.filter(d => d.cat_id === cat).sort((a,b) => (a.nom_UC||'').localeCompare(b.nom_UC||'','fr')) : [];
     selNom.innerHTML = '<option value="">— Choisir ou créer —</option>' +
