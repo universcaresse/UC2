@@ -3059,15 +3059,7 @@ function afficherApercuItems(fournisseur) {
           <option value="">— Choisir —</option>
           ${ingsDeCat.map(d => `<option value="${d.nom_UC}" ${d.nom_UC === nom_UC ? 'selected' : ''}>${d.nom_UC}</option>`).join('')}
         </select>
-        <button class="bouton bouton-petit bouton-contour" style="margin-top:4px" onclick="ifAjouterNomUC(${idx})">+ Nouveau</button>
-        <div id="if-nouveau-uc-${idx}" class="cache" style="margin-top:4px">
-          <input type="text" class="form-ctrl" id="if-nouveau-nom-${idx}" placeholder="Nom UC">
-          <select class="form-ctrl" id="if-nouveau-cat-${idx}" style="margin-top:4px">
-            <option value="">— Catégorie —</option>
-            ${listesDropdown.types.map(t => `<option value="${t}">${listesDropdown.categoriesMap?.[t] || t}</option>`).join('')}
-          </select>
-          <button class="bouton bouton-petit" style="margin-top:4px" onclick="ifConfirmerNomUC(${idx}, '${fournisseur}')">Créer</button>
-        </div>
+        <button class="bouton bouton-petit bouton-contour" onclick="ifOuvrirModalNouvelIngredient(${idx}, '${fournisseur}')">+ Nouveau</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -3087,6 +3079,21 @@ function ifFiltrerNoms(idx) {
 function ifAjouterNomUC(idx) {
   document.getElementById(`if-nouveau-uc-${idx}`)?.classList.remove('cache');
   document.getElementById(`if-nouveau-nom-${idx}`)?.focus();
+}
+
+function ifOuvrirModalNouvelIngredient(idx, fournisseur) {
+  document.getElementById('modal-ajouter-inci-titre').textContent = 'Nouvel ingrédient';
+  document.getElementById('modal-inci-nom').value = ifItems[idx]?.description || '';
+  document.getElementById('modal-inci-url').value = '';
+  document.getElementById('modal-inci-fourn').value = '';
+  document.getElementById('modal-inci-champs-manuels').classList.remove('cache');
+  document.getElementById('modal-inci-inci').value = '';
+  document.getElementById('modal-inci-bot').value = '';
+  document.getElementById('modal-inci-note').value = '';
+  document.getElementById('modal-inci-statut').classList.add('cache');
+  document.getElementById('modal-ajouter-inci').dataset.idx = idx;
+  document.getElementById('modal-ajouter-inci').dataset.fournisseur = fournisseur;
+  document.getElementById('modal-ajouter-inci').classList.add('ouvert');
 }
 
 async function ifConfirmerNomUC(idx, fournisseur) {
@@ -3491,7 +3498,42 @@ function inciRechercher()              {}
 function retourRecetteDepuisInci()     { afficherSection('produits', null); }
 function ajouterIngredientInci()       {}
 function fermerModalAjouterInci()      { document.getElementById('modal-ajouter-inci')?.classList.remove('ouvert'); }
-async function modalInciGo()           {}
+async function modalInciGo() {
+  const modal      = document.getElementById('modal-ajouter-inci');
+  const idx        = modal?.dataset.idx;
+  const fournisseur = modal?.dataset.fournisseur;
+  const nom        = document.getElementById('modal-inci-nom')?.value.trim();
+  const inci       = document.getElementById('modal-inci-inci')?.value.trim();
+  const cat        = document.getElementById('if-type-' + idx)?.value;
+  if (!nom) { afficherMsg('import-facture', 'Le nom est requis.', 'erreur'); return; }
+  if (!cat) { afficherMsg('import-facture', 'Choisir une catégorie dans le tableau.', 'erreur'); return; }
+  const ing_id = 'ING-' + Date.now();
+  const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: nom, inci: inci || '', statut: 'actif' });
+  if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
+  listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: inci || '' });
+  const item = ifItems[idx];
+  if (fournisseur && item) {
+    await appelAPIPost('saveMappingFournisseur', {
+      fournisseur,
+      categorie_fournisseur: listesDropdown.categoriesMap?.[cat] || cat,
+      nom_fournisseur:       item.description,
+      categorie_UC:          listesDropdown.categoriesMap?.[cat] || cat,
+      nom_UC:                nom,
+      ing_id
+    });
+    ifMapping.push({ fournisseur, categorie_fournisseur: listesDropdown.categoriesMap?.[cat] || cat, nom_fournisseur: item.description, categorie_UC: listesDropdown.categoriesMap?.[cat] || cat, nom_UC: nom, ing_id });
+  }
+  const select = document.getElementById(`if-nomuc-${idx}`);
+  if (select) {
+    const opt = document.createElement('option');
+    opt.value = nom; opt.textContent = nom; opt.selected = true;
+    select.appendChild(opt);
+  }
+  const tr = document.getElementById(`if-nomuc-${idx}`)?.closest('tr');
+  if (tr) tr.classList.remove('ligne-rouge');
+  fermerModalAjouterInci();
+  afficherMsg('import-facture', `✅ "${nom}" créé et mappé.`);
+}
 function modalInciToggleChamps()       {}
 function modalInciSyncNomUC()         {}
 function afficherStatutModalInci()     {}
