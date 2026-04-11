@@ -3082,18 +3082,75 @@ function ifAjouterNomUC(idx) {
 }
 
 function ifOuvrirModalNouvelIngredient(idx, fournisseur) {
-  document.getElementById('modal-ajouter-inci-titre').textContent = 'Nouvel ingrédient';
-  document.getElementById('modal-inci-nom').value = ifItems[idx]?.description || '';
-  document.getElementById('modal-inci-url').value = '';
-  document.getElementById('modal-inci-fourn').value = '';
-  document.getElementById('modal-inci-champs-manuels').classList.remove('cache');
-  document.getElementById('modal-inci-inci').value = '';
-  document.getElementById('modal-inci-bot').value = '';
-  document.getElementById('modal-inci-note').value = '';
-  document.getElementById('modal-inci-statut').classList.add('cache');
-  document.getElementById('modal-ajouter-inci').dataset.idx = idx;
-  document.getElementById('modal-ajouter-inci').dataset.fournisseur = fournisseur;
-  document.getElementById('modal-ajouter-inci').classList.add('ouvert');
+  const modal = document.getElementById('modal-if-nouvel-ingredient');
+  const selCat = document.getElementById('modal-if-cat');
+  const selNom = document.getElementById('modal-if-nomuc');
+  selCat.innerHTML = '<option value="">— Catégorie —</option>' +
+    listesDropdown.types.map(t => `<option value="${t}">${listesDropdown.categoriesMap?.[t] || t}</option>`).join('');
+  selNom.innerHTML = '<option value="">— Choisir ou créer —</option>';
+  selCat.onchange = () => {
+    const cat = selCat.value;
+    const ings = cat ? listesDropdown.fullData.filter(d => d.cat_id === cat).sort((a,b) => (a.nom_UC||'').localeCompare(b.nom_UC||'','fr')) : [];
+    selNom.innerHTML = '<option value="">— Choisir ou créer —</option>' +
+      ings.map(d => `<option value="${d.nom_UC}">${d.nom_UC}</option>`).join('') +
+      '<option value="__nouveau__">+ Créer un nouveau nom UC</option>';
+  };
+  selNom.onchange = () => {
+    if (selNom.value === '__nouveau__') {
+      const nom = prompt('Nouveau nom UC :');
+      if (nom) {
+        const opt = document.createElement('option');
+        opt.value = nom; opt.textContent = nom; opt.selected = true;
+        selNom.appendChild(opt);
+      } else {
+        selNom.value = '';
+      }
+    }
+  };
+  modal.dataset.idx = idx;
+  modal.dataset.fournisseur = fournisseur;
+  modal.classList.add('ouvert');
+}
+
+function fermerModalIfNouvelIngredient() {
+  document.getElementById('modal-if-nouvel-ingredient')?.classList.remove('ouvert');
+}
+
+async function modalIfConfirmer() {
+  const modal      = document.getElementById('modal-if-nouvel-ingredient');
+  const idx        = modal?.dataset.idx;
+  const fournisseur = modal?.dataset.fournisseur;
+  const cat        = document.getElementById('modal-if-cat')?.value;
+  const nom        = document.getElementById('modal-if-nomuc')?.value;
+  if (!cat || !nom || nom === '__nouveau__') { afficherMsg('import-facture', 'Catégorie et nom UC requis.', 'erreur'); return; }
+  const ingExistant = listesDropdown.fullData.find(d => d.nom_UC === nom && d.cat_id === cat);
+  let ing_id = ingExistant?.ing_id || '';
+  if (!ingExistant) {
+    ing_id = 'ING-' + Date.now();
+    const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: nom, inci: '', statut: 'actif' });
+    if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
+    listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
+  }
+  const item = ifItems[idx];
+  await appelAPIPost('saveMappingFournisseur', {
+    fournisseur,
+    categorie_fournisseur: listesDropdown.categoriesMap?.[cat] || cat,
+    nom_fournisseur:       item ? item.description : nom,
+    categorie_UC:          listesDropdown.categoriesMap?.[cat] || cat,
+    nom_UC:                nom,
+    ing_id
+  });
+  ifMapping.push({ fournisseur, categorie_fournisseur: listesDropdown.categoriesMap?.[cat] || cat, nom_fournisseur: item ? item.description : nom, categorie_UC: listesDropdown.categoriesMap?.[cat] || cat, nom_UC: nom, ing_id });
+  const select = document.getElementById(`if-nomuc-${idx}`);
+  if (select) {
+    const opt = document.createElement('option');
+    opt.value = nom; opt.textContent = nom; opt.selected = true;
+    select.appendChild(opt);
+  }
+  const tr = document.getElementById(`if-type-${idx}`)?.closest('tr');
+  if (tr) tr.classList.remove('ligne-rouge');
+  fermerModalIfNouvelIngredient();
+  afficherMsg('import-facture', `✅ "${nom}" mappé.`);
 }
 
 async function ifConfirmerNomUC(idx, fournisseur) {
