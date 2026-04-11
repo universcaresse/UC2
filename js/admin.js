@@ -3084,14 +3084,20 @@ async function ifConfirmerNomUC(idx) {
   const nom = document.getElementById(`if-nouveau-nom-${idx}`)?.value.trim();
   const cat = document.getElementById(`if-nouveau-cat-${idx}`)?.value;
   if (!nom || !cat) { afficherMsg('import-facture', 'Nom et catégorie requis.', 'erreur'); return; }
-  afficherMsg('import-facture', `✅ "${nom}" — à ajouter manuellement dans Ingredients_INCI_v2.`);
+  const ing_id = 'ING-' + Date.now();
+  const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: nom, inci: '', statut: 'actif' });
+  if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
+  listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
   const select = document.getElementById(`if-nomuc-${idx}`);
   if (select) {
     const opt = document.createElement('option');
     opt.value = nom; opt.textContent = nom; opt.selected = true;
     select.appendChild(opt);
   }
+  const tr = document.getElementById(`if-nomuc-${idx}`)?.closest('tr');
+  if (tr) tr.classList.remove('ligne-rouge');
   document.getElementById(`if-nouveau-uc-${idx}`)?.classList.add('cache');
+  afficherMsg('import-facture', `✅ "${nom}" créé dans Ingredients_INCI_v2.`);
 }
 
 function validerTotaux(facture) {
