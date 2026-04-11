@@ -3090,7 +3090,10 @@ function ifOuvrirModalNouvelIngredient(idx, fournisseur) {
     '<option value="__nouvelle_cat__">+ Créer une nouvelle catégorie</option>';
   document.getElementById('modal-if-nouvelle-cat-groupe').classList.add('cache');
   document.getElementById('modal-if-nouvelle-cat').value = '';
+  document.getElementById('modal-if-nouveau-nom-groupe').classList.add('cache');
+  document.getElementById('modal-if-nouveau-nom').value = '';
   selNom.innerHTML = '<option value="">— Choisir ou créer —</option>';
+  selNom.classList.add('cache');
   selCat.onchange = () => {
     if (selCat.value === '__nouvelle_cat__') {
       document.getElementById('modal-if-nouvelle-cat-groupe').classList.remove('cache');
