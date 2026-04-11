@@ -1343,7 +1343,7 @@ async function ouvrirFormProduit() {
   document.getElementById('grille-produits').classList.add('cache');
   document.getElementById('btn-nouvelle-recette').classList.add('cache');
   await chargerCollectionsPourSelecteur();
-  document.getElementById('form-recettes').classList.add('visible');
+ document.getElementById('form-recettes').classList.remove('cache');
   rafraichirListeIngredientsRecette();
   rafraichirListeFormatsRecette();
   window.scrollTo(0, 0);
