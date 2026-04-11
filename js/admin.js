@@ -886,12 +886,12 @@ function ouvrirFicheGamme2(gam_id) {
   document.getElementById('btn-supprimer-gamme').onclick  = () => supprimerGamme(gam_id);
   document.getElementById('contenu-gammes').classList.add('cache');
   document.getElementById('btn-nouvelle-gamme').classList.add('cache');
-  document.getElementById('fiche-gamme').classList.add('visible');
+  document.getElementById('fiche-gamme').classList.remove('cache');
   window.scrollTo(0, 0);
 }
 
 function fermerFicheGamme2() {
-  document.getElementById('fiche-gamme').classList.remove('visible');
+  document.getElementById('fiche-gamme').classList.add('cache');
   document.getElementById('contenu-gammes').classList.remove('cache');
   const btnNew = document.getElementById('btn-nouvelle-gamme');
   if (btnNew) btnNew.classList.remove('cache');
@@ -3270,7 +3270,7 @@ function ouvrirFormFabrication(existant) {
   document.getElementById('form-fabrication').dataset.mode = existant ? 'existant' : 'nouveau';
   document.getElementById('fab-apercu').classList.add('cache');
   document.getElementById('contenu-fabrication').classList.add('cache');
-  document.getElementById('form-fabrication').classList.add('visible');
+  document.getElementById('form-fabrication').classList.remove('cache');
 }
 
 function fabFiltrerRecettes() {
@@ -3309,7 +3309,7 @@ function fabFiltrerFormats() {
 }
 
 function fermerFormFabrication() {
-  document.getElementById('form-fabrication').classList.remove('visible');
+  document.getElementById('form-fabrication').classList.add('cache');
   document.getElementById('contenu-fabrication').classList.remove('cache');
   document.getElementById('fab-collection').value = '';
   document.getElementById('fab-recette').innerHTML = '<option value="">— Choisir un produit —</option>';

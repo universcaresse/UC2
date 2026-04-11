@@ -719,18 +719,26 @@
      CSS (style.css)
        .fiche-collection-desc
      ════════════════════════════════════════ -->
-        <div id="fiche-gamme" class="form-panel">
-          <button class="btn-fermer-panneau" onclick="fermerFicheGamme2()" title="Fermer">✕</button>
-          <div class="form-panel-header">
-            <div class="form-panel-titre" id="fiche-gamme-titre"></div>
+       <div id="fiche-gamme" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau">
+                <span class="form-panel-titre" id="fiche-gamme-titre"></span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFicheGamme2()" title="Fermer">✕</button>
+            </div>
           </div>
-          <div class="form-body">
-            <div class="form-valeur" id="fiche-gamme-collection"></div>
-            <p class="fiche-desc" id="fiche-gamme-desc"></p>
+          <div class="form-panel">
+            <div class="form-body">
+              <div class="form-valeur" id="fiche-gamme-collection"></div>
+              <p class="fiche-desc" id="fiche-gamme-desc"></p>
+            </div>
           </div>
-          <div class="form-actions">
-            <button class="bouton" id="fiche-gamme-modifier">Modifier</button>
-            <button class="bouton bouton-rouge" id="btn-supprimer-gamme">Supprimer</button>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" id="fiche-gamme-modifier">Modifier</button>
+              <button class="bouton bouton-rouge" id="btn-supprimer-gamme">Supprimer</button>
+            </div>
           </div>
         </div>
 		
@@ -1385,32 +1393,51 @@
           <div class="page-entete-titre">Import <em>facture PDF</em></div>
         </div>
         <div id="msg-import-facture" class="msg-zone"></div>
-        <div class="form-panel visible" id="if-bloc-upload">
-          <div class="form-body">
-            <div class="form-groupe">
-              <label class="form-label">Fournisseur</label>
-              <select class="form-ctrl" id="if-fournisseur">
-                <option value="PA">Pure Arôme</option>
-                <option value="MH">Les Mauvaises Herbes</option>
-                <option value="Arbressence">Arbressence</option>
-                <option value="DE">Divine Essence</option>
-              </select>
+		
+		
+        <div id="if-bloc-upload">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau">
+                <span class="form-panel-titre">Import facture PDF</span>
+              </div>
             </div>
-            <div class="form-groupe">
-              <label class="form-label">Fichier PDF</label>
-              <input type="file" class="form-ctrl" id="if-fichier" accept="application/pdf">
+          </div>
+          <div class="form-panel">
+            <div class="form-body">
+              <div class="form-groupe">
+                <label class="form-label">Fournisseur</label>
+                <select class="form-ctrl" id="if-fournisseur">
+                  <option value="PA">Pure Arôme</option>
+                  <option value="MH">Les Mauvaises Herbes</option>
+                  <option value="Arbressence">Arbressence</option>
+                  <option value="DE">Divine Essence</option>
+                </select>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Fichier PDF</label>
+                <input type="file" class="form-ctrl" id="if-fichier" accept="application/pdf">
+              </div>
             </div>
+          </div>
+          <div class="form-panel form-body-actions">
             <div class="form-actions">
-              <span></span>
               <button class="bouton" onclick="importerFacturePDF()">Lire le PDF</button>
             </div>
           </div>
         </div>
+		
+		
+		
         <div id="if-apercu" class="cache">
-          <div class="form-panel visible" style="margin-top:1rem;">
+      <div class="form-panel">
             <div class="form-panel-header">
-              <div class="form-panel-titre">Aperçu de la facture</div>
+              <div class="fiche-bandeau">
+                <span class="form-panel-titre">Aperçu de la facture</span>
+              </div>
             </div>
+          </div>
+          <div class="form-panel">
             <div class="form-body">
               <div class="form-grille-2">
                 <div class="form-groupe">
@@ -1460,13 +1487,18 @@
                   <input type="text" class="form-ctrl" id="if-total" readonly>
                 </div>
               </div>
-              <div id="if-validation" class="msg-zone" style="margin-top:0.5rem;"></div>
-              <div class="form-actions" style="margin-top:1rem;">
-                <button class="bouton bouton-contour" onclick="document.getElementById('if-apercu').classList.add('cache')">Annuler</button>
-                <button class="bouton" id="if-btn-confirmer" onclick="confirmerImportFacture()">Confirmer l'import</button>
-              </div>
+              <div id="if-validation" class="msg-zone"></div>
             </div>
           </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton bouton-contour" onclick="document.getElementById('if-apercu').classList.add('cache')">Annuler</button>
+              <button class="bouton" id="if-btn-confirmer" onclick="confirmerImportFacture()">Confirmer l'import</button>
+            </div>
+          </div>
+		  
+		  
+		  
         </div>
       </div>
 
@@ -1625,80 +1657,88 @@
         <div id="contenu-fabrication"></div>
 
         <!-- FORMULAIRE NOUVEAU LOT -->
-        <div id="form-fabrication" class="form-panel" data-mode="">
-          <div class="form-panel-header">
-            <span class="form-panel-titre">Nouveau lot</span>
-            <button class="btn-fermer-panneau" onclick="fermerFormFabrication()">✕</button>
+		
+		<div id="form-fabrication" class="cache" data-mode="">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau">
+                <span class="form-panel-titre">Nouveau lot</span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFormFabrication()">✕</button>
+            </div>
           </div>
-          <div class="form-body">
-            <div class="form-grille">
-
-              <div class="form-groupe col-plein">
-                <label class="form-label">Collection</label>
-                <select id="fab-collection" class="form-ctrl" onchange="fabFiltrerRecettes()">
-                  <option value="">— Choisir une collection —</option>
-                </select>
-              </div>
-
-              <div class="form-groupe">
-                <label class="form-label">Recette</label>
-                <select id="fab-recette" class="form-ctrl" onchange="fabFiltrerFormats()">
-                  <option value="">— Choisir une recette —</option>
-                </select>
-              </div>
-
-              <div class="form-groupe" id="fab-groupe-format">
-                <label class="form-label">Format</label>
-                <select id="fab-format" class="form-ctrl" onchange="calculerApercuLot()">
-                  <option value="">— Choisir un format —</option>
-                </select>
-              </div>
-
-              <div class="form-groupe" id="fab-groupe-multiplicateur">
-                <label class="form-label">Multiplicateur</label>
-                <select id="fab-multiplicateur" class="form-ctrl" onchange="calculerApercuLot()">
-                  <option value="1">1×</option>
-                  <option value="2">2×</option>
-                  <option value="3">3×</option>
-                </select>
-              </div>
-              <div class="form-groupe cache" id="fab-groupe-nb-unites">
-                <label class="form-label">Nombre de savons</label>
-                <input type="number" id="fab-nb-unites" class="form-ctrl" min="1" oninput="calculerApercuLot()">
-              </div>
-
-              <div class="form-groupe">
-                <label class="form-label">Date de fabrication</label>
-                <input type="date" id="fab-date" class="form-ctrl" onchange="calculerApercuLot()">
-              </div>
-
-            </div>
-
-            <!-- APERÇU CALCULÉ -->
-            <div id="fab-apercu" class="carte-admin cache">
-              <div class="carte-admin-entete">Aperçu</div>
+          <div class="form-panel">
+            <div class="form-body">
               <div class="form-grille">
-                <div class="form-groupe">
-                  <label class="form-label">Unités produites</label>
-                  <div id="fab-apercu-unites" class="texte-secondaire">—</div>
+
+                <div class="form-groupe col-plein">
+                  <label class="form-label">Collection</label>
+                  <select id="fab-collection" class="form-ctrl" onchange="fabFiltrerRecettes()">
+                    <option value="">— Choisir une collection —</option>
+                  </select>
                 </div>
+
                 <div class="form-groupe">
-                  <label class="form-label">Disponible le</label>
-                  <div id="fab-apercu-dispo" class="texte-secondaire">—</div>
+                  <label class="form-label">Recette</label>
+                  <select id="fab-recette" class="form-ctrl" onchange="fabFiltrerFormats()">
+                    <option value="">— Choisir une recette —</option>
+                  </select>
                 </div>
+
+                <div class="form-groupe" id="fab-groupe-format">
+                  <label class="form-label">Format</label>
+                  <select id="fab-format" class="form-ctrl" onchange="calculerApercuLot()">
+                    <option value="">— Choisir un format —</option>
+                  </select>
+                </div>
+
+                <div class="form-groupe" id="fab-groupe-multiplicateur">
+                  <label class="form-label">Multiplicateur</label>
+                  <select id="fab-multiplicateur" class="form-ctrl" onchange="calculerApercuLot()">
+                    <option value="1">1×</option>
+                    <option value="2">2×</option>
+                    <option value="3">3×</option>
+                  </select>
+                </div>
+                <div class="form-groupe cache" id="fab-groupe-nb-unites">
+                  <label class="form-label">Nombre de savons</label>
+                  <input type="number" id="fab-nb-unites" class="form-ctrl" min="1" oninput="calculerApercuLot()">
+                </div>
+
                 <div class="form-groupe">
-                  <label class="form-label">Coût estimé</label>
-                  <div id="fab-apercu-cout" class="texte-secondaire">—</div>
+                  <label class="form-label">Date de fabrication</label>
+                  <input type="date" id="fab-date" class="form-ctrl" onchange="calculerApercuLot()">
+                </div>
+
+              </div>
+
+              <div id="fab-apercu" class="carte-admin cache">
+                <div class="carte-admin-entete">Aperçu</div>
+                <div class="form-grille">
+                  <div class="form-groupe">
+                    <label class="form-label">Unités produites</label>
+                    <div id="fab-apercu-unites" class="texte-secondaire">—</div>
+                  </div>
+                  <div class="form-groupe">
+                    <label class="form-label">Disponible le</label>
+                    <div id="fab-apercu-dispo" class="texte-secondaire">—</div>
+                  </div>
+                  <div class="form-groupe">
+                    <label class="form-label">Coût estimé</label>
+                    <div id="fab-apercu-cout" class="texte-secondaire">—</div>
+                  </div>
                 </div>
               </div>
             </div>
-
+          </div>
+          <div class="form-panel form-body-actions">
             <div class="form-actions">
               <button class="bouton bouton-contour" onclick="fermerFormFabrication()">Annuler</button>
               <button class="bouton" onclick="sauvegarderLot()">Confirmer</button>
             </div>
           </div>
         </div>
+       
 
       </div>
 
