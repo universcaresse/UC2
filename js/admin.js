@@ -3231,7 +3231,13 @@ async function confirmerImportFacture() {
   const tvq         = parseFloat(document.getElementById('if-tvq').value) || 0;
   const livraison   = parseFloat(document.getElementById('if-livraison').value) || 0;
   const sousTotal   = parseFloat(document.getElementById('if-soustotal').value) || 0;
-  if (!numero) { afficherMsg('import-facture', 'Numéro de facture requis.', 'erreur'); return; }
+if (!numero) { afficherMsg('import-facture', 'Numéro de facture requis.', 'erreur'); return; }
+  const lignesIncompletes = ifItems.filter((item, idx) => {
+    const nom_UC = document.getElementById(`if-nomuc-${idx}`)?.value || '';
+    const cat_UC = document.getElementById(`if-type-${idx}`)?.value  || '';
+    return !nom_UC || !cat_UC;
+  });
+  if (lignesIncompletes.length) { afficherMsg('import-facture', `❌ ${lignesIncompletes.length} ligne(s) sans catégorie ou nom UC — complète ou ignore-les avant de confirmer.`, 'erreur'); return; }
 
   const btn = document.getElementById('if-btn-confirmer');
   btn.disabled = true;
