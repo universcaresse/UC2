@@ -1286,7 +1286,7 @@ async function ouvrirFicheProduit(pro_id) {
   `;
 
   fermerFormProduit();
-  document.getElementById('fiche-recette').classList.add('visible');
+  document.getElementById('fiche-recette').classList.remove('cache');
   document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
   document.getElementById('grille-produits').classList.add('cache');
   document.getElementById('btn-nouvelle-recette').classList.add('cache');
@@ -1294,7 +1294,7 @@ async function ouvrirFicheProduit(pro_id) {
 }
 
 function fermerFicheProduit() {
-  document.getElementById('fiche-recette').classList.remove('visible');
+  document.getElementById('fiche-recette').classList.add('cache');
   document.querySelector('#section-produits .filtres-bar')?.classList.remove('cache');
   document.getElementById('grille-produits').classList.remove('cache');
   document.getElementById('btn-nouvelle-recette').classList.remove('cache');
@@ -1307,7 +1307,7 @@ function fermerFicheProduit() {
 
 async function basculerModeEditionRecette() {
   if (!produitActif) return;
-  document.getElementById('fiche-recette').classList.remove('visible');
+  document.getElementById('fiche-recette').classList.add('cache');
   await modifierProduit(produitActif.pro_id);
 }
 

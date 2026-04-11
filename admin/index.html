@@ -886,16 +886,23 @@
      CSS (style.css)
        .recette-statut-badge, .recette-statut-public, .recette-statut-test
      ════════════════════════════════════════ -->
-        <div class="form-panel" id="fiche-recette">
-          <button class="btn-fermer-panneau" onclick="fermerFicheRecette()" title="Fermer">✕</button>
-          <div class="form-panel-header">
-            <div class="form-panel-titre" id="fiche-recette-titre"></div>
+        <div id="fiche-recette" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="fiche-recette-bandeau">
+                <span class="form-panel-titre" id="fiche-recette-titre"></span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFicheRecette()" title="Fermer">✕</button>
+            </div>
           </div>
-          <div class="form-body" id="fiche-recette-contenu"></div>
-          <hr class="separateur">
-          <div class="form-actions">
-            <button class="bouton" onclick="basculerModeEditionRecette()">Modifier</button>
-            <button class="bouton bouton-rouge" onclick="supprimerRecetteActive()">Supprimer</button>
+          <div class="form-panel">
+            <div class="form-body" id="fiche-recette-contenu"></div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" onclick="basculerModeEditionRecette()">Modifier</button>
+              <button class="bouton bouton-rouge" onclick="supprimerRecetteActive()">Supprimer</button>
+            </div>
           </div>
         </div>
        
