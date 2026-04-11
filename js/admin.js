@@ -1350,7 +1350,7 @@ async function ouvrirFormProduit() {
 }
 
 function fermerFormProduit() {
-  document.getElementById('form-recettes').classList.remove('visible');
+  document.getElementById('form-recettes').classList.add('cache');
   const filtresBar = document.querySelector('#section-produits .filtres-bar');
   if (filtresBar) filtresBar.classList.remove('cache');
   document.getElementById('grille-produits').classList.remove('cache');
@@ -1420,9 +1420,9 @@ await chargerCollectionsPourSelecteur();
     poids: f.poids, unite: f.unite, prix: f.prix_vente, desc: ''
   }));
 
-  document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
+ document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
   document.getElementById('grille-produits').classList.add('cache');
-  document.getElementById('form-recettes').classList.add('visible');
+  document.getElementById('form-recettes').classList.remove('cache');
   rafraichirListeIngredientsRecette();
   rafraichirListeFormatsRecette();
   window.scrollTo(0, 0);
@@ -1430,6 +1430,7 @@ await chargerCollectionsPourSelecteur();
 
 // Compatibilité nom V1
 function modifierRecette(id) { return modifierProduit(id); }
+
 
 async function sauvegarderRecette() {
   const btnSauvegarder = document.querySelector('#form-recettes .bouton');

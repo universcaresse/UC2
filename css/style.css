@@ -791,7 +791,7 @@ footer > * { position: relative; z-index: 1; }
 #fiche-collection { display: none; }
 #fiche-collection.visible { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
 #fiche-collection .form-panel { display: block; margin-bottom: 0; }
-#form-collections .form-panel, #form-gammes .form-panel, #form-familles .form-panel, #fiche-famille .form-panel, #fiche-recette .form-panel { display: block; }
+#form-collections .form-panel, #form-gammes .form-panel, #form-familles .form-panel, #fiche-famille .form-panel, #fiche-recette .form-panel, #form-recettes .form-panel { display: block; }
  
 
 /* ═══════════════════════════════════════
