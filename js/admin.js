@@ -3054,11 +3054,20 @@ function afficherApercuItems(fournisseur) {
        ${listesDropdown.types.map(t => `<option value="${t}" ${t === cat_UC ? 'selected' : ''}>${listesDropdown.categoriesMap?.[t] || t}</option>`).join('')}
         </select>
       </td>
-      <td>
+   <td>
         <select class="form-ctrl" id="if-nomuc-${idx}">
           <option value="">— Choisir —</option>
           ${ingsDeCat.map(d => `<option value="${d.nom_UC}" ${d.nom_UC === nom_UC ? 'selected' : ''}>${d.nom_UC}</option>`).join('')}
         </select>
+        <button class="bouton bouton-petit bouton-contour" style="margin-top:4px" onclick="ifAjouterNomUC(${idx})">+ Nouveau</button>
+        <div id="if-nouveau-uc-${idx}" class="cache" style="margin-top:4px">
+          <input type="text" class="form-ctrl" id="if-nouveau-nom-${idx}" placeholder="Nom UC">
+          <select class="form-ctrl" id="if-nouveau-cat-${idx}" style="margin-top:4px">
+            <option value="">— Catégorie —</option>
+            ${listesDropdown.types.map(t => `<option value="${t}">${listesDropdown.categoriesMap?.[t] || t}</option>`).join('')}
+          </select>
+          <button class="bouton bouton-petit" style="margin-top:4px" onclick="ifConfirmerNomUC(${idx}, '${fournisseur}')">Créer</button>
+        </div>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -3080,7 +3089,7 @@ function ifAjouterNomUC(idx) {
   document.getElementById(`if-nouveau-nom-${idx}`)?.focus();
 }
 
-async function ifConfirmerNomUC(idx) {
+async function ifConfirmerNomUC(idx, fournisseur) {
   const nom = document.getElementById(`if-nouveau-nom-${idx}`)?.value.trim();
   const cat = document.getElementById(`if-nouveau-cat-${idx}`)?.value;
   if (!nom || !cat) { afficherMsg('import-facture', 'Nom et catégorie requis.', 'erreur'); return; }
@@ -3088,6 +3097,16 @@ async function ifConfirmerNomUC(idx) {
   const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: nom, inci: '', statut: 'actif' });
   if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
   listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
+  const item = ifItems[idx];
+  await appelAPIPost('saveMappingFournisseur', {
+    fournisseur,
+    categorie_fournisseur: listesDropdown.categoriesMap?.[cat] || cat,
+    nom_fournisseur:       item ? item.description : nom,
+    categorie_UC:          listesDropdown.categoriesMap?.[cat] || cat,
+    nom_UC:                nom,
+    ing_id
+  });
+  ifMapping.push({ fournisseur, categorie_fournisseur: listesDropdown.categoriesMap?.[cat] || cat, nom_fournisseur: item ? item.description : nom, categorie_UC: listesDropdown.categoriesMap?.[cat] || cat, nom_UC: nom, ing_id });
   const select = document.getElementById(`if-nomuc-${idx}`);
   if (select) {
     const opt = document.createElement('option');
@@ -3097,7 +3116,7 @@ async function ifConfirmerNomUC(idx) {
   const tr = document.getElementById(`if-nomuc-${idx}`)?.closest('tr');
   if (tr) tr.classList.remove('ligne-rouge');
   document.getElementById(`if-nouveau-uc-${idx}`)?.classList.add('cache');
-  afficherMsg('import-facture', `✅ "${nom}" créé dans Ingredients_INCI_v2.`);
+  afficherMsg('import-facture', `✅ "${nom}" créé et mappé.`);
 }
 
 function validerTotaux(facture) {
@@ -3145,6 +3164,19 @@ async function confirmerImportFacture() {
     if (item.formatUnite === 'kg') grammes = item.formatQte * 1000;
     if (item.formatUnite === 'ml') grammes = item.formatQte;
     const prixParG = grammes > 0 ? (item.prixUnitaire / grammes) : 0;
+
+    // Sauvegarder le mapping si assigné manuellement
+    if (!trouverMappingItem(item.description, fournisseur)) {
+      await appelAPIPost('saveMappingFournisseur', {
+        fournisseur,
+        categorie_fournisseur: cat_UC,
+        nom_fournisseur:       item.description,
+        categorie_UC:          cat_UC,
+        nom_UC,
+        ing_id: ingObj?.ing_id || ''
+      });
+      ifMapping.push({ fournisseur, categorie_fournisseur: cat_UC, nom_fournisseur: item.description, categorie_UC: cat_UC, nom_UC, ing_id: ingObj?.ing_id || '' });
+    }
 
     const resLigne = await appelAPIPost('addAchatLigne', {
       ach_id,
