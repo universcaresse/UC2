@@ -2317,7 +2317,8 @@ async function chargerFactures() {
     ...a,
     numero:      a.ach_id,
     fournisseur: fournisseursMap[a.four_id] || a.four_id || '—',
-    dateRaw:     a.date,
+    dateRaw:     a.date ? a.date.split('T')[0] : '',
+    dateAff:     a.date ? (a.date.split('T')[0].split('-').reverse().join('/')) : '—',
     total:       a.total,
     statut:      a.statut
   }));
@@ -2382,9 +2383,9 @@ function afficherFactures(liste) {
     tr.className = 'cliquable';
     tr.onclick = () => voirDetailFacture(f.ach_id);
     tr.innerHTML = `
-      <td class="td-numero">${f.ach_id}</td>
-      <td class="td-date">${f.date}</td>
       <td>${f.fournisseur}</td>
+      <td class="td-numero">${f.ach_id}</td>
+      <td class="td-date">${f.dateAff}</td>
       <td class="td-prix">${f.total ? formaterPrix(f.total) : '—'}</td>
       <td>${badge}</td>`;
     tbody.appendChild(tr);
