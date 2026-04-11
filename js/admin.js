@@ -3086,9 +3086,20 @@ function ifOuvrirModalNouvelIngredient(idx, fournisseur) {
   const selCat = document.getElementById('modal-if-cat');
   const selNom = document.getElementById('modal-if-nomuc');
   selCat.innerHTML = '<option value="">— Catégorie —</option>' +
-    listesDropdown.types.map(t => `<option value="${t}">${listesDropdown.categoriesMap?.[t] || t}</option>`).join('');
+    listesDropdown.types.map(t => `<option value="${t}">${listesDropdown.categoriesMap?.[t] || t}</option>`).join('') +
+    '<option value="__nouvelle_cat__">+ Créer une nouvelle catégorie</option>';
+  document.getElementById('modal-if-nouvelle-cat-groupe').classList.add('cache');
+  document.getElementById('modal-if-nouvelle-cat').value = '';
   selNom.innerHTML = '<option value="">— Choisir ou créer —</option>';
   selCat.onchange = () => {
+    if (selCat.value === '__nouvelle_cat__') {
+      document.getElementById('modal-if-nouvelle-cat-groupe').classList.remove('cache');
+      document.getElementById('modal-if-nouvelle-cat').focus();
+      selNom.innerHTML = '<option value="">— Choisir ou créer —</option>';
+      return;
+    }
+    document.getElementById('modal-if-nouvelle-cat-groupe').classList.add('cache');
+    document.getElementById('modal-if-nouvelle-cat').value = '';
     const cat = selCat.value;
     const ings = cat ? listesDropdown.fullData.filter(d => d.cat_id === cat).sort((a,b) => (a.nom_UC||'').localeCompare(b.nom_UC||'','fr')) : [];
     selNom.innerHTML = '<option value="">— Choisir ou créer —</option>' +
@@ -3120,9 +3131,17 @@ async function modalIfConfirmer() {
   const modal      = document.getElementById('modal-if-nouvel-ingredient');
   const idx        = modal?.dataset.idx;
   const fournisseur = modal?.dataset.fournisseur;
-  const cat        = document.getElementById('modal-if-cat')?.value;
+  let cat = document.getElementById('modal-if-cat')?.value;
+  const nouvelleCat = document.getElementById('modal-if-nouvelle-cat')?.value.trim();
+  if (cat === '__nouvelle_cat__' && nouvelleCat) {
+    const resCat = await appelAPIPost('saveCategorieUC', { nom: nouvelleCat });
+    if (!resCat || !resCat.success) { afficherMsg('import-facture', 'Erreur création catégorie.', 'erreur'); return; }
+    cat = resCat.cat_id || nouvelleCat;
+    listesDropdown.categoriesMap[cat] = nouvelleCat;
+    listesDropdown.types.push(cat);
+  }
   const nom        = document.getElementById('modal-if-nomuc')?.value;
-  if (!cat || !nom || nom === '__nouveau__') { afficherMsg('import-facture', 'Catégorie et nom UC requis.', 'erreur'); return; }
+  if (!cat || cat === '__nouvelle_cat__' || !nom || nom === '__nouveau__') { afficherMsg('import-facture', 'Catégorie et nom UC requis.', 'erreur'); return; }
   const ingExistant = listesDropdown.fullData.find(d => d.nom_UC === nom && d.cat_id === cat);
   let ing_id = ingExistant?.ing_id || '';
   if (!ingExistant) {
