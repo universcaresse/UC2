@@ -1305,50 +1305,55 @@
      ════════════════════════════════════════ -->
   <div id="wizard-step-3" class="wizard-step cache">
 
-    <div class="finalisation-panel">
-      <div class="finalisation-titre">Finalisation de la facture</div>
-
-      <div id="final-msg" class="msg-zone"></div>
-
-      <div class="form-grille">
-
-        <div class="form-groupe">
-          <label class="form-label">Sous-total</label>
-          <input type="text" id="final-sous-total" class="form-ctrl" readonly>
-        </div>
-
-        <div class="form-groupe">
-          <label class="form-label">Livraison ($)</label>
-          <input type="text" inputmode="decimal" id="final-livraison" class="form-ctrl"
-                 oninput="calculerTotalFinal()" autocomplete="off">
-        </div>
-
-        <div class="form-groupe">
-          <label class="form-label">TPS ($)</label>
-          <input type="text" inputmode="decimal" id="final-tps" class="form-ctrl"
-                 oninput="calculerTotalFinal()" autocomplete="off">
-        </div>
-
-        <div class="form-groupe">
-          <label class="form-label">TVQ ($)</label>
-          <input type="text" inputmode="decimal" id="final-tvq" class="form-ctrl"
-                 oninput="calculerTotalFinal()" autocomplete="off">
-        </div>
-
-      </div>
-
-      <div class="total-final-row">
-        <div>
-          <div class="total-final-label">Total</div>
-          <div class="total-final-montant" id="final-total-affichage">0,00 $</div>
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <div class="fiche-bandeau">
+          <span class="form-panel-titre">Finalisation de la facture</span>
         </div>
       </div>
+    </div>
+    <div class="form-panel">
+      <div class="form-body">
+        <div id="final-msg" class="msg-zone"></div>
+        <div class="form-grille">
 
-      <div class="form-actions mt-24">
+          <div class="form-groupe">
+            <label class="form-label">Sous-total</label>
+            <input type="text" id="final-sous-total" class="form-ctrl" readonly>
+          </div>
+
+          <div class="form-groupe">
+            <label class="form-label">Livraison ($)</label>
+            <input type="text" inputmode="decimal" id="final-livraison" class="form-ctrl"
+                   oninput="calculerTotalFinal()" autocomplete="off">
+          </div>
+
+          <div class="form-groupe">
+            <label class="form-label">TPS ($)</label>
+            <input type="text" inputmode="decimal" id="final-tps" class="form-ctrl"
+                   oninput="calculerTotalFinal()" autocomplete="off">
+          </div>
+
+          <div class="form-groupe">
+            <label class="form-label">TVQ ($)</label>
+            <input type="text" inputmode="decimal" id="final-tvq" class="form-ctrl"
+                   oninput="calculerTotalFinal()" autocomplete="off">
+          </div>
+
+        </div>
+        <div class="total-final-row">
+          <div>
+            <div class="total-final-label">Total</div>
+            <div class="total-final-montant" id="final-total-affichage">0,00 $</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-panel form-body-actions">
+      <div class="form-actions">
         <button class="bouton bouton-contour" onclick="wizardEtape2()">← Retour</button>
         <button class="bouton bouton-or" onclick="finaliserFacture()">Finaliser</button>
       </div>
-
     </div>
 
   </div>
