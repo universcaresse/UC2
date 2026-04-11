@@ -1202,10 +1202,14 @@
     </div>
 
     <!-- Formulaire ajout item -->
-    <div class="form-panel visible">
+    <div class="form-panel">
       <div class="form-panel-header">
-        <span class="form-panel-titre">Ajouter un item</span>
+        <div class="fiche-bandeau">
+          <span class="form-panel-titre">Ajouter un item</span>
+        </div>
       </div>
+    </div>
+    <div class="form-panel">
       <div class="form-body">
         <div id="item-msg" class="msg-zone"></div>
         <div class="form-grille">
@@ -1247,7 +1251,6 @@
               <option value="lbs">lbs</option>
             </select>
           </div>
-          
 
           <div class="form-groupe">
             <label class="form-label">Prix unitaire ($)</label>
@@ -1265,9 +1268,11 @@
           </div>
 
         </div>
-        <div class="form-actions">
-          <button class="bouton" onclick="ajouterItem()">+ Ajouter</button>
-        </div>
+      </div>
+    </div>
+    <div class="form-panel form-body-actions">
+      <div class="form-actions">
+        <button class="bouton" onclick="ajouterItem()">+ Ajouter</button>
       </div>
     </div>
 
