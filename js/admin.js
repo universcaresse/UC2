@@ -2384,7 +2384,7 @@ function afficherFactures(liste) {
     tr.onclick = () => voirDetailFacture(f.ach_id);
     tr.innerHTML = `
       <td>${f.fournisseur}</td>
-      <td class="td-numero">${f.ach_id}</td>
+      <td class="td-numero">${f.numero_facture || f.ach_id}</td>
       <td class="td-date">${f.dateAff}</td>
       <td class="td-prix">${f.total ? formaterPrix(f.total) : '—'}</td>
       <td>${badge}</td>`;
@@ -3237,7 +3237,7 @@ async function confirmerImportFacture() {
   btn.disabled = true;
 
   const ach_id  = 'ACH-' + Date.now();
-  const resAch  = await appelAPIPost('createAchatEntete', { ach_id, date, four_id: fournisseur });
+  const resAch  = await appelAPIPost('createAchatEntete', { ach_id, date, four_id: fournisseur, numero_facture: numero });
   if (!resAch || !resAch.success) {
     afficherMsg('import-facture', resAch?.message || 'Erreur création facture.', 'erreur');
     btn.disabled = false;
