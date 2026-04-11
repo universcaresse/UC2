@@ -605,41 +605,51 @@
      CSS (style.css)
        .famille-groupe, .famille-groupe-titre, .famille-groupe-desc
      ════════════════════════════════════════ -->
-        <div class="form-panel" id="form-familles">
-          <button class="btn-fermer-panneau" onclick="fermerFormFamille()" title="Fermer">✕</button>
-          <div class="form-panel-header">
-            <div class="form-panel-titre" id="form-familles-titre">Nouvelle famille</div>
+        <div id="form-familles" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="form-familles-bandeau">
+                <span class="form-panel-titre" id="form-familles-titre">Nouvelle famille</span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFormFamille()" title="Fermer">✕</button>
+            </div>
           </div>
-          <div class="form-body">
-            <input type="hidden" id="ff-id">
-            <div class="form-grille">
-              <div class="form-groupe">
-                <label class="form-label">Collection</label>
-                <select class="form-ctrl" id="ff-collection">
-                  <option value="">— Choisir —</option>
-                </select>
-              </div>
-              <div class="form-groupe col-petit">
-                <label class="form-label">Rang</label>
-                <input type="text" inputmode="decimal" class="form-ctrl" id="ff-rang">
-              </div>
-              <div class="form-groupe">
-                <label class="form-label">Nom</label>
-                <input type="text" class="form-ctrl" id="ff-nom">
-              </div>
-              <div class="form-groupe col-plein">
-                <label class="form-label">Description</label>
-                <textarea class="form-ctrl" id="ff-desc" rows="3"></textarea>
-              </div>
-              <div class="form-groupe">
-                <label class="form-label">Couleur HEX</label>
-                <input type="text" class="form-ctrl" id="ff-couleur-hex">
+          <div class="form-panel">
+            <div class="form-body">
+              <input type="hidden" id="ff-id">
+              <input type="hidden" id="ff-rang">
+              <div class="form-grille">
+                <div class="form-groupe">
+                  <label class="form-label">Collection</label>
+                  <select class="form-ctrl" id="ff-collection" onchange="peuplerPositionFamille(this.value, null)">
+                    <option value="">— Choisir —</option>
+                  </select>
+                </div>
+                <div class="form-groupe col-petit">
+                  <label class="form-label">Position</label>
+                  <select class="form-ctrl" id="ff-position">
+                    <option value="0">En premier</option>
+                  </select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Nom</label>
+                  <input type="text" class="form-ctrl" id="ff-nom">
+                </div>
+                <div class="form-groupe col-plein">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-ctrl textarea-auto" id="ff-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Couleur HEX</label>
+                  <input type="text" class="form-ctrl" id="ff-couleur-hex">
+                </div>
               </div>
             </div>
-            <hr class="separateur">
+          </div>
+          <div class="form-panel form-body-actions">
             <div class="form-actions">
               <button class="bouton" onclick="sauvegarderFamille()">Enregistrer</button>
-              <button class="bouton bouton-vert-pale" onclick="fermerFormFamille()">Annuler</button>
+              <button class="bouton bouton-contour" onclick="fermerFormFamille()">Annuler</button>
             </div>
           </div>
         </div>

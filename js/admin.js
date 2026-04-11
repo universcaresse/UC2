@@ -340,6 +340,22 @@ function fermerFicheFamille() {
   if (btnNew) btnNew.classList.remove('cache');
 }
 
+function peuplerPositionFamille(col_id, rangActuel) {
+  const selPos = document.getElementById('ff-position');
+  if (!selPos) return;
+  selPos.innerHTML = '<option value="0">En premier</option>';
+  if (!col_id) return;
+  donneesFamilles.filter(f => f.col_id === col_id)
+    .sort((a, b) => (a.rang || 99) - (b.rang || 99))
+    .forEach(f => {
+      const o = document.createElement('option');
+      o.value = f.rang;
+      o.textContent = 'Après ' + f.nom;
+      if (rangActuel && f.rang === rangActuel - 1) o.selected = true;
+      selPos.appendChild(o);
+    });
+}
+
 function ouvrirFormFamille() {
   fermerFicheFamille();
   document.getElementById('form-familles-titre').textContent = 'Nouvelle famille';
@@ -355,15 +371,15 @@ function ouvrirFormFamille() {
     o.value = col.col_id; o.textContent = col.nom; sel.appendChild(o);
   });
   sel.value = '';
+  peuplerPositionFamille('', null);
   document.getElementById('contenu-familles').classList.add('cache');
   document.getElementById('btn-nouvelle-famille').classList.add('cache');
-  document.getElementById('form-familles').classList.add('visible');
+  document.getElementById('form-familles').classList.remove('cache');
   window.scrollTo(0, 0);
 }
 
-
 function fermerFormFamille() {
-  document.getElementById('form-familles').classList.remove('visible');
+  document.getElementById('form-familles').classList.add('cache');
   document.getElementById('contenu-familles').classList.remove('cache');
   const btnNew = document.getElementById('btn-nouvelle-famille');
   if (btnNew) btnNew.classList.remove('cache');
@@ -373,7 +389,7 @@ function modifierFamille(fam_id) {
   const fam = donneesFamilles.find(f => f.fam_id === fam_id);
   if (!fam) return;
   document.getElementById('form-familles-titre').textContent = 'Modifier la famille';
- document.getElementById('ff-id').value          = fam.fam_id;
+  document.getElementById('ff-id').value          = fam.fam_id;
   document.getElementById('ff-rang').value        = fam.rang || '';
   document.getElementById('ff-nom').value         = fam.nom || '';
   document.getElementById('ff-desc').value        = fam.description || '';
@@ -385,9 +401,10 @@ function modifierFamille(fam_id) {
     o.value = col.col_id; o.textContent = col.nom; sel.appendChild(o);
   });
   sel.value = fam.col_id || '';
+  peuplerPositionFamille(fam.col_id, fam.rang);
   document.getElementById('contenu-familles').classList.add('cache');
   document.getElementById('btn-nouvelle-famille').classList.add('cache');
-  document.getElementById('form-familles').classList.add('visible');
+  document.getElementById('form-familles').classList.remove('cache');
   window.scrollTo(0, 0);
 }
 
@@ -396,10 +413,11 @@ async function sauvegarderFamille() {
   const col_id = document.getElementById('ff-collection').value;
   const nom    = document.getElementById('ff-nom').value.trim().toUpperCase();
   if (!nom || !col_id) { afficherMsg('familles', 'Nom et collection requis.', 'erreur'); return; }
+  const positionChoisie = parseInt(document.getElementById('ff-position')?.value) || 0;
   const d = {
     fam_id:      id || ('FAM-' + Date.now()),
     col_id,
-    rang:        parseInt(document.getElementById('ff-rang')?.value) || 99,
+    rang:        positionChoisie + 1,
     nom,
     description: document.getElementById('ff-desc').value,
     couleur_hex: document.getElementById('ff-couleur-hex').value
