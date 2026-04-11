@@ -797,7 +797,7 @@ footer > * { position: relative; z-index: 1; }
 
 
 #fiche-collection .form-panel { display: block; margin-bottom: 0; }
-#form-collections .form-panel, #form-gammes .form-panel, #form-familles .form-panel { display: block; }
+#form-collections .form-panel, #form-gammes .form-panel, #form-familles .form-panel, #fiche-famille .form-panel { display: block; }
  
 
 /* ═══════════════════════════════════════

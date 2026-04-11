@@ -329,12 +329,12 @@ function ouvrirFicheFamille(fam_id) {
   document.getElementById('btn-supprimer-famille').onclick = () => supprimerFamille(fam_id);
   document.getElementById('contenu-familles').classList.add('cache');
   document.getElementById('btn-nouvelle-famille').classList.add('cache');
-  document.getElementById('fiche-famille').classList.add('visible');
+  document.getElementById('fiche-famille').classList.remove('cache');
   window.scrollTo(0, 0);
 }
 
 function fermerFicheFamille() {
-  document.getElementById('fiche-famille').classList.remove('visible');
+  document.getElementById('fiche-famille').classList.add('cache');
   document.getElementById('contenu-familles').classList.remove('cache');
   const btnNew = document.getElementById('btn-nouvelle-famille');
   if (btnNew) btnNew.classList.remove('cache');
