@@ -59,13 +59,13 @@
 }
 .cover-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.55) 35%, transparent 58%); }
 
-.cover-corps { position: relative; z-index: 2; padding: 0 64px 60px; margin-top: auto; }
+.cover-corps { position: relative; z-index: 2; padding: 0 64px 60px; margin-top: auto; display: flex; flex-direction: column; gap: 16px; }
 
 .cover-logo { width: 400px; margin-bottom: 12px; display: block; transform: translate(20px, -15px); }
 
 .cover-eyebrow {
   font-size: 12px; font-weight: 500; letter-spacing: 0.4em; text-transform: uppercase;
-  color: var(--blanc); display: flex; align-items: center; gap: 15px;
+  color: var(--blanc); display: flex; align-items: center; gap: 12px;
 }
 .cover-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--accent); display: block; }
 
