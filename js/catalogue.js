@@ -274,16 +274,38 @@ async function chargerCatalogue() {
   const conteneur = document.getElementById('pages-collections');
 
   try {
-    const reponse = await fetch(API_URL + '?action=getCatalogue');
-    const data = await reponse.json();
+    const [repCatalogue, repMediatheque, repContenu] = await Promise.all([
+      fetch(API_URL + '?action=getCatalogue'),
+      fetch(API_URL + '?action=getMediatheque'),
+      fetch(API_URL + '?action=getContenu')
+    ]);
+    const [data, dataMediatheque, dataContenu] = await Promise.all([
+      repCatalogue.json(),
+      repMediatheque.json(),
+      repContenu.json()
+    ]);
 
     if (!data.success) {
       conteneur.innerHTML = '<div class="chargement">Erreur : ' + (data.message || 'réponse invalide') + '</div>';
       return;
     }
 
-    // Eyebrow couverture
-    const eyebrow = data.eyebrow || data.contenu_accueil_eyebrow || '';
+    // Médiathèque — indexée par nom
+    const mediatheque = {};
+    if (dataMediatheque.success && dataMediatheque.items) {
+      dataMediatheque.items.forEach(function(item) {
+        if (item.nom) mediatheque[item.nom] = item.url;
+      });
+    }
+
+    // Photo couverture depuis médiathèque — ajouter 'photo_couverture' dans la médiathèque
+    const elCoverPhoto = document.querySelector('.cover-photo');
+    if (elCoverPhoto && mediatheque['photo_couverture']) {
+      elCoverPhoto.style.setProperty('--cover-photo-url', 'url(' + mediatheque['photo_couverture'] + ')');
+    }
+
+    // Eyebrow couverture depuis contenu
+    const eyebrow = (dataContenu.success && dataContenu.contenu) ? (dataContenu.contenu.accueil_eyebrow || '') : '';
     const elEyebrow = document.getElementById('cover-eyebrow-texte');
     if (elEyebrow && eyebrow) elEyebrow.textContent = eyebrow;
 
@@ -321,11 +343,18 @@ async function chargerCatalogue() {
     collections.forEach(function(item) {
       const couleur = item.collection.couleur_hex || '#888';
 
-      if (coverCols) {
-        const el = document.createElement('div');
-        el.className = 'cover-col-carre';
-        el.style.background = couleur;
-        coverCols.appendChild(el);
+     if (coverCols) {
+        const ligne = document.createElement('div');
+        ligne.className = 'cover-col-ligne';
+        const nomEl = document.createElement('span');
+        nomEl.className = 'cover-col-nom';
+        nomEl.textContent = item.collection.nom;
+        const carre = document.createElement('div');
+        carre.className = 'cover-col-carre';
+        carre.style.setProperty('--col-hex', couleur);
+        ligne.appendChild(nomEl);
+        ligne.appendChild(carre);
+        coverCols.appendChild(ligne);
       }
       if (dosDots) {
         const el = document.createElement('div');

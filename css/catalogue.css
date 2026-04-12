@@ -49,13 +49,15 @@
 .p-cover { background: var(--beige); }
 
 .cover-photo {
-  position: absolute; inset: 0;
-  background: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1774629257/rustic-pine-wood-shelving-units-filled-w_nwviwu8US0-S9GgJSsz-5Q_tHOMx3yvRTKbYUxTQjN3Bw_ykdd4h.jpg') center/cover no-repeat;
+  position: absolute; inset: 36px;
+  background-image: var(--cover-photo-url);
+  background-size: cover;
+  background-position: center;
   opacity: 0.45;
 }
 
 .cover-corps { position: relative; z-index: 2; padding: 0 64px 60px; margin-top: auto; }
-.cover-logo { width: 200px; margin-bottom: 12px; display: block; }
+.cover-logo { width: 320px; margin-bottom: 12px; display: block; }
 
 .cover-eyebrow {
   font-size: 9px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase;
@@ -64,7 +66,9 @@
 .cover-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--gris); display: block; }
 
 .cover-cols { position: absolute; top: 48px; right: 64px; z-index: 2; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-.cover-col-carre { width: 14px; height: 14px; }
+.cover-col-ligne { display: flex; align-items: center; gap: 8px; }
+.cover-col-nom { font-size: 7px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--blanc); }
+.cover-col-carre { width: 10px; height: 10px; background: var(--col-hex); flex-shrink: 0; }
 
 /* ══════════════════════════════════════
    P2 — CHANTAL
