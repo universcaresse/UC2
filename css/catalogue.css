@@ -77,18 +77,20 @@
 
 .chantal-photo { 
   width: 400px; 
-  height: 500px; /* Assurez-vous d'avoir une hauteur fixe ici */
   flex-shrink: 0; 
   position: relative; 
   overflow: hidden; 
+  height: 600px; /* IMPORTANT : Ajoutez la hauteur de votre espace ici */
 }
 
-/* C'est ce bloc qui gère l'image */
+/* Ajoutez ce bloc pour cibler l'image */
 .chantal-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Remplit le cadre en gardant les proportions */
-  object-position: center; /* Coupe les côtés gauche et droit pour centrer l'action */
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 100%; /* Garde la pleine hauteur */
+  width: auto; /* Laisse la largeur déborder naturellement */
 }
 
 .chantal-photo::after { 
@@ -96,7 +98,7 @@
   position: absolute; 
   inset: 0; 
   background: linear-gradient(to right, transparent 40%, var(--beige)); 
-  z-index: 2; /* Garde le dégradé par-dessus l'image */
+  z-index: 2; /* Force le dégradé à rester par-dessus l'image */
 }
 
 
