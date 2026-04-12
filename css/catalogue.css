@@ -5,7 +5,7 @@
 
 /* ── BODY ── */
 .catalogue-body-print {
-  background: var(--beige);
+  background: var(--beige) !important;
   padding: 40px 20px;
 }
 
