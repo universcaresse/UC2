@@ -1,0 +1,250 @@
+/* ═══════════════════════════════════════
+   CATALOGUE — catalogue.css
+   Complément de style.css — format imprimé uniquement
+   ═══════════════════════════════════════ */
+
+/* ── BODY ── */
+.catalogue-body-print {
+  background: var(--beige);
+  padding: 40px 20px;
+}
+
+/* ── CONTRÔLES ── */
+.cat-controles { text-align: center; margin-bottom: 36px; }
+
+/* ── LABEL DE PAGE ── */
+.page-label {
+  text-align: center; color: var(--gris);
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  margin-bottom: 6px; margin-top: 40px;
+}
+
+/* ── PAGE 8.5×11 ── */
+.page {
+  width: 816px; height: 1056px;
+  background: var(--blanc);
+  margin: 0 auto 4px;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+
+/* ── PIED COMMUN ── */
+.cat-pied {
+  padding: 10px 48px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid var(--beige); flex-shrink: 0;
+  font-size: 9px; color: var(--gris); letter-spacing: 0.06em;
+}
+
+/* ── UTILITAIRES PARTAGÉS ── */
+.photo-pleine { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fondu-droite { position: absolute; inset: 0; background: linear-gradient(to right, transparent 40%, var(--blanc)); }
+.fondu-bas { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.70) 100%); }
+.fondu-beige-bas { position: absolute; inset: 0; background: linear-gradient(to top, rgba(242,228,207,0.92) 0%, rgba(242,228,207,0.3) 60%, rgba(242,228,207,0.1) 100%); }
+.overflow-cache { overflow: hidden; position: relative; }
+
+/* ══════════════════════════════════════
+   P1 — COUVERTURE
+══════════════════════════════════════ */
+.p-cover { background: var(--beige); }
+
+.cover-photo {
+  position: absolute; inset: 0;
+  background: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1774629257/rustic-pine-wood-shelving-units-filled-w_nwviwu8US0-S9GgJSsz-5Q_tHOMx3yvRTKbYUxTQjN3Bw_ykdd4h.jpg') center/cover no-repeat;
+  opacity: 0.45;
+}
+
+.cover-corps { position: relative; z-index: 2; padding: 0 64px 60px; margin-top: auto; }
+.cover-logo { width: 200px; margin-bottom: 12px; display: block; }
+
+.cover-eyebrow {
+  font-size: 9px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--gris); display: flex; align-items: center; gap: 12px;
+}
+.cover-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--gris); display: block; }
+
+.cover-cols { position: absolute; top: 48px; right: 64px; z-index: 2; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.cover-col-carre { width: 14px; height: 14px; }
+
+/* ══════════════════════════════════════
+   P2 — CHANTAL
+══════════════════════════════════════ */
+.p-chantal { background: var(--beige); flex-direction: row; }
+
+.chantal-photo { width: 340px; flex-shrink: 0; position: relative; overflow: hidden; }
+.chantal-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, transparent 40%, var(--beige)); }
+
+.chantal-texte { flex: 1; padding: 80px 56px; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
+
+.chantal-titre { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 400; color: var(--gris-fonce); line-height: 1.2; }
+.chantal-titre em { font-style: italic; color: var(--primary); }
+.chantal-corps { font-size: 13px; color: var(--gris); line-height: 2; font-weight: 300; }
+.chantal-citation { border-left: 2px solid var(--accent); padding-left: 18px; font-family: 'Playfair Display', serif; font-size: 13px; font-style: italic; color: var(--gris-fonce); line-height: 1.8; }
+
+/* ══════════════════════════════════════
+   P3 — TABLE DES MATIÈRES
+══════════════════════════════════════ */
+.p-tdm { background: var(--beige); }
+
+.tdm-overlay { position: absolute; inset: 0; background: linear-gradient(to left, rgba(242,228,207,0.96) 45%, rgba(242,228,207,0.5) 75%, rgba(242,228,207,0.15) 100%); }
+
+.tdm-corps { position: relative; z-index: 2; margin-left: auto; width: 420px; height: 100%; padding: 80px 64px 60px 40px; display: flex; flex-direction: column; justify-content: center; gap: 32px; }
+
+.tdm-liste { display: flex; flex-direction: column; }
+.tdm-ligne { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--beige-40); }
+.tdm-ligne:first-child { border-top: 1px solid var(--beige-40); }
+.tdm-carre { width: 10px; height: 10px; flex-shrink: 0; }
+.tdm-nom { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 400; color: var(--gris-fonce); }
+.tdm-slogan { font-size: 8px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); margin-left: auto; text-align: right; }
+
+/* ══════════════════════════════════════
+   STRUCTURE COMMUNE — COLLECTIONS
+══════════════════════════════════════ */
+.col-page { display: flex; flex-direction: column; }
+
+.col-hero { height: 220px; position: relative; flex-shrink: 0; overflow: hidden; }
+.col-hero-photo { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.col-hero-contenu { position: absolute; bottom: 0; left: 0; right: 0; padding: 0 48px 24px; z-index: 2; }
+.col-hero-trait { width: 28px; height: 2px; margin-bottom: 10px; }
+.col-hero-nom { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 400; color: var(--blanc); line-height: 1; margin-bottom: 5px; }
+.col-hero-slogan { font-size: 10px; font-weight: 300; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blanc-80); }
+
+.col-corps { flex: 1; padding: 20px 36px 0; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── GRILLES ── */
+.cat-grille { display: grid; gap: 10px; flex: 1; }
+.cat-grille-4 { grid-template-columns: repeat(4, 1fr); }
+.cat-grille-3 { grid-template-columns: repeat(3, 1fr); }
+
+/* ── CARTE GÉNÉRIQUE ── */
+.cat-carte { display: flex; flex-direction: column; overflow: hidden; }
+.cat-carte-visuel { flex: 1; overflow: hidden; }
+.cat-carte-visuel img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cat-carte-hex { background: var(--col-hex); padding: 8px 10px; flex-shrink: 0; }
+.cat-carte-nom { font-family: 'Playfair Display', serif; font-size: 9px; font-weight: 600; color: var(--blanc); line-height: 1.2; margin-bottom: 2px; }
+.cat-carte-desc { font-size: 7px; font-weight: 300; color: var(--blanc-70); font-style: italic; line-height: 1.4; margin-bottom: 3px; }
+.cat-carte-prix { font-size: 8px; font-weight: 400; color: var(--blanc-80); letter-spacing: 0.04em; }
+
+/* ── PAGE PARTAGÉE ── */
+.p-partage { display: flex; flex-direction: column; }
+
+.col-mini { flex: 1; display: flex; flex-direction: column; border-bottom: 1px solid var(--beige); overflow: hidden; }
+.col-mini:last-of-type { border-bottom: none; }
+.col-mini-entete { padding: 14px 48px 8px; display: flex; align-items: baseline; gap: 12px; flex-shrink: 0; }
+.col-mini-trait { width: 16px; height: 2px; flex-shrink: 0; margin-top: 6px; }
+.col-mini-nom { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; }
+.col-mini-slogan { font-size: 8px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); margin-left: auto; }
+.col-mini-grille { padding: 0 48px 10px; display: grid; gap: 8px; flex: 1; }
+.col-mini-grille.g3 { grid-template-columns: repeat(3, 1fr); }
+.col-mini-grille.g4 { grid-template-columns: repeat(4, 1fr); }
+.col-mini-grille.g5 { grid-template-columns: repeat(5, 1fr); }
+
+/* ══════════════════════════════════════
+   SAPONICA — DOUBLE PAGE
+══════════════════════════════════════ */
+.sap-page-gauche { display: flex; flex-direction: row; }
+
+.sap-photo-collection { width: 280px; flex-shrink: 0; position: relative; overflow: hidden; }
+.sap-photo-fondu { position: absolute; inset: 0; background: linear-gradient(to right, transparent 40%, var(--blanc)); }
+
+.sap-contenu-gauche { flex: 1; padding: 40px 32px 0 28px; display: flex; flex-direction: column; overflow: hidden; }
+.sap-nom { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 400; color: var(--gris-fonce); line-height: 1; margin-bottom: 6px; }
+.sap-slogan { font-size: 9px; font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gris); margin-bottom: 16px; }
+.sap-description { margin-bottom: 20px; }
+.sap-description p { font-size: 10px; line-height: 1.8; color: var(--gris); font-weight: 300; margin-bottom: 8px; }
+.sap-grille { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex: 1; }
+
+.sap-page-droite { display: flex; flex-direction: column; position: relative; }
+.sap-grille-droite { padding: 32px 32px 0; flex: 1; }
+.sap-point-ancrage { position: absolute; top: 24px; right: 32px; width: 14px; height: 14px; }
+
+/* ── Traitements SAPONICA ── */
+.sap-carte { display: flex; flex-direction: column; overflow: hidden; position: relative; }
+.sap-photo { overflow: hidden; flex-shrink: 0; }
+.sap-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sap-photo-60 { height: 60%; }
+.sap-photo-70 { height: 70%; }
+.sap-photo-75 { height: 75%; }
+.sap-photo-full { position: absolute; inset: 0; height: 100%; width: 100%; }
+.sap-photo-relative { position: relative; }
+
+.sap-hex { flex-shrink: 0; background: var(--col-hex); display: flex; flex-direction: column; justify-content: flex-end; padding: 8px 10px; }
+.sap-hex-40 { height: 40%; }
+.sap-hex-25 { height: 25%; justify-content: center; }
+
+.sap-bande-v { position: absolute; left: 0; top: 0; bottom: 0; width: 30%; background: var(--col-hex); display: flex; align-items: flex-end; padding: 10px 6px; z-index: 2; }
+.sap-bande-v-texte { width: 100%; }
+
+.sap-bas-blanc { flex-shrink: 0; height: 30%; background: var(--blanc); padding: 6px 10px; display: flex; flex-direction: column; justify-content: center; }
+.sap-trait-hex { width: 16px; height: 2px; margin-bottom: 5px; }
+.sap-photo-bas { position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 10px; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%); }
+
+.sap-carte-nom { font-family: 'Playfair Display', serif; font-size: 9px; font-weight: 600; color: var(--blanc); line-height: 1.2; margin-bottom: 2px; }
+.sap-carte-nom-v { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 8px; }
+.sap-bas-blanc .sap-carte-nom { color: var(--gris-fonce); }
+.sap-carte-desc { font-size: 7px; font-weight: 300; color: var(--blanc-70); font-style: italic; line-height: 1.4; margin-bottom: 3px; }
+.sap-carte-prix { font-size: 8px; font-weight: 400; color: var(--blanc-80); letter-spacing: 0.04em; }
+.sap-prix-fonce { color: var(--gris); }
+
+/* ══════════════════════════════════════
+   PETIT NUAGE — PAGE 6
+══════════════════════════════════════ */
+.pn-page { background: #E8D8E0; flex-direction: column; }
+
+.pn-photos-haut { display: flex; height: 320px; flex-shrink: 0; }
+.pn-photo-grande { flex: 1.4; overflow: hidden; }
+.pn-photo-petite { flex: 1; overflow: hidden; margin-top: 48px; }
+
+.pn-texte { padding: 24px 56px 16px; flex-shrink: 0; }
+.pn-nom { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; color: var(--gris-fonce); margin-bottom: 4px; }
+.pn-slogan { font-size: 8px; font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gris); margin-bottom: 14px; }
+.pn-description p { font-size: 11px; line-height: 1.8; color: var(--gris); font-weight: 300; margin-bottom: 6px; }
+
+.pn-grille { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 56px; flex: 1; }
+
+/* ══════════════════════════════════════
+   CAPRIN — PAGE 7
+══════════════════════════════════════ */
+.cap-page { background: var(--blanc); flex-direction: column; }
+
+.cap-haut { display: flex; height: 380px; flex-shrink: 0; }
+.cap-haut-texte { flex: 1; padding: 40px 36px 32px 48px; display: flex; flex-direction: column; justify-content: center; }
+.cap-haut-photo { flex: 1; overflow: hidden; }
+
+.cap-nom { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 400; color: var(--gris-fonce); line-height: 1; margin-bottom: 6px; }
+.cap-slogan { font-size: 8px; font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gris); margin-bottom: 16px; }
+.cap-description p { font-size: 11px; line-height: 1.8; color: var(--gris); font-weight: 300; margin-bottom: 8px; }
+
+.cap-grille { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 16px 48px 0; flex: 1; }
+
+/* ══════════════════════════════════════
+   PHILOSOPHIE
+══════════════════════════════════════ */
+.p-philo { background: var(--gris-fonce); justify-content: center; align-items: center; }
+.philo-contenu { padding: 64px; text-align: center; max-width: 560px; z-index: 2; }
+.philo-trait { width: 32px; height: 1px; background: var(--accent); margin: 0 auto 20px; }
+.philo-valeurs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; text-align: left; margin-top: 48px; }
+
+/* ══════════════════════════════════════
+   DOS DE COUVERTURE
+══════════════════════════════════════ */
+.p-dos { background: var(--blanc); justify-content: center; align-items: center; }
+.dos-corps { text-align: center; padding: 48px; }
+.dos-marque { font-size: 52px; margin-bottom: 6px; }
+.dos-sep { width: 40px; height: 1px; background: var(--beige); margin: 32px auto; }
+.dos-coords { margin-bottom: 28px; }
+.dos-coord { font-size: 12px; color: var(--gris-fonce); letter-spacing: 0.04em; margin-bottom: 6px; }
+.dos-note { font-size: 10px; color: var(--gris); line-height: 1.8; font-style: italic; max-width: 340px; margin: 0 auto 40px; }
+.dos-dots { display: flex; gap: 8px; justify-content: center; }
+.dos-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ══════════════════════════════════════
+   PRINT
+══════════════════════════════════════ */
+@media print {
+  .catalogue-body-print { background: white; padding: 0; margin: 0; }
+  .cat-controles { display: none; }
+  .page-label { display: none; }
+  .page { width: 8.5in; height: 11in; margin: 0; page-break-after: always; overflow: hidden; }
+  @page { size: 8.5in 11in; margin: 0; }
+}
