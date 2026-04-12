@@ -57,18 +57,18 @@
 }
 
 .cover-corps { position: relative; z-index: 2; padding: 0 64px 60px; margin-top: auto; }
-.cover-logo { width: 320px; margin-bottom: 12px; display: block; }
+.cover-logo { width: 320px; margin-bottom: 12px; display: block; filter: brightness(0) invert(1); }
 
 .cover-eyebrow {
   font-size: 9px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase;
-  color: var(--gris); display: flex; align-items: center; gap: 12px;
+  color: var(--accent); display: flex; align-items: center; gap: 12px;
 }
-.cover-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--gris); display: block; }
+.cover-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--accent); display: block; }
 
-.cover-cols { position: absolute; top: 48px; right: 64px; z-index: 2; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-.cover-col-ligne { display: flex; align-items: center; gap: 8px; }
-.cover-col-nom { font-size: 7px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--blanc); }
-.cover-col-carre { width: 10px; height: 10px; background: var(--col-hex); flex-shrink: 0; }
+.cover-cols { position: absolute; top: 80px; right: 80px; z-index: 2; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+.cover-col-ligne { display: flex; align-items: center; gap: 10px; }
+.cover-col-nom { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--blanc); }
+.cover-col-carre { width: 12px; height: 12px; background: var(--col-hex); flex-shrink: 0; }
 
 /* ══════════════════════════════════════
    P2 — CHANTAL
