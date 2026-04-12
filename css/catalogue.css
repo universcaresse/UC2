@@ -75,7 +75,7 @@
 ══════════════════════════════════════ */
 .p-chantal { background: var(--beige); flex-direction: row; }
 
-.chantal-photo { width: 340px; flex-shrink: 0; position: relative; overflow: hidden; }
+.chantal-photo { width: 400px; flex-shrink: 0; position: relative; overflow: hidden; }
 .chantal-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, transparent 40%, var(--beige)); }
 
 .chantal-texte { flex: 1; padding: 80px 56px; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
