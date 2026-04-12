@@ -5,7 +5,7 @@
 
 /* ── BODY ── */
 .catalogue-body-print {
-  background: var(--beige) !important;
+  background: var(--blanc) !important;
   padding: 40px 20px;
 }
 
@@ -75,8 +75,29 @@
 ══════════════════════════════════════ */
 .p-chantal { background: var(--beige); flex-direction: row; }
 
-.chantal-photo { width: 400px; flex-shrink: 0; position: relative; overflow: hidden; }
-.chantal-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, transparent 40%, var(--beige)); }
+.chantal-photo { 
+  width: 400px; 
+  height: 400px; /* Ajoutez une hauteur pour définir l'espace */
+  flex-shrink: 0; 
+  position: relative; 
+  overflow: hidden; 
+}
+
+/* Ciblez l'image à l'intérieur du conteneur */
+.chantal-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Remplit l'espace sans déformer l'image */
+  object-position: center; /* Centre l'image dans l'espace */
+}
+
+.chantal-photo::after { 
+  content: ''; 
+  position: absolute; 
+  inset: 0; 
+  background: linear-gradient(to right, transparent 40%, var(--beige)); 
+}
+
 
 .chantal-texte { flex: 1; padding: 80px 56px; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
 
