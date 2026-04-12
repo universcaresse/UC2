@@ -54,7 +54,8 @@
   background-image: var(--cover-photo-url);
   background-size: cover;
   background-position: center;
-  opacity: 0.85;
+    opacity: 0.85;
+  filter: blur(2px);
   -webkit-mask-image: radial-gradient(ellipse 80% 85% at center, black 30%, transparent 90%);
   mask-image: radial-gradient(ellipse 80% 85% at center, black 30%, transparent 90%);
 }
