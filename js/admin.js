@@ -2953,7 +2953,7 @@ async function lirePDF(fichier) {
         for (let i = 1; i <= pdf.numPages; i++) {
           const page    = await pdf.getPage(i);
           const content = await page.getTextContent();
-          texte += content.items.map(s => s.str).join(' ') + '\n';
+          texte += content.items.map(s => s.str).join('\n') + '\n';
         }
         resolve(texte);
       } catch(e) { resolve(null); }
