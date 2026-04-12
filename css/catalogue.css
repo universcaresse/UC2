@@ -56,8 +56,7 @@
   background-position: center;
     opacity: 0.85;
   filter: blur(2px);
-  -webkit-mask-image: radial-gradient(ellipse 80% 85% at center, black 30%, transparent 90%);
-  mask-image: radial-gradient(ellipse 80% 85% at center, black 30%, transparent 90%);
+  
 }
 .cover-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 60%); }
 
@@ -70,6 +69,17 @@
   color: var(--blanc); display: flex; align-items: center; gap: 12px;
 }
 .cover-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--accent); display: block; }
+
+.cover-fondu {
+  position: absolute;
+  top: 36px; right: 36px; bottom: 36px; left: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    linear-gradient(to bottom, var(--blanc) 0%, transparent 18%),
+    linear-gradient(to top, var(--blanc) 0%, transparent 18%),
+    linear-gradient(to left, var(--blanc) 0%, transparent 25%);
+}
 
 .cover-cols { position: absolute; top: 100px; right: 100px; z-index: 2; display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
 .cover-col-ligne { display: flex; align-items: center; gap: 10px; }
