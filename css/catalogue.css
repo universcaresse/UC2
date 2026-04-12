@@ -75,30 +75,28 @@
 ══════════════════════════════════════ */
 .p-chantal { background: var(--beige); flex-direction: row; }
 
+/* --- Votre code existant --- */
 .chantal-photo { 
   width: 400px; 
   flex-shrink: 0; 
   position: relative; 
   overflow: hidden; 
-  height: 600px; /* IMPORTANT : Ajoutez la hauteur de votre espace ici */
 }
 
-/* Ajoutez ce bloc pour cibler l'image */
+/* --- AJOUTEZ CE BLOC --- */
 .chantal-photo img {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 100%; /* Garde la pleine hauteur */
-  width: auto; /* Laisse la largeur déborder naturellement */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* Remplir l'espace sans déformer */
+  object-position: center; /* Centrer l'image (affiche le milieu) */
 }
 
+/* --- Votre code existant --- */
 .chantal-photo::after { 
   content: ''; 
   position: absolute; 
   inset: 0; 
   background: linear-gradient(to right, transparent 40%, var(--beige)); 
-  z-index: 2; /* Force le dégradé à rester par-dessus l'image */
 }
 
 
