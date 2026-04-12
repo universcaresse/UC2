@@ -57,17 +57,17 @@
 }
 
 .cover-corps { position: relative; z-index: 2; padding: 0 64px 60px; margin-top: auto; }
-.cover-logo { width: 400px; margin-bottom: 12px; display: block; filter: brightness(0) invert(1); }
+.cover-logo { width: 400px; margin-bottom: 14px; display: block; filter: brightness(0) invert(1); }
 
 .cover-eyebrow {
-  font-size: 9px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.4em; text-transform: uppercase;
   color: var(--blanc); display: flex; align-items: center; gap: 12px;
 }
 .cover-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--accent); display: block; }
 
 .cover-cols { position: absolute; top: 100px; right: 100px; z-index: 2; display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
 .cover-col-ligne { display: flex; align-items: center; gap: 10px; }
-.cover-col-nom { font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--blanc); }
+.cover-col-nom { font-size: 12px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--blanc); }
 .cover-col-carre { width: 14px; height: 14px; background: var(--col-hex); flex-shrink: 0; }
 
 /* ══════════════════════════════════════
