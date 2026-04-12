@@ -274,7 +274,7 @@ async function chargerCatalogue() {
   const conteneur = document.getElementById('pages-collections');
 
   try {
-    const reponse = await fetch(API_URL + '?action=getCataloguePublic');
+    const reponse = await fetch(API_URL + '?action=getCatalogue');
     const data = await reponse.json();
 
     if (!data.success) {
