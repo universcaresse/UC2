@@ -61,28 +61,33 @@ function parserFactureAmazon(texte) {
   const mSous = texte.match(/Invoice subtotal[^$]*\$([\d\.]+)/i);
   if (mSous) facture.sousTotal = parseFloat(mSous[1]) || 0;
 
-  // Items — pattern : texte ... N $XX.XX $0.00 $X.XX $X.XX $XX.XX ... ASIN: XXXXX
-  const reItem = /([A-Za-zÀ-ÿ][^$]+?)\s+(\d+)\s+\$([\d\.]+)\s+\$[\d\.]+\s+\$([\d\.]+)\s+\$([\d\.]+)\s+\$[\d\.]+\s+(?:Shipping[^A]+)?ASIN:\s*\S+/gi;
-  let m;
-  while ((m = reItem.exec(texte)) !== null) {
-    const desc     = m[1].trim().replace(/\s+/g, ' ');
-    const qte      = parseInt(m[2]) || 1;
-    const prixUnit = parseFloat(m[3]) || 0;
-    const tpsItem  = parseFloat(m[4]) || 0;
-    const tvqItem  = parseFloat(m[5]) || 0;
-    if (prixUnit <= 0 || desc.length < 3) continue;
-    if (/shipping|frais d.exp/i.test(desc)) continue;
-
-    const fmtMatch = desc.match(/([\d\.]+)\s*(ml|g|L|kg|oz|lb|lbs)/i);
-    facture.items.push({
-      description:  desc,
-      formatQte:    fmtMatch ? parseFloat(fmtMatch[1]) : 0,
-      formatUnite:  fmtMatch ? fmtMatch[2].toLowerCase() : 'unité',
-      prixUnitaire: prixUnit,
-      quantite:     qte
-    });
-    facture.tps += tpsItem;
-    facture.tvq += tvqItem;
+  // Items — extraire les zones entre 'la pièce' et 'Shipping charges'
+  const reZone = /la\s+pièce\s+(.+?)\s+Shipping\s+charges/gi;
+  let mZone;
+  while ((mZone = reZone.exec(texte)) !== null) {
+    const zone = mZone[1];
+    const reItem = /(.+?)\s+(\d+)\s+\$([\d\.]+)\s+\$[\d\.]+\s+\$([\d\.]+)\s+\$([\d\.]+)\s+\$[\d\.]+/g;
+    let mItem;
+    while ((mItem = reItem.exec(zone)) !== null) {
+      const descBrut   = mItem[1].trim();
+      const qte        = parseInt(mItem[2]) || 1;
+      const prixUnit   = parseFloat(mItem[3]) || 0;
+      const tpsItem    = parseFloat(mItem[4]) || 0;
+      const tvqItem    = parseFloat(mItem[5]) || 0;
+      if (prixUnit <= 0 || descBrut.length < 3) continue;
+      // Garder seulement la partie anglaise
+      const desc = descBrut.split(' / ')[0].trim();
+      const fmtMatch = desc.match(/([\d\.]+)\s*(ml|g|L|kg|oz|lb|lbs)/i);
+      facture.items.push({
+        description:  desc,
+        formatQte:    fmtMatch ? parseFloat(fmtMatch[1]) : 0,
+        formatUnite:  fmtMatch ? fmtMatch[2].toLowerCase() : 'unité',
+        prixUnitaire: prixUnit,
+        quantite:     qte
+      });
+      facture.tps += tpsItem;
+      facture.tvq += tvqItem;
+    }
   }
 
   facture.tps   = Math.round(facture.tps * 100) / 100;
