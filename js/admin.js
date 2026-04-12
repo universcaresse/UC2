@@ -2921,7 +2921,6 @@ async function importerFacturePDF() {
   afficherMsg('import-facture', 'Lecture du PDF…');
   const texte = await lirePDF(fichier);
   if (!texte) { afficherMsg('import-facture', 'Impossible de lire le PDF.', 'erreur'); return; }
-  if (fournisseur === 'Amazon') { afficherMsg('import-facture', texte.substring(0, 500)); return; }
   const facture = fournisseur === 'Amazon' ? parserFactureAmazon(texte) : parserFacturePA(texte);
   if (!facture.items.length) { afficherMsg('import-facture', 'Aucun item trouvé dans le PDF.', 'erreur'); return; }
   if (!ifMapping.length) await ifChargerMapping();
