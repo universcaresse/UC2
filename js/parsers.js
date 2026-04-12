@@ -44,11 +44,11 @@ function parserFacturePA(texte) {
 function parserFactureAmazon(texte) {
   const facture = { numeroFacture: '', date: '', items: [], tps: 0, tvq: 0, livraison: 0, sousTotal: 0, total: 0 };
 
-  // Numéro de facture — premier trouvé
+  // Numéro de facture
   const mNum = texte.match(/Invoice\s*#\s*\/[^:]+:\s*([A-Z0-9]+)/i);
   if (mNum) facture.numeroFacture = mNum[1].trim();
 
-  // Date — "Invoice date / Date de facturation: DD Month YYYY"
+  // Date
   const moisMap = { january:'01', february:'02', march:'03', april:'04', may:'05', june:'06', july:'07', august:'08', september:'09', october:'10', november:'11', december:'12' };
   const mDate = texte.match(/Invoice date[^:]*:\s*(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/i);
   if (mDate) {
@@ -58,36 +58,22 @@ function parserFactureAmazon(texte) {
   }
 
   // Sous-total
-  const mSous = texte.match(/Invoice subtotal[^\n$]*\$([\d\.]+)/i);
+  const mSous = texte.match(/Invoice subtotal[^$]*\$([\d\.]+)/i);
   if (mSous) facture.sousTotal = parseFloat(mSous[1]) || 0;
 
-  // Items — chaque item précède son ASIN
-  const blocsASIN = [];
-  const reASIN = /(.+?)\nASIN:\s*\S+/gs;
+  // Items — pattern : texte ... N $XX.XX $0.00 $X.XX $X.XX $XX.XX ... ASIN: XXXXX
+  const reItem = /([A-Za-zÀ-ÿ][^$]+?)\s+(\d+)\s+\$([\d\.]+)\s+\$[\d\.]+\s+\$([\d\.]+)\s+\$([\d\.]+)\s+\$[\d\.]+\s+(?:Shipping[^A]+)?ASIN:\s*\S+/gi;
   let m;
-  while ((m = reASIN.exec(texte)) !== null) {
-    blocsASIN.push(m[1]);
-  }
+  while ((m = reItem.exec(texte)) !== null) {
+    const desc     = m[1].trim().replace(/\s+/g, ' ');
+    const qte      = parseInt(m[2]) || 1;
+    const prixUnit = parseFloat(m[3]) || 0;
+    const tpsItem  = parseFloat(m[4]) || 0;
+    const tvqItem  = parseFloat(m[5]) || 0;
+    if (prixUnit <= 0 || desc.length < 3) continue;
+    if (/shipping|frais d.exp/i.test(desc)) continue;
 
-  for (const bloc of blocsASIN) {
-    // Ligne : N $XX.XX $0.00 $X.XX $X.XX $XX.XX
-    const mLigne = bloc.match(/(\d+)\s+\$([\d\.]+)\s+\$[\d\.]+\s+\$([\d\.]+)\s+\$([\d\.]+)\s+\$([\d\.]+)\s*$/);
-    if (!mLigne) continue;
-    const qte      = parseInt(mLigne[1]) || 1;
-    const prixUnit = parseFloat(mLigne[2]) || 0;
-    const tpsItem  = parseFloat(mLigne[3]) || 0;
-    const tvqItem  = parseFloat(mLigne[4]) || 0;
-    if (prixUnit <= 0) continue;
-
-    // Description — retirer la ligne de prix, garder la partie anglaise
-    const descBrut = bloc.replace(/\d+\s+\$[\d\.]+\s+\$[\d\.]+\s+\$[\d\.]+\s+\$[\d\.]+\s+\$[\d\.]+\s*$/, '').trim();
-    const descParts = descBrut.split(/\s*\/\s+/);
-    const desc = (descParts[0] || descBrut).trim().replace(/\s+/g, ' ');
-    if (!desc || desc.length < 3) continue;
-
-    // Format dans la description
     const fmtMatch = desc.match(/([\d\.]+)\s*(ml|g|L|kg|oz|lb|lbs)/i);
-
     facture.items.push({
       description:  desc,
       formatQte:    fmtMatch ? parseFloat(fmtMatch[1]) : 0,
@@ -95,7 +81,6 @@ function parserFactureAmazon(texte) {
       prixUnitaire: prixUnit,
       quantite:     qte
     });
-
     facture.tps += tpsItem;
     facture.tvq += tvqItem;
   }
