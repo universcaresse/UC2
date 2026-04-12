@@ -272,7 +272,7 @@
    ÉCRAN LIVRE
 ══════════════════════════════════════ */
 .livre-ecran {
-  background: #d0ccc7;
+  background: #ffffff;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
