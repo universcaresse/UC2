@@ -57,7 +57,7 @@
 }
 
 .cover-corps { position: relative; z-index: 2; padding: 0 64px 60px; margin-top: auto; }
-.cover-logo { width: 320px; margin-bottom: 12px; display: block; filter: brightness(0) invert(1); }
+.cover-logo { width: 400px; margin-bottom: 12px; display: block; filter: brightness(0) invert(1); }
 
 .cover-eyebrow {
   font-size: 9px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase;
