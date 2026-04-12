@@ -46,7 +46,7 @@
 /* ══════════════════════════════════════
    P1 — COUVERTURE
 ══════════════════════════════════════ */
-.p-cover { background: var(--blanc); }
+.p-cover { background: var(--blanc); } 
 
 .cover-photo {
   position: absolute;
