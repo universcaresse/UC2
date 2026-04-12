@@ -70,8 +70,8 @@
 
 .cover-cols { position: absolute; top: 100px; right: 100px; z-index: 2; display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
 .cover-col-ligne { display: flex; align-items: center; gap: 10px; }
-.cover-col-nom { font-size: 12px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--blanc); }
-.cover-col-carre { width: 14px; height: 14px; background: var(--col-hex); flex-shrink: 0; }
+.cover-col-nom { font-size: 14px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--blanc); }
+.cover-col-carre { width: 16px; height: 16px; background: var(--col-hex); flex-shrink: 0; }
 
 /* ══════════════════════════════════════
    P2 — CHANTAL
