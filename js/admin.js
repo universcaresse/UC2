@@ -2921,7 +2921,7 @@ async function importerFacturePDF() {
   afficherMsg('import-facture', 'Lecture du PDF…');
   const texte = await lirePDF(fichier);
   if (!texte) { afficherMsg('import-facture', 'Impossible de lire le PDF.', 'erreur'); return; }
-  const facture = parserFacturePA(texte);
+  const facture = fournisseur === 'Amazon' ? parserFactureAmazon(texte) : parserFacturePA(texte);
   if (!facture.items.length) { afficherMsg('import-facture', 'Aucun item trouvé dans le PDF.', 'erreur'); return; }
   if (!ifMapping.length) await ifChargerMapping();
   ifItems = facture.items;
@@ -2967,41 +2967,6 @@ async function lirePDF(fichier) {
   });
 }
 
-function parserFacturePA(texte) {
-  const facture = { numeroFacture: '', date: '', items: [], tps: 0, tvq: 0, livraison: 0, sousTotal: 0, total: 0 };
-  const mNum  = texte.match(/Détails de la commande[\s\S]{0,20}?(\d{4,6})/i);
-  if (mNum) facture.numeroFacture = mNum[1].trim();
-  const mDate = texte.match(/(\d{2}-\d{2}-\d{4})/);
-  if (mDate) { const p = mDate[1].split('-'); facture.date = `${p[2]}-${p[1]}-${p[0]}`; }
-  const mTps   = texte.match(/TPS\s*[:\s]+([\d\s,\.]+)\s*\$/i);
-  if (mTps) facture.tps = parseFloat(mTps[1].replace(/\s/g,'').replace(',','.'));
-  const mTvq   = texte.match(/TVQ\s*[:\s]+([\d\s,\.]+)\s*\$/i);
-  if (mTvq) facture.tvq = parseFloat(mTvq[1].replace(/\s/g,'').replace(',','.'));
-  const mSous  = texte.match(/Sous-total\s*[:\s]+([\d\s,\.]+)\s*\$/i);
-  if (mSous) facture.sousTotal = parseFloat(mSous[1].replace(/\s/g,'').replace(',','.'));
-  const mTotal = texte.match(/Total de la commande\s*[:\s]+([\d\s,\.]+)\s*\$/i);
-  if (mTotal) facture.total = parseFloat(mTotal[1].replace(/\s/g,'').replace(',','.'));
-  const mLiv   = texte.match(/Livraison\s*[:\s]+([\d\s,\.]+)\s*\$/i);
-  if (mLiv && !/gratuite/i.test(mLiv[0])) facture.livraison = parseFloat(mLiv[1].replace(/\s/g,'').replace(',','.'));
-  const ligneItem = /([A-ZÀ-Ÿa-zà-ÿ][A-ZÀ-Ÿa-zà-ÿ\s\/&\(\)\-\']+)\s*\((\d+)\)\s*([\d]+(?:ml|g|L|kg|oz)[^\n]*?)?\s*([\d,\.\s]+)\s*\$\s*CAD/gi;
-  let m;
-  while ((m = ligneItem.exec(texte)) !== null) {
-    const desc = m[1].trim();
-    const qte  = parseInt(m[2]);
-    const fmt  = (m[3] || '').trim();
-    const prix = parseFloat(m[4].replace(/\s/g,'').replace(',', '.'));
-    if (!desc || isNaN(prix) || prix <= 0) continue;
-    const fmtMatch = fmt.match(/^([\d\.]+)\s*(ml|g|L|kg)/i) || desc.match(/([\d\.]+)\s*(ml|g|L|kg)/i);
-    facture.items.push({
-      description:  desc,
-      formatQte:    fmtMatch ? parseFloat(fmtMatch[1]) : 0,
-      formatUnite:  fmtMatch ? fmtMatch[2].toLowerCase() : 'unité',
-      prixUnitaire: prix,
-      quantite:     qte
-    });
-  }
-  return facture;
-}
 
 function normaliserPourMapping(s) {
   return (s || '').toLowerCase()
