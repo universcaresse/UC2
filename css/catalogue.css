@@ -56,7 +56,7 @@
   background-position: center;
     opacity: 0.72;
 }
-.cover-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.45) 25%, transparent 50%); }
+.cover-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.55) 35%, transparent 58%); }
 
 .cover-corps { position: relative; z-index: 2; padding: 0 64px 60px; margin-top: auto; }
 
