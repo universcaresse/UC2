@@ -60,6 +60,7 @@
 }
 
 .cover-corps { position: relative; z-index: 2; padding: 0 64px 60px; margin-top: auto; }
+.cover-corps::before { content: ''; position: absolute; inset: -80px -64px 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%); z-index: -1; }
 .cover-logo { width: 400px; margin-bottom: 12px; display: block; filter: brightness(0) invert(1);  transform: translate(20px, -15px);  }
 
 .cover-eyebrow {
