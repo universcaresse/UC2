@@ -309,6 +309,22 @@ async function chargerCatalogue() {
     const elEyebrow = document.getElementById('cover-eyebrow-texte');
     if (elEyebrow && eyebrow) elEyebrow.textContent = eyebrow;
 
+    // Page Chantal depuis contenu
+    const contenu = (dataContenu.success && dataContenu.contenu) ? dataContenu.contenu : {};
+    const elTitre = document.getElementById('chantal-titre');
+    if (elTitre) {
+      const titre = (contenu.qui_titre || '') + (contenu.qui_titre_em ? ' <em>' + contenu.qui_titre_em + '</em>' : '');
+      elTitre.innerHTML = titre;
+    }
+    const elSig = document.getElementById('chantal-signature');
+    if (elSig) elSig.textContent = contenu.qui_signature_nom || '';
+    const elSigTitre = document.getElementById('chantal-signature-titre');
+    if (elSigTitre) elSigTitre.textContent = contenu.qui_signature_titre || '';
+    const elCorps = document.getElementById('chantal-corps');
+    if (elCorps) elCorps.textContent = contenu.qui_texte || '';
+    const elCitation = document.getElementById('chantal-citation');
+    if (elCitation) elCitation.textContent = contenu.citation_texte || '';
+
     // Regrouper les produits par collection
     const parCollection = {};
     data.produits.forEach(function(p) {
