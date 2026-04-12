@@ -44,11 +44,11 @@ function parserFacturePA(texte) {
 function parserFactureAmazon(texte) {
   const facture = { numeroFacture: '', date: '', items: [], tps: 0, tvq: 0, livraison: 0, sousTotal: 0, total: 0 };
 
-  // Numéro de facture
-  const mNum = texte.match(/Invoice\s*#\s*\/\s*#\s*de\s*facture[:\s]+([A-Z0-9]+)/i);
+  // Numéro de facture — premier trouvé
+  const mNum = texte.match(/Invoice\s*#\s*\/[^:]+:\s*([A-Z0-9]+)/i);
   if (mNum) facture.numeroFacture = mNum[1].trim();
 
-  // Date — format "DD Month YYYY" ou "DD December 2025"
+  // Date — "Invoice date / Date de facturation: DD Month YYYY"
   const moisMap = { january:'01', february:'02', march:'03', april:'04', may:'05', june:'06', july:'07', august:'08', september:'09', october:'10', november:'11', december:'12' };
   const mDate = texte.match(/Invoice date[^:]*:\s*(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/i);
   if (mDate) {
@@ -58,37 +58,34 @@ function parserFactureAmazon(texte) {
   }
 
   // Sous-total
-  const mSous = texte.match(/Invoice subtotal[^$]*\$([\d\.]+)/i);
+  const mSous = texte.match(/Invoice subtotal[^\n$]*\$([\d\.]+)/i);
   if (mSous) facture.sousTotal = parseFloat(mSous[1]) || 0;
 
-  // TPS et TVQ — totaux de la page 2
-  const mTps = texte.match(/Federal tax[^$\n]*\$([\d\.]+)\s*Provincial/i);
-  if (mTps) facture.tps = parseFloat(mTps[1]) || 0;
-  const mTvq = texte.match(/Provincial tax[^$\n]*\$([\d\.]+)\s*Tax subtotal/i);
-  if (mTvq) facture.tvq = parseFloat(mTvq[1]) || 0;
+  // Items — chaque item précède son ASIN
+  const blocsASIN = [];
+  const reASIN = /(.+?)\nASIN:\s*\S+/gs;
+  let m;
+  while ((m = reASIN.exec(texte)) !== null) {
+    blocsASIN.push(m[1]);
+  }
 
-  // Items — chaque item se termine par ASIN: XXXXX
-  // Pattern : description multiligne + ASIN + quantité + prix unitaire + ... + sous-total item
-  const asinBlocs = texte.split(/ASIN:\s*[A-Z0-9]+/i);
-  for (let i = 0; i < asinBlocs.length - 1; i++) {
-    const bloc = asinBlocs[i];
-    // Chercher la ligne avec quantité et prix : N $XX.XX $0.00 $X.XX $X.XX $XX.XX
+  for (const bloc of blocsASIN) {
+    // Ligne : N $XX.XX $0.00 $X.XX $X.XX $XX.XX
     const mLigne = bloc.match(/(\d+)\s+\$([\d\.]+)\s+\$[\d\.]+\s+\$([\d\.]+)\s+\$([\d\.]+)\s+\$([\d\.]+)\s*$/);
     if (!mLigne) continue;
-    const qte         = parseInt(mLigne[1]) || 1;
-    const prixUnit    = parseFloat(mLigne[2]) || 0;
-    const tpsItem     = parseFloat(mLigne[3]) || 0;
-    const tvqItem     = parseFloat(mLigne[4]) || 0;
+    const qte      = parseInt(mLigne[1]) || 1;
+    const prixUnit = parseFloat(mLigne[2]) || 0;
+    const tpsItem  = parseFloat(mLigne[3]) || 0;
+    const tvqItem  = parseFloat(mLigne[4]) || 0;
     if (prixUnit <= 0) continue;
 
-    // Description — prendre le texte avant la ligne de prix, nettoyer
-    const descBrut = bloc.replace(/(\d+)\s+\$([\d\.]+)\s+\$[\d\.]+\s+\$([\d\.]+)\s+\$([\d\.]+)\s+\$([\d\.]+)\s*$/, '').trim();
-    // Garder seulement la partie anglaise — avant le "/" qui sépare EN/FR
-    const descParts = descBrut.split(/\s*\/\s*/);
+    // Description — retirer la ligne de prix, garder la partie anglaise
+    const descBrut = bloc.replace(/\d+\s+\$[\d\.]+\s+\$[\d\.]+\s+\$[\d\.]+\s+\$[\d\.]+\s+\$[\d\.]+\s*$/, '').trim();
+    const descParts = descBrut.split(/\s*\/\s+/);
     const desc = (descParts[0] || descBrut).trim().replace(/\s+/g, ' ');
-    if (!desc) continue;
+    if (!desc || desc.length < 3) continue;
 
-    // Format dans la description — ex: 1.6 L, 118ML, 110gm, 473.6g
+    // Format dans la description
     const fmtMatch = desc.match(/([\d\.]+)\s*(ml|g|L|kg|oz|lb|lbs)/i);
 
     facture.items.push({
@@ -99,15 +96,12 @@ function parserFactureAmazon(texte) {
       quantite:     qte
     });
 
-    // Accumuler TPS et TVQ si pas trouvés globalement
     facture.tps += tpsItem;
     facture.tvq += tvqItem;
   }
 
-  // Si les totaux globaux ont été trouvés, ne pas doubler
-  if (mTps) facture.tps = parseFloat(mTps[1]) || 0;
-  if (mTvq) facture.tvq = parseFloat(mTvq[1]) || 0;
-
+  facture.tps   = Math.round(facture.tps * 100) / 100;
+  facture.tvq   = Math.round(facture.tvq * 100) / 100;
   facture.total = facture.sousTotal + facture.tps + facture.tvq + facture.livraison;
   return facture;
 }
