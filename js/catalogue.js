@@ -435,3 +435,86 @@ async function chargerCatalogue() {
 }
 
 chargerCatalogue();
+
+/* ══════════════════════════════════════
+   NAVIGATION LIVRE
+══════════════════════════════════════ */
+function initialiserLivre() {
+  const contenu    = document.getElementById('livre-contenu');
+  const btnPrev    = document.getElementById('livre-precedent');
+  const btnSuiv    = document.getElementById('livre-suivant');
+  const infoVue    = document.getElementById('livre-info');
+
+  const pages = Array.from(contenu.querySelectorAll('.page'));
+  if (pages.length === 0) return;
+
+  // Masquer les page-label
+  contenu.querySelectorAll('.page-label').forEach(function(el) {
+    el.style.display = 'none';
+  });
+
+  // Construire les vues
+  // Vue 1 : couverture seule (page 0)
+  // Vues intermédiaires : doubles pages (pages 1 à N-2, par paires)
+  // Dernière vue : dos seul (dernière page)
+  const vues = [];
+
+  // Couverture seule
+  vues.push({ type: 'seule', pages: [pages[0]] });
+
+  // Doubles pages intermédiaires
+  const pagesInterieures = pages.slice(1, pages.length - 1);
+  for (let i = 0; i < pagesInterieures.length; i += 2) {
+    if (i + 1 < pagesInterieures.length) {
+      vues.push({ type: 'double', pages: [pagesInterieures[i], pagesInterieures[i + 1]] });
+    } else {
+      vues.push({ type: 'seule', pages: [pagesInterieures[i]] });
+    }
+  }
+
+  // Dos seul
+  if (pages.length > 1) {
+    vues.push({ type: 'seule', pages: [pages[pages.length - 1]] });
+  }
+
+  // Créer les conteneurs de vues
+  const enveloppes = vues.map(function(vue, idx) {
+    const div = document.createElement('div');
+    div.className = vue.type === 'double' ? 'livre-double' : 'livre-seule';
+    div.id = 'livre-vue-' + (idx + 1);
+    vue.pages.forEach(function(p) { div.appendChild(p); });
+    contenu.appendChild(div);
+    return div;
+  });
+
+  let vueActive = 0;
+
+  function afficherVue(idx) {
+    enveloppes.forEach(function(e) { e.classList.remove('actif'); });
+    enveloppes[idx].classList.add('actif');
+    infoVue.textContent = (idx + 1) + ' / ' + vues.length;
+    btnPrev.disabled = idx === 0;
+    btnSuiv.disabled = idx === vues.length - 1;
+    vueActive = idx;
+  }
+
+  btnPrev.addEventListener('click', function() {
+    if (vueActive > 0) afficherVue(vueActive - 1);
+  });
+
+  btnSuiv.addEventListener('click', function() {
+    if (vueActive < vues.length - 1) afficherVue(vueActive + 1);
+  });
+
+  afficherVue(0);
+}
+
+// Attendre que les pages dynamiques soient générées
+const _observateur = new MutationObserver(function(mutations, obs) {
+  const pages = document.querySelectorAll('#livre-contenu .page');
+  if (pages.length > 3) {
+    obs.disconnect();
+    initialiserLivre();
+  }
+});
+_observateur.observe(document.getElementById('livre-contenu'), { childList: true, subtree: true });

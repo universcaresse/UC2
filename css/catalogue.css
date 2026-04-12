@@ -265,7 +265,87 @@
 .dos-dot { width: 8px; height: 8px; border-radius: 50%; }
 
 /* ══════════════════════════════════════
-   PRINT
+   ÉCRAN LIVRE
+══════════════════════════════════════ */
+.livre-ecran {
+  background: #d0ccc7;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.livre-navigation {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.livre-bouton {
+  background: var(--gris-fonce);
+  color: var(--blanc);
+  border: none;
+  padding: 10px 28px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.livre-bouton:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.livre-info {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gris-fonce);
+  min-width: 120px;
+  text-align: center;
+}
+
+.livre-double {
+  display: none;
+  flex-direction: row;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+}
+
+.livre-double.actif {
+  display: flex;
+}
+
+.livre-seule {
+  display: none;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+}
+
+.livre-seule.actif {
+  display: block;
+}
+
+.livre-double .page,
+.livre-seule .page {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.livre-double .page + .page {
+  border-left: 1px solid rgba(0,0,0,0.08);
+}
+
+.livre-imprimer {
+  margin-top: 32px;
+}
+
+/* ══════════════════════════════════════
+   IMPRESSION
 ══════════════════════════════════════ */
 @media print {
   .catalogue-body-print { background: white; padding: 0; margin: 0; }
