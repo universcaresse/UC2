@@ -119,10 +119,10 @@
 
 .tdm-overlay { position: absolute; inset: 0; background: linear-gradient(to left, rgba(255,255,255,1) 40%, rgba(255,255,255,0.6) 65%, rgba(255,255,255,0.1) 100%); }
 
-.tdm-corps { position: relative; z-index: 2; margin-left: auto; width: 420px; height: 100%; padding: 80px 64px 60px 40px; display: flex; flex-direction: column; justify-content: center; gap: 32px; }
+.tdm-corps { position: relative; z-index: 2; width: 100%; height: 100%; padding: 60px 64px; display: flex; flex-direction: column; justify-content: center; gap: 32px; }
 
 .tdm-liste { display: flex; flex-direction: column; }
-.tdm-ligne { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--beige-40); }
+.tdm-ligne { display: flex; align-items: center; gap: 14px; padding: 20px 0; border-bottom: 1px solid var(--beige-40); }
 .tdm-ligne:first-child { border-top: 1px solid var(--beige-40); }
 .tdm-carre { width: 10px; height: 10px; flex-shrink: 0; }
 .tdm-nom { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; color: var(--gris-fonce); white-space: nowrap; }
