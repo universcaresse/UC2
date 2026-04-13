@@ -64,8 +64,9 @@
 .cover-logo { width: 400px; margin-bottom: 12px; display: block; transform: translate(20px, -15px); }
 
 .cover-eyebrow {
-  font-size: 13px; font-weight: 500; letter-spacing: 0.4em; text-transform: uppercase;
-  color: var(--logo); display: flex; align-items: center; gap: 12px;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.4em; text-transform: uppercase;
+  color: var(--accent); display: flex; align-items: center; gap: 12px;
+  background: rgba(0,0,0,0.28); padding: 6px 12px; align-self: flex-start;
 }
 .cover-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--accent); display: block; }
 
