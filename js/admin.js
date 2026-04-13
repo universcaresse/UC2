@@ -2717,7 +2717,7 @@ function inciRendreLigne(l, cat, uid) {
       <td>${l.inci || ''}</td>
       <td><span>${statutLabel}</span></td>
     </tr>
-    <tr class="accordeon-detail cache" id="${id}-detail">
+    <tr class="accordeon-detail cache" id="${id}-detail" data-ing-id="${l.ing_id || ''}">
       <td colspan="4">
         <div class="form-groupe">
           <label class="form-label">INCI</label>
@@ -2731,6 +2731,10 @@ function inciRendreLigne(l, cat, uid) {
           <label class="form-label">Note olfactive</label>
           <input type="text" class="form-ctrl" id="${id}-note" value="${(l.note_olfactive || '').replace(/"/g, '&quot;')}">
         </div>
+        ${l.source ? `<div class="form-groupe">
+          <label class="form-label">Données fournisseur</label>
+          <textarea class="form-ctrl" id="${id}-scraping" rows="4" readonly placeholder="Chargement…"></textarea>
+        </div>` : ''}
         <hr class="separateur">
         <div class="form-actions">
           <span></span>
@@ -2740,12 +2744,24 @@ function inciRendreLigne(l, cat, uid) {
     </tr>`;
 }
 
-function inciToggleDetail(id) {
+async function inciToggleDetail(id) {
   const detail = document.getElementById(`${id}-detail`);
   if (!detail) return;
   const estOuvert = !detail.classList.contains('cache');
   document.querySelectorAll('.accordeon-detail').forEach(d => { if (d !== detail) d.classList.add('cache'); });
   detail.classList.toggle('cache', estOuvert);
+  if (estOuvert) return;
+  const ing = listesDropdown.fullData.find(d => d.ing_id === detail.dataset.ingId);
+  if (!ing || !ing.source) return;
+  const zoneScraping = document.getElementById(`${id}-scraping`);
+  if (!zoneScraping || zoneScraping.dataset.charge === 'true') return;
+  zoneScraping.textContent = 'Recherche en cours…';
+  const res = await appelAPI('rechercherScraping', { source: ing.source, nom_UC: ing.nom_UC });
+  if (!res || !res.success || !res.found) { zoneScraping.textContent = 'Aucune donnée de scraping trouvée.'; return; }
+  zoneScraping.dataset.charge = 'true';
+  if (res.inci && !document.getElementById(`${id}-inci`).value) document.getElementById(`${id}-inci`).value = res.inci;
+  if (res.nom_botanique && !document.getElementById(`${id}-bot`).value) document.getElementById(`${id}-bot`).value = res.nom_botanique;
+  zoneScraping.textContent = res.texte_brut || 'Aucun texte brut disponible.';
 }
 
 function inciToggleAccordeon(header) {
@@ -2761,10 +2777,10 @@ async function inciValider(id, nom_UC, cat_id, ing_id) {
   const nomBotanique  = document.getElementById(`${id}-bot`)?.value   || '';
   const noteOlfactive = document.getElementById(`${id}-note`)?.value  || '';
   if (!ing_id) { afficherMsg('inci', 'Ingrédient introuvable.', 'erreur'); return; }
-  const res = await appelAPIPost('saveIngredientInci', { ing_id, inci, nom_botanique: nomBotanique, note_olfactive: noteOlfactive });
+  const res = await appelAPIPost('saveIngredientInci', { ing_id, inci, nom_botanique: nomBotanique, note_olfactive: noteOlfactive, statut: '✅ Validé' });
   if (res && res.success) {
     afficherMsg('inci', '✅ INCI sauvegardé.');
-    listesDropdown.fullData = listesDropdown.fullData.map(d => d.ing_id === ing_id ? { ...d, inci, nom_botanique: nomBotanique, note_olfactive: noteOlfactive } : d);
+    listesDropdown.fullData = listesDropdown.fullData.map(d => d.ing_id === ing_id ? { ...d, inci, nom_botanique: nomBotanique, note_olfactive: noteOlfactive, statut: '✅ Validé' } : d);
   } else {
     afficherMsg('inci', res?.message || 'Erreur lors de la sauvegarde.', 'erreur');
   }
