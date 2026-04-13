@@ -3249,7 +3249,7 @@ async function modalIfConfirmer() {
   let ing_id = ingExistant?.ing_id || '';
   if (!ingExistant) {
     ing_id = 'ING-' + Date.now();
-    const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: nom, inci: '', statut: 'actif' });
+    const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: item.description, inci: '', source: ifFournisseurActif, statut: true });
     if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
     listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
   }
