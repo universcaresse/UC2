@@ -79,13 +79,14 @@
    P2 — CHANTAL
 ══════════════════════════════════════ */
 .p-chantal { background: var(--blanc); flex-direction: row; }
-.p-chantal .page-interieur { margin: 36px 0 36px 36px; flex: 1; display: flex; flex-direction: row; overflow: hidden; background: var(--beige); }
+.p-chantal .page-interieur { margin: 36px 0 36px 36px; flex: 1; display: flex; flex-direction: row; overflow: hidden; background: var(--blanc); }
 
 .chantal-photo { 
-  width: 400px; 
+  width: 400px;
   flex-shrink: 0; 
   position: relative; 
-  overflow: hidden; 
+  overflow: hidden;
+  align-self: stretch;
 }
 
 .chantal-photo img {
