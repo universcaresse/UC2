@@ -475,7 +475,7 @@ select.form-control, select.form-ctrl { cursor: pointer; }
   align-items: center; justify-content: center;
 }
 .modal-admin-overlay.ouvert { display: flex; }
-.modal-admin { background: var(--blanc); max-width: 860px; width: 94%; max-height: 88vh; overflow-y: auto; animation: modalEntre 0.3s ease; }
+.modal-admin { background: var(--blanc); max-width: 860px; width: 94%; max-height: 88vh; overflow-y: auto; animation: modalEntre 0.3s ease; position: relative; }
 .modal-admin-header { padding: 24px 32px; border-bottom: 1px solid var(--beige); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .modal-admin-titre { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gris-fonce); }
 .modal-admin-info { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; color: var(--gris); margin-top: 2px; }

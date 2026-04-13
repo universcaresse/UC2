@@ -266,6 +266,7 @@ function stringToColor(str) {
 ════════════════════════════════ */
 var donneesCollections = []; // [{col_id, rang, nom, slogan, description, couleur_hex, photo_url, photo_noel_url}]
 var donneesGammes      = []; // [{gam_id, col_id, rang, nom, description, couleur_hex, photo_url, photo_noel_url}]
+var filtreGammesColId  = '';
 
 /* ════════════════════════════════
    FAMILLES V2
@@ -851,8 +852,20 @@ function afficherGammes() {
   if (loading) loading.classList.add('cache');
   if (btnNew)  btnNew.classList.remove('cache');
 
-  let html = '';
+  let optionsCol = '<option value="">Toutes les collections</option>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
+    const sel = filtreGammesColId === col.col_id ? 'selected' : '';
+    optionsCol += `<option value="${col.col_id}" ${sel}>${col.nom}</option>`;
+  });
+  let html = `<div class="filtres-bar" style="margin-bottom:1.2rem;">
+    <select class="form-ctrl" style="max-width:260px;" onchange="filtreGammesColId=this.value;afficherGammes();">${optionsCol}</select>
+  </div>`;
+
+  const colsFiltrees = filtreGammesColId
+    ? donneesCollections.filter(c => c.col_id === filtreGammesColId)
+    : donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99));
+
+  colsFiltrees.forEach(col => {
     const gammesDeLaCol = donneesGammes.filter(g => g.col_id === col.col_id).sort((a, b) => (a.rang || 99) - (b.rang || 99));
     if (!gammesDeLaCol.length) return;
     html += `<div class="recette-collection-titre">${col.nom.toUpperCase()}</div>`;
@@ -882,6 +895,9 @@ function ouvrirFicheGamme2(gam_id) {
   document.getElementById('fiche-gamme-titre').textContent      = (gam.nom || '').toUpperCase();
   document.getElementById('fiche-gamme-collection').textContent = col?.nom || '—';
   document.getElementById('fiche-gamme-desc').textContent       = gam.description || '—';
+  const produitsGamme = donneesProduits.filter(p => p.gam_id === gam_id);
+  const elProduits = document.getElementById('fiche-gamme-produits');
+  if (elProduits) elProduits.textContent = produitsGamme.length ? produitsGamme.map(p => p.nom).join(' — ') : 'Aucun produit';
   document.getElementById('fiche-gamme-modifier').onclick = () => { fermerFicheGamme2(); modifierGamme(gam_id); };
   document.getElementById('btn-supprimer-gamme').onclick  = () => supprimerGamme(gam_id);
   document.getElementById('contenu-gammes').classList.add('cache');
@@ -2509,7 +2525,7 @@ async function chargerInventaire() {
   let total = 0;
 
   Object.keys(parCat).sort().forEach(cat => {
-    html += `<tr><td colspan="4" class="inv-titre-rangee">${cat}</td></tr>`;
+    html += `<tr><td colspan="4" class="inv-titre-rangee">${listesDropdown.categoriesMap?.[cat] || cat}</td></tr>`;
     parCat[cat].forEach(item => {
       total += (item.qte_g || 0) * (item.prix_par_g_reel || 0);
       html += `
@@ -2557,8 +2573,8 @@ function filtrerInventaire() {
   });
   let html  = '<div class="tableau-wrap"><table><thead><tr><th>Ingrédient</th><th>Stock (g)</th><th>Prix/g réel</th><th>Dernière màj</th></tr></thead><tbody>';
   let total = 0;
-  Object.keys(parCat).sort().forEach(cat => {
-    html += `<tr><td colspan="4" class="inv-titre-rangee">${cat}</td></tr>`;
+ Object.keys(parCat).sort().forEach(cat => {
+    html += `<tr><td colspan="4" class="inv-titre-rangee">${listesDropdown.categoriesMap?.[cat] || cat}</td></tr>`;
     parCat[cat].forEach(item => {
       total += (item.qte_g || 0) * (item.prix_par_g_reel || 0);
       html += `<tr><td>${item.nom_UC || item.ing_id}</td><td>${parseFloat(item.qte_g || 0).toFixed(0)} g</td><td>${item.prix_par_g_reel ? parseFloat(item.prix_par_g_reel).toFixed(4) + ' $/g' : '—'}</td><td>${item.date_derniere_maj || '—'}</td></tr>`;
