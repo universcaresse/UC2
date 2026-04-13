@@ -78,7 +78,8 @@
 /* ══════════════════════════════════════
    P2 — CHANTAL
 ══════════════════════════════════════ */
-.p-chantal { background: var(--beige); flex-direction: row; padding: 36px 0 36px 36px; }
+.p-chantal { background: var(--blanc); flex-direction: row; }
+.p-chantal .page-interieur { margin: 36px 0 36px 36px; flex: 1; display: flex; flex-direction: row; overflow: hidden; background: var(--beige); }
 
 .chantal-photo { 
   width: 400px; 
@@ -112,7 +113,8 @@
 /* ══════════════════════════════════════
    P3 — TABLE DES MATIÈRES
 ══════════════════════════════════════ */
-.p-tdm { background: var(--blanc); padding: 36px 36px 36px 0; }
+.p-tdm { background: var(--blanc); }
+.p-tdm .page-interieur { margin: 36px 36px 36px 0; flex: 1; overflow: hidden; }
 
 .tdm-overlay { position: absolute; inset: 0; background: linear-gradient(to left, rgba(255,255,255,1) 40%, rgba(255,255,255,0.6) 65%, rgba(255,255,255,0.1) 100%); }
 
