@@ -61,7 +61,7 @@
 
 .cover-corps { position: relative; z-index: 2; padding: 0 64px 60px; margin-top: auto; display: flex; flex-direction: column; gap: 16px; }
 
-.cover-logo { width: 400px; margin-bottom: 12px; display: block; transform: translate(20px, -15px); }
+.cover-logo { width: 425px; margin-bottom: 12px; display: block; transform: translate(20px, -15px); }
 
 .cover-eyebrow {
   font-size: 14px; font-weight: 500; letter-spacing: 0.5em; text-transform: uppercase;

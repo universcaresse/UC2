@@ -110,10 +110,10 @@ function parserFactureAmazon(texte) {
     facture.tps += tpsItem;
     facture.tvq += tvqItem;
 
-    const fmtMatch = desc.match(/([\d\.]+)\s*(ml|g|L|kg|oz|lb|lbs)/i);
+    const fmtMatch = desc.match(/([\d]+[,\.][\d]+|[\d]+)\s*(ml|g|L|kg|oz|lb|lbs)/i);
     facture.items.push({
       description:  desc,
-      formatQte:    fmtMatch ? parseFloat(fmtMatch[1]) : 0,
+      formatQte:    fmtMatch ? parseFloat(fmtMatch[1].replace(',', '.')) : 0,
       formatUnite:  fmtMatch ? fmtMatch[2].toLowerCase() : 'unité',
       prixUnitaire: prixUnit,
       quantite:     qte || 1
