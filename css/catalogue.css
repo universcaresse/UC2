@@ -126,7 +126,8 @@
 .tdm-ligne:first-child { border-top: 1px solid var(--beige-40); }
 .tdm-carre { width: 10px; height: 10px; flex-shrink: 0; }
 .tdm-nom { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; color: var(--gris-fonce); white-space: nowrap; }
-.tdm-slogan { font-size: 11px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); margin-left: auto; text-align: right; }
+.tdm-slogan { font-size: 11px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); flex: 1; }
+.tdm-page { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; color: var(--beige); min-width: 32px; text-align: right; }
 
 /* ══════════════════════════════════════
    STRUCTURE COMMUNE — COLLECTIONS

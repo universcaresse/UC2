@@ -383,6 +383,7 @@ async function chargerCatalogue() {
           + '<div class="tdm-carre" style="background:' + couleur + ';"></div>'
           + '<div class="tdm-nom">' + item.collection.nom + '</div>'
           + '<div class="tdm-slogan">' + (item.collection.slogan || '') + '</div>'
+          + '<div class="tdm-page"></div>'
           + '</div>';
       }
     });
