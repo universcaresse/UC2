@@ -3141,10 +3141,10 @@ async function ifConfirmerNouveauNom(idx) {
   const cat = document.getElementById(`if-type-${idx}`)?.value;
   if (!cat) { afficherMsg('import-facture', 'Choisir une catégorie d\'abord.', 'erreur'); return; }
   const ing_id = 'ING-' + Date.now();
-  const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: nom, inci: '', statut: 'actif' });
+  const item = ifItems[idx];
+  const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: item?.description || nom, inci: '', source: ifFournisseurActif, statut: true });
   if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur.', 'erreur'); return; }
   listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
-  const item = ifItems[idx];
   if (ifFournisseurActif && item) {
     await appelAPIPost('saveMappingFournisseur', {
       fournisseur:            ifFournisseurActif,
