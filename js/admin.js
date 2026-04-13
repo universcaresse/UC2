@@ -2921,6 +2921,7 @@ async function sauvegarderContenuSite() {
    IMPORT FACTURE PDF V2
 ════════════════════════════════ */
 var ifItems   = [];
+var ifFournisseurActif = '';
 var ifMapping = [];
 
 async function ifChargerMapping() {
@@ -3007,6 +3008,7 @@ function trouverMappingItem(description, fournisseur) {
 }
 
 function afficherApercuItems(fournisseur) {
+ifFournisseurActif = fournisseur;
   const tbody = document.getElementById('if-tbody');
   tbody.innerHTML = '';
   ifItems.forEach((item, idx) => {
@@ -3024,25 +3026,46 @@ function afficherApercuItems(fournisseur) {
       : [];
     const tr = document.createElement('tr');
     tr.className = rouge ? 'ligne-rouge' : '';
-    tr.innerHTML = `
+   
+   tr.innerHTML = `
       <td>${item.description}</td>
       <td>${item.formatQte} ${item.formatUnite}</td>
       <td>${item.quantite}</td>
       <td>${item.prixUnitaire.toFixed(2)} $</td>
       <td>${total} $</td>
       <td>
-        <select class="form-ctrl" id="if-type-${idx}" onchange="ifFiltrerNoms(${idx})">
+        <select class="form-ctrl" id="if-type-${idx}" onchange="ifOnChangeCat(${idx})">
           <option value="">— Catégorie —</option>
-       ${listesDropdown.types.map(t => `<option value="${t}" ${t === cat_UC ? 'selected' : ''}>${listesDropdown.categoriesMap?.[t] || t}</option>`).join('')}
+          ${listesDropdown.types.map(t => `<option value="${t}" ${t === cat_UC ? 'selected' : ''}>${listesDropdown.categoriesMap?.[t] || t}</option>`).join('')}
+          <option value="__nouvelle_cat__">+ Créer</option>
         </select>
+        <div id="if-new-cat-${idx}" class="cache">
+          <input type="text" class="form-ctrl" id="if-new-cat-input-${idx}" placeholder="Nouvelle catégorie">
+          <div class="form-actions">
+            <button class="bouton bouton-petit" onclick="ifConfirmerNouvelleCat(${idx})">✓</button>
+            <button class="bouton bouton-petit bouton-contour" onclick="ifAnnulerNouvelleCat(${idx})">✕</button>
+          </div>
+        </div>
       </td>
-   <td>
-        <select class="form-ctrl" id="if-nomuc-${idx}">
+      <td>
+        <select class="form-ctrl" id="if-nomuc-${idx}" onchange="ifOnChangeNom(${idx})">
           <option value="">— Choisir —</option>
           ${ingsDeCat.map(d => `<option value="${d.nom_UC}" ${d.nom_UC === nom_UC ? 'selected' : ''}>${d.nom_UC}</option>`).join('')}
+          <option value="__nouveau__">+ Créer</option>
         </select>
-        <button class="bouton bouton-petit bouton-contour" onclick="ifOuvrirModalNouvelIngredient(${idx}, '${fournisseur}')">+ Nouveau</button>
+        <div id="if-new-nom-${idx}" class="cache">
+          <input type="text" class="form-ctrl" id="if-new-nom-input-${idx}" placeholder="Nouveau nom UC">
+          <div class="form-actions">
+            <button class="bouton bouton-petit" onclick="ifConfirmerNouveauNom(${idx})">✓</button>
+            <button class="bouton bouton-petit bouton-contour" onclick="ifAnnulerNouveauNom(${idx})">✕</button>
+          </div>
+        </div>
       </td>`;
+   
+   
+   
+   
+   
     tbody.appendChild(tr);
   });
 }
@@ -3055,7 +3078,95 @@ function ifFiltrerNoms(idx) {
     ? listesDropdown.fullData.filter(d => d.cat_id === type).sort((a,b) => (a.nom_UC||'').localeCompare(b.nom_UC||'','fr'))
     : [];
   select.innerHTML = '<option value="">— Choisir —</option>' +
-    filtres.map(d => `<option value="${d.nom_UC}">${d.nom_UC}</option>`).join('');
+    filtres.map(d => `<option value="${d.nom_UC}">${d.nom_UC}</option>`).join('') +
+    '<option value="__nouveau__">+ Créer</option>';
+}
+
+function ifOnChangeCat(idx) {
+  const select = document.getElementById(`if-type-${idx}`);
+  if (!select) return;
+  if (select.value === '__nouvelle_cat__') {
+    select.value = '';
+    document.getElementById(`if-new-cat-${idx}`).classList.remove('cache');
+    document.getElementById(`if-new-cat-input-${idx}`).focus();
+    return;
+  }
+  ifFiltrerNoms(idx);
+}
+
+function ifOnChangeNom(idx) {
+  const select = document.getElementById(`if-nomuc-${idx}`);
+  if (!select) return;
+  if (select.value === '__nouveau__') {
+    select.value = '';
+    document.getElementById(`if-new-nom-${idx}`).classList.remove('cache');
+    document.getElementById(`if-new-nom-input-${idx}`).focus();
+  }
+}
+
+function ifAnnulerNouvelleCat(idx) {
+  document.getElementById(`if-new-cat-${idx}`).classList.add('cache');
+  document.getElementById(`if-new-cat-input-${idx}`).value = '';
+}
+
+function ifAnnulerNouveauNom(idx) {
+  document.getElementById(`if-new-nom-${idx}`).classList.add('cache');
+  document.getElementById(`if-new-nom-input-${idx}`).value = '';
+}
+
+async function ifConfirmerNouvelleCat(idx) {
+  const nom = document.getElementById(`if-new-cat-input-${idx}`)?.value.trim();
+  if (!nom) return;
+  const cat_id = 'CAT-' + Date.now();
+  const res = await appelAPIPost('saveCategorieUC', { cat_id, nom });
+  if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur.', 'erreur'); return; }
+  listesDropdown.types.push(cat_id);
+  listesDropdown.categoriesMap[cat_id] = nom;
+  document.querySelectorAll('[id^="if-type-"]').forEach(sel => {
+    const creerOpt = [...sel.options].find(o => o.value === '__nouvelle_cat__');
+    const opt = document.createElement('option');
+    opt.value = cat_id;
+    opt.textContent = nom;
+    if (creerOpt) sel.insertBefore(opt, creerOpt);
+    else sel.appendChild(opt);
+  });
+  document.getElementById(`if-type-${idx}`).value = cat_id;
+  ifAnnulerNouvelleCat(idx);
+  ifFiltrerNoms(idx);
+}
+
+async function ifConfirmerNouveauNom(idx) {
+  const nom = document.getElementById(`if-new-nom-input-${idx}`)?.value.trim();
+  if (!nom) return;
+  const cat = document.getElementById(`if-type-${idx}`)?.value;
+  if (!cat) { afficherMsg('import-facture', 'Choisir une catégorie d\'abord.', 'erreur'); return; }
+  const ing_id = 'ING-' + Date.now();
+  const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: nom, inci: '', statut: 'actif' });
+  if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur.', 'erreur'); return; }
+  listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
+  const item = ifItems[idx];
+  if (ifFournisseurActif && item) {
+    await appelAPIPost('saveMappingFournisseur', {
+      fournisseur:            ifFournisseurActif,
+      categorie_fournisseur:  listesDropdown.categoriesMap?.[cat] || cat,
+      nom_fournisseur:        item.description,
+      categorie_UC:           listesDropdown.categoriesMap?.[cat] || cat,
+      nom_UC:                 nom,
+      ing_id
+    });
+  }
+  const select = document.getElementById(`if-nomuc-${idx}`);
+  if (select) {
+    const creerOpt = [...select.options].find(o => o.value === '__nouveau__');
+    const opt = document.createElement('option');
+    opt.value = nom; opt.textContent = nom; opt.selected = true;
+    if (creerOpt) select.insertBefore(opt, creerOpt);
+    else select.appendChild(opt);
+  }
+  const tr = document.getElementById(`if-nomuc-${idx}`)?.closest('tr');
+  if (tr) tr.classList.remove('ligne-rouge');
+  ifAnnulerNouveauNom(idx);
+  afficherMsg('import-facture', `✅ "${nom}" créé.`);
 }
 
 function ifAjouterNomUC(idx) {
