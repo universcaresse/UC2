@@ -3401,6 +3401,9 @@ async function confirmerImportFacture() {
     afficherMsg('import-facture', `✅ Facture ${ach_id} importée avec succès.`);
   document.getElementById('if-apercu').classList.add('cache');
   document.getElementById('if-bloc-upload').classList.remove('cache');
+  const inputFichier = document.getElementById('if-fichier');
+  if (inputFichier) inputFichier.value = '';
+  ifItems = [];
   btn.disabled = false;
   btn.textContent = texteOriginal;
 }
