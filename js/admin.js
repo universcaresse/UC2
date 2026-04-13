@@ -2756,7 +2756,7 @@ async function inciToggleDetail(id) {
   const zoneScraping = document.getElementById(`${id}-scraping`);
   if (!zoneScraping || zoneScraping.dataset.charge === 'true') return;
   zoneScraping.textContent = 'Recherche en cours…';
-  const res = await appelAPI('rechercherScraping', { source: ing.source, nom_UC: ing.nom_UC });
+  const res = await appelAPI('rechercherScraping', { source: ing.source, nom_UC: ing.nom_fournisseur || ing.nom_UC });
   if (!res || !res.success || !res.found) { zoneScraping.textContent = 'Aucune donnée de scraping trouvée.'; return; }
   zoneScraping.dataset.charge = 'true';
   if (res.inci && !document.getElementById(`${id}-inci`).value) document.getElementById(`${id}-inci`).value = res.inci;
