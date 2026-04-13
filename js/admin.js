@@ -2781,6 +2781,8 @@ async function inciValider(id, nom_UC, cat_id, ing_id) {
   if (res && res.success) {
     afficherMsg('inci', '✅ INCI sauvegardé.');
     listesDropdown.fullData = listesDropdown.fullData.map(d => d.ing_id === ing_id ? { ...d, inci, nom_botanique: nomBotanique, note_olfactive: noteOlfactive, statut: '✅ Validé' } : d);
+    document.getElementById(`${id}-detail`)?.classList.add('cache');
+    await chargerInci();
   } else {
     afficherMsg('inci', res?.message || 'Erreur lors de la sauvegarde.', 'erreur');
   }
