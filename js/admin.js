@@ -3314,7 +3314,6 @@ function validerTotaux(facture) {
     zone.innerHTML = `<div class="msg msg-erreur">⚠ Écart de ${diff.toFixed(2)} $ entre les items (${sommItems.toFixed(2)} $) et le sous-total (${facture.sousTotal.toFixed(2)} $)</div>`;
   }
 }
-
 async function confirmerImportFacture() {
   const numero      = document.getElementById('if-numero').value.trim();
   const date        = document.getElementById('if-date').value.trim();
@@ -3323,7 +3322,7 @@ async function confirmerImportFacture() {
   const tvq         = parseFloat(document.getElementById('if-tvq').value) || 0;
   const livraison   = parseFloat(document.getElementById('if-livraison').value) || 0;
   const sousTotal   = parseFloat(document.getElementById('if-soustotal').value) || 0;
-if (!numero) { afficherMsg('import-facture', 'Numéro de facture requis.', 'erreur'); return; }
+  if (!numero) { afficherMsg('import-facture', 'Numéro de facture requis.', 'erreur'); return; }
   const lignesIncompletes = ifItems.filter((item, idx) => {
     const nom_UC = document.getElementById(`if-nomuc-${idx}`)?.value || '';
     const cat_UC = document.getElementById(`if-type-${idx}`)?.value  || '';
@@ -3332,64 +3331,77 @@ if (!numero) { afficherMsg('import-facture', 'Numéro de facture requis.', 'erre
   if (lignesIncompletes.length) { afficherMsg('import-facture', `❌ ${lignesIncompletes.length} ligne(s) sans catégorie ou nom UC — complète ou ignore-les avant de confirmer.`, 'erreur'); return; }
 
   const btn = document.getElementById('if-btn-confirmer');
+  const texteOriginal = btn.textContent;
   btn.disabled = true;
+  btn.textContent = '⏳ Import en cours…';
 
-  const ach_id  = 'ACH-' + Date.now();
-  const resAch  = await appelAPIPost('createAchatEntete', { ach_id, date, four_id: fournisseur, numero_facture: numero });
+  const ach_id = 'ACH-' + Date.now();
+  const resAch = await appelAPIPost('createAchatEntete', { ach_id, date, four_id: fournisseur, numero_facture: numero });
   if (!resAch || !resAch.success) {
     afficherMsg('import-facture', resAch?.message || 'Erreur création facture.', 'erreur');
     btn.disabled = false;
+    btn.textContent = texteOriginal;
     return;
   }
 
+  // Préparer toutes les lignes
+  const lignes = [];
   for (let idx = 0; idx < ifItems.length; idx++) {
-    const item    = ifItems[idx];
-    const nom_UC  = document.getElementById(`if-nomuc-${idx}`)?.value || '';
-    const cat_UC  = document.getElementById(`if-type-${idx}`)?.value  || '';
+    const item   = ifItems[idx];
+    const nom_UC = document.getElementById(`if-nomuc-${idx}`)?.value || '';
+    const cat_UC = document.getElementById(`if-type-${idx}`)?.value  || '';
     if (!nom_UC || !cat_UC) continue;
-
     const ingObj = listesDropdown.fullData.find(d => d.nom_UC === nom_UC);
-    const config = listesDropdown.config?.[cat_UC] || {};
     let grammes  = item.formatQte;
     if (item.formatUnite === 'l')  grammes = item.formatQte * 1000;
     if (item.formatUnite === 'kg') grammes = item.formatQte * 1000;
     if (item.formatUnite === 'ml') grammes = item.formatQte;
     const prixParG = grammes > 0 ? (item.prixUnitaire / grammes) : 0;
+    lignes.push({ idx, item, nom_UC, cat_UC, ingObj, prixParG });
+  }
 
-    // Sauvegarder le mapping si assigné manuellement
+  // Mappings et lignes en parallèle
+  const promesses = lignes.map(({ idx, item, nom_UC, cat_UC, ingObj, prixParG }) => {
+    const appels = [];
     if (!trouverMappingItem(item.description, fournisseur)) {
-      await appelAPIPost('saveMappingFournisseur', {
+      ifMapping.push({ fournisseur, categorie_fournisseur: cat_UC, nom_fournisseur: item.description, categorie_UC: cat_UC, nom_UC, ing_id: ingObj?.ing_id || '' });
+      appels.push(appelAPIPost('saveMappingFournisseur', {
         fournisseur,
         categorie_fournisseur: cat_UC,
         nom_fournisseur:       item.description,
         categorie_UC:          cat_UC,
         nom_UC,
         ing_id: ingObj?.ing_id || ''
-      });
-      ifMapping.push({ fournisseur, categorie_fournisseur: cat_UC, nom_fournisseur: item.description, categorie_UC: cat_UC, nom_UC, ing_id: ingObj?.ing_id || '' });
+      }));
     }
-
-    const resLigne = await appelAPIPost('addAchatLigne', {
+    appels.push(appelAPIPost('addAchatLigne', {
       ach_id,
-      ing_id:       ingObj?.ing_id || '',
-      format_qte:   item.formatQte,
-      format_unite: item.formatUnite,
+      ing_id:        ingObj?.ing_id || '',
+      format_qte:    item.formatQte,
+      format_unite:  item.formatUnite,
       prix_unitaire: item.prixUnitaire,
-      prix_par_g:   prixParG.toFixed(6),
-      quantite:     item.quantite
-    });
-    if (!resLigne || !resLigne.success) {
-      afficherMsg('import-facture', `❌ Erreur à l'item ${idx + 1} (${item.description}) — import annulé. Supprimer la facture ${ach_id} manuellement.`, 'erreur');
-      btn.disabled = false;
-      return;
-    }
+      prix_par_g:    prixParG.toFixed(6),
+      quantite:      item.quantite
+    }).then(res => ({ res, idx, description: item.description })));
+    return Promise.all(appels);
+  });
+
+  const resultats = await Promise.allSettled(promesses);
+  const erreurs = resultats.filter(r => r.status === 'rejected' || (r.value && r.value.some(v => v?.res && !v.res.success)));
+  if (erreurs.length) {
+    afficherMsg('import-facture', `❌ ${erreurs.length} ligne(s) en erreur — vérifier la facture ${ach_id}.`, 'erreur');
+    btn.disabled = false;
+    btn.textContent = texteOriginal;
+    return;
   }
 
   await appelAPIPost('finaliserAchat', { ach_id, sous_total: sousTotal, tps, tvq, livraison });
 
-  afficherMsg('import-facture', `✅ Facture ${ach_id} importée avec succès.`);
+    afficherMsg('import-facture', `✅ Facture ${ach_id} importée avec succès.`);
   document.getElementById('if-apercu').classList.add('cache');
+  document.getElementById('if-bloc-upload').classList.remove('cache');
   btn.disabled = false;
+  btn.textContent = texteOriginal;
 }
 
 /* ════════════════════════════════
