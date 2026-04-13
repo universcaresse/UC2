@@ -181,7 +181,7 @@ function construireDoubleSaponica(collection, produits, pageNo) {
   const cartesD = produits.slice(moitie).map(function(p, i) { return construireCarteSaponica(p, i + moitie); }).join('');
 
   const pageGauche = '<div class="page-label">Page ' + pageNo + ' — SAPONICA</div>'
-    + '<div class="page sap-page-gauche page-g">'
+    + '<div class="page sap-page-gauche ' + (pageNo % 2 === 0 ? 'page-g' : 'page-d') + '">'
     + '<div class="page-int">'
     + '<div class="sap-photo-collection">'
     + (collection.photo_url ? '<img src="' + collection.photo_url + '" alt="SAPONICA" class="photo-pleine">' : '')
@@ -198,7 +198,7 @@ function construireDoubleSaponica(collection, produits, pageNo) {
     + '</div>';
 
   const pageDroite = '<div class="page-label">Page ' + (pageNo + 1) + ' — SAPONICA (suite)</div>'
-    + '<div class="page sap-page-droite page-d" style="background:' + couleur + '18;">'
+    + '<div class="page sap-page-droite ' + ((pageNo + 1) % 2 === 0 ? 'page-g' : 'page-d') + '" style="background:' + couleur + '18;">'
     + '<div class="page-int">'
     + '<div class="sap-point-ancrage" style="background:' + couleur + ';"></div>'
     + '<div class="sap-grille sap-grille-droite">' + cartesD + '</div>'
