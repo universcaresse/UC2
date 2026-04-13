@@ -181,7 +181,8 @@ function construireDoubleSaponica(collection, produits, pageNo) {
   const cartesD = produits.slice(moitie).map(function(p, i) { return construireCarteSaponica(p, i + moitie); }).join('');
 
   const pageGauche = '<div class="page-label">Page ' + pageNo + ' — SAPONICA</div>'
-    + '<div class="page sap-page-gauche">'
+    + '<div class="page sap-page-gauche page-g">'
+    + '<div class="page-int">'
     + '<div class="sap-photo-collection">'
     + (collection.photo_url ? '<img src="' + collection.photo_url + '" alt="SAPONICA" class="photo-pleine">' : '')
     + '<div class="sap-photo-fondu"></div>'
@@ -193,12 +194,15 @@ function construireDoubleSaponica(collection, produits, pageNo) {
     + '<div class="sap-description">' + construireDescription(collection.description) + '</div>'
     + '<div class="sap-grille">' + cartesG + '</div>'
     + '</div>'
+    + '</div>'
     + '</div>';
 
   const pageDroite = '<div class="page-label">Page ' + (pageNo + 1) + ' — SAPONICA (suite)</div>'
-    + '<div class="page sap-page-droite" style="background:' + couleur + '18;">'
+    + '<div class="page sap-page-droite page-d" style="background:' + couleur + '18;">'
+    + '<div class="page-int">'
     + '<div class="sap-point-ancrage" style="background:' + couleur + ';"></div>'
     + '<div class="sap-grille sap-grille-droite">' + cartesD + '</div>'
+    + '</div>'
     + '<div class="cat-pied">'
     + '<span class="logo-tagline" style="font-size:17px;">Univers Caresse</span>'
     + '<span>universcaresse.ca</span>'
@@ -216,7 +220,7 @@ function construirePagePetitNuage(collection, produits, pageNo) {
   const cartes = produits.map(function(p) { return construireCarte(p, true); }).join('');
 
   return '<div class="page-label">Page ' + pageNo + ' — PETIT NUAGE</div>'
-    + '<div class="page pn-page">'
+    + '<div class="page pn-page page-g">'
     + '<div class="pn-photos-haut">'
     + '<div class="pn-photo-grande overflow-cache">'
     + (collection.photo_url ? '<img src="' + collection.photo_url + '" alt="Petit Nuage" class="photo-pleine">' : '')

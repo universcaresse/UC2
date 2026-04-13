@@ -2255,7 +2255,17 @@ function afficherItemsFacture() {
       <tr>
         <td>${item.type}</td>
         <td>${item.ingredient}</td>
-        <td>${item.formatQte} ${item.formatUnite}</td>
+        <td>
+        <input type="text" inputmode="decimal" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte || ''}" placeholder="Qté" style="width:60px">
+        <select class="form-ctrl" id="if-fmt-unite-${idx}">
+          <option value="g" ${item.formatUnite==='g'?'selected':''}>g</option>
+          <option value="kg" ${item.formatUnite==='kg'?'selected':''}>kg</option>
+          <option value="ml" ${item.formatUnite==='ml'?'selected':''}>ml</option>
+          <option value="L" ${item.formatUnite==='L'?'selected':''}>L</option>
+          <option value="lbs" ${item.formatUnite==='lbs'?'selected':''}>lbs</option>
+          <option value="unité" ${item.formatUnite==='unité'?'selected':''}>unité</option>
+        </select>
+      </td>
         <td>${formaterPrix(item.prixUnitaire)}</td>
         <td>${item.quantite}</td>
         <td>${formaterPrix(item.prixTotal)}</td>
@@ -3372,11 +3382,14 @@ async function confirmerImportFacture() {
     const nom_UC = document.getElementById(`if-nomuc-${idx}`)?.value || '';
     const cat_UC = document.getElementById(`if-type-${idx}`)?.value  || '';
     if (!nom_UC || !cat_UC) continue;
-    const ingObj = listesDropdown.fullData.find(d => d.nom_UC === nom_UC);
-    let grammes  = item.formatQte;
-    if (item.formatUnite === 'l')  grammes = item.formatQte * 1000;
-    if (item.formatUnite === 'kg') grammes = item.formatQte * 1000;
-    if (item.formatUnite === 'ml') grammes = item.formatQte;
+    const ingObj     = listesDropdown.fullData.find(d => d.nom_UC === nom_UC);
+    const fmtQte     = parseFloat(document.getElementById(`if-fmt-qte-${idx}`)?.value) || item.formatQte;
+    const fmtUnite   = document.getElementById(`if-fmt-unite-${idx}`)?.value || item.formatUnite;
+    let grammes  = fmtQte;
+    if (fmtUnite === 'l')   grammes = fmtQte * 1000;
+    if (fmtUnite === 'L')   grammes = fmtQte * 1000;
+    if (fmtUnite === 'kg')  grammes = fmtQte * 1000;
+    if (fmtUnite === 'ml')  grammes = fmtQte;
     const prixParG = grammes > 0 ? (item.prixUnitaire / grammes) : 0;
     lignes.push({ idx, item, nom_UC, cat_UC, ingObj, prixParG });
   }
@@ -3398,8 +3411,8 @@ async function confirmerImportFacture() {
     appels.push(appelAPIPost('addAchatLigne', {
       ach_id,
       ing_id:        ingObj?.ing_id || '',
-      format_qte:    item.formatQte,
-      format_unite:  item.formatUnite,
+      format_qte:    fmtQte,
+      format_unite:  fmtUnite,
       prix_unitaire: item.prixUnitaire,
       prix_par_g:    prixParG.toFixed(6),
       quantite:      item.quantite
