@@ -3015,7 +3015,7 @@ ifFournisseurActif = fournisseur;
     const mapping  = trouverMappingItem(item.description, fournisseur);
   const nom_UC   = mapping ? mapping.nom_UC : '';
     const catNom   = mapping ? mapping.categorie_UC : '';
-    const cat_UC   = catNom ? (Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === catNom) || '') : '';
+    const cat_UC   = catNom ? (Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === catNom) || (listesDropdown.categoriesMap?.[catNom] !== undefined ? catNom : '')) : '';
     const total    = (item.prixUnitaire * item.quantite).toFixed(2);
    const rouge    = !nom_UC || !cat_UC;
  const catId = cat_UC
@@ -3154,6 +3154,7 @@ async function ifConfirmerNouveauNom(idx) {
       nom_UC:                 nom,
       ing_id
     });
+    ifMapping.push({ fournisseur: ifFournisseurActif, categorie_fournisseur: listesDropdown.categoriesMap?.[cat] || cat, nom_fournisseur: item.description, categorie_UC: listesDropdown.categoriesMap?.[cat] || cat, nom_UC: nom, ing_id });
   }
   const select = document.getElementById(`if-nomuc-${idx}`);
   if (select) {
@@ -3367,9 +3368,9 @@ async function confirmerImportFacture() {
       ifMapping.push({ fournisseur, categorie_fournisseur: cat_UC, nom_fournisseur: item.description, categorie_UC: cat_UC, nom_UC, ing_id: ingObj?.ing_id || '' });
       appels.push(appelAPIPost('saveMappingFournisseur', {
         fournisseur,
-        categorie_fournisseur: cat_UC,
+        categorie_fournisseur: listesDropdown.categoriesMap?.[cat_UC] || cat_UC,
         nom_fournisseur:       item.description,
-        categorie_UC:          cat_UC,
+        categorie_UC:          listesDropdown.categoriesMap?.[cat_UC] || cat_UC,
         nom_UC,
         ing_id: ingObj?.ing_id || ''
       }));
