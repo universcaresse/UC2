@@ -119,7 +119,7 @@
 
 .tdm-overlay { position: absolute; inset: 0; background: linear-gradient(to left, rgba(255,255,255,1) 40%, rgba(255,255,255,0.6) 65%, rgba(255,255,255,0.1) 100%); }
 
-.tdm-corps { position: relative; z-index: 2; width: 100%; height: 100%; padding: 60px 64px; display: flex; flex-direction: column; justify-content: center; gap: 32px; }
+.tdm-corps { position: relative; z-index: 2; width: 100%; height: 100%; padding: 60px 64px 60px 120px; display: flex; flex-direction: column; justify-content: center; gap: 32px; }
 
 .tdm-liste { display: flex; flex-direction: column; }
 .tdm-ligne { display: flex; align-items: center; gap: 14px; padding: 20px 0; border-bottom: 1px solid var(--beige-40); }
