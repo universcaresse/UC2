@@ -119,6 +119,12 @@ function toggleDropdownAdmin(el) {
   if (!estOuvert) item.classList.add('ouvert');
 }
 
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.nav-admin-item')) {
+    document.querySelectorAll('.nav-admin-item.ouvert').forEach(i => i.classList.remove('ouvert'));
+  }
+});
+
 function afficherSection(id, bouton) {
   history.pushState({ section: id }, '', '#' + id);
   document.querySelectorAll('.nav-admin-item.ouvert').forEach(i => i.classList.remove('ouvert'));
@@ -2971,6 +2977,17 @@ async function importerFacturePDF() {
   validerTotaux(facture);
   document.getElementById('if-apercu').classList.remove('cache');
   document.getElementById('if-bloc-upload').classList.add('cache');
+  afficherMsg('import-facture', '');
+}
+
+async function voirTexteBrutPDF() {
+  const fichier = document.getElementById('if-fichier').files[0];
+  if (!fichier) { afficherMsg('import-facture', 'Choisis un fichier PDF.', 'erreur'); return; }
+  afficherMsg('import-facture', 'Lecture du PDF…');
+  const texte = await lirePDF(fichier);
+  if (!texte) { afficherMsg('import-facture', 'Impossible de lire le PDF.', 'erreur'); return; }
+  document.getElementById('if-texte-brut').value = texte;
+  document.getElementById('if-texte-brut-zone').classList.remove('cache');
   afficherMsg('import-facture', '');
 }
 

@@ -1428,6 +1428,17 @@
           <div class="form-panel form-body-actions">
             <div class="form-actions">
               <button class="bouton" onclick="importerFacturePDF()">Lire le PDF</button>
+              <button class="bouton bouton-contour" onclick="voirTexteBrutPDF()">Texte brut</button>
+            </div>
+          </div>
+          <div id="if-texte-brut-zone" class="cache">
+            <div class="form-panel">
+              <div class="form-body">
+                <div class="form-groupe">
+                  <label class="form-label">Texte brut extrait du PDF</label>
+                  <textarea class="form-ctrl" id="if-texte-brut" rows="20" readonly></textarea>
+                </div>
+              </div>
             </div>
           </div>
         </div>
