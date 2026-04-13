@@ -85,7 +85,9 @@ function parserFactureAmazon(texte) {
       descLignes.unshift(l);
       j--;
     }
-    let desc = descLignes.join(' ').split(' / ')[0].trim();
+   const descBrut = descLignes.join(' ');
+    const partieFr = descBrut.split(' / ')[1];
+    let desc = (partieFr || descBrut.split(' / ')[0]).trim();
     if (!desc || desc.length < 3) continue;
 
     // Après l'ASIN — qté puis $values dans l'ordre : prix, remise, TPS, TVQ, sous-total
