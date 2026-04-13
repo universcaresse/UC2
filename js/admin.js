@@ -3017,7 +3017,7 @@ ifFournisseurActif = fournisseur;
     const catNom   = mapping ? mapping.categorie_UC : '';
     const cat_UC   = catNom ? (Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === catNom) || '') : '';
     const total    = (item.prixUnitaire * item.quantite).toFixed(2);
-    const rouge    = !nom_UC;
+   const rouge    = !nom_UC || !cat_UC;
  const catId = cat_UC
       ? Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === cat_UC) || cat_UC
       : '';
