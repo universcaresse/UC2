@@ -43,10 +43,20 @@ function parserFacturePA(texte) {
 // ─── AMAZON ───
 function parserFactureAmazon(texte) {
   const facture = { numeroFacture: '', date: '', items: [], tps: 0, tvq: 0, livraison: 0, sousTotal: 0, total: 0 };
+  const lignes = texte.split('\n').map(l => l.trim()).filter(Boolean);
 
   // Numéro de facture
-  const mNum = texte.match(/Invoice\s*#\s*\/[^:]+:\s*([A-Z0-9]+)/i);
+  const mNum = texte.match(/Invoice\s*#\s*[\/\|][^:\n]*:\s*([A-Z0-9]{6,})/i);
   if (mNum) facture.numeroFacture = mNum[1].trim();
+  if (!facture.numeroFacture) {
+    for (let i = 0; i < lignes.length; i++) {
+      if (/Invoice\s*#/i.test(lignes[i])) {
+        const mInline = lignes[i].match(/:\s*([A-Z0-9]{6,})$/);
+        if (mInline) { facture.numeroFacture = mInline[1]; break; }
+        if (i + 1 < lignes.length && /^[A-Z0-9]{6,}$/.test(lignes[i + 1])) { facture.numeroFacture = lignes[i + 1]; break; }
+      }
+    }
+  }
 
   // Date
   const moisMap = { january:'01', february:'02', march:'03', april:'04', may:'05', june:'06', july:'07', august:'08', september:'09', october:'10', november:'11', december:'12' };
@@ -58,36 +68,54 @@ function parserFactureAmazon(texte) {
   }
 
   // Sous-total
-  const mSous = texte.match(/Invoice subtotal[^$]*\$([\d\.]+)/i);
+  const mSous = texte.match(/Invoice subtotal[\s\S]{0,60}\$([\d\.]+)/i);
   if (mSous) facture.sousTotal = parseFloat(mSous[1]) || 0;
 
-  // Items — extraire les zones entre 'la pièce' et 'Shipping charges'
-  const reZone = /la\s+pièce\s+(.+?)\s+Shipping\s+charges/gi;
-  let mZone;
-  while ((mZone = reZone.exec(texte)) !== null) {
-    const zone = mZone[1];
-    const reItem = /(.+?)\s+(\d+)\s+\$([\d\.]+)\s+\$[\d\.]+\s+\$([\d\.]+)\s+\$([\d\.]+)\s+\$[\d\.]+/g;
-    let mItem;
-    while ((mItem = reItem.exec(zone)) !== null) {
-      const descBrut   = mItem[1].trim();
-      const qte        = parseInt(mItem[2]) || 1;
-      const prixUnit   = parseFloat(mItem[3]) || 0;
-      const tpsItem    = parseFloat(mItem[4]) || 0;
-      const tvqItem    = parseFloat(mItem[5]) || 0;
-      if (prixUnit <= 0 || descBrut.length < 3) continue;
-      // Garder seulement la partie anglaise
-      const desc = descBrut.split(' / ')[0].trim();
-      const fmtMatch = desc.match(/([\d\.]+)\s*(ml|g|L|kg|oz|lb|lbs)/i);
-      facture.items.push({
-        description:  desc,
-        formatQte:    fmtMatch ? parseFloat(fmtMatch[1]) : 0,
-        formatUnite:  fmtMatch ? fmtMatch[2].toLowerCase() : 'unité',
-        prixUnitaire: prixUnit,
-        quantite:     qte
-      });
-      facture.tps += tpsItem;
-      facture.tvq += tvqItem;
+  // Items — ancre sur ASIN
+  for (let i = 0; i < lignes.length; i++) {
+    if (!/^ASIN:\s*[A-Z0-9]+$/i.test(lignes[i])) continue;
+
+    // Description — remonter jusqu'à une ligne connue
+    const descLignes = [];
+    let j = i - 1;
+    while (j >= 0) {
+      const l = lignes[j];
+      if (/^(Description|Quantity|Unit\s*price|Discount|Federal|Provincial|Item\s*subtotal|Sous-total|Quantit|\[GST|ASIN:|Shipping|Invoice|Order|Shipment|Billing|Delivery|Sold\s*by|Page\s*\d)/i.test(l)) break;
+      if (/^\$[\d\.]+$/.test(l) || /^\d+$/.test(l)) break;
+      descLignes.unshift(l);
+      j--;
     }
+    let desc = descLignes.join(' ').split(' / ')[0].trim();
+    if (!desc || desc.length < 3) continue;
+
+    // Après l'ASIN — qté puis $values dans l'ordre : prix, remise, TPS, TVQ, sous-total
+    let qte = 0;
+    const dollarValues = [];
+    for (let k = i + 1; k < Math.min(i + 15, lignes.length); k++) {
+      const l = lignes[k];
+      if (/^Shipping/i.test(l)) break;
+      if (!qte) { const mQ = l.match(/^(\d+)$/); if (mQ) { qte = parseInt(mQ[1]); continue; } }
+      const mP = l.match(/^\$([\d\.]+)$/);
+      if (mP) { dollarValues.push(parseFloat(mP[1])); }
+      if (dollarValues.length >= 5) break;
+    }
+
+    const prixUnit = dollarValues[0] || 0;
+    const tpsItem  = dollarValues[2] || 0;
+    const tvqItem  = dollarValues[3] || 0;
+    if (prixUnit <= 0) continue;
+
+    facture.tps += tpsItem;
+    facture.tvq += tvqItem;
+
+    const fmtMatch = desc.match(/([\d\.]+)\s*(ml|g|L|kg|oz|lb|lbs)/i);
+    facture.items.push({
+      description:  desc,
+      formatQte:    fmtMatch ? parseFloat(fmtMatch[1]) : 0,
+      formatUnite:  fmtMatch ? fmtMatch[2].toLowerCase() : 'unité',
+      prixUnitaire: prixUnit,
+      quantite:     qte || 1
+    });
   }
 
   facture.tps   = Math.round(facture.tps * 100) / 100;
