@@ -3255,7 +3255,6 @@ async function modalIfConfirmer() {
     if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
     listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
   }
-  const item = ifItems[idx];
   await appelAPIPost('saveMappingFournisseur', {
     fournisseur,
     categorie_fournisseur: listesDropdown.categoriesMap?.[cat] || cat,
