@@ -3246,11 +3246,12 @@ async function modalIfConfirmer() {
     nom = document.getElementById('modal-if-nouveau-nom')?.value.trim();
   }
   if (!nom) { afficherMsg('import-facture', 'Le nom UC est requis.', 'erreur'); return; }
+  const item = ifItems[idx];
   const ingExistant = listesDropdown.fullData.find(d => d.nom_UC === nom && d.cat_id === cat);
   let ing_id = ingExistant?.ing_id || '';
   if (!ingExistant) {
     ing_id = 'ING-' + Date.now();
-    const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: item.description, inci: '', source: ifFournisseurActif, statut: 'actif' });
+    const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: item?.description || nom, inci: '', source: ifFournisseurActif, statut: 'actif' });
     if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
     listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
   }
