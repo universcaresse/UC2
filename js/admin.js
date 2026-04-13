@@ -3055,13 +3055,6 @@ ifFournisseurActif = fournisseur;
           ${listesDropdown.types.map(t => `<option value="${t}" ${t === cat_UC ? 'selected' : ''}>${listesDropdown.categoriesMap?.[t] || t}</option>`).join('')}
           <option value="__nouvelle_cat__">+ Créer</option>
         </select>
-        <div id="if-new-cat-${idx}" class="cache">
-          <input type="text" class="form-ctrl" id="if-new-cat-input-${idx}" placeholder="Nouvelle catégorie">
-          <div class="form-actions">
-            <button class="bouton bouton-petit" onclick="ifConfirmerNouvelleCat(${idx})">✓</button>
-            <button class="bouton bouton-petit bouton-contour" onclick="ifAnnulerNouvelleCat(${idx})">✕</button>
-          </div>
-        </div>
       </td>
       <td>
         <select class="form-ctrl" id="if-nomuc-${idx}" onchange="ifOnChangeNom(${idx})">
@@ -3069,13 +3062,6 @@ ifFournisseurActif = fournisseur;
           ${ingsDeCat.map(d => `<option value="${d.nom_UC}" ${d.nom_UC === nom_UC ? 'selected' : ''}>${d.nom_UC}</option>`).join('')}
           <option value="__nouveau__">+ Créer</option>
         </select>
-        <div id="if-new-nom-${idx}" class="cache">
-          <input type="text" class="form-ctrl" id="if-new-nom-input-${idx}" placeholder="Nouveau nom UC">
-          <div class="form-actions">
-            <button class="bouton bouton-petit" onclick="ifConfirmerNouveauNom(${idx})">✓</button>
-            <button class="bouton bouton-petit bouton-contour" onclick="ifAnnulerNouveauNom(${idx})">✕</button>
-          </div>
-        </div>
       </td>`;
    
    
@@ -3103,8 +3089,7 @@ function ifOnChangeCat(idx) {
   if (!select) return;
   if (select.value === '__nouvelle_cat__') {
     select.value = '';
-    document.getElementById(`if-new-cat-${idx}`).classList.remove('cache');
-    document.getElementById(`if-new-cat-input-${idx}`).focus();
+    ifOuvrirModalNouvelIngredient(idx, ifFournisseurActif);
     return;
   }
   ifFiltrerNoms(idx);
@@ -3115,8 +3100,7 @@ function ifOnChangeNom(idx) {
   if (!select) return;
   if (select.value === '__nouveau__') {
     select.value = '';
-    document.getElementById(`if-new-nom-${idx}`).classList.remove('cache');
-    document.getElementById(`if-new-nom-input-${idx}`).focus();
+    ifOuvrirModalNouvelIngredient(idx, ifFournisseurActif);
   }
 }
 
@@ -3248,19 +3232,20 @@ async function modalIfConfirmer() {
   const fournisseur = modal?.dataset.fournisseur;
   let cat = document.getElementById('modal-if-cat')?.value;
   const nouvelleCat = document.getElementById('modal-if-nouvelle-cat')?.value.trim();
-  if (cat === '__nouvelle_cat__' && nouvelleCat) {
+  if (cat === '__nouvelle_cat__') {
+    if (!nouvelleCat) { afficherMsg('import-facture', 'Le nom de la nouvelle catégorie est requis.', 'erreur'); return; }
     const resCat = await appelAPIPost('saveCategorieUC', { nom: nouvelleCat });
     if (!resCat || !resCat.success) { afficherMsg('import-facture', 'Erreur création catégorie.', 'erreur'); return; }
     cat = resCat.cat_id || nouvelleCat;
     listesDropdown.categoriesMap[cat] = nouvelleCat;
     listesDropdown.types.push(cat);
   }
+  if (!cat) { afficherMsg('import-facture', 'La catégorie est requise.', 'erreur'); return; }
   let nom = document.getElementById('modal-if-nomuc')?.value;
-  if (nom === '__nouveau__') {
+  if (nom === '__nouveau__' || !nom) {
     nom = document.getElementById('modal-if-nouveau-nom')?.value.trim();
-    if (!nom) { afficherMsg('import-facture', 'Nouveau nom UC requis.', 'erreur'); return; }
   }
-  if (!cat || cat === '__nouvelle_cat__' || !nom) { afficherMsg('import-facture', 'Catégorie et nom UC requis.', 'erreur'); return; }
+  if (!nom) { afficherMsg('import-facture', 'Le nom UC est requis.', 'erreur'); return; }
   const ingExistant = listesDropdown.fullData.find(d => d.nom_UC === nom && d.cat_id === cat);
   let ing_id = ingExistant?.ing_id || '';
   if (!ingExistant) {
