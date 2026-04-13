@@ -3142,7 +3142,7 @@ async function ifConfirmerNouveauNom(idx) {
   if (!cat) { afficherMsg('import-facture', 'Choisir une catégorie d\'abord.', 'erreur'); return; }
   const ing_id = 'ING-' + Date.now();
   const item = ifItems[idx];
-  const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: item?.description || nom, inci: '', source: ifFournisseurActif, statut: true });
+ const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: item?.description || nom, inci: '', source: ifFournisseurActif, statut: 'actif' });
   if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur.', 'erreur'); return; }
   listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
   if (ifFournisseurActif && item) {
@@ -3249,7 +3249,7 @@ async function modalIfConfirmer() {
   let ing_id = ingExistant?.ing_id || '';
   if (!ingExistant) {
     ing_id = 'ING-' + Date.now();
-    const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: item.description, inci: '', source: ifFournisseurActif, statut: true });
+    const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: item.description, inci: '', source: ifFournisseurActif, statut: 'actif' });
     if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
     listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
   }
