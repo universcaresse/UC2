@@ -80,7 +80,6 @@
 ══════════════════════════════════════ */
 .p-chantal { background: var(--beige); flex-direction: row; }
 
-/* --- Votre code existant --- */
 .chantal-photo { 
   width: 400px; 
   flex-shrink: 0; 
@@ -88,16 +87,14 @@
   overflow: hidden; 
 }
 
-/* --- AJOUTEZ CE BLOC --- */
 .chantal-photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;       /* Remplir l'espace sans déformer */
-  object-position: center; /* Centrer l'image (affiche le milieu) */
+  object-fit: cover;
+  object-position: center;
 }
 
-/* --- Votre code existant --- */
-.chantal-photo::after { 
+.chantal-photo::after {
   content: ''; 
   position: absolute; 
   inset: 0; 
