@@ -3418,7 +3418,7 @@ async function confirmerImportFacture() {
 
   await appelAPIPost('finaliserAchat', { ach_id, sous_total: sousTotal, tps, tvq, livraison });
 
-    afficherMsg('import-facture', `✅ Facture ${ach_id} importée avec succès.`);
+    afficherMsg('import-facture', `✅ Facture ${numero} importée avec succès.`);
   document.getElementById('if-apercu').classList.add('cache');
   document.getElementById('if-bloc-upload').classList.remove('cache');
   const inputFichier = document.getElementById('if-fichier');
