@@ -1910,7 +1910,9 @@ function supprimerFormatRecette(index) {
 function rafraichirListeFormatsRecette() {
   const liste = document.getElementById('liste-formats-recette');
   if (!liste) return;
-  if (formatsRecette.length === 0) { liste.innerHTML = ''; return; }
+  const labels = document.getElementById('labels-formats-recette');
+  if (formatsRecette.length === 0) { liste.innerHTML = ''; if (labels) labels.classList.add('cache'); return; }
+  if (labels) labels.classList.remove('cache');
   liste.innerHTML = formatsRecette.map((f, i) => `
     <div class="ingredient-rangee">
       <input type="text" inputmode="decimal" class="form-ctrl" value="${f.poids||''}" placeholder="Poids" onchange="formatsRecette[${i}].poids=this.value">
