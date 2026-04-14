@@ -3044,7 +3044,7 @@ async function saisirDepuisCatalogue() {
   if (!fournisseur) { afficherMsg('import-facture', 'Choisis un fournisseur.', 'erreur'); return; }
   afficherMsg('import-facture', 'Chargement du catalogue…');
   const [res, resAch] = await Promise.all([
-    appelAPI('getScrapingFournisseur&source=' + fournisseur),
+    appelAPI('getScrapingFournisseur', { source: fournisseur }),
     appelAPI('getAchatsEntete')
   ]);
   if (!res || !res.success || !res.items.length) { afficherMsg('import-facture', 'Aucun item trouvé pour ce fournisseur.', 'erreur'); return; }
