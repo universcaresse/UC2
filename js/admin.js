@@ -3083,7 +3083,7 @@ ifFournisseurActif = fournisseur;
       <td>
         <select class="form-ctrl" id="if-type-${idx}" onchange="ifOnChangeCat(${idx})">
           <option value="">— Catégorie —</option>
-          ${listesDropdown.types.map(t => `<option value="${t}" ${t === cat_UC ? 'selected' : ''}>${listesDropdown.categoriesMap?.[t] || t}</option>`).join('')}
+          ${[...listesDropdown.types].sort((a,b) => (listesDropdown.categoriesMap?.[a]||a).localeCompare(listesDropdown.categoriesMap?.[b]||b, 'fr')).map(t => `<option value="${t}" ${t === cat_UC ? 'selected' : ''}>${listesDropdown.categoriesMap?.[t] || t}</option>`).join('')}
           <option value="__nouvelle_cat__">+ Créer</option>
         </select>
       </td>
@@ -3211,7 +3211,7 @@ function ifOuvrirModalNouvelIngredient(idx, fournisseur) {
   const selCat = document.getElementById('modal-if-cat');
   const selNom = document.getElementById('modal-if-nomuc');
   selCat.innerHTML = '<option value="">— Catégorie —</option>' +
-    listesDropdown.types.map(t => `<option value="${t}">${listesDropdown.categoriesMap?.[t] || t}</option>`).join('') +
+    [...listesDropdown.types].sort((a,b) => (listesDropdown.categoriesMap?.[a]||a).localeCompare(listesDropdown.categoriesMap?.[b]||b, 'fr')).map(t => `<option value="${t}">${listesDropdown.categoriesMap?.[t] || t}</option>`).join('') +
     '<option value="__nouvelle_cat__">+ Créer une nouvelle catégorie</option>';
   document.getElementById('modal-if-nouvelle-cat-groupe').classList.add('cache');
   document.getElementById('modal-if-nouvelle-cat').value = '';
@@ -3270,6 +3270,14 @@ async function modalIfConfirmer() {
     cat = resCat.cat_id || nouvelleCat;
     listesDropdown.categoriesMap[cat] = nouvelleCat;
     listesDropdown.types.push(cat);
+    document.querySelectorAll('[id^="if-type-"]').forEach(sel => {
+      const creerOpt = [...sel.options].find(o => o.value === '__nouvelle_cat__');
+      const opt = document.createElement('option');
+      opt.value = cat; opt.textContent = nouvelleCat;
+      if (creerOpt) sel.insertBefore(opt, creerOpt);
+      else sel.appendChild(opt);
+    });
+    document.getElementById(`if-type-${idx}`).value = cat;
   }
   if (!cat) { afficherMsg('import-facture', 'La catégorie est requise.', 'erreur'); return; }
   let nom = document.getElementById('modal-if-nomuc')?.value;
