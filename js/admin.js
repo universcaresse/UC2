@@ -3076,6 +3076,15 @@ async function saisirDepuisCatalogue() {
   document.getElementById('if-bloc-upload').classList.add('cache');
   afficherMsg('import-facture', '');
 }
+function ifRecalculerSousTotal() {
+  const sousTotal = ifItems.reduce((sum, item) => sum + ((parseFloat(item.prixUnitaire)||0) * (parseFloat(item.quantite)||1)), 0);
+  document.getElementById('if-soustotal').value = sousTotal.toFixed(2);
+  const tps = parseFloat(document.getElementById('if-tps').value) || 0;
+  const tvq = parseFloat(document.getElementById('if-tvq').value) || 0;
+  const liv = parseFloat(document.getElementById('if-livraison').value) || 0;
+  document.getElementById('if-total').value = (sousTotal + tps + tvq + liv).toFixed(2);
+}
+
 
 function ifOnChangeCatCatalogue() {
   const cat = document.getElementById('if-cat-catalogue').value;
@@ -3180,7 +3189,7 @@ ifFournisseurActif = fournisseur;
         </select>
       </td>
       <td><input type="text" inputmode="decimal" class="form-ctrl" value="${item.quantite}" style="width:60px" onchange="ifItems[${idx}].quantite=parseFloat(this.value)||1"></td>
-      <td><input type="text" inputmode="decimal" class="form-ctrl" value="${item.prixUnitaire||''}" placeholder="0.00" style="width:80px" onchange="ifItems[${idx}].prixUnitaire=parseFloat(this.value)||0"></td>
+      <td><input type="text" inputmode="decimal" class="form-ctrl" value="${item.prixUnitaire||''}" placeholder="0.00" style="width:80px" onchange="ifItems[${idx}].prixUnitaire=parseFloat(this.value)||0; ifRecalculerSousTotal()"></td>
       <td>${total} $</td>
       <td>
         <select class="form-ctrl" id="if-type-${idx}" onchange="ifOnChangeCat(${idx})">
