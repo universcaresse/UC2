@@ -1302,6 +1302,11 @@ async function ouvrirFicheProduit(pro_id) {
     <div class="fiche-section-titre">Notes</div>
     <div class="fiche-texte">${pro.notes || '—'}</div>
     <div class="fiche-section-titre">Ingrédients</div>
+    <div class="fiche-ingredient fiche-ingredient-labels">
+      <span class="fiche-ing-nom">Nom</span>
+      <span class="fiche-ing-inci">INCI</span>
+      <span class="fiche-ing-qte">Qté</span>
+    </div>
     <div class="fiche-ingredients">${ingsHtml}</div>
     <div class="fiche-section-titre">Formats disponibles</div>
     <div class="fiche-ingredients">${formatsHtml}</div>
