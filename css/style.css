@@ -699,6 +699,8 @@ footer > * { position: relative; z-index: 1; }
 
 .carte-infos.carte-infos-clair .carte-prix { color: var(--blanc); }
 .carte-infos.carte-infos-clair .carte-bas { border-top-color: var(--blanc-pur-30); }
+.carte-infos.carte-infos-clair .carte-format-prix { color: var(--blanc); }
+.carte-infos.carte-infos-clair .carte-format-poids { color: var(--blanc); }
 
 .carte-infos.carte-infos-fonce .carte-collection-badge { color: rgba(0,0,0,0.55); }
 .carte-infos.carte-infos-fonce .carte-nom { color: rgba(0,0,0,0.85); }
