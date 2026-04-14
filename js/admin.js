@@ -1958,7 +1958,7 @@ async function initialiserNouvelleFacture() {
   factureActive   = null;
   produitsFacture = [];
   const dateField = document.getElementById('facture-date');
-  if (dateField && !dateField.value) dateField.value = new Date().toISOString().split('T')[0];
+  if (dateField) dateField.value = '';
   await chargerListesFournisseurs();
   const resFormats = await appelAPI('getFormatsIngredients');
   listesDropdown.formats = (resFormats && resFormats.items) ? resFormats.items : [];
