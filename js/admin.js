@@ -3393,7 +3393,7 @@ async function confirmerImportFacture() {
     if (fmtUnite === 'kg')  grammes = fmtQte * 1000;
     if (fmtUnite === 'ml')  grammes = fmtQte;
     const prixParG = grammes > 0 ? (item.prixUnitaire / grammes) : 0;
-    lignes.push({ idx, item, nom_UC, cat_UC, ingObj, prixParG });
+    lignes.push({ idx, item, nom_UC, cat_UC, ingObj, prixParG, fmtQte, fmtUnite });
   }
 
   // Mappings et lignes en parallèle
