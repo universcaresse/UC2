@@ -3042,20 +3042,30 @@ async function lirePDF(fichier) {
 async function saisirDepuisCatalogue() {
   const fournisseur = document.getElementById('if-fournisseur').value;
   if (!fournisseur) { afficherMsg('import-facture', 'Choisis un fournisseur.', 'erreur'); return; }
-  if (!ifMapping.length) await ifChargerMapping();
-  const items = ifMapping.filter(m => m.fournisseur === fournisseur);
-  if (!items.length) { afficherMsg('import-facture', 'Aucun item connu pour ce fournisseur.', 'erreur'); return; }
-  ifItems = items.map(m => ({
-    description:   m.nom_fournisseur,
-    categorie:     m.categorie_fournisseur,
-    formatQte:     '',
-    formatUnite:   '',
-    prixUnitaire:  0,
-    quantite:      1,
-    total:         0
+  afficherMsg('import-facture', 'Chargement du catalogue…');
+  const [res, resAch] = await Promise.all([
+    appelAPI('getScrapingFournisseur&source=' + fournisseur),
+    appelAPI('getAchatsEntete')
+  ]);
+  if (!res || !res.success || !res.items.length) { afficherMsg('import-facture', 'Aucun item trouvé pour ce fournisseur.', 'erreur'); return; }
+  const factures = (resAch && resAch.success) ? resAch.items : [];
+  const maxMan = factures.reduce((max, f) => {
+    const m = (f.numero_facture || '').match(/^MAN-(\d+)$/);
+    return m ? Math.max(max, parseInt(m[1])) : max;
+  }, 0);
+  const numeroAuto = 'MAN-' + String(maxMan + 1).padStart(3, '0');
+  const today = new Date().toISOString().split('T')[0];
+  ifItems = res.items.map(item => ({
+    description:  item.nom,
+    categorie:    item.categorie,
+    formatQte:    '',
+    formatUnite:  '',
+    prixUnitaire: 0,
+    quantite:     1,
+    total:        0
   }));
-  document.getElementById('if-numero').value    = '';
-  document.getElementById('if-date').value      = '';
+  document.getElementById('if-numero').value    = numeroAuto;
+  document.getElementById('if-date').value      = today;
   document.getElementById('if-tps').value       = '';
   document.getElementById('if-tvq').value       = '';
   document.getElementById('if-livraison').value = '';
