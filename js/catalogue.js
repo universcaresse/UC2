@@ -59,12 +59,12 @@ function construirePagePleine(collection, produits, pageNo) {
   const cartes = produits.map(function(p) { return construireCarte(p, false); }).join('');
 
   return '<div class="page-label">Page ' + pageNo + ' — ' + collection.nom.toUpperCase() + '</div>'
-    + '<div class="page col-page" style="background:' + couleur + '18;">'
+    + '<div class="page col-page" style="--col-hex:' + couleur + ';">'
     + '<div class="col-hero">'
     + (collection.photo_url ? '<div class="col-hero-photo" style="background-image:url(\'' + collection.photo_url + '\');"></div>' : '')
     + '<div class="fondu-bas"></div>'
     + '<div class="col-hero-contenu">'
-    + '<div class="col-hero-trait" style="background:' + couleur + ';"></div>'
+    + '<div class="col-hero-trait" style="--col-hex:' + couleur + ';"></div>'
     + '<div class="col-hero-nom">' + collection.nom + '</div>'
     + '<div class="col-hero-slogan">' + (collection.slogan || '') + '</div>'
     + '</div>'
@@ -73,7 +73,7 @@ function construirePagePleine(collection, produits, pageNo) {
     + '<div class="cat-grille ' + cols + '">' + cartes + '</div>'
     + '</div>'
     + '<div class="cat-pied">'
-    + '<span class="logo-tagline" style="font-size:17px;">Univers Caresse</span>'
+    + '<span class="logo-tagline" >Univers Caresse</span>'
     + '<span>universcaresse.ca</span>'
     + '<span>' + pageNo + '</span>'
     + '</div>'
@@ -110,7 +110,7 @@ function construirePagePartagee(groupes, pageNo) {
     + '<div class="page p-partage">'
     + sections
     + '<div class="cat-pied">'
-    + '<span class="logo-tagline" style="font-size:17px;">Univers Caresse</span>'
+    + '<span class="logo-tagline" >Univers Caresse</span>'
     + '<span>universcaresse.ca</span>'
     + '<span>' + pageNo + '</span>'
     + '</div>'
@@ -166,7 +166,7 @@ function construireCarteSaponica(produit, index) {
   return '<div class="sap-carte">'
     + '<div class="sap-photo sap-photo-70"><img src="' + photo + '" alt="' + produit.nom + '"></div>'
     + '<div class="sap-bas-blanc">'
-    + '<div class="sap-trait-hex" style="background:' + couleur + ';"></div>'
+    + '<div class="sap-trait-hex" style="--col-hex:' + couleur + ';"></div>'
     + '<div class="sap-carte-nom" style="color:var(--gris-fonce);">' + produit.nom + '</div>'
     + (desc ? '<div class="sap-carte-desc" style="color:var(--gris);">' + desc + '</div>' : '')
     + (prixPoids ? '<div class="sap-carte-prix sap-prix-fonce">' + prixPoids + '</div>' : '')
@@ -198,13 +198,13 @@ function construireDoubleSaponica(collection, produits, pageNo) {
     + '</div>';
 
   const pageDroite = '<div class="page-label">Page ' + (pageNo + 1) + ' — SAPONICA (suite)</div>'
-    + '<div class="page sap-page-droite ' + ((pageNo + 1) % 2 === 0 ? 'page-g' : 'page-d') + '" style="background:' + couleur + '18;">'
+    + '<div class="page sap-page-droite ' + ((pageNo + 1) % 2 === 0 ? 'page-g' : 'page-d') + '" style="--col-hex:' + couleur + ';">'
     + '<div class="page-int">'
-    + '<div class="sap-point-ancrage" style="background:' + couleur + ';"></div>'
+    + '<div class="sap-point-ancrage" style="--col-hex:' + couleur + ';"></div>'
     + '<div class="sap-grille sap-grille-droite">' + cartesD + '</div>'
     + '</div>'
     + '<div class="cat-pied">'
-    + '<span class="logo-tagline" style="font-size:17px;">Univers Caresse</span>'
+    + '<span class="logo-tagline">Univers Caresse</span>'
     + '<span>universcaresse.ca</span>'
     + '<span>' + (pageNo + 1) + '</span>'
     + '</div>'
@@ -236,7 +236,7 @@ function construirePagePetitNuage(collection, produits, pageNo) {
     + '</div>'
     + '<div class="pn-grille">' + cartes + '</div>'
     + '<div class="cat-pied">'
-    + '<span class="logo-tagline" style="font-size:17px;">Univers Caresse</span>'
+    + '<span class="logo-tagline" >Univers Caresse</span>'
     + '<span>universcaresse.ca</span>'
     + '<span>' + pageNo + '</span>'
     + '</div>'
@@ -264,7 +264,7 @@ function construirePageCaprin(collection, produits, pageNo) {
     + '</div>'
     + '<div class="cap-grille">' + cartes + '</div>'
     + '<div class="cat-pied">'
-    + '<span class="logo-tagline" style="font-size:17px;">Univers Caresse</span>'
+    + '<span class="logo-tagline" >Univers Caresse</span>'
     + '<span>universcaresse.ca</span>'
     + '<span>' + pageNo + '</span>'
     + '</div>'

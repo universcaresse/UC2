@@ -35,6 +35,7 @@
   border-top: 1px solid var(--beige); flex-shrink: 0;
   font-size: 9px; color: var(--gris); letter-spacing: 0.06em;
 }
+.cat-pied .logo-tagline { font-size: 13px; }
 
 /* ── UTILITAIRES PARTAGÉS ── */
 .photo-pleine { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -140,7 +141,7 @@
 .col-hero { height: 220px; position: relative; flex-shrink: 0; overflow: hidden; }
 .col-hero-photo { position: absolute; inset: 0; background-size: cover; background-position: center; }
 .col-hero-contenu { position: absolute; bottom: 0; left: 0; right: 0; padding: 0 48px 24px; z-index: 2; }
-.col-hero-trait { width: 28px; height: 2px; margin-bottom: 10px; }
+.col-hero-trait { width: 28px; height: 2px; margin-bottom: 10px; background: var(--col-hex); }
 .col-hero-nom { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 400; color: var(--blanc); line-height: 1; margin-bottom: 5px; }
 .col-hero-slogan { font-size: 10px; font-weight: 300; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blanc-80); }
 
@@ -190,9 +191,9 @@
 .sap-description p { font-size: 10px; line-height: 1.8; color: var(--gris); font-weight: 300; margin-bottom: 8px; }
 .sap-grille { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex: 1; }
 
-.sap-page-droite { display: flex; flex-direction: column; position: relative; }
+.sap-page-droite { display: flex; flex-direction: column; position: relative; background: color-mix(in srgb, var(--col-hex) 9%, white); }
 .sap-grille-droite { padding: 32px 32px 0; flex: 1; }
-.sap-point-ancrage { position: absolute; top: 24px; right: 32px; width: 14px; height: 14px; }
+.sap-point-ancrage { position: absolute; top: 24px; right: 32px; width: 14px; height: 14px; background: var(--col-hex); }
 
 /* ── Traitements SAPONICA ── */
 .sap-carte { display: flex; flex-direction: column; overflow: hidden; position: relative; }
@@ -212,7 +213,7 @@
 .sap-bande-v-texte { width: 100%; }
 
 .sap-bas-blanc { flex-shrink: 0; height: 30%; background: var(--blanc); padding: 6px 10px; display: flex; flex-direction: column; justify-content: center; }
-.sap-trait-hex { width: 16px; height: 2px; margin-bottom: 5px; }
+.sap-trait-hex { width: 16px; height: 2px; margin-bottom: 5px; background: var(--col-hex); }
 .sap-photo-bas { position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 10px; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%); }
 
 .sap-carte-nom { font-family: 'Playfair Display', serif; font-size: 9px; font-weight: 600; color: var(--blanc); line-height: 1.2; margin-bottom: 2px; }
