@@ -380,6 +380,9 @@ select.form-control, select.form-ctrl { cursor: pointer; }
 .form-grille { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
 
 .ingredient-rangee { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.ingredient-rangee-labels { margin-bottom: 2px; }
+.ingredient-rangee-labels span { flex: 1; font-size: 0.75rem; text-transform: uppercase; color: var(--texte-secondaire); }
+.ingredient-rangee-labels span:last-child { width: 38px; flex: none; }
 .ingredient-rangee .ing-type { flex: 1; }
 .ingredient-rangee .ing-nom { flex: 2; }
 .ingredient-rangee .ing-inci { flex: 2; }
