@@ -1837,7 +1837,7 @@ function rafraichirListeIngredientsRecette() {
         <option value="">— Ingrédient —</option>
         ${ingsDeType.map(d => `<option value="${d.nom_UC}" ${ing.nom===d.nom_UC?'selected':''}>${d.nom_UC}</option>`).join('')}
       </select>
-      <input type="text" class="form-ctrl ing-inci" readonly placeholder="INCI" value="${inciVal}">
+      <input type="text" class="form-ctrl ing-inci${inciVal ? '' : ' ing-inci-manquant'}" readonly placeholder="INCI manquant" value="${inciVal}">
       <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${ing.quantite||''}" placeholder="g" onchange="ingredientsRecette[${i}].quantite=parseFloat(this.value)||0">
       <button class="bouton bouton-petit bouton-rouge" onclick="supprimerIngredientRecette(${i})">✕</button>
     </div>`;
