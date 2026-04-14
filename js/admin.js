@@ -1972,9 +1972,16 @@ async function chargerListesFournisseurs() {
     appelAPI('getIngredientsInci'),
     appelAPI('getAchatsEntete')
   ]);
-  if (resInci && resInci.success) {
+ if (resInci && resInci.success) {
     listesDropdown.fullData = resInci.items || [];
     listesDropdown.types    = [...new Set(resInci.items.map(i => i.cat_id))].filter(Boolean).sort();
+  }
+  if (!listesDropdown.categoriesMap || Object.keys(listesDropdown.categoriesMap).length === 0) {
+    const resCats = await appelAPI('getCategoriesUC');
+    if (resCats && resCats.success) {
+      listesDropdown.categoriesMap = {};
+      (resCats.items || []).forEach(c => { listesDropdown.categoriesMap[c.cat_id] = c.nom; });
+    }
   }
   if (resFour && resFour.success) {
     listesDropdown.fournisseurs = (resFour.items || []).map(f => f.nom);
@@ -3031,6 +3038,34 @@ async function lirePDF(fichier) {
   });
 }
 
+
+async function saisirDepuisCatalogue() {
+  const fournisseur = document.getElementById('if-fournisseur').value;
+  if (!fournisseur) { afficherMsg('import-facture', 'Choisis un fournisseur.', 'erreur'); return; }
+  if (!ifMapping.length) await ifChargerMapping();
+  const items = ifMapping.filter(m => m.fournisseur === fournisseur);
+  if (!items.length) { afficherMsg('import-facture', 'Aucun item connu pour ce fournisseur.', 'erreur'); return; }
+  ifItems = items.map(m => ({
+    description:   m.nom_fournisseur,
+    categorie:     m.categorie_fournisseur,
+    formatQte:     '',
+    formatUnite:   '',
+    prixUnitaire:  0,
+    quantite:      1,
+    total:         0
+  }));
+  document.getElementById('if-numero').value    = '';
+  document.getElementById('if-date').value      = '';
+  document.getElementById('if-tps').value       = '';
+  document.getElementById('if-tvq').value       = '';
+  document.getElementById('if-livraison').value = '';
+  document.getElementById('if-soustotal').value = '';
+  document.getElementById('if-total').value     = '';
+  afficherApercuItems(fournisseur);
+  document.getElementById('if-apercu').classList.remove('cache');
+  document.getElementById('if-bloc-upload').classList.add('cache');
+  afficherMsg('import-facture', '');
+}
 
 function normaliserPourMapping(s) {
   return (s || '').toLowerCase()
