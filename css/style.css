@@ -867,6 +867,7 @@ tr.cliquable { cursor: pointer; }
 .fiche-champ { display: flex; flex-direction: column; gap: 4px; }
 .fiche-label { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gris); }
 .fiche-label-manquant { color: var(--danger); font-weight: 500; }
+.ing-inci-manquant { background: rgba(196,69,54,0.08) !important; border-color: var(--danger) !important; color: var(--danger) !important; }
 .fiche-label-manquant::before { content: '⚠️ '; }
 .fiche-valeur { font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--gris-fonce); }
 .fiche-section-titre { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--gris); margin: 24px 0 8px; border-bottom: 1px solid var(--beige); padding-bottom: 6px; }
