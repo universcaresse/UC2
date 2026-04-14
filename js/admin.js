@@ -3169,9 +3169,18 @@ ifFournisseurActif = fournisseur;
    
    tr.innerHTML = `
       <td>${item.description}</td>
-      <td>${item.formatQte} ${item.formatUnite}</td>
-      <td>${item.quantite}</td>
-      <td>${item.prixUnitaire.toFixed(2)} $</td>
+      <td>
+        <input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte}" placeholder="Qté" style="width:60px" onchange="ifItems[${idx}].formatQte=this.value">
+        <select class="form-ctrl" id="if-fmt-unite-${idx}" onchange="ifItems[${idx}].formatUnite=this.value" style="width:70px">
+          <option value="g" ${item.formatUnite==='g'?'selected':''}>g</option>
+          <option value="ml" ${item.formatUnite==='ml'?'selected':''}>ml</option>
+          <option value="kg" ${item.formatUnite==='kg'?'selected':''}>kg</option>
+          <option value="L" ${item.formatUnite==='L'?'selected':''}>L</option>
+          <option value="lbs" ${item.formatUnite==='lbs'?'selected':''}>lbs</option>
+        </select>
+      </td>
+      <td><input type="text" inputmode="decimal" class="form-ctrl" value="${item.quantite}" style="width:60px" onchange="ifItems[${idx}].quantite=parseFloat(this.value)||1"></td>
+      <td><input type="text" inputmode="decimal" class="form-ctrl" value="${item.prixUnitaire||''}" placeholder="0.00" style="width:80px" onchange="ifItems[${idx}].prixUnitaire=parseFloat(this.value)||0"></td>
       <td>${total} $</td>
       <td>
         <select class="form-ctrl" id="if-type-${idx}" onchange="ifOnChangeCat(${idx})">
