@@ -108,7 +108,7 @@
 }
 
 
-.chantal-texte { flex: 1; padding: 80px 56px; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
+.chantal-texte { flex: 1; padding: 80px 56px 0; display: flex; flex-direction: column; gap: 20px; }
 
 .chantal-titre { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 400; color: var(--gris-fonce); line-height: 1.2; }
 .chantal-titre em { font-style: italic; color: var(--primary); }
