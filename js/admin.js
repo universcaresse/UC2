@@ -3397,7 +3397,7 @@ async function confirmerImportFacture() {
   }
 
   // Mappings et lignes en parallèle
-  const promesses = lignes.map(({ idx, item, nom_UC, cat_UC, ingObj, prixParG }) => {
+  const promesses = lignes.map(({ idx, item, nom_UC, cat_UC, ingObj, prixParG, fmtQte, fmtUnite }) => {
     const appels = [];
     if (!trouverMappingItem(item.description, fournisseur)) {
       ifMapping.push({ fournisseur, categorie_fournisseur: cat_UC, nom_fournisseur: item.description, categorie_UC: cat_UC, nom_UC, ing_id: ingObj?.ing_id || '' });
