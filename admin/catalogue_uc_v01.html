@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalogue Univers Caresse 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:ital,wght@0,200;0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+/* ── VARS ── */
+:root {
+  --primary: #5a8a3a;
+  --accent:  #d4a445;
+  --blanc:   #ffffff;
+  --beige:   #f2e4cf;
+  --gris:    #8b8680;
+  --gdn:     #3d3b39;
+  --hx:      #8A7A4A;
+  --tc:      #ffffff;
+  --hx-over: rgba(138,122,74,0.88);
+}
+.c-COL-001 { --hx: #8A7A4A; --tc: #ffffff; }
+.p-PRO-014 { --hx: #3EAF85; --tc: #ffffff; --hx-over: rgba(62,175,133,0.88); }
+.p-PRO-041 { --hx: #FFB400; --tc: #3d3b39; --hx-over: rgba(255,180,0,0.88); }
+.p-PRO-042 { --hx: #FF6735; --tc: #ffffff; --hx-over: rgba(255,103,53,0.88); }
+.p-PRO-053 { --hx: #65791A; --tc: #ffffff; --hx-over: rgba(101,121,26,0.88); }
+.p-PRO-073 { --hx: #FD791A; --tc: #ffffff; --hx-over: rgba(253,121,26,0.88); }
+.p-PRO-078 { --hx: #91D129; --tc: #3d3b39; --hx-over: rgba(145,209,41,0.88); }
+.p-PRO-004 { --hx: #363636; --tc: #ffffff; --hx-over: rgba(54,54,54,0.88); }
+.p-PRO-012 { --hx: #7F6811; --tc: #ffffff; --hx-over: rgba(127,104,17,0.88); }
+.p-PRO-031 { --hx: #6B5229; --tc: #ffffff; --hx-over: rgba(107,82,41,0.88); }
+.p-PRO-032 { --hx: #AF99A4; --tc: #ffffff; --hx-over: rgba(175,153,164,0.88); }
+.p-PRO-033 { --hx: #E76877; --tc: #ffffff; --hx-over: rgba(231,104,119,0.88); }
+.p-PRO-040 { --hx: #32EDFF; --tc: #3d3b39; --hx-over: rgba(50,237,255,0.88); }
+.p-PRO-047 { --hx: #A4894A; --tc: #ffffff; --hx-over: rgba(164,137,74,0.88); }
+.p-PRO-048 { --hx: #FC6B33; --tc: #ffffff; --hx-over: rgba(252,107,51,0.88); }
+.p-PRO-054 { --hx: #9E3E3E; --tc: #ffffff; --hx-over: rgba(158,62,62,0.88); }
+.p-PRO-061 { --hx: #7F68CA; --tc: #ffffff; --hx-over: rgba(127,104,202,0.88); }
+.c-COL-002 { --hx: #E8D8E0; --tc: #3d3b39; }
+.p-PRO-066 { --hx: #B7DCC4; --tc: #3d3b39; --hx-over: rgba(183,220,196,0.88); }
+.p-PRO-067 { --hx: #5A4657; --tc: #ffffff; --hx-over: rgba(90,70,87,0.88); }
+.p-PRO-068 { --hx: #F8E7A1; --tc: #3d3b39; --hx-over: rgba(248,231,161,0.88); }
+.p-PRO-069 { --hx: #F7DDE6; --tc: #3d3b39; --hx-over: rgba(247,221,230,0.88); }
+.p-PRO-065 { --hx: #B64679; --tc: #ffffff; --hx-over: rgba(182,70,121,0.88); }
+.c-COL-003 { --hx: #957A6A; --tc: #ffffff; }
+.p-PRO-028 { --hx: #A2414D; --tc: #ffffff; --hx-over: rgba(162,65,77,0.88); }
+.p-PRO-029 { --hx: #BF0E24; --tc: #ffffff; --hx-over: rgba(191,14,36,0.88); }
+.p-PRO-043 { --hx: #476B33; --tc: #ffffff; --hx-over: rgba(71,107,51,0.88); }
+.p-PRO-049 { --hx: #BF705E; --tc: #ffffff; --hx-over: rgba(191,112,94,0.88); }
+.p-PRO-062 { --hx: #C67D26; --tc: #ffffff; --hx-over: rgba(198,125,38,0.88); }
+.p-PRO-070 { --hx: #51EB4E; --tc: #3d3b39; --hx-over: rgba(81,235,78,0.88); }
+.c-COL-004 { --hx: #C4956A; --tc: #ffffff; }
+.p-PRO-044 { --hx: #E7B539; --tc: #3d3b39; --hx-over: rgba(231,181,57,0.88); }
+.p-PRO-064 { --hx: #519A9C; --tc: #ffffff; --hx-over: rgba(81,154,156,0.88); }
+.p-PRO-001 { --hx: #5A1C37; --tc: #ffffff; --hx-over: rgba(90,28,55,0.88); }
+.p-PRO-002 { --hx: #9C1E45; --tc: #ffffff; --hx-over: rgba(156,30,69,0.88); }
+.p-PRO-003 { --hx: #519A9C; --tc: #ffffff; --hx-over: rgba(81,154,156,0.88); }
+.p-PRO-050 { --hx: #B60F31; --tc: #ffffff; --hx-over: rgba(182,15,49,0.88); }
+.p-PRO-055 { --hx: #908ED3; --tc: #ffffff; --hx-over: rgba(144,142,211,0.88); }
+.p-PRO-057 { --hx: #90FAD3; --tc: #3d3b39; --hx-over: rgba(144,250,211,0.88); }
+.p-PRO-075 { --hx: #F1FFBB; --tc: #3d3b39; --hx-over: rgba(241,255,187,0.88); }
+.p-PRO-076 { --hx: #8A7A4A; --tc: #ffffff; --hx-over: rgba(138,122,74,0.88); }
+.p-PRO-077 { --hx: #609C6A; --tc: #ffffff; --hx-over: rgba(96,156,106,0.88); }
+.p-PRO-006 { --hx: #3EAF85; --tc: #ffffff; --hx-over: rgba(62,175,133,0.88); }
+.p-PRO-007 { --hx: #AF99A4; --tc: #ffffff; --hx-over: rgba(175,153,164,0.88); }
+.p-PRO-008 { --hx: #E76877; --tc: #ffffff; --hx-over: rgba(231,104,119,0.88); }
+.p-PRO-009 { --hx: #7F68CA; --tc: #ffffff; --hx-over: rgba(127,104,202,0.88); }
+.p-PRO-010 { --hx: #FFF8DC; --tc: #3d3b39; --hx-over: rgba(255,248,220,0.88); }
+.p-PRO-011 { --hx: #8A7A4A; --tc: #ffffff; --hx-over: rgba(138,122,74,0.88); }
+.p-PRO-005 { --hx: #7F6811; --tc: #ffffff; --hx-over: rgba(127,104,17,0.88); }
+.p-PRO-021 { --hx: #9EBD7C; --tc: #3d3b39; --hx-over: rgba(158,189,124,0.88); }
+.c-COL-005 { --hx: #6A6A50; --tc: #ffffff; }
+.p-PRO-051 { --hx: #545454; --tc: #ffffff; --hx-over: rgba(84,84,84,0.88); }
+.p-PRO-052 { --hx: #425B00; --tc: #ffffff; --hx-over: rgba(66,91,0,0.88); }
+.p-PRO-058 { --hx: #3F2300; --tc: #ffffff; --hx-over: rgba(63,35,0,0.88); }
+.p-PRO-059 { --hx: #A2AF0E; --tc: #3d3b39; --hx-over: rgba(162,175,14,0.88); }
+.c-COL-006 { --hx: #5A9A7A; --tc: #ffffff; }
+.p-PRO-034 { --hx: #CF8E56; --tc: #ffffff; --hx-over: rgba(207,142,86,0.88); }
+.p-PRO-013 { --hx: #547956; --tc: #ffffff; --hx-over: rgba(84,121,86,0.88); }
+.p-PRO-030 { --hx: #366d1f; --tc: #ffffff; --hx-over: rgba(54,109,31,0.88); }
+.p-PRO-072 { --hx: #79b547; --tc: #3d3b39; --hx-over: rgba(121,181,71,0.88); }
+.p-PRO-015 { --hx: #6787FF; --tc: #ffffff; --hx-over: rgba(103,135,255,0.88); }
+.p-PRO-071 { --hx: #2387FF; --tc: #ffffff; --hx-over: rgba(35,135,255,0.88); }
+.c-COL-007 { --hx: #9AAF60; --tc: #3d3b39; }
+.p-PRO-039 { --hx: #FFF816; --tc: #3d3b39; --hx-over: rgba(255,248,22,0.88); }
+.p-PRO-016 { --hx: #8A7A4A; --tc: #ffffff; --hx-over: rgba(138,122,74,0.88); }
+.p-PRO-017 { --hx: #8A7A4A; --tc: #ffffff; --hx-over: rgba(138,122,74,0.88); }
+.p-PRO-018 { --hx: #8A7A4A; --tc: #ffffff; --hx-over: rgba(138,122,74,0.88); }
+.p-PRO-020 { --hx: #8A7A4A; --tc: #ffffff; --hx-over: rgba(138,122,74,0.88); }
+.p-PRO-019 { --hx: #ce8fe7; --tc: #3d3b39; --hx-over: rgba(206,143,231,0.88); }
+.p-PRO-038 { --hx: #74df5b; --tc: #3d3b39; --hx-over: rgba(116,223,91,0.88); }
+.p-PRO-035 { --hx: #68dedf; --tc: #3d3b39; --hx-over: rgba(104,222,223,0.88); }
+.p-PRO-036 { --hx: #7400e7; --tc: #ffffff; --hx-over: rgba(116,0,231,0.88); }
+.p-PRO-037 { --hx: #ce8fe7; --tc: #3d3b39; --hx-over: rgba(206,143,231,0.88); }
+.p-PRO-024 { --hx: #FC6B33; --tc: #ffffff; --hx-over: rgba(252,107,51,0.88); }
+.p-PRO-025 { --hx: #F1FFEF; --tc: #3d3b39; --hx-over: rgba(241,255,239,0.88); }
+.p-PRO-026 { --hx: #7F68CA; --tc: #ffffff; --hx-over: rgba(127,104,202,0.88); }
+.p-PRO-027 { --hx: #A26B83; --tc: #ffffff; --hx-over: rgba(162,107,131,0.88); }
+.p-PRO-074 { --hx: #4A6126; --tc: #ffffff; --hx-over: rgba(74,97,38,0.88); }
+.p-PRO-022 { --hx: #8A7A4A; --tc: #ffffff; --hx-over: rgba(138,122,74,0.88); }
+.c-COL-008 { --hx: #3A5A6A; --tc: #ffffff; }
+.p-PRO-045 { --hx: #C57513; --tc: #ffffff; --hx-over: rgba(197,117,19,0.88); }
+.p-PRO-079 { --hx: #AA7513; --tc: #ffffff; --hx-over: rgba(170,117,19,0.88); }
+.p-PRO-080 { --hx: #AA7513; --tc: #ffffff; --hx-over: rgba(170,117,19,0.88); }
+.p-PRO-056 { --hx: #7A9B76; --tc: #ffffff; --hx-over: rgba(122,155,118,0.88); }
+.p-PRO-060 { --hx: #2C4A6B; --tc: #ffffff; --hx-over: rgba(44,74,107,0.88); }
+.p-PRO-046 { --hx: #7AAFAF; --tc: #3d3b39; --hx-over: rgba(122,175,175,0.88); }
+.c-COL-009 { --hx: #C4845A; --tc: #ffffff; }
+.p-PRO-063 { --hx: #E6DEDF; --tc: #3d3b39; --hx-over: rgba(230,222,223,0.88); }
+
+/* ── VIEWER ── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #e8e4de; font-family: 'DM Sans', sans-serif; }
+
+.viewer {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 32px 20px 60px;
+}
+
+.viewer-nav {
+  display: flex; align-items: center; gap: 24px; margin-bottom: 28px;
+  background: white; padding: 12px 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+.nav-btn {
+  background: var(--gdn); color: white; border: none;
+  padding: 8px 22px; font-family: 'DM Sans'; font-size: 10px;
+  letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer;
+  transition: opacity 0.2s;
+}
+.nav-btn:disabled { opacity: 0.2; cursor: default; }
+.nav-info { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gdn); min-width: 100px; text-align: center; }
+
+.spread {
+  display: none; flex-direction: row;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.28);
+}
+.spread.actif { display: flex; }
+.spread .page + .page { border-left: 1px solid rgba(0,0,0,0.07); }
+
+.imprimer-btn {
+  margin-top: 24px; background: transparent; border: 1px solid var(--gdn);
+  color: var(--gdn); padding: 10px 28px; font-family: 'DM Sans'; font-size: 10px;
+  letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer;
+}
+
+/* ── PAGE ── */
+.page {
+  width: 816px; height: 1056px;
+  background: var(--blanc);
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  flex-shrink: 0;
+}
+.page-int {
+  flex: 1; display: flex; flex-direction: column;
+  overflow: hidden; min-height: 0;
+}
+.page-g .page-int { margin: 32px 0 0 32px; }
+.page-d .page-int { margin: 32px 32px 0 0; }
+
+/* ── CAT-PIED ── */
+.cat-pied {
+  flex-shrink: 0; height: 34px;
+  padding: 0 44px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid var(--beige);
+  font-size: 8px; color: var(--gris); letter-spacing: 0.1em; text-transform: uppercase;
+}
+
+/* ── COLLECTION ENTETE ── */
+.col-entete {
+  display: grid; grid-template-columns: 1fr 1.1fr;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.col-entete-photo { overflow: hidden; position: relative; }
+.col-entete-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+.col-entete-photo::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to right, transparent 55%, var(--blanc));
+}
+.col-entete-droite {
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.col-entete-hex {
+  background: var(--hx); flex-shrink: 0;
+  padding: 20px 28px 16px;
+}
+.col-entete-trait {
+  width: 24px; height: 2px; background: rgba(255,255,255,0.5); margin-bottom: 10px;
+}
+.col-entete-nom {
+  font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 400;
+  color: var(--tc); line-height: 1; letter-spacing: 0.04em;
+}
+.col-entete-slogan {
+  font-size: 8.5px; font-weight: 300; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--tc); opacity: 0.75; margin-top: 6px; line-height: 1.4;
+}
+.col-entete-desc {
+  flex: 1; overflow: hidden; padding: 16px 28px 12px;
+  background: var(--blanc);
+}
+.col-entete-desc p {
+  font-size: 9.5px; line-height: 1.85; color: var(--gris); font-weight: 300;
+  display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* ── GAMME SEPARATEUR ── */
+.gam-sep {
+  flex-shrink: 0; padding: 10px 0 8px;
+  display: flex; align-items: center; gap: 14px;
+  border-bottom: 1px solid var(--beige);
+  margin-bottom: 8px;
+}
+.gam-sep-trait { width: 20px; height: 2px; background: var(--hx); flex-shrink: 0; }
+.gam-sep-nom {
+  font-family: 'Playfair Display', serif; font-size: 12px; font-weight: 400;
+  color: var(--gdn); letter-spacing: 0.06em; text-transform: uppercase;
+}
+.gam-sep-desc {
+  font-size: 8px; font-weight: 300; color: var(--gris);
+  letter-spacing: 0.06em; flex: 1; text-align: right;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-style: italic; padding-right: 4px;
+}
+
+/* ── PRODUITS GRILLE ── */
+.produits-zone { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow: hidden; min-height: 0; }
+.produits-rangee { display: grid; gap: 8px; flex: 1; min-height: 0; }
+.rangee-2 { grid-template-columns: 1fr 1fr; }
+.rangee-1 { grid-template-columns: 1fr; }
+.rangee-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+/* ── CARTE ── */
+.carte { overflow: hidden; position: relative; display: flex; }
+
+/* Grammar A: photo haut, hex bas */
+.carte-A { flex-direction: column; }
+.carte-A .carte-photo { flex: 1; overflow: hidden; }
+.carte-A .carte-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.carte-A .carte-info {
+  background: var(--hx); flex-shrink: 0; height: 38%;
+  padding: 10px 12px 8px; display: flex; flex-direction: column; justify-content: flex-end;
+}
+
+/* Grammar B: hex haut, photo bas */
+.carte-B { flex-direction: column; }
+.carte-B .carte-info {
+  background: var(--hx); flex-shrink: 0; height: 36%;
+  padding: 12px 12px 8px; display: flex; flex-direction: column; justify-content: flex-start;
+}
+.carte-B .carte-photo { flex: 1; overflow: hidden; }
+.carte-B .carte-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Grammar C: hex bande gauche, photo droite */
+.carte-C { flex-direction: row; }
+.carte-C .carte-info {
+  background: var(--hx); width: 36%; flex-shrink: 0;
+  padding: 12px 10px; display: flex; flex-direction: column; justify-content: flex-end;
+}
+.carte-C .carte-photo { flex: 1; overflow: hidden; }
+.carte-C .carte-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Grammar D: hex bande droite, photo gauche */
+.carte-D { flex-direction: row; }
+.carte-D .carte-photo { flex: 1; overflow: hidden; }
+.carte-D .carte-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.carte-D .carte-info {
+  background: var(--hx); width: 36%; flex-shrink: 0;
+  padding: 12px 10px; display: flex; flex-direction: column; justify-content: flex-start;
+}
+
+/* Grammar E: photo pleine avec overlay hex bas */
+.carte-E { position: relative; }
+.carte-E .carte-photo { position: absolute; inset: 0; }
+.carte-E .carte-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.carte-E .carte-info {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--hx-over); padding: 14px 14px 10px;
+}
+
+/* ── TEXTES CARTE ── */
+.carte-nom {
+  font-family: 'Playfair Display', serif; font-size: 11px; font-weight: 500;
+  color: var(--tc); line-height: 1.25; margin-bottom: 4px; letter-spacing: 0.02em;
+}
+.carte-desc {
+  font-size: 8.5px; font-weight: 300; color: var(--tc); opacity: 0.82;
+  font-style: italic; line-height: 1.55; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.carte-prix {
+  font-size: 8.5px; font-weight: 400; color: var(--tc); opacity: 0.7;
+  letter-spacing: 0.06em; margin-top: 5px; flex-shrink: 0;
+}
+
+/* ── ZONE TAMPON ── */
+.zone-tampon {
+  flex: 1; display: flex; flex-direction: row;
+  overflow: hidden;
+}
+.tampon-photo {
+  flex: 1; overflow: hidden; position: relative;
+}
+.tampon-photo img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.tampon-texte {
+  width: 38%; background: var(--hx);
+  padding: 24px 20px; display: flex; flex-direction: column; justify-content: center;
+}
+.tampon-titre {
+  font-family: 'Playfair Display'; font-size: 13px; font-style: italic;
+  color: var(--tc); line-height: 1.5; margin-bottom: 10px;
+}
+.tampon-trait {
+  width: 20px; height: 1px; background: rgba(255,255,255,0.4); margin-bottom: 10px;
+}
+.tampon-corps {
+  font-size: 9px; color: var(--tc); opacity: 0.78; line-height: 1.7; font-weight: 300;
+}
+
+/* ── PAGE SPÉCIALE: COLLECTION SOLO ── */
+.col-solo {
+  flex: 1; display: grid; grid-template-rows: 1fr 1fr; gap: 0;
+  overflow: hidden;
+}
+.col-solo-haut {
+  display: grid; grid-template-columns: 1fr 1fr; overflow: hidden;
+}
+.col-solo-bas {
+  display: grid; grid-template-columns: 1fr 1fr; overflow: hidden;
+  border-top: 1px solid var(--beige);
+}
+
+/* ── PRINT ── */
+@media print {
+  body { background: white; }
+  .viewer-nav, .imprimer-btn, .spread:not(.actif) { display: none !important; }
+  .viewer { padding: 0; background: white; }
+  .spread { display: flex !important; page-break-after: always; box-shadow: none; }
+  .page { width: 8.5in; height: 11in; page-break-after: always; }
+  @page { size: 8.5in 11in; margin: 0; }
+}
+</style>
+</head>
+<body>
+<div class="viewer">
+  <div class="viewer-nav">
+    <button class="nav-btn" id="btn-prev" onclick="prevSpread()" disabled>← Précédent</button>
+    <span class="nav-info" id="nav-info">Pages 1-2</span>
+    <button class="nav-btn" id="btn-next" onclick="nextSpread()">Suivant →</button>
+  </div>
+  <div id="pages-wrap"></div>
+  <button class="imprimer-btn" onclick="window.print()">Imprimer le catalogue</button>
+</div>
+
+<script>
+const DATA = {"COL-001": {"id": "COL-001", "rang": 1.0, "nom": "SAPONICA", "slogan": "Simplement la nature qui prend soin de vous", "description": "SAPONICA, c'est le savon dans sa forme la plus pure. Huile de tournesol, huile de coco, beurre de karité — une base généreuse, soigneusement surgraissée, qui nettoie sans jamais décaper. Sa mousse crémeuse enveloppe, sa glycérine naturelle hydrate, et votre peau ressort douce, sans avoir besoin de rien d'autre.\n\nSur cette base, chaque savon devient une histoire. Boréal sent la forêt boréale et ses grands espaces. Délicat murmure la pivoine et la lavande. Étreinte gourmande réunit l'avoine, le miel et l'amande. D'un savon à l'autre, la même âme — des personnalités radicalement différentes.", "hex": "#8A7A4A", "photo": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773699699/saponica_yvg3if.jpg", "gammes": [{"id": "GAM-001", "col_id": "COL-001", "rang": 1.0, "nom": "SAVON", "description": null, "hex": "#8A7A4A", "photo": null, "produits": [{"id": "PRO-014", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "BRISE DES LAGUNES", "desc_emballage": "La fraîcheur des eaux secrètes, la caresse des vents marins.", "hex": "#3EAF85", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/Brisedeslagunes_nurrcu.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/BrisedeslagunesNoel_whufa1.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-041", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "ÉCLAT FLORAL", "desc_emballage": "Un savon mosaïque, doré d'Argile jaune et parsemé de fleurs, où chaque fragment renaît en douceur.", "hex": "#FFB400", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448829/Eclatfloral_rqh0ry.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448784/Eclatfloralnoel_om51gw.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-042", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "ÉCLAT TROPICAL", "desc_emballage": "Mangue, pêche, mandarine. Un été qui ne finit jamais.", "hex": "#FF6735", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448785/Eclatfloral_lg1ysi.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448370/Eclattropicalnoel_iggl8h.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-053", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "JARDIN D'AURORE", "desc_emballage": "Fraîcheur de concombre, souffle de menthe, un jardin qui respire entre les mains.", "hex": "#65791A", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773449232/Jardindaurore_vtpqvp.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773449232/Jardindaurorenoel_vitnor.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-073", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "SOLEIL DE PROVENCE", "desc_emballage": "Agrumes et romarin sauvage. Le sud de la France dans chaque mousse.", "hex": "#FD791A", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448369/Soleildeprovence_pue3as.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448369/Soleildeprovencenoel_hbh9lb.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-078", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "VOILE DE POIRE", "desc_emballage": "Poire juteuse, thé vert, bergamote. Une douceur qui glisse.", "hex": "#91D129", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448369/Voiledepoire_ue6ufc.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448370/Voiledepoirenoel_xg6jef.jpg", "formats": [{"poids": 95.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-004", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "BOIS DE CARACTÈRE", "desc_emballage": "L'élégance brute de la forêt. Notes boisées et épicées pour une force tranquille.", "hex": "#363636", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448451/Boisdecaractere_hbi5xd.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448369/Boisdecaracterenoel_tww5tv.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-012", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "BORÉAL", "desc_emballage": "C'est la rencontre entre la fraîcheur des grands espaces et la chaleur intime du foyer.", "hex": "#7F6811", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/Bor%C3%A9al_iemqim.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/BorealNoel_bgg7as.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-031", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "CLUB PRIVÉ", "desc_emballage": "Une vanille suave traversée d'un souffle de cigare.", "hex": "#6B5229", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773449731/Clubprive_vatlos.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773449731/Clubprive_vatlos.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-032", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "DÉLICAT", "desc_emballage": "Pivoine et Lavande. L'élégance d'un voile parfumé.", "hex": "#AF99A4", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/D%C3%A9licat_vdewef.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773418761/DelicatNoel_b8setp.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-033", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "DOUCE PENSÉE", "desc_emballage": "Savon qui apaise l'esprit autant qu'il embellit la peau, un bouquet délicat déposé sur le cœur.", "hex": "#E76877", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773418761/Doucepensee_jgnf8a.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773418761/DoucepenseeNoel_tygoxv.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-040", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "ÉCLAT DE MER", "desc_emballage": "Une mousse claire qui réveille la peau comme un matin au bord de l'océan.", "hex": "#32EDFF", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448653/Eclatdemer_gn5fap.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448370/Eclatdemernoel_tyev2l.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-047", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "ÉTREINTE GOURMANDE", "desc_emballage": "La transparence d'une caresse. Avoine et miel enlacés, l'amande en lumière.", "hex": "#A4894A", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773418762/etreinte_nknqua.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773418762/etreinteNoel_szipsq.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-048", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "FEU D'AUTOMNE", "desc_emballage": "Teintes cuivrées de canneberge, résine de pin blanc et essence de romarin. L'âme des forêts automnales dans un savon vibrant et vivifiant.", "hex": "#FC6B33", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448368/Feudautomne_etjdou.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773449076/Feudautomnenoel_fmh0ss.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-054", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "JARDIN DE ROSES", "desc_emballage": "L'essence même de la rose dans sa plus belle simplicité. Délicate et envoûtante.", "hex": "#9E3E3E", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448370/Jardideroses_c0mjii.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773448369/Eclatderosenoel_nliqmx.jpg", "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-061", "col_id": "COL-001", "gam_id": "GAM-001", "nom": "NUAGE DE LAVANDE", "desc_emballage": "Un champ de lavande, le soir. Rien de plus, rien de moins.", "hex": "#7F68CA", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773418762/Nuagedelavande_kwncrq.jpg", "image_noel_url": null, "formats": [{"poids": 90.0, "unite": "g", "prix": 7.0}]}]}]}, "COL-002": {"id": "COL-002", "rang": 2.0, "nom": "PETIT NUAGE", "slogan": "Simplement la nature qui dorlote vos tout-petits", "description": "La peau des tout-petits mérite ce qu'il y a de plus doux. PETIT NUAGE est formulé sans compromis pour les épidermes les plus fragiles — surgraissé à 10%, avec des ingrédients choisis un à un pour leur douceur. Un savon qui prend soin sans jamais irriter.\n\nCâlin sent la poudre de bébé, Fleuri évoque un matin de printemps, Rosé murmure la tendresse quotidienne. Chaque savon a sa douceur, sa couleur, son caractère — tous pensés pour les peaux les plus précieuses.", "hex": "#E8D8E0", "photo": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773699700/nuage_tn6a3j.jpg", "gammes": [{"id": "GAM-002", "col_id": "COL-002", "rang": 1.0, "nom": "SAVON", "description": null, "hex": "#E8D8E0", "photo": null, "produits": [{"id": "PRO-066", "col_id": "COL-002", "gam_id": "GAM-002", "nom": "PETIT NUAGE CÂLIN", "desc_emballage": "Un savon tendre comme une étreinte, pensé pour envelopper la peau d'une douceur rassurante.", "hex": "#B7DCC4", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773083346/univers-caresse/produits/vw5bdqa4j1dumkwjodzr.jpg", "image_noel_url": null, "formats": []}, {"id": "PRO-067", "col_id": "COL-002", "gam_id": "GAM-002", "nom": "PETIT NUAGE DOUCE BAIE", "desc_emballage": "Un souffle mauve et fruité, velouté comme un smoothie d'été, doux comme une caresse de mûre.", "hex": "#5A4657", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773083394/univers-caresse/produits/gncwgz5xektcburqtpzr.jpg", "image_noel_url": null, "formats": []}, {"id": "PRO-068", "col_id": "COL-002", "gam_id": "GAM-002", "nom": "PETIT NUAGE FLEURI", "desc_emballage": "Un savon lumineux et joyeux, comme un matin de printemps.", "hex": "#F8E7A1", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773083428/univers-caresse/produits/qiea1clad0wsqu8x4v1r.jpg", "image_noel_url": null, "formats": []}, {"id": "PRO-069", "col_id": "COL-002", "gam_id": "GAM-002", "nom": "PETIT NUAGE ROSÉ", "desc_emballage": "Une bulle de tendresse, une invitation à la douceur quotidienne.", "hex": "#F7DDE6", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773083525/univers-caresse/produits/kdrgqwki1vaclkhjln4c.jpg", "image_noel_url": null, "formats": []}, {"id": "PRO-065", "col_id": "COL-002", "gam_id": "GAM-002", "nom": "PETIT NUAGE BONBON", "desc_emballage": "Un nuage espiègle et sucré, gomme balloune et rires d'enfants dans une mousse joyeuse.", "hex": "#B64679", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773083581/univers-caresse/produits/ywvtdsbkjhww65hyhrcv.jpg", "image_noel_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773083581/univers-caresse/produits/ywvtdsbkjhww65hyhrcv.jpg", "formats": [{"poids": 75.0, "unite": "g", "prix": 5.0}]}]}]}, "COL-003": {"id": "COL-003", "rang": 3.0, "nom": "CAPRIN", "slogan": "Simplement la nature et la douceur de la chèvre", "description": "Le lait de chèvre, c'est une douceur qu'on reconnaît au premier contact. Riche en vitamines et en acides gras, il nourrit, apaise, respecte même les peaux les plus réactives. Dans chaque savon CAPRIN, il s'unit aux huiles végétales et au beurre de karité pour une mousse crémeuse, lactée, qui prend soin sans jamais agresser.\n\nPomme verte, melon d'eau, cerise — CAPRIN joue avec les fraîcheurs fruitées sur cette base douce et constante. Des savons qui sentent bon, qui font du bien, et qui donnent envie de recommencer.", "hex": "#957A6A", "photo": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773699700/Caprin_wbqg5n.jpg", "gammes": [{"id": "GAM-003", "col_id": "COL-003", "rang": 1.0, "nom": "SAVON AU LAIT DE CHÈVRE", "description": null, "hex": "#957A6A", "photo": null, "produits": [{"id": "PRO-028", "col_id": "COL-003", "gam_id": "GAM-003", "nom": "CAPRICE FRAISÉ", "desc_emballage": "L'alliance gourmande du lait onctueux et de la fraise sucrée.", "hex": "#A2414D", "image_url": null, "image_noel_url": null, "formats": [{"poids": 72.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-029", "col_id": "COL-003", "gam_id": "GAM-003", "nom": "CERISE DE VELOURS", "desc_emballage": "Savon gourmand au lait de chèvre et cerises, douceur fruitée et peau satinée.", "hex": "#BF0E24", "image_url": null, "image_noel_url": null, "formats": [{"poids": 72.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-043", "col_id": "COL-003", "gam_id": "GAM-003", "nom": "ÉCLOSION DE SOIE", "desc_emballage": "Un savon velouté où le jasmin s'ouvre doucement sur un fond de thé vert et de lait crémeux. Une caresse soyeuse, presque textile.", "hex": "#476B33", "image_url": null, "image_noel_url": null, "formats": [{"poids": 72.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-049", "col_id": "COL-003", "gam_id": "GAM-003", "nom": "FRAÎCHEUR DE MELON", "desc_emballage": "La douceur crémeuse du lait de chèvre épouse la légèreté rafraîchissante du melon d'eau.", "hex": "#BF705E", "image_url": null, "image_noel_url": null, "formats": [{"poids": 72.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-062", "col_id": "COL-003", "gam_id": "GAM-003", "nom": "ORANGE SAUVAGE", "desc_emballage": "Éclat d'agrume et souffle d'épices, comme une chaleur libre qui danse sur la peau.", "hex": "#C67D26", "image_url": null, "image_noel_url": null, "formats": [{"poids": 72.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-070", "col_id": "COL-003", "gam_id": "GAM-003", "nom": "POMME D'ÉMERAUDE", "desc_emballage": "Savon délicat au lait de chèvre et pomme verte, fraîcheur et douceur en un seul geste.", "hex": "#51EB4E", "image_url": null, "image_noel_url": null, "formats": [{"poids": 72.0, "unite": "g", "prix": 7.0}]}]}]}, "COL-004": {"id": "COL-004", "rang": 4.0, "nom": "ÉMOLIA", "slogan": "Simplement la nature dédiée à votre bien-être", "description": "ÉMOLIA, c'est la collection pour ceux qui prennent soin d'eux avec intention. Pas juste se laver — se choyer. Des baumes qui réparent, des bombes de bain qui transforment le bain en rituel, des soins qui restent sur la peau longtemps après le rinçage. L'essentiel du bien-être, pensé avec la même philosophie que nos savons.\n\nDes lèvres aux talons, ÉMOLIA couvre tout. Baumes à lèvres nourrissants, bombes de bain effervescentes, baumes corporels enveloppants, savon exfoliant revitalisant. Chaque produit est une invitation à ralentir, à s'offrir un moment rien qu'à soi.", "hex": "#C4956A", "photo": "https://res.cloudinary.com/dfasrauyy/image/upload/v1774629279/a-minimalist-still-life-photograph-featu_OmMoSBO5T2WkphsZCBhDQA_DSW-Hw_cTSqI_Is56u75Dg_aesvzs.jpg", "gammes": [{"id": "GAM-004", "col_id": "COL-004", "rang": 1.0, "nom": "BAUME", "description": null, "hex": null, "photo": null, "produits": [{"id": "PRO-044", "col_id": "COL-004", "gam_id": "GAM-004", "nom": "EFFLUVE APAISANT", "desc_emballage": "Un baume aromatique qui dégage, réchauffe et réconforte — le souffle de l'hiver apprivoisé.", "hex": "#E7B539", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-064", "col_id": "COL-004", "gam_id": "GAM-004", "nom": "PETIT BOUCLIER", "desc_emballage": "Un voile protecteur tout en douceur, pour les petites peaux qui ont besoin d'être chouchoutées.", "hex": "#519A9C", "image_url": null, "image_noel_url": null, "formats": []}]}, {"id": "GAM-006", "col_id": "COL-004", "rang": 2.0, "nom": "BAUME À LÈVRES", "description": "Une caresse nourrissante qui protège et répare. L'huile de noix de coco hydrate en profondeur, la cire d'abeille crée un voile protecteur, la vitamine E préserve, tandis que le beurre de mangue apporte une douceur veloutée.\n\nDes lèvres douces, naturellement sublimées.", "hex": null, "photo": null, "produits": [{"id": "PRO-001", "col_id": "COL-004", "gam_id": "GAM-006", "nom": "BAISER FRUITÉ", "desc_emballage": "La douceur des fruits rouges, un brillant qui fait tout dire.", "hex": "#5A1C37", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-002", "col_id": "COL-004", "gam_id": "GAM-006", "nom": "NUAGE FRAISE", "desc_emballage": "Doux comme un nuage, sucré comme une fraise — un baume sécuritaire pour les petites lèvres.", "hex": "#9C1E45", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-003", "col_id": "COL-004", "gam_id": "GAM-006", "nom": "PETIT NUAGE DOUILLET", "desc_emballage": "Un câlin pour les petites lèvres quand le froid arrive — doux, sécuritaire et réconfortant.", "hex": "#519A9C", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-050", "col_id": "COL-004", "gam_id": "GAM-006", "nom": "FRAISE ET BASILIC", "desc_emballage": "L'audace d'un duo inattendu, la douceur d'un instant gourmand.", "hex": "#B60F31", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-055", "col_id": "COL-004", "gam_id": "GAM-006", "nom": "LAVANDE - ROMARIN", "desc_emballage": "La sérénité de la lavande, la vigueur du romarin. La Provence dans un baume.", "hex": "#908ED3", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-057", "col_id": "COL-004", "gam_id": "GAM-006", "nom": "MENTHE POIVRÉE", "desc_emballage": "Un frisson de fraîcheur, même en plein hiver.", "hex": "#90FAD3", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-075", "col_id": "COL-004", "gam_id": "GAM-006", "nom": "SOUFFLE D'ÉTÉ", "desc_emballage": "Un souffle de fraîcheur pour des lèvres réparées par le soleil.", "hex": "#F1FFBB", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-076", "col_id": "COL-004", "gam_id": "GAM-006", "nom": "SOUFFLE D'HIVER", "desc_emballage": "Un souffle chaud qui libère, répare et protège au cœur de l'hiver.", "hex": "#8A7A4A", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-077", "col_id": "COL-004", "gam_id": "GAM-006", "nom": "VENT FRAIS", "desc_emballage": "La nature à l'état pur, sur tes lèvres.", "hex": "#609C6A", "image_url": null, "image_noel_url": null, "formats": [{"poids": 125.0, "unite": "g", "prix": 7.0}]}]}, {"id": "GAM-005", "col_id": "COL-004", "rang": 3.0, "nom": "BOMBES DE BAIN", "description": "Une boule, un plongeon, et le bain se transforme. L'effervescence du bicarbonate, le sel d'Epsom qui détend les muscles, l'huile d'amande qui soyeuse la peau — tout ça en un seul geste. Un rituel simple qui fait toute la différence.\n\nMême magie, formule adaptée aux tout-petits. Sans sel d'Epsom, sans huiles essentielles — juste l'effervescence joyeuse et la douceur de l'amande et du karité. Le bain devient une fête.", "hex": null, "photo": null, "produits": [{"id": "PRO-006", "col_id": "COL-004", "gam_id": "GAM-005", "nom": "BOMBE BAIN BRISE DES LAGUNES", "desc_emballage": "Une escapade aquatique — la brise marine et le cèdre bleu pour un bain qui sent l'horizon.", "hex": "#3EAF85", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-007", "col_id": "COL-004", "gam_id": "GAM-005", "nom": "BOMBE BAIN DÉLICAT", "desc_emballage": "Pivoine, lavande et thé vert — une effervescence florale toute en douceur.", "hex": "#AF99A4", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-008", "col_id": "COL-004", "gam_id": "GAM-005", "nom": "BOMBE BAIN DOUCE PENSÉE", "desc_emballage": "Géranium rosat et ylang-ylang — une effervescence florale chaude et enveloppante.", "hex": "#E76877", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-009", "col_id": "COL-004", "gam_id": "GAM-005", "nom": "BOMBE BAIN NUAGE DE LAVANDE", "desc_emballage": "La lavande à l'état pur — une effervescence douce pour un bain tout en quiétude.", "hex": "#7F68CA", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-010", "col_id": "COL-004", "gam_id": "GAM-005", "nom": "BOMBE BAIN VANILLE ET CITRON", "desc_emballage": "La douceur de la vanille rencontre le pétillement du citron — un bain gourmand et lumineux.", "hex": "#FFF8DC", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-011", "col_id": "COL-004", "gam_id": "GAM-005", "nom": "BOMBES DE BAIN PETIT NUAGE", "desc_emballage": null, "hex": "#8A7A4A", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-005", "col_id": "COL-004", "gam_id": "GAM-005", "nom": "BORÉAL", "desc_emballage": "Le grand air du Nord dans un bain effervescent — bois, verdure et musc pour une détente profonde.", "hex": "#7F6811", "image_url": null, "image_noel_url": null, "formats": []}]}, {"id": "GAM-008", "col_id": "COL-004", "rang": 5.0, "nom": "SAVON EXFOLIANT", "description": null, "hex": null, "photo": null, "produits": [{"id": "PRO-021", "col_id": "COL-004", "gam_id": "GAM-008", "nom": "BRUME DE ROSÉE", "desc_emballage": "Le luffa réveille, la menthe vivifie. Une fraîcheur verte pour une peau neuve.", "hex": "#9EBD7C", "image_url": null, "image_noel_url": null, "formats": []}]}]}, "COL-005": {"id": "COL-005", "rang": 5.0, "nom": "ÉPURE", "slogan": "Simplement la nature entre vos mains", "description": "ÉPURE, c'est le savon qu'on garde près de l'évier. Cubique, solide, sans fioritures — mais pas sans soin. Formulé pour les mains qui travaillent, cuisinent, jardinent, bricolent. Il nettoie en profondeur, décroche la graisse, et laisse les mains douces sans avoir besoin de crème après.\n\nGrain d'acier pour les mains marquées d'huile et de métal. Mousse d'espresso pour réveiller les sens au café du matin. Herbe douce pour la fraîcheur du jardin. Murmure d'Oliva pour un souffle méditerranéen près du fourneau. Chacun a son caractère — tous ont la même solidité.", "hex": "#6A6A50", "photo": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773699700/epure_tvqlz0.jpg", "gammes": [{"id": "GAM-009", "col_id": "COL-005", "rang": 1.0, "nom": "SAVON À MAIN", "description": null, "hex": null, "photo": null, "produits": [{"id": "PRO-051", "col_id": "COL-005", "gam_id": "GAM-009", "nom": "GRAIN D'ACIER", "desc_emballage": "Un savon robuste et épuré, conçu pour les mains marquées d'huile et de métal. Sa mousse dense décroche la graisse et laisse la peau nette.", "hex": "#545454", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773085030/univers-caresse/produits/dgskttwylxoqxh1x689n.jpg", "image_noel_url": null, "formats": [{"poids": 125.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-052", "col_id": "COL-005", "gam_id": "GAM-009", "nom": "HERBE DOUCE", "desc_emballage": "Un savon clair et apaisant, où le pin blanc et la poire se mêlent à une lumière douce. Une fraîcheur verte, simple et pure, comme un matin tranquille.", "hex": "#425B00", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773085101/univers-caresse/produits/p0dsiibm02qrmhuluhok.jpg", "image_noel_url": null, "formats": [{"poids": 125.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-058", "col_id": "COL-005", "gam_id": "GAM-009", "nom": "MOUSSE D'ESPRESSO", "desc_emballage": "Un parfum mocha, une mousse chaleureuse, des grains qui réveillent la peau.", "hex": "#3F2300", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773085149/univers-caresse/produits/gewk6wpfn1tet13vzsnc.jpg", "image_noel_url": null, "formats": [{"poids": 125.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-059", "col_id": "COL-005", "gam_id": "GAM-009", "nom": "MURMURE D'OLIVA", "desc_emballage": "Un souffle doux venu de la Méditerranée.", "hex": "#A2AF0E", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773085196/univers-caresse/produits/m5gjwtn5cfdctygdzawl.jpg", "image_noel_url": null, "formats": [{"poids": 125.0, "unite": "g", "prix": 7.0}]}]}]}, "COL-006": {"id": "COL-006", "rang": 6.0, "nom": "KÉRYS", "slogan": "Simplement la nature qui veille sur vos cheveux", "description": "KÉRYS, c'est le soin capillaire repensé en barre. Concentré, efficace, sans eau inutile — il lave, nourrit et respecte le cuir chevelu en un seul geste. Pas de compromis sur les ingrédients, pas de contenant plastique à jeter. Juste ce qu'il faut, là où ça compte.\n\nTrois lignes, trois natures de cheveux. PURÉLIA pour les cheveux gras qui cherchent la légèreté. ÉQUILIBRA pour les cheveux normaux qui veulent rester équilibrés. HYDRABOUCLE pour les boucles qui réclament hydratation et définition. Chaque ligne a ses formules, ses ingrédients, sa promesse.", "hex": "#5A9A7A", "photo": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773699700/kerys_tan8yy.jpg", "gammes": [{"id": "GAM-012", "col_id": "COL-006", "rang": 1.0, "nom": "HYDRABOUCLE", "description": "Les boucles ont leurs propres besoins. HYDRABOUCLE les nourrit, les hydrate, les enlace d'une douceur protectrice — sans jamais les alourdir ni les dompter.", "hex": null, "photo": null, "produits": [{"id": "PRO-034", "col_id": "COL-006", "gam_id": "GAM-012", "nom": "DOUCEUR DES ÎLES", "desc_emballage": "Les boucles s'imprègnent de chaleur exotique, comme caressées par des vents tropicaux et les fruits solaires.", "hex": "#CF8E56", "image_url": null, "image_noel_url": null, "formats": [{"poids": 90.0, "unite": "g", "prix": 10.0}]}, {"id": "PRO-013", "col_id": "COL-006", "gam_id": "GAM-012", "nom": "BOTANICA", "desc_emballage": "Les boucles s'ancrent dans la force des plantes, retrouvant vigueur et harmonie au cœur de la nature.", "hex": "#547956", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773084252/univers-caresse/produits/ftivtqm8akpeeij6zdxg.jpg", "image_noel_url": null, "formats": [{"poids": 90.0, "unite": "g", "prix": 10.0}]}]}, {"id": "GAM-011", "col_id": "COL-006", "rang": 2.0, "nom": "PURÉLIA", "description": "La source limpide où les cheveux retrouvent leur légèreté. Argiles absorbantes et ingrédients purifiants dissolvent l'excès sans décaper, sans alourdir. Le cuir chevelu respire, les cheveux brillent.", "hex": null, "photo": null, "produits": [{"id": "PRO-030", "col_id": "COL-006", "gam_id": "GAM-011", "nom": "CLARTÉ VERTE", "desc_emballage": "La chevelure respire comme une clairière purifiée.", "hex": "#366d1f", "image_url": null, "image_noel_url": null, "formats": [{"poids": 85.0, "unite": "g", "prix": 10.0}]}, {"id": "PRO-072", "col_id": "COL-006", "gam_id": "GAM-011", "nom": "RAYON LUMINEUX", "desc_emballage": "La chevelure s'illumine d'une fraîcheur solaire et pétillante.", "hex": "#79b547", "image_url": null, "image_noel_url": null, "formats": [{"poids": 95.0, "unite": "g", "prix": 19.0}]}]}, {"id": "GAM-010", "col_id": "COL-006", "rang": 3.0, "nom": "ÉQUILIBRA", "description": "L'équilibre au quotidien. Des formules douces qui respectent le cuir chevelu naturellement bien réglé — pour qu'il le reste, lavage après lavage.", "hex": null, "photo": null, "produits": [{"id": "PRO-015", "col_id": "COL-006", "gam_id": "GAM-010", "nom": "BRISE MATINALE", "desc_emballage": "Sous sa caresse, le cuir chevelu s'illumine comme au lever du jour.", "hex": "#6787FF", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773084533/univers-caresse/produits/dk74oyfcggmp3qgcmhpl.png", "image_noel_url": null, "formats": []}, {"id": "PRO-071", "col_id": "COL-006", "gam_id": "GAM-010", "nom": "PURE HARMONIE", "desc_emballage": "La lavande apaise, l'avoine équilibre. Un souffle de douceur pour les cheveux de tous les jours.", "hex": "#2387FF", "image_url": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773084403/univers-caresse/produits/yihx6ik4giouqmror9qx.png", "image_noel_url": null, "formats": [{"poids": 90.0, "unite": "g", "prix": 10.0}]}]}]}, "COL-007": {"id": "COL-007", "rang": 7.0, "nom": "CASA", "slogan": "Simplement la nature pour votre maison", "description": "CASA, c'est la même philosophie que pour votre peau — appliquée à votre maison. Des produits pensés avec les mêmes exigences : ingrédients choisis, efficacité réelle, sans compromis. Parce que prendre soin de son intérieur, c'est aussi prendre soin de soi.\n\nUn cake vaisselle qui dégraisse sans agresser les mains. Une bruine d'ambiance qui transforme l'air en un souffle parfumé. Une eau de linge qui dépose une douceur discrète sur chaque fibre. Le quotidien, sublimé.", "hex": "#9AAF60", "photo": "https://res.cloudinary.com/dfasrauyy/image/upload/v1774629280/a-serene-still-life-photograph-capturing_eNdcu-T-QwOlCQFoxMnZoA_QGE0w6WwRdKH6816Kjky-w_oxu2k1.jpg", "gammes": [{"id": "GAM-014", "col_id": "COL-007", "rang": 1.0, "nom": "CAKE VAISSELLE", "description": "Dans la continuité de notre collection de savons pour les mains, Épure Vaisselle apporte la même philosophie d'authenticité à l'évier. Un pain solide qui mousse généreusement au contact de l'eau et de l'éponge.\n\nSon pouvoir dégraissant naturel ce savon vaisselle fait disparaître les résidus alimentaires sans laisser de traces. Sa texture ferme et compacte lui confère une longévité exceptionnelle : un seul pain remplace plusieurs flacons de liquide vaisselle.", "hex": null, "photo": null, "produits": [{"id": "PRO-039", "col_id": "COL-007", "gam_id": "GAM-014", "nom": "ÉCLAT CITRONNÉ", "desc_emballage": "Un cake dégraissant au citron, efficace et naturel. Une longévité exceptionnelle qui remplace plusieurs flacons.", "hex": "#FFF816", "image_url": null, "image_noel_url": null, "formats": [{"poids": 230.0, "unite": "g", "prix": 20.0}, {"poids": 200.0, "unite": "g", "prix": 15.0}]}]}, {"id": "GAM-013", "col_id": "COL-007", "rang": 3.0, "nom": "BRUINE D'AMBIANCE", "description": "L'atmosphère en bouteille. Ce spray délicat transforme instantanément l'air de votre intérieur en une invitation à la détente. Formulée à base d'eau distillée et de fragrances naturelles, la bruine d'ambiance enveloppe chaque pièce d'un voile olfactif subtil et éphémère. Une impulsion, et l'espace se métamorphose.", "hex": null, "photo": null, "produits": [{"id": "PRO-016", "col_id": "COL-007", "gam_id": "GAM-013", "nom": "BRUINE AGRUMES ET ROMARIN", "desc_emballage": "Un souffle délicat qui transforme l'air de votre intérieur.", "hex": "#8A7A4A", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-017", "col_id": "COL-007", "gam_id": "GAM-013", "nom": "BRUINE BRISE DES LAGUNES", "desc_emballage": "Un souffle délicat qui transforme l'air de votre intérieur.", "hex": "#8A7A4A", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-018", "col_id": "COL-007", "gam_id": "GAM-013", "nom": "BRUINE LAVANDE", "desc_emballage": "Un souffle délicat qui transforme l'air de votre intérieur.", "hex": "#8A7A4A", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-020", "col_id": "COL-007", "gam_id": "GAM-013", "nom": "BRUINE POIRE", "desc_emballage": "Un souffle délicat qui transforme l'air de votre intérieur.", "hex": "#8A7A4A", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-019", "col_id": "COL-007", "gam_id": "GAM-013", "nom": "LESSIVE FRAÎCHE", "desc_emballage": "Un souffle délicat qui transforme l'air de votre intérieur.", "hex": "#ce8fe7", "image_url": null, "image_noel_url": null, "formats": []}]}, {"id": "GAM-015", "col_id": "COL-007", "rang": 4.0, "nom": "EAU DE LINGE", "description": "Le linge comme une seconde peau. Vaporisée sur vos tissus avant ou après le repassage, cette eau délicatement parfumée prolonge la fraîcheur et laisse sur draps, vêtements et linges de maison un sillage doux et naturel. Parce que la douceur commence dès le matin, au contact du tissu.", "hex": null, "photo": null, "produits": [{"id": "PRO-038", "col_id": "COL-007", "gam_id": "GAM-015", "nom": "EAU DE LINGE SÉRÉNITÉ PURE", "desc_emballage": "La douceur de la lavande sur un fond de linge propre — une sérénité textile, du matin au soir.", "hex": "#74df5b", "image_url": null, "image_noel_url": null, "formats": []}, {"id": "PRO-035", "col_id": "COL-007", "gam_id": "GAM-015", "nom": "GRAND AIR", "desc_emballage": "Un souffle d'air pur sur vos tissus — citron, eucalyptus et menthe pour un linge qui sent le grand dehors.", "hex": "#68dedf", "image_url": null, "image_noel_url": null, "formats": [{"poids": 500.0, "unite": "ml", "prix": 0.0}]}, {"id": "PRO-036", "col_id": "COL-007", "gam_id": "GAM-015", "nom": "EAU DE LINGE LAVANDE", "desc_emballage": "Une eau délicatement parfumée qui dépose sur vos tissus un sillage doux et naturel, du matin au soir.", "hex": "#7400e7", "image_url": null, "image_noel_url": null, "formats": [{"poids": 500.0, "unite": "ml", "prix": 0.0}]}, {"id": "PRO-037", "col_id": "COL-007", "gam_id": "GAM-015", "nom": "LESSIVE FRAÎCHE", "desc_emballage": "L'odeur du linge séché au grand air — comme si la corde à linge avait tout fait le travail.", "hex": "#ce8fe7", "image_url": null, "image_noel_url": null, "formats": [{"poids": 500.0, "unite": "ml", "prix": 0.0}]}]}, {"id": "GAM-016", "col_id": "COL-007", "rang": 5.0, "nom": "BOUGIE", "description": "LUMINA, c'est l'atmosphère en cire. Des chandelles artisanales à base de cire de soya qui brûlent doucement, proprement, longtemps. La flamme danse, le parfum s'installe, la pièce se transforme.\n\nLessive fraîche, Pivoine et Poire — des fragrances exclusives aux chandelles, disponibles en tout temps. Club privé, Feu d'automne, Nuage de lavande de SAPONICA, disponibles régulièrement.", "hex": null, "photo": null, "produits": [{"id": "PRO-024", "col_id": "COL-007", "gam_id": "GAM-016", "nom": "BOUGIE FEU D'AUTOMNE", "desc_emballage": null, "hex": "#FC6B33", "image_url": null, "image_noel_url": null, "formats": [{"poids": 10.0, "unite": "g", "prix": 1.0}, {"poids": 135.0, "unite": "g", "prix": 8.0}, {"poids": 240.0, "unite": "g", "prix": 15.0}]}, {"id": "PRO-025", "col_id": "COL-007", "gam_id": "GAM-016", "nom": "BOUGIE LESSIVE FRAÎCHE", "desc_emballage": null, "hex": "#F1FFEF", "image_url": null, "image_noel_url": null, "formats": [{"poids": 10.0, "unite": "g", "prix": 1.0}, {"poids": 135.0, "unite": "g", "prix": 8.0}, {"poids": 240.0, "unite": "g", "prix": 15.0}]}, {"id": "PRO-026", "col_id": "COL-007", "gam_id": "GAM-016", "nom": "BOUGIE NUAGE DE LAVANDE", "desc_emballage": null, "hex": "#7F68CA", "image_url": null, "image_noel_url": null, "formats": [{"poids": 10.0, "unite": "g", "prix": 1.0}, {"poids": 135.0, "unite": "g", "prix": 8.0}, {"poids": 240.0, "unite": "g", "prix": 15.0}]}, {"id": "PRO-027", "col_id": "COL-007", "gam_id": "GAM-016", "nom": "BOUGIE PIVOINE ET POIRE", "desc_emballage": null, "hex": "#A26B83", "image_url": null, "image_noel_url": null, "formats": [{"poids": 10.0, "unite": "g", "prix": 1.0}, {"poids": 135.0, "unite": "g", "prix": 8.0}, {"poids": 240.0, "unite": "g", "prix": 15.0}]}, {"id": "PRO-074", "col_id": "COL-007", "gam_id": "GAM-016", "nom": "SOUFFLE DE SAPIN", "desc_emballage": "Un savon rustique au parfum de forêt, puissant et authentique, créé pour détacher les tissus et nettoyer la maison avec la force simple du sapin.", "hex": "#4A6126", "image_url": null, "image_noel_url": null, "formats": [{"poids": 125.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-022", "col_id": "COL-007", "gam_id": "GAM-016", "nom": "BRISE DES LAGUNES", "desc_emballage": null, "hex": "#8A7A4A", "image_url": null, "image_noel_url": null, "formats": [{"poids": 10.0, "unite": "g", "prix": 1.0}, {"poids": 135.0, "unite": "g", "prix": 8.0}, {"poids": 240.0, "unite": "g", "prix": 15.0}]}]}]}, "COL-008": {"id": "COL-008", "rang": 8.0, "nom": "LUI", "slogan": "Simplement la nature au masculin", "description": "Prendre soin de soi n'est pas une question de genre, mais d'exigence. LUI rassemble des produits pensés pour les hommes qui choisissent le naturel sans sacrifier l'efficacité. Les mêmes ingrédients, le même soin artisanal — avec des parfums boisés, frais, affirmés.\n\nSavons pour le corps et les mains, huile à barbe nourrissante, savon à raser en développement. Cèdre bleu, patchouli, bois de santal, romarin — des parfums qui parlent d'eux-mêmes.", "hex": "#3A5A6A", "photo": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773716071/IMG_3026_gngdtk.jpg", "gammes": [{"id": "GAM-1775511367298", "col_id": "COL-008", "rang": 1.0, "nom": "HUILE À BARBE ", "description": null, "hex": null, "photo": null, "produits": [{"id": "PRO-045", "col_id": "COL-008", "gam_id": "GAM-1775511367298", "nom": "L'ÉLIXIR DU MATIN", "desc_emballage": "Trois huiles nobles, un souffle de lavande, un fond de cèdre. Une huile légère qui nourrit, assouplit et sublime la barbe.", "hex": "#C57513", "image_url": null, "image_noel_url": null, "formats": []}]}, {"id": "GAM-018", "col_id": "COL-008", "rang": 2.0, "nom": "SAVON À RASER", "description": null, "hex": null, "photo": null, "produits": [{"id": "PRO-079", "col_id": "COL-008", "gam_id": "GAM-018", "nom": "L'INSTANT DU BARBIER", "desc_emballage": "Un savon qui transforme le rasage en rituel. Une mousse onctueuse qui prend soin du poil et de la peau, du premier geste au dernier.", "hex": "#AA7513", "image_url": null, "image_noel_url": null, "formats": [{"poids": 330.0, "unite": "g", "prix": 30.0}, {"poids": 200.0, "unite": "g", "prix": 20.0}]}, {"id": "PRO-080", "col_id": "COL-008", "gam_id": "GAM-018", "nom": "CLUB PRIVÉ (SAVON À BARBE)", "desc_emballage": "Un savon qui transforme le rasage en rituel. Une mousse onctueuse qui prend soin du poil et de la peau, du premier geste au dernier.", "hex": "#AA7513", "image_url": null, "image_noel_url": null, "formats": [{"poids": 330.0, "unite": "g", "prix": 30.0}, {"poids": 200.0, "unite": "g", "prix": 20.0}]}]}, {"id": "GAM-017", "col_id": "COL-008", "rang": 3.0, "nom": "SAVAGE SAVONNERIE", "description": null, "hex": null, "photo": null, "produits": [{"id": "PRO-056", "col_id": "COL-008", "gam_id": "GAM-017", "nom": "LICHEN", "desc_emballage": "Savon d'été rafraîchissant. Formulé avec olive, coco et ricin pour une mousse généreuse. Spiruline naturelle, senteur de sous-bois après la pluie.", "hex": "#7A9B76", "image_url": null, "image_noel_url": null, "formats": [{"poids": 125.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-060", "col_id": "COL-008", "gam_id": "GAM-017", "nom": "NORDET", "desc_emballage": "Pour ceux qui ne négocient pas avec l'hiver.", "hex": "#2C4A6B", "image_url": null, "image_noel_url": null, "formats": [{"poids": 125.0, "unite": "g", "prix": 7.0}]}, {"id": "PRO-046", "col_id": "COL-008", "gam_id": "GAM-017", "nom": "ESKER", "desc_emballage": "Savon de printemps léger. Formulé avec olive, coco et ricin pour fraîcheur et mousse douce. Spiruline et indigo évoquent l'eau glaciaire. Senteur végétale de sauge, petitgrain et bergamote.", "hex": "#7AAFAF", "image_url": null, "image_noel_url": null, "formats": [{"poids": 125.0, "unite": "g", "prix": 7.0}]}]}]}, "COL-009": {"id": "COL-009", "rang": 9.0, "nom": "ANIMA", "slogan": "Simplement la nature pour pattes et museaux", "description": "Nos compagnons méritent le même soin que nous. ANIMA est formulé avec la même rigueur que nos savons pour la peau humaine — saponifié à froid, surgraissé, avec des ingrédients choisis pour leurs bienfaits. Argile purifiante, avoine apaisante, sans huiles essentielles ni parfum ajouté. Parce que l'odorat d'un chien ou d'un chat est bien trop précieux pour être brusqué.\n\nPattes blanches, le seul et unique pour l'instant — mais pensé avec autant d'attention que toute la gamme. Un bain qui nettoie en douceur, respecte la peau sous le pelage, et laisse votre compagnon propre sans l'incommoder.", "hex": "#C4845A", "photo": "https://res.cloudinary.com/dfasrauyy/image/upload/v1773699700/Anima_iacrow.jpg", "gammes": [{"id": "GAM-019", "col_id": "COL-009", "rang": 1.0, "nom": "SAVON", "description": null, "hex": null, "photo": null, "produits": [{"id": "PRO-063", "col_id": "COL-009", "gam_id": "GAM-019", "nom": "PATTES BLANCHES", "desc_emballage": "Le savon des petits aventuriers, pour effacer les traces d'aventure et retrouver un pelage de velours.", "hex": "#E6DEDF", "image_url": null, "image_noel_url": null, "formats": [{"poids": 125.0, "unite": "g", "prix": 7.0}]}]}]}};
+
+// ── HELPERS ──
+function fmt(p) {
+  if (!p.formats || p.formats.length === 0) return '';
+  const f = p.formats[0];
+  return `${f.poids}${f.unite} · ${parseFloat(f.prix).toFixed(2)} $`;
+}
+
+function img(url, alt) {
+  if (!url) return `<div style="background:var(--hx);width:100%;height:100%;"></div>`;
+  return `<img src="${url}" alt="${alt || ''}" loading="lazy">`;
+}
+
+function truncate(str, max) {
+  if (!str) return '';
+  return str.length > max ? str.slice(0, max-1) + '…' : str;
+}
+
+// ── GRAMMAIRES ──
+const GRAMMARS = ['A','B','C','D','B','A','D','C','A','B','E','C'];
+let gramIdx = 0;
+
+function nextGram() {
+  return GRAMMARS[gramIdx++ % GRAMMARS.length];
+}
+
+function carte(p, gram, extraClass) {
+  const gr = gram || nextGram();
+  return `<div class="carte carte-${gr} p-${p.id} ${extraClass||''}" >
+    <div class="carte-photo">${img(p.image_url, p.nom)}</div>
+    <div class="carte-info">
+      <div class="carte-nom">${p.nom}</div>
+      <div class="carte-desc">${truncate(p.desc_emballage, 110) || ''}</div>
+      <div class="carte-prix">${fmt(p)}</div>
+    </div>
+  </div>`;
+}
+
+// ── ENTETE COLLECTION ──
+function colEntete(col, hauteur) {
+  const desc = (col.description || '').split('\n')[0];
+  return `<div class="col-entete c-${col.id}" style="height:${hauteur}px">
+    <div class="col-entete-photo">${img(col.photo, col.nom)}</div>
+    <div class="col-entete-droite">
+      <div class="col-entete-hex">
+        <div class="col-entete-trait"></div>
+        <div class="col-entete-nom">${col.nom}</div>
+        <div class="col-entete-slogan">${col.slogan || ''}</div>
+      </div>
+      <div class="col-entete-desc"><p>${truncate(desc, 320)}</p></div>
+    </div>
+  </div>`;
+}
+
+// ── SÉPARATEUR GAMME ──
+function gamSep(gam, colHex) {
+  const desc = gam.description ? truncate(gam.description.split('\n')[0], 80) : '';
+  return `<div class="gam-sep c-${gam.col_id}">
+    <div class="gam-sep-trait"></div>
+    <div class="gam-sep-nom">${gam.nom}</div>
+    ${desc ? `<div class="gam-sep-desc">${desc}</div>` : ''}
+  </div>`;
+}
+
+// ── LAYOUT PRODUITS EN RANGÉES ──
+function produitsZone(produits, nbRangees, nPerRow) {
+  const rows = [];
+  for (let i = 0; i < produits.length; i += nPerRow) {
+    const rowProds = produits.slice(i, i + nPerRow);
+    const rowClass = rowProds.length === 1 ? 'rangee-1' : rowProds.length === 2 ? 'rangee-2' : 'rangee-3';
+    rows.push(`<div class="produits-rangee ${rowClass}">${rowProds.map(p => carte(p)).join('')}</div>`);
+  }
+  return `<div class="produits-zone">${rows.join('')}</div>`;
+}
+
+// ── GÉNÉRATEUR DE PAGES ──
+const pages = [];
+
+function addPage(side, content, pageNum) {
+  pages.push({ side, content, pageNum });
+}
+
+function buildCollectionPages(col) {
+  const allProds = col.gammes.flatMap(g => g.produits.map(p => ({...p, _gam: g})));
+  const total = allProds.length;
+  
+  // Première page: entête + premiers produits
+  const firstPageProds = total > 8 ? 4 : total <= 3 ? total : 2;
+  const headerH = total <= 4 ? 180 : 220;
+  
+  let firstContent = colEntete(col, headerH);
+  
+  // Ajouter les séparateurs de gamme si plusieurs gammes
+  let prodsForFirst = allProds.slice(0, firstPageProds);
+  const firstGams = [...new Set(prodsForFirst.map(p => p._gam.id))];
+  
+  let firstBody = '';
+  if (col.gammes.length > 1) {
+    for (const gamId of firstGams) {
+      const gam = col.gammes.find(g => g.id === gamId);
+      const gamProds = prodsForFirst.filter(p => p._gam.id === gamId);
+      firstBody += gamSep(gam);
+      firstBody += produitsZone(gamProds, 1, 2);
+    }
+  } else {
+    firstBody = produitsZone(prodsForFirst, firstPageProds <= 2 ? 1 : 2, 2);
+  }
+  
+  firstContent += firstBody;
+  pages.push({ content: firstContent, col: col.id });
+  
+  // Pages suivantes
+  let remaining = allProds.slice(firstPageProds);
+  let gammeIdx = 0;
+  
+  while (remaining.length > 0) {
+    let pageContent = '';
+    let pageProds = remaining.slice(0, 4);
+    remaining = remaining.slice(4);
+    
+    // Grouper par gamme pour les séparateurs
+    if (col.gammes.length > 1) {
+      const pageGams = [...new Set(pageProds.map(p => p._gam.id))];
+      for (const gamId of pageGams) {
+        const gam = col.gammes.find(g => g.id === gamId);
+        const gamProds = pageProds.filter(p => p._gam.id === gamId);
+        pageContent += gamSep(gam);
+        pageContent += produitsZone(gamProds, Math.ceil(gamProds.length/2), 2);
+      }
+    } else {
+      pageContent = produitsZone(pageProds, Math.ceil(pageProds.length/2), 2);
+    }
+    
+    pages.push({ content: pageContent, col: col.id });
+  }
+}
+
+// Générer toutes les collections (pages 4+)
+// Pages 1-3 sont figées — on commence à 4
+let pageNum = 4;
+for (const colId in DATA) {
+  gramIdx = 0; // reset grammar per collection
+  buildCollectionPages(DATA[colId]);
+}
+
+// ── RENDU ──
+const wrap = document.getElementById('pages-wrap');
+
+// Grouper en spreads (paires de pages)
+const spreads = [];
+// Pages 1-3 sont déjà dans le booklet imprimé, on commence nos pages à 4
+// Mais pour la prévisualisation, on affiche directement depuis la page 4
+
+for (let i = 0; i < pages.length; i += 2) {
+  spreads.push([pages[i], pages[i+1] || null]);
+}
+
+let currentSpread = 0;
+
+function renderSpread(idx) {
+  const [left, right] = spreads[idx];
+  const spreadEl = document.createElement('div');
+  spreadEl.className = 'spread actif';
+  
+  function makePageEl(pg, num, side) {
+    if (!pg) {
+      const blank = document.createElement('div');
+      blank.className = `page page-${side}`;
+      blank.innerHTML = `<div class="page-int"></div><div class="cat-pied"><span>Univers Caresse</span><span>${num}</span></div>`;
+      return blank;
+    }
+    const el = document.createElement('div');
+    el.className = `page page-${side} c-${pg.col}`;
+    el.innerHTML = `
+      <div class="page-int">${pg.content}</div>
+      <div class="cat-pied">
+        <span style="font-family:'Playfair Display';font-style:italic">Univers Caresse</span>
+        <span>${num}</span>
+      </div>`;
+    return el;
+  }
+  
+  const leftNum = pageNum + idx * 2;
+  const rightNum = leftNum + 1;
+  
+  spreadEl.appendChild(makePageEl(left, leftNum, 'g'));
+  spreadEl.appendChild(makePageEl(right, rightNum, 'd'));
+  
+  return spreadEl;
+}
+
+// Rendre tous les spreads (masqués sauf le premier)
+const spreadEls = spreads.map((_, i) => {
+  const el = renderSpread(i);
+  if (i !== 0) el.classList.remove('actif');
+  wrap.appendChild(el);
+  return el;
+});
+
+function updateNav() {
+  document.getElementById('btn-prev').disabled = currentSpread === 0;
+  document.getElementById('btn-next').disabled = currentSpread === spreadEls.length - 1;
+  const l = pageNum + currentSpread * 2;
+  document.getElementById('nav-info').textContent = `Pages ${l}–${l+1}`;
+}
+
+function prevSpread() {
+  if (currentSpread > 0) {
+    spreadEls[currentSpread].classList.remove('actif');
+    currentSpread--;
+    spreadEls[currentSpread].classList.add('actif');
+    updateNav();
+  }
+}
+
+function nextSpread() {
+  if (currentSpread < spreadEls.length - 1) {
+    spreadEls[currentSpread].classList.remove('actif');
+    currentSpread++;
+    spreadEls[currentSpread].classList.add('actif');
+    updateNav();
+  }
+}
+
+updateNav();
+</script>
+</body>
+</html>
