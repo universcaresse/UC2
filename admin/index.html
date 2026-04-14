@@ -1472,7 +1472,26 @@
                   <input type="text" class="form-ctrl" id="if-date">
                 </div>
               </div>
-              <div class="tableau-wrap" style="margin-top:1rem;">
+              <div id="if-catalogue-zone" class="cache">
+            <div class="form-grille-2" style="margin-bottom:1rem;">
+              <div class="form-groupe">
+                <label class="form-label">Catégorie</label>
+                <select class="form-ctrl" id="if-cat-catalogue" onchange="ifOnChangeCatCatalogue()">
+                  <option value="">— Catégorie —</option>
+                </select>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Item</label>
+                <select class="form-ctrl" id="if-item-catalogue">
+                  <option value="">— Choisir —</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions" style="margin-bottom:1rem;">
+              <button class="bouton bouton-petit" onclick="ifAjouterDepuisCatalogue()">+ Ajouter</button>
+            </div>
+          </div>
+          <div class="tableau-wrap" style="margin-top:1rem;">
                 <table class="tableau-admin" id="if-tableau">
                   <thead>
                     <tr>

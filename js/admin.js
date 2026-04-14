@@ -2965,6 +2965,7 @@ async function sauvegarderContenuSite() {
 ════════════════════════════════ */
 var ifItems   = [];
 var ifFournisseurActif = '';
+var ifCatalogueItems = [];
 var ifMapping = [];
 
 async function ifChargerMapping() {
@@ -3055,15 +3056,8 @@ async function saisirDepuisCatalogue() {
   }, 0);
   const numeroAuto = 'MAN-' + String(maxMan + 1).padStart(3, '0');
   const today = new Date().toISOString().split('T')[0];
-  ifItems = res.items.map(item => ({
-    description:  item.nom,
-    categorie:    item.categorie,
-    formatQte:    '',
-    formatUnite:  '',
-    prixUnitaire: 0,
-    quantite:     1,
-    total:        0
-  }));
+  ifCatalogueItems = res.items;
+  ifItems = [];
   document.getElementById('if-numero').value    = numeroAuto;
   document.getElementById('if-date').value      = today;
   document.getElementById('if-tps').value       = '';
@@ -3071,10 +3065,64 @@ async function saisirDepuisCatalogue() {
   document.getElementById('if-livraison').value = '';
   document.getElementById('if-soustotal').value = '';
   document.getElementById('if-total').value     = '';
+  const cats = [...new Set(ifCatalogueItems.map(i => i.categorie).filter(Boolean))].sort((a,b) => a.localeCompare(b,'fr'));
+  const selCat = document.getElementById('if-cat-catalogue');
+  selCat.innerHTML = '<option value="">— Catégorie —</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  document.getElementById('if-item-catalogue').innerHTML = '<option value="">— Choisir —</option>';
+  document.getElementById('if-catalogue-zone').classList.remove('cache');
+  document.getElementById('if-tbody').innerHTML = '';
   afficherApercuItems(fournisseur);
   document.getElementById('if-apercu').classList.remove('cache');
   document.getElementById('if-bloc-upload').classList.add('cache');
   afficherMsg('import-facture', '');
+}
+
+function ifOnChangeCatCatalogue() {
+  const cat = document.getElementById('if-cat-catalogue').value;
+  const items = cat ? ifCatalogueItems.filter(i => i.categorie === cat) : [];
+  const sel = document.getElementById('if-item-catalogue');
+  sel.innerHTML = '<option value="">— Choisir —</option>' +
+    items.sort((a,b) => (a.nom||'').localeCompare(b.nom||'','fr')).map(i => `<option value="${i.nom}">${i.nom}</option>`).join('');
+}
+
+function ifAjouterDepuisCatalogue() {
+  const nom = document.getElementById('if-item-catalogue').value;
+  const cat = document.getElementById('if-cat-catalogue').value;
+  if (!nom) { afficherMsg('import-facture', 'Choisis un item.', 'erreur'); return; }
+  ifItems.push({
+    description:  nom,
+    categorie:    cat,
+    formatQte:    '',
+    formatUnite:  '',
+    prixUnitaire: 0,
+    quantite:     1,
+    total:        0
+  });
+  afficherApercuItems(ifFournisseurActif);
+}
+
+function ifOnChangeCatCatalogue() {
+  const cat = document.getElementById('if-cat-catalogue').value;
+  const items = cat ? ifCatalogueItems.filter(i => i.categorie === cat) : [];
+  const sel = document.getElementById('if-item-catalogue');
+  sel.innerHTML = '<option value="">— Choisir —</option>' +
+    items.sort((a,b) => (a.nom||'').localeCompare(b.nom||'','fr')).map(i => `<option value="${i.nom}">${i.nom}</option>`).join('');
+}
+
+function ifAjouterDepuisCatalogue() {
+  const nom = document.getElementById('if-item-catalogue').value;
+  const cat = document.getElementById('if-cat-catalogue').value;
+  if (!nom) { afficherMsg('import-facture', 'Choisis un item.', 'erreur'); return; }
+  ifItems.push({
+    description:  nom,
+    categorie:    cat,
+    formatQte:    '',
+    formatUnite:  '',
+    prixUnitaire: 0,
+    quantite:     1,
+    total:        0
+  });
+  afficherApercuItems(ifFournisseurActif);
 }
 
 function normaliserPourMapping(s) {
