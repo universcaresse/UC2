@@ -1304,7 +1304,7 @@ tr.cliquable { cursor: pointer; }
 .edu-tableau td { font-size: 0.85rem; line-height: 1.6; color: var(--gris); font-weight: 300; padding: 14px 16px; border-bottom: 1px solid var(--beige); vertical-align: top; }
 .edu-tableau tbody tr:last-child td { border-bottom: none; }
 .edu-tableau tbody tr:hover td { background: var(--primary-04); }
-.filtres-ligne { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; }
+.filtres-ligne { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; margin-bottom: 8px; }
 .tableau-admin { width: 100%; border-collapse: collapse; }
 .tableau-admin th, .tableau-admin td { padding: 10px 12px; border-bottom: 1px solid var(--beige); }
 .tableau-admin td:last-child { white-space: normal; width: 15%; }
