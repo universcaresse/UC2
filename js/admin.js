@@ -3050,7 +3050,7 @@ async function saisirDepuisCatalogue() {
   if (!res || !res.success || !res.items.length) { afficherMsg('import-facture', 'Aucun item trouvé pour ce fournisseur.', 'erreur'); return; }
   const factures = (resAch && resAch.success) ? resAch.items : [];
   const maxMan = factures.reduce((max, f) => {
-    const m = (f.numero_facture || '').match(/^MAN-(\d+)$/);
+    const m = String(f.numero_facture || '').match(/^MAN-(\d+)$/);
     return m ? Math.max(max, parseInt(m[1])) : max;
   }, 0);
   const numeroAuto = 'MAN-' + String(maxMan + 1).padStart(3, '0');
