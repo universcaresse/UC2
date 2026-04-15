@@ -1330,6 +1330,7 @@ async function ouvrirFicheProduit(pro_id) {
       <div class="fiche-champ"><span class="fiche-label">Nb unités</span><span class="fiche-valeur">${pro.nb_unites || '—'}</span></div>
       <div class="fiche-champ"><span class="fiche-label">Surgras</span><span class="fiche-valeur">${pro.surgras || '—'}</span></div>
       <div class="fiche-champ"><span class="fiche-label">Couleur HEX</span><span class="fiche-valeur">${pro.couleur_hex || '—'}</span></div>
+      ${coutHtml}
     </div>
     <div class="fiche-section-titre">Description</div>
     <div class="fiche-texte">${pro.description || '—'}</div>
@@ -1341,7 +1342,6 @@ async function ouvrirFicheProduit(pro_id) {
     <div class="fiche-texte">${pro.avertissement || '—'}</div>
     <div class="fiche-section-titre">Mode d'emploi</div>
     <div class="fiche-texte">${pro.mode_emploi || '—'}</div>
-    ${coutHtml}
     <div class="fiche-section-titre">Ingrédients</div>
     <div class="fiche-ingredient fiche-ingredient-labels">
       <span class="fiche-ing-nom">Nom</span>
