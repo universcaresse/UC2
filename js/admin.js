@@ -1279,6 +1279,14 @@ async function ouvrirFicheProduit(pro_id) {
   // Charger les ingrédients
   const resIng = await appelAPI('getProduitsIngredients', { pro_id });
   const ings   = (resIng && resIng.success) ? resIng.items : [];
+
+  // Charger le stock si pas encore en mémoire
+  if (!listesDropdown.stock) {
+    const resSto = await appelAPI('getStock');
+    listesDropdown.stock = (resSto && resSto.success) ? resSto.items : [];
+  }
+  const cout = calculerCoutRevient(ings);
+  const coutHtml = `<div class="fiche-champ"><span class="fiche-label">Coût de revient estimé</span><span class="fiche-valeur">${cout > 0 ? cout.toFixed(2) + ' $' : '—'}</span></div>`;
   const ingsHtml = ings.length
     ? ings.sort((a, b) => b.quantite_g - a.quantite_g).map(i => {
         const inciObj  = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient);
@@ -1320,6 +1328,7 @@ async function ouvrirFicheProduit(pro_id) {
       <span class="fiche-ing-qte">Qté</span>
     </div>
     <div class="fiche-ingredients">${ingsHtml}</div>
+    ${coutHtml}
     <div class="fiche-section-titre">Formats disponibles</div>
     <div class="fiche-ingredients">${formatsHtml}</div>
   `;
@@ -3802,6 +3811,33 @@ async function sauvegarderLot() {
   } else {
     afficherMsg('fabrication', '❌ ' + (res?.message || 'Erreur.'));
   }
+}
+
+// ─── COÛT DE REVIENT ───
+
+function calculerCoutRevient(ingredients) {
+  const stock  = listesDropdown.stock  || [];
+  const config = listesDropdown.config || {};
+
+  let total = 0;
+  ingredients.forEach(ing => {
+    const stockItem = stock.find(s => s.ing_id === ing.ing_id);
+    if (!stockItem) return;
+
+    const prixParG = stockItem.prix_par_g_reel || 0;
+    const cat_id   = stockItem.cat_id || '';
+    const cfg      = config[cat_id] || {};
+    const perte    = cfg.margePertePct || 0;
+    const facteur  = 1 + (perte / 100);
+
+    total += (ing.quantite_g || 0) * prixParG * facteur;
+  });
+
+  // Structure ouverte pour bonifier plus tard :
+  // total += coutEmballages;
+  // total += coutMainOeuvre;
+
+  return total;
 }
 
 // ─── FONCTIONS INCI RESTANTES (compatibilité HTML) ───
