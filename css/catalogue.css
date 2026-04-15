@@ -86,7 +86,7 @@
 .p-chantal .page-int { flex-direction: row; background: var(--blanc); }
 
 .chantal-photo { 
-  width: 400px;
+  width: 340px;
   flex-shrink: 0; 
   position: relative; 
   overflow: hidden;
