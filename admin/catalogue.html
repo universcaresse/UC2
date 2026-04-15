@@ -11,142 +11,105 @@
 <body class="catalogue-body-print">
 
 <div class="livre-ecran">
-<div class="livre-navigation">
-  <button class="livre-bouton" id="livre-precedent" disabled>← Précédent</button>
-  <span class="livre-info" id="livre-info"></span>
-  <button class="livre-bouton" id="livre-suivant">Suivant →</button>
-</div>
-<div id="livre-contenu">
-
-<!-- ══════════════════════════════
-  P1 — COUVERTURE
-══════════════════════════════ -->
-<div class="page-label">Page 1 — Couverture</div>
-<div class="page p-cover">
-
-
-
-   <div class="cover-photo"></div>
-  <div class="cover-fondu"></div>
- 
-
-<div class="cover-cols" id="cover-cols-collections"></div>
-
-  <div class="cover-corps">
-    <div class="cover-eyebrow" id="cover-eyebrow-texte"></div>
-    <img src="../Images/Logofinal.png"
-         alt="Univers Caresse"
-         class="cover-logo">
+  <div class="livre-navigation">
+    <button class="livre-bouton" id="livre-precedent" disabled>← Précédent</button>
+    <span class="livre-info" id="livre-info"></span>
+    <button class="livre-bouton" id="livre-suivant">Suivant →</button>
   </div>
-</div>
+  <div id="livre-contenu">
 
-<!-- ══════════════════════════════
-  P2-P3 — CHANTAL + TABLE DES MATIÈRES
-══════════════════════════════ -->
-<div class="livre-double" id="livre-vue-2">
-<div class="page-label">Page 2 — Mot de Chantal</div>
-<div class="page p-chantal">
-  <div class="page-interieur">
-  <div class="chantal-photo">
-    <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774627932/a-warm-inviting-photograph-of-an-artisan_uCbddMjKSkWQWJrd_XQJdg_VTqWCfYYQ_Kna8JgcGw28A_lmm3kj.jpg"
-         alt="Atelier Univers Caresse">
-  </div>
-  <div class="chantal-texte">
-    <div class="chantal-titre" id="chantal-titre"></div>
-    <div class="page-hero-signature" id="chantal-signature"></div>
-    <div class="page-hero-titre-signature" id="chantal-signature-titre"></div>
-    <div class="chantal-corps" id="chantal-corps"></div>
- <div class="chantal-citation" id="chantal-citation"></div>
-  </div>
-</div>
-</div>
-  <div class="cat-pied">
-    <span class="logo-tagline">Univers Caresse</span>
-    <span>universcaresse.ca</span>
-    <span>2</span>
-  </div>
-</div>
-
-<!-- ══════════════════════════════
-  PAGES COLLECTIONS — DYNAMIQUES
-══════════════════════════════ -->
-<div class="page-label">Page 3 — Table des matières</div>
-<div class="page p-tdm">
-  <div class="page-interieur">
-  <div class="tdm-overlay"></div>
-  <div class="tdm-corps">
-    <div class="page-entete-eyebrow">Collections</div>
-    <div class="tdm-liste" id="tdm-liste"></div>
-  </div>
-</div>
-  <div class="cat-pied">
-    <span class="logo-tagline">Univers Caresse</span>
-    <span>universcaresse.ca</span>
-    <span>3</span>
-  </div>
-</div>
-<div id="pages-collections">
-  <div class="chargement">Chargement des collections…</div>
-</div>
-
-<!-- ══════════════════════════════
-  P — PHILOSOPHIE
-══════════════════════════════ -->
-<div class="page-label">Page — Philosophie</div>
-<div class="page p-philo">
-  <div class="philo-contenu">
-    <div class="philo-trait"></div>
-    <div class="page-entete-eyebrow">Notre philosophie</div>
-    <div class="bandeau-citation" style="background:transparent;">
-      <p class="citation-texte">
-        « Chaque ingrédient est choisi pour ce qu'il apporte vraiment — fabriqué à la main, en petites séries, sans compromis. »
-      </p>
-    </div>
-    <span class="page-hero-signature">Chantal Mondor</span>
-    <div class="page-hero-titre-signature">Artisane savonnière · Québec</div>
-    <div class="philo-valeurs">
-      <div>
-        <div class="valeur-titre">100% Naturel</div>
-        <div class="valeur-desc">Aucun sulfate, paraben, silicone ou colorant synthétique. Juste la nature.</div>
-      </div>
-      <div>
-        <div class="valeur-titre">Fait à la main</div>
-        <div class="valeur-desc">Chaque produit est coulé, démoulé et préparé manuellement en petites séries.</div>
-      </div>
-      <div>
-        <div class="valeur-titre">Fièrement québécois</div>
-        <div class="valeur-desc">Ingrédients locaux privilégiés, fabriqué au Québec, sans huile de palme.</div>
+    <!-- ══════════════════════════════
+      P1 — COUVERTURE
+      Exception : plein format, pas de bande blanche — voulu
+    ══════════════════════════════ -->
+    <div class="page-label">Page 1 — Couverture</div>
+    <div class="page p-cover">
+      <div class="cover-photo"></div>
+      <div class="cover-fondu"></div>
+      <div class="cover-cols" id="cover-cols-collections"></div>
+      <div class="cover-corps">
+        <div class="cover-eyebrow" id="cover-eyebrow-texte"></div>
+        <img src="../Images/Logofinal.png" alt="Univers Caresse" class="cover-logo">
       </div>
     </div>
+
+    <!-- ══════════════════════════════
+      P2 — CHANTAL
+    ══════════════════════════════ -->
+    <div class="page-label">Page 2 — Mot de Chantal</div>
+    <div class="page p-chantal page-g">
+      <div class="page-int">
+        <div class="chantal-photo">
+          <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774627932/a-warm-inviting-photograph-of-an-artisan_uCbddMjKSkWQWJrd_XQJdg_VTqWCfYYQ_Kna8JgcGw28A_lmm3kj.jpg"
+               alt="Atelier Univers Caresse">
+        </div>
+        <div class="chantal-texte">
+          <div class="chantal-titre" id="chantal-titre"></div>
+          <div class="page-hero-signature" id="chantal-signature"></div>
+          <div class="page-hero-titre-signature" id="chantal-signature-titre"></div>
+          <div class="chantal-corps" id="chantal-corps"></div>
+          <div class="chantal-citation" id="chantal-citation"></div>
+        </div>
+      </div>
+      <div class="cat-pied">
+        <span class="logo-tagline">Univers Caresse</span>
+        <span>universcaresse.ca</span>
+        <span>2</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+      P3 — TABLE DES MATIÈRES
+    ══════════════════════════════ -->
+    <div class="page-label">Page 3 — Table des matières</div>
+    <div class="page p-tdm page-d">
+      <div class="page-int">
+        <div class="tdm-overlay"></div>
+        <div class="tdm-corps">
+          <div class="page-entete-eyebrow">Collections</div>
+          <div class="tdm-liste" id="tdm-liste"></div>
+        </div>
+      </div>
+      <div class="cat-pied">
+        <span class="logo-tagline">Univers Caresse</span>
+        <span>universcaresse.ca</span>
+        <span>3</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+      PAGES COLLECTIONS — DYNAMIQUES
+    ══════════════════════════════ -->
+    <div id="pages-collections"></div>
+
+    <!-- ══════════════════════════════
+      P — DOS DE COUVERTURE
+      Exception : centré, pas de bande blanche — voulu
+    ══════════════════════════════ -->
+    <div class="page-label">Page — Dos de couverture</div>
+    <div class="page p-dos">
+      <div class="dos-corps">
+        <div class="logo-tagline dos-marque">Univers Caresse</div>
+        <div class="page-hero-titre-signature">Savonnerie artisanale · Québec</div>
+        <div class="dos-sep"></div>
+        <div class="dos-coords">
+          <div class="dos-coord">universcaresse.ca</div>
+          <div class="dos-coord">universcaresse@outlook.com</div>
+        </div>
+        <div class="dos-note">
+          Disponible en ligne et dans les marchés locaux.<br>
+          Toutes les collections sont fabriquées à la main en petites séries — disponibilité selon la saison.
+        </div>
+        <div class="dos-dots" id="dos-dots-collections"></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="livre-imprimer">
+    <button class="bouton bouton-contour bouton-petit" onclick="window.print()">Imprimer</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════
-  P — DOS DE COUVERTURE
-══════════════════════════════ -->
-<div class="page-label">Page — Dos de couverture</div>
-<div class="page p-dos">
-  <div class="dos-corps">
-    <div class="logo-tagline dos-marque">Univers Caresse</div>
-    <div class="page-hero-titre-signature">Savonnerie artisanale · Québec</div>
-    <div class="dos-sep"></div>
-    <div class="dos-coords">
-      <div class="dos-coord">universcaresse.ca</div>
-      <div class="dos-coord">universcaresse@outlook.com</div>
-    </div>
-    <div class="dos-note">
-      Disponible en ligne et dans les marchés locaux.<br>
-      Toutes les collections sont fabriquées à la main en petites séries — disponibilité selon la saison.
-    </div>
-    <div class="dos-dots" id="dos-dots-collections"></div>
-  </div>
-</div>
-
-</div>
-<div class="livre-imprimer">
-  <button class="bouton bouton-contour bouton-petit" onclick="window.print()">Imprimer</button>
-</div>
-</div>
 <script src="../js/catalogue.js"></script>
 </body>
 </html>
