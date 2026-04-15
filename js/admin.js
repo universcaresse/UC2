@@ -3269,7 +3269,7 @@ ifFournisseurActif = fournisseur;
         })()}
       </td>
       <td><input type="text" inputmode="decimal" class="form-ctrl" value="${item.quantite}" style="width:60px" onchange="ifItems[${idx}].quantite=parseFloat(this.value)||1; ifRecalculerSousTotal()"></td>
-      <td><input type="text" inputmode="decimal" class="form-ctrl" value="${item.prixUnitaire||''}" placeholder="0.00" style="width:80px" onchange="ifItems[${idx}].prixUnitaire=parseFloat(this.value)||0; ifRecalculerSousTotal()"></td>
+      <td><input type="text" inputmode="decimal" class="form-ctrl" value="${item.prixUnitaire||''}" placeholder="0.00" style="width:80px" onchange="ifItems[${idx}].prixUnitaire=parseFloat(this.value)||0; afficherApercuItems(ifFournisseurActif)"></td>
       <td style="white-space:nowrap">${total} $</td>
       <td>
         <select class="form-ctrl" id="if-type-${idx}" onchange="ifOnChangeCat(${idx})">
