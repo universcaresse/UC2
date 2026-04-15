@@ -6,6 +6,7 @@
 // ─── PURE ARÔME ───
 function parserFacturePA(texte) {
   const facture = { numeroFacture: '', date: '', items: [], tps: 0, tvq: 0, livraison: 0, sousTotal: 0, total: 0 };
+  texte = texte.replace(/https?:\/\/\S+/g, '').replace(/Page\s+\d+\s+sur\s+\d+/gi, '');
   const mNum  = texte.match(/Détails de la commande[\s\S]{0,20}?(\d{4,6})/i);
   if (mNum) facture.numeroFacture = mNum[1].trim();
   const mDate = texte.match(/(\d{2}-\d{2}-\d{4})/);
