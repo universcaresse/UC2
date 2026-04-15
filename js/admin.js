@@ -3566,37 +3566,35 @@ async function confirmerImportFacture() {
     const prixParG = grammes > 0 ? (item.prixUnitaire / grammes) : 0;
     lignes.push({ idx, item, nom_UC, cat_UC, ingObj, prixParG, fmtQte, fmtUnite });
   }
-
-  // Mappings et lignes en parallèle
-  const promesses = lignes.map(({ idx, item, nom_UC, cat_UC, ingObj, prixParG, fmtQte, fmtUnite }) => {
-    const appels = [];
-    if (!trouverMappingItem(item.description, fournisseur)) {
+// Mappings en parallèle
+  const promessesMapping = lignes
+    .filter(({ item }) => !trouverMappingItem(item.description, fournisseur))
+    .map(({ item, nom_UC, cat_UC, ingObj }) => {
       ifMapping.push({ fournisseur, categorie_fournisseur: cat_UC, nom_fournisseur: item.description, categorie_UC: cat_UC, nom_UC, ing_id: ingObj?.ing_id || '' });
-      appels.push(appelAPIPost('saveMappingFournisseur', {
+      return appelAPIPost('saveMappingFournisseur', {
         fournisseur,
         categorie_fournisseur: listesDropdown.categoriesMap?.[cat_UC] || cat_UC,
         nom_fournisseur:       item.description,
         categorie_UC:          listesDropdown.categoriesMap?.[cat_UC] || cat_UC,
         nom_UC,
         ing_id: ingObj?.ing_id || ''
-      }));
-    }
-    appels.push(appelAPIPost('addAchatLigne', {
-      ach_id,
-      ing_id:        ingObj?.ing_id || '',
-      format_qte:    fmtQte,
-      format_unite:  fmtUnite,
-      prix_unitaire: item.prixUnitaire,
-      prix_par_g:    prixParG.toFixed(6),
-      quantite:      item.quantite
-    }).then(res => ({ res, idx, description: item.description })));
-    return Promise.all(appels);
-  });
+      });
+    });
+  await Promise.allSettled(promessesMapping);
 
-  const resultats = await Promise.allSettled(promesses);
-  const erreurs = resultats.filter(r => r.status === 'rejected' || (r.value && r.value.some(v => v?.res && !v.res.success)));
-  if (erreurs.length) {
-    afficherMsg('import-facture', `❌ ${erreurs.length} ligne(s) en erreur — vérifier la facture ${ach_id}.`, 'erreur');
+  // Toutes les lignes en un seul appel
+  const payload = lignes.map(({ item, ingObj, prixParG, fmtQte, fmtUnite }) => ({
+    ach_id,
+    ing_id:        ingObj?.ing_id || '',
+    format_qte:    fmtQte,
+    format_unite:  fmtUnite,
+    prix_unitaire: item.prixUnitaire,
+    prix_par_g:    prixParG.toFixed(6),
+    quantite:      item.quantite
+  }));
+  const resLignes = await appelAPIPost('addAchatLignes', { lignes: payload });
+  if (!resLignes || !resLignes.success) {
+    afficherMsg('import-facture', `❌ Erreur import lignes — ${resLignes?.message || ''}`, 'erreur');
     btn.disabled = false;
     btn.textContent = texteOriginal;
     return;
