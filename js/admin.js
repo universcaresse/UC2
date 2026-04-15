@@ -3231,14 +3231,36 @@ ifFournisseurActif = fournisseur;
    tr.innerHTML = `
       <td>${item.description}</td>
       <td>
-        <input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte}" placeholder="Qté" style="width:60px" onchange="ifItems[${idx}].formatQte=this.value">
-        <select class="form-ctrl" id="if-fmt-unite-${idx}" onchange="ifItems[${idx}].formatUnite=this.value" style="width:70px">
-          <option value="g" ${item.formatUnite==='g'?'selected':''}>g</option>
-          <option value="ml" ${item.formatUnite==='ml'?'selected':''}>ml</option>
-          <option value="kg" ${item.formatUnite==='kg'?'selected':''}>kg</option>
-          <option value="L" ${item.formatUnite==='L'?'selected':''}>L</option>
-          <option value="lbs" ${item.formatUnite==='lbs'?'selected':''}>lbs</option>
-        </select>
+        ${(() => {
+          const ingObj = listesDropdown.fullData?.find(d => d.nom_UC === nom_UC);
+          const fmts = ingObj ? (listesDropdown.formats || []).filter(f => f.ing_id === ingObj.ing_id) : [];
+          if (fmts.length > 0) {
+            const opts = fmts.map(f => `<option value="${f.quantite}|${f.unite}" ${item.formatQte == f.quantite && item.formatUnite === f.unite ? 'selected' : ''}>${f.quantite} ${f.unite}</option>`).join('');
+            return `<select class="form-ctrl" id="if-fmt-sel-${idx}" style="width:110px" onchange="ifOnChangeFormat(${idx},this.value)">
+              ${opts}
+              <option value="__nouveau__">+ Nouveau</option>
+            </select>
+            <span id="if-fmt-manuel-${idx}" class="cache">
+              <input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte}" placeholder="Qté" style="width:60px" onchange="ifItems[${idx}].formatQte=this.value">
+              <select class="form-ctrl" id="if-fmt-unite-${idx}" onchange="ifItems[${idx}].formatUnite=this.value" style="width:70px">
+                <option value="g" ${item.formatUnite==='g'?'selected':''}>g</option>
+                <option value="ml" ${item.formatUnite==='ml'?'selected':''}>ml</option>
+                <option value="kg" ${item.formatUnite==='kg'?'selected':''}>kg</option>
+                <option value="L" ${item.formatUnite==='L'?'selected':''}>L</option>
+                <option value="lbs" ${item.formatUnite==='lbs'?'selected':''}>lbs</option>
+              </select>
+            </span>`;
+          } else {
+            return `<input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte}" placeholder="Qté" style="width:60px" onchange="ifItems[${idx}].formatQte=this.value">
+            <select class="form-ctrl" id="if-fmt-unite-${idx}" onchange="ifItems[${idx}].formatUnite=this.value" style="width:70px">
+              <option value="g" ${item.formatUnite==='g'?'selected':''}>g</option>
+              <option value="ml" ${item.formatUnite==='ml'?'selected':''}>ml</option>
+              <option value="kg" ${item.formatUnite==='kg'?'selected':''}>kg</option>
+              <option value="L" ${item.formatUnite==='L'?'selected':''}>L</option>
+              <option value="lbs" ${item.formatUnite==='lbs'?'selected':''}>lbs</option>
+            </select>`;
+          }
+        })()}
       </td>
       <td><input type="text" inputmode="decimal" class="form-ctrl" value="${item.quantite}" style="width:60px" onchange="ifItems[${idx}].quantite=parseFloat(this.value)||1"></td>
       <td><input type="text" inputmode="decimal" class="form-ctrl" value="${item.prixUnitaire||''}" placeholder="0.00" style="width:80px" onchange="ifItems[${idx}].prixUnitaire=parseFloat(this.value)||0; ifRecalculerSousTotal()"></td>
@@ -3264,6 +3286,21 @@ ifFournisseurActif = fournisseur;
    
     tbody.appendChild(tr);
   });
+}
+
+function ifOnChangeFormat(idx, val) {
+  if (val === '__nouveau__') {
+    document.getElementById(`if-fmt-manuel-${idx}`)?.classList.remove('cache');
+  } else {
+    document.getElementById(`if-fmt-manuel-${idx}`)?.classList.add('cache');
+    const parts = val.split('|');
+    ifItems[idx].formatQte   = parseFloat(parts[0]) || 0;
+    ifItems[idx].formatUnite = parts[1] || 'g';
+    const qteInput = document.getElementById(`if-fmt-qte-${idx}`);
+    const uniSel   = document.getElementById(`if-fmt-unite-${idx}`);
+    if (qteInput) qteInput.value = ifItems[idx].formatQte;
+    if (uniSel)   uniSel.value   = ifItems[idx].formatUnite;
+  }
 }
 
 function ifFiltrerNoms(idx) {
