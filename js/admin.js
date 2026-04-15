@@ -1298,8 +1298,7 @@ async function ouvrirFicheProduit(pro_id) {
     const facteur   = 1 + (perte / 100);
     const sousTotal = (ing.quantite_g || 0) * prixParG * facteur;
     coutTotal += sousTotal;
-    const manquant = !stockItem ? ' ⚠' : '';
-    coutDetail += `<div class="fiche-ingredient"><span class="fiche-ing-nom">${ing.nom_ingredient}${manquant}</span><span class="fiche-ing-inci">${prixParG > 0 ? prixParG.toFixed(4) + ' $/g' : '—'}</span><span class="fiche-ing-qte">${sousTotal > 0 ? sousTotal.toFixed(2) + ' $' : '⚠'}</span></div>`;
+    
   });
   const cout    = coutTotal;
   const coutHtml = `<div class="fiche-champ"><span class="fiche-label">Coût de revient estimé</span><span class="fiche-valeur">${cout > 0 ? cout.toFixed(2) + ' $' : '—'}</span></div>`;
@@ -1308,7 +1307,10 @@ async function ouvrirFicheProduit(pro_id) {
         const inciObj  = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient);
         const inciCode = inciObj?.inci || '';
         const sansInci = !inciCode;
-        return `<div class="fiche-ingredient"><span class="fiche-ing-nom${sansInci ? ' fiche-label-manquant' : ''}">${sansInci ? '⚠ ' : ''}${i.nom_ingredient}</span><span class="fiche-ing-inci">${inciCode}</span><span class="fiche-ing-qte">${i.quantite_g} g</span></div>`;
+        const stockItem2 = (listesDropdown.stock || []).find(s => s.ing_id === i.ing_id);
+        const prixParG2  = stockItem2 ? (stockItem2.prix_par_g_reel || 0) : 0;
+        const coutIng    = prixParG2 > 0 ? (i.quantite_g * prixParG2).toFixed(2) + ' $' : '⚠';
+        return `<div class="fiche-ingredient"><span class="fiche-ing-nom${sansInci ? ' fiche-label-manquant' : ''}">${sansInci ? '⚠ ' : ''}${i.nom_ingredient}</span><span class="fiche-ing-inci">${inciCode}</span><span class="fiche-ing-qte">${i.quantite_g} g — ${coutIng}</span></div>`;
       }).join('')
     : '<div class="fiche-vide">Aucun ingrédient</div>';
 
