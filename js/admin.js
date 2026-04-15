@@ -1351,7 +1351,7 @@ async function ouvrirFormProduit() {
   ingredientsRecette = [];
   document.getElementById('form-recettes-titre').textContent = 'Nouveau produit';
   document.getElementById('fr-id').value = '';
-  ['fr-nom','fr-couleur','fr-unites','fr-cure','fr-description','fr-instructions','fr-notes','fr-surgras']
+['fr-nom','fr-couleur','fr-unites','fr-cure','fr-description','fr-instructions','fr-notes','fr-surgras','fr-avertissement','fr-mode-emploi']
     .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
   document.getElementById('fr-statut').value     = 'test';
  document.getElementById('fr-collection').value = '';
@@ -1410,6 +1410,10 @@ async function modifierProduit(pro_id) {
   if (descEmb) descEmb.value = pro.desc_emballage || '';
   document.getElementById('fr-instructions').value             = pro.instructions || '';
   document.getElementById('fr-notes').value                    = pro.notes || '';
+  const elAvert = document.getElementById('fr-avertissement');
+  if (elAvert) elAvert.value = pro.avertissement || '';
+  const elMode = document.getElementById('fr-mode-emploi');
+  if (elMode) elMode.value = pro.mode_emploi || '';
   document.getElementById('fr-surgras').value                  = pro.surgras || '';
   document.getElementById('fr-statut').value                   = pro.statut || 'test';
 await chargerCollectionsPourSelecteur();
@@ -1478,8 +1482,10 @@ async function sauvegarderRecette() {
     cure:        parseInt(document.getElementById('fr-cure').value) || 0,
     description: document.getElementById('fr-description').value,
     desc_emballage: document.getElementById('fr-desc-emballage')?.value || '',
-    instructions: document.getElementById('fr-instructions').value,
-    notes:        document.getElementById('fr-notes').value,
+    instructions:  document.getElementById('fr-instructions').value,
+    notes:         document.getElementById('fr-notes').value,
+    avertissement: document.getElementById('fr-avertissement')?.value || '',
+    mode_emploi:   document.getElementById('fr-mode-emploi')?.value || '',
     surgras:      document.getElementById('fr-surgras').value,
     statut:       document.getElementById('fr-statut').value || 'test',
     image_url:       document.getElementById('fr-image-url').value,
