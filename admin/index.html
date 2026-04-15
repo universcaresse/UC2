@@ -1478,26 +1478,30 @@
 			
 			
 			
+             <input type="hidden" id="if-date">
               <div class="filtres-bar">
                 <div class="form-groupe">
                   <label class="form-label">N° facture</label>
                   <input type="text" class="form-ctrl" id="if-numero">
                 </div>
                 <div class="form-groupe">
-                  <label class="form-label">Date</label>
-                  <input type="hidden" id="if-date">
-                  <div class="filtres-bar">
-                    <select class="form-ctrl" id="if-date-jour" onchange="ifSyncDate()"></select>
-                    <select class="form-ctrl" id="if-date-mois" onchange="ifSyncDate()">
-                      <option value="01">Janvier</option><option value="02">Février</option>
-                      <option value="03">Mars</option><option value="04">Avril</option>
-                      <option value="05">Mai</option><option value="06">Juin</option>
-                      <option value="07">Juillet</option><option value="08">Août</option>
-                      <option value="09">Septembre</option><option value="10">Octobre</option>
-                      <option value="11">Novembre</option><option value="12">Décembre</option>
-                    </select>
-                    <select class="form-ctrl" id="if-date-annee" onchange="ifSyncDate()"></select>
-                  </div>
+                  <label class="form-label">Jour</label>
+                  <select class="form-ctrl" id="if-date-jour" onchange="ifSyncDate()" style="width:70px"></select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Mois</label>
+                  <select class="form-ctrl" id="if-date-mois" onchange="ifSyncDate()">
+                    <option value="01">Janvier</option><option value="02">Février</option>
+                    <option value="03">Mars</option><option value="04">Avril</option>
+                    <option value="05">Mai</option><option value="06">Juin</option>
+                    <option value="07">Juillet</option><option value="08">Août</option>
+                    <option value="09">Septembre</option><option value="10">Octobre</option>
+                    <option value="11">Novembre</option><option value="12">Décembre</option>
+                  </select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Année</label>
+                  <select class="form-ctrl" id="if-date-annee" onchange="ifSyncDate()" style="width:90px"></select>
                 </div>
               </div>
 			  
