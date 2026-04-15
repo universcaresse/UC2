@@ -1355,7 +1355,7 @@ tr.cliquable { cursor: pointer; }
 .carte-produit-chargement {
   position: relative;
   pointer-events: none;
-  opacity: 0.6;
+  
 }
 .carte-produit-chargement::after {
   content: '';
