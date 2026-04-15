@@ -1312,7 +1312,7 @@ async function ouvrirFicheProduit(pro_id) {
         const stockItem2 = (listesDropdown.stock || []).find(s => s.ing_id === i.ing_id);
         const prixParG2  = stockItem2 ? (stockItem2.prix_par_g_reel || 0) : 0;
         const coutIng    = prixParG2 > 0 ? (i.quantite_g * prixParG2).toFixed(2) + ' $' : '⚠';
-        return `<div class="fiche-ingredient"><span class="fiche-ing-nom${sansInci ? ' fiche-label-manquant' : ''}">${sansInci ? '⚠ ' : ''}${i.nom_ingredient}</span><span class="fiche-ing-inci">${inciCode}</span><span class="fiche-ing-qte">${i.quantite_g} g — ${coutIng}</span></div>`;
+        return `<div class="fiche-ingredient"><span class="fiche-ing-nom${sansInci ? ' fiche-label-manquant' : ''}">${sansInci ? '⚠ ' : ''}${i.nom_ingredient}</span><span class="fiche-ing-inci">${inciCode}</span><span class="fiche-ing-qte">${i.quantite_g} g</span><span class="fiche-ing-qte">${coutIng}</span></div>`;
       }).join('')
     : '<div class="fiche-vide">Aucun ingrédient</div>';
 
