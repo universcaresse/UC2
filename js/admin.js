@@ -3256,14 +3256,15 @@ ifFournisseurActif = fournisseur;
               </select>
             </span>`;
           } else {
-            return `<input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte}" placeholder="Qté" style="width:60px" onchange="ifItems[${idx}].formatQte=this.value">
-            <select class="form-ctrl" id="if-fmt-unite-${idx}" onchange="ifItems[${idx}].formatUnite=this.value" style="width:70px">
-              <option value="g" ${item.formatUnite==='g'?'selected':''}>g</option>
-              <option value="ml" ${item.formatUnite==='ml'?'selected':''}>ml</option>
-              <option value="kg" ${item.formatUnite==='kg'?'selected':''}>kg</option>
-              <option value="L" ${item.formatUnite==='L'?'selected':''}>L</option>
-              <option value="lbs" ${item.formatUnite==='lbs'?'selected':''}>lbs</option>
-            </select>`;
+            return `<div style="display:flex;gap:4px;align-items:center;">
+              <input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte}" placeholder="Qté" style="width:55px" onchange="ifItems[${idx}].formatQte=this.value">
+              <select class="form-ctrl" id="if-fmt-unite-${idx}" onchange="ifItems[${idx}].formatUnite=this.value" style="width:65px">
+                <option value="g" ${item.formatUnite==='g'?'selected':''}>g</option>
+                <option value="ml" ${item.formatUnite==='ml'?'selected':''}>ml</option>
+                <option value="kg" ${item.formatUnite==='kg'?'selected':''}>kg</option>
+                <option value="L" ${item.formatUnite==='L'?'selected':''}>L</option>
+                <option value="lbs" ${item.formatUnite==='lbs'?'selected':''}>lbs</option>
+              </select></div>`;
           }
         })()}
       </td>
