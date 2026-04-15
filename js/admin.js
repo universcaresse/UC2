@@ -1300,8 +1300,10 @@ async function ouvrirFicheProduit(pro_id) {
     coutTotal += sousTotal;
     
   });
-  const cout    = coutTotal;
-  const coutHtml = `<div class="fiche-champ"><span class="fiche-label">Coût de revient estimé</span><span class="fiche-valeur">${cout > 0 ? cout.toFixed(2) + ' $' : '—'}</span></div>`;
+  const cout        = coutTotal;
+  const nbUnites    = pro.nb_unites || 1;
+  const coutParUnit = cout > 0 ? (cout / nbUnites).toFixed(2) + ' $' : '—';
+  const coutHtml = `<div class="fiche-champ"><span class="fiche-label">Coût de revient estimé</span><span class="fiche-valeur">${cout > 0 ? cout.toFixed(2) + ' $' : '—'}</span></div><div class="fiche-champ"><span class="fiche-label">Coût par unité (${nbUnites} unités)</span><span class="fiche-valeur">${coutParUnit}</span></div>`;
   const ingsHtml = ings.length
     ? ings.sort((a, b) => b.quantite_g - a.quantite_g).map(i => {
         const inciObj  = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient);
