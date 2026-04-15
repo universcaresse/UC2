@@ -3039,7 +3039,7 @@ async function importerFacturePDF() {
   if (!ifMapping.length) await ifChargerMapping();
   ifItems = facture.items;
   document.getElementById('if-numero').value    = facture.numeroFacture;
-  document.getElementById('if-date').value      = facture.date;
+   ifInitSelects(facture.date);
   document.getElementById('if-tps').value       = facture.tps;
   document.getElementById('if-tvq').value       = facture.tvq;
   document.getElementById('if-livraison').value = facture.livraison;
@@ -3111,7 +3111,7 @@ async function saisirDepuisCatalogue() {
   ifCatalogueItems = res.items;
   ifItems = [];
   document.getElementById('if-numero').value    = numeroAuto;
-  document.getElementById('if-date').value      = today;
+ ifInitSelects(today);
   document.getElementById('if-tps').value       = '';
   document.getElementById('if-tvq').value       = '';
   document.getElementById('if-livraison').value = '';
@@ -3128,6 +3128,33 @@ async function saisirDepuisCatalogue() {
   document.getElementById('if-bloc-upload').classList.add('cache');
   afficherMsg('import-facture', '');
 }
+function ifInitSelects(valeur) {
+  const selJour  = document.getElementById('if-date-jour');
+  const selMois  = document.getElementById('if-date-mois');
+  const selAnnee = document.getElementById('if-date-annee');
+  if (!selJour || !selMois || !selAnnee) return;
+  selJour.innerHTML = Array.from({length:31},(_,i)=>{const j=String(i+1).padStart(2,'0');return `<option value="${j}">${j}</option>`;}).join('');
+  const anneeEnCours = new Date().getFullYear();
+  selAnnee.innerHTML = [anneeEnCours-1, anneeEnCours, anneeEnCours+1].map(a=>`<option value="${a}">${a}</option>`).join('');
+  if (valeur) {
+    const parts = valeur.split('-');
+    if (parts.length === 3) { selAnnee.value = parts[0]; selMois.value = parts[1]; selJour.value = parts[2]; }
+  } else {
+    const today = new Date();
+    selAnnee.value = String(today.getFullYear());
+    selMois.value  = String(today.getMonth()+1).padStart(2,'0');
+    selJour.value  = String(today.getDate()).padStart(2,'0');
+    ifSyncDate();
+  }
+}
+
+function ifSyncDate() {
+  const j = document.getElementById('if-date-jour')?.value;
+  const m = document.getElementById('if-date-mois')?.value;
+  const a = document.getElementById('if-date-annee')?.value;
+  if (j && m && a) document.getElementById('if-date').value = `${a}-${m}-${j}`;
+}
+
 function ifRecalculerSousTotal() {
   const sousTotal = ifItems.reduce((sum, item) => sum + ((parseFloat(item.prixUnitaire)||0) * (parseFloat(item.quantite)||1)), 0);
   document.getElementById('if-soustotal').value = sousTotal.toFixed(2);
@@ -3159,30 +3186,8 @@ function ifAjouterDepuisCatalogue() {
     quantite:     1,
     total:        0
   });
-  afficherApercuItems(ifFournisseurActif);
-}
-
-function ifOnChangeCatCatalogue() {
-  const cat = document.getElementById('if-cat-catalogue').value;
-  const items = cat ? ifCatalogueItems.filter(i => i.categorie === cat) : [];
-  const sel = document.getElementById('if-item-catalogue');
-  sel.innerHTML = '<option value="">— Choisir —</option>' +
-    items.sort((a,b) => (a.nom||'').localeCompare(b.nom||'','fr')).map(i => `<option value="${i.nom}">${i.nom}</option>`).join('');
-}
-
-function ifAjouterDepuisCatalogue() {
-  const nom = document.getElementById('if-item-catalogue').value;
-  const cat = document.getElementById('if-cat-catalogue').value;
-  if (!nom) { afficherMsg('import-facture', 'Choisis un item.', 'erreur'); return; }
-  ifItems.push({
-    description:  nom,
-    categorie:    cat,
-    formatQte:    '',
-    formatUnite:  '',
-    prixUnitaire: 0,
-    quantite:     1,
-    total:        0
-  });
+  document.getElementById('if-cat-catalogue').value = '';
+  document.getElementById('if-item-catalogue').innerHTML = '<option value="">— Choisir —</option>';
   afficherApercuItems(ifFournisseurActif);
 }
 
@@ -3284,8 +3289,17 @@ ifFournisseurActif = fournisseur;
    
    
    
+    const tdSuppr = document.createElement('td');
+    tdSuppr.innerHTML = `<button class="bouton bouton-petit bouton-rouge" onclick="ifSupprimerLigne(${idx})">✕</button>`;
+    tr.appendChild(tdSuppr);
     tbody.appendChild(tr);
   });
+}
+
+function ifSupprimerLigne(idx) {
+  ifItems.splice(idx, 1);
+  afficherApercuItems(ifFournisseurActif);
+  ifRecalculerSousTotal();
 }
 
 function ifOnChangeFormat(idx, val) {
