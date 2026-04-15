@@ -3022,9 +3022,12 @@ var ifMapping = [];
 
 async function ifChargerMapping() {
   if (ifMapping.length) return;
-  // V2 : getMappingFournisseurs
-  const res = await appelAPI('getMappingFournisseurs');
-  ifMapping = (res && res.success) ? res.items || [] : [];
+  const [resMap, resFmt] = await Promise.all([
+    appelAPI('getMappingFournisseurs'),
+    appelAPI('getFormatsIngredients')
+  ]);
+  ifMapping = (resMap && resMap.success) ? resMap.items || [] : [];
+  listesDropdown.formats = (resFmt && resFmt.success) ? resFmt.items || [] : [];
 }
 
 async function importerFacturePDF() {
@@ -3246,7 +3249,7 @@ ifFournisseurActif = fournisseur;
               <option value="__nouveau__">+ Nouveau</option>
             </select>
             <span id="if-fmt-manuel-${idx}" class="cache">
-              <input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte}" placeholder="Qté" style="width:60px" onchange="ifItems[${idx}].formatQte=this.value">
+              <input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte}" placeholder="-" style="width:60px" onchange="ifItems[${idx}].formatQte=this.value">
               <select class="form-ctrl" id="if-fmt-unite-${idx}" onchange="ifItems[${idx}].formatUnite=this.value" style="width:70px">
                 <option value="g" ${item.formatUnite==='g'?'selected':''}>g</option>
                 <option value="ml" ${item.formatUnite==='ml'?'selected':''}>ml</option>
