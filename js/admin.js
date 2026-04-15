@@ -1301,6 +1301,10 @@ async function ouvrirFicheProduit(pro_id) {
     <div class="fiche-texte">${pro.instructions || '—'}</div>
     <div class="fiche-section-titre">Notes</div>
     <div class="fiche-texte">${pro.notes || '—'}</div>
+    <div class="fiche-section-titre">Avertissement</div>
+    <div class="fiche-texte">${pro.avertissement || '—'}</div>
+    <div class="fiche-section-titre">Mode d'emploi</div>
+    <div class="fiche-texte">${pro.mode_emploi || '—'}</div>
     <div class="fiche-section-titre">Ingrédients</div>
     <div class="fiche-ingredient fiche-ingredient-labels">
       <span class="fiche-ing-nom">Nom</span>
