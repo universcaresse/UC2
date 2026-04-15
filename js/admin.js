@@ -1285,8 +1285,23 @@ async function ouvrirFicheProduit(pro_id) {
     const resSto = await appelAPI('getStock');
     listesDropdown.stock = (resSto && resSto.success) ? resSto.items : [];
   }
-  const cout = calculerCoutRevient(ings);
-  const coutHtml = `<div class="fiche-champ"><span class="fiche-label">Coût de revient estimé</span><span class="fiche-valeur">${cout > 0 ? cout.toFixed(2) + ' $' : '—'}</span></div>`;
+  const stock  = listesDropdown.stock  || [];
+  const config = listesDropdown.config || {};
+  let coutDetail = '';
+  let coutTotal  = 0;
+  ings.forEach(ing => {
+    const stockItem = stock.find(s => s.ing_id === ing.ing_id);
+    const prixParG  = stockItem ? (stockItem.prix_par_g_reel || 0) : 0;
+    const cat_id    = stockItem ? (stockItem.cat_id || '') : '';
+    const cfg       = config[cat_id] || {};
+    const perte     = cfg.margePertePct || 0;
+    const facteur   = 1 + (perte / 100);
+    const sousTotal = (ing.quantite_g || 0) * prixParG * facteur;
+    coutTotal += sousTotal;
+    coutDetail += `<div class="fiche-ingredient"><span class="fiche-ing-nom">${ing.nom_ingredient}</span><span class="fiche-ing-inci">${prixParG.toFixed(4)} $/g</span><span class="fiche-ing-qte">${sousTotal.toFixed(2)} $</span></div>`;
+  });
+  const cout    = coutTotal;
+  const coutHtml = `<div class="fiche-champ"><span class="fiche-label">Coût de revient estimé</span><span class="fiche-valeur">${cout > 0 ? cout.toFixed(2) + ' $' : '—'}</span></div>${coutDetail}`;
   const ingsHtml = ings.length
     ? ings.sort((a, b) => b.quantite_g - a.quantite_g).map(i => {
         const inciObj  = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient);
