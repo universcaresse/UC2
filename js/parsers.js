@@ -6,7 +6,7 @@
 // ─── PURE ARÔME ───
 function parserFacturePA(texte) {
   const facture = { numeroFacture: '', date: '', items: [], tps: 0, tvq: 0, livraison: 0, sousTotal: 0, total: 0 };
-texte = texte.replace(/https?:\/\/\S+/g, '').replace(/Page\s+\d+\s+sur\s+\d+/gi, '').replace(/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}/g, '');
+
   const mNum  = texte.match(/Détails de la commande[\s\S]{0,20}?(\d{4,6})/i);
   if (mNum) facture.numeroFacture = mNum[1].trim();
   const mDate = texte.match(/(\d{2}-\d{2}-\d{4})/);
@@ -38,6 +38,16 @@ texte = texte.replace(/https?:\/\/\S+/g, '').replace(/Page\s+\d+\s+sur\s+\d+/gi,
       quantite:     qte
     });
   }
+  const vus = {};
+  facture.items = facture.items.filter(item => {
+    const cle = item.description + '|' + item.prixUnitaire;
+    if (!vus[cle]) { vus[cle] = item; return true; }
+    if (item.formatQte > 0 && vus[cle].formatQte === 0) {
+      vus[cle].formatQte  = item.formatQte;
+      vus[cle].formatUnite = item.formatUnite;
+    }
+    return false;
+  });
   return facture;
 }
 
