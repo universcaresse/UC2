@@ -1348,3 +1348,28 @@ tr.cliquable { cursor: pointer; }
 .maintenance-titre { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--noir); margin-bottom: 24px; font-weight: 600; }
 .maintenance-texte { font-family: 'DM Sans', sans-serif; font-size: 1rem; line-height: 1.8; color: var(--gris); font-weight: 300; margin-bottom: 12px; }
 .maintenance-signature { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; color: var(--primary); margin-top: 32px; } 
+
+
+
+
+.carte-produit-chargement {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.carte-produit-chargement::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.5);
+  border-radius: inherit;
+  z-index: 2;
+}
+.carte-produit-chargement .spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  display: inline-flex;
+}

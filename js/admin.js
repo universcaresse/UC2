@@ -1088,7 +1088,15 @@ async function afficherProduits() {
     const div = document.createElement('div');
         div.className = 'carte-produit';
         div.dataset.proId = pro.pro_id;
-        div.onclick = () => ouvrirFicheProduit(pro.pro_id);
+        div.onclick = () => {
+          div.classList.add('carte-produit-chargement');
+          div.insertAdjacentHTML('beforeend', '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>');
+          ouvrirFicheProduit(pro.pro_id).finally(() => {
+            div.classList.remove('carte-produit-chargement');
+            const sp = div.querySelector('.spinner');
+            if (sp) sp.remove();
+          });
+        };
         div.style.setProperty('--col-hex', couleur);
         const col = donneesCollections.find(c => c.col_id === pro.col_id);
         div.innerHTML = `
