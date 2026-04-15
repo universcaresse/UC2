@@ -1341,6 +1341,7 @@ async function ouvrirFicheProduit(pro_id) {
     <div class="fiche-texte">${pro.avertissement || '—'}</div>
     <div class="fiche-section-titre">Mode d'emploi</div>
     <div class="fiche-texte">${pro.mode_emploi || '—'}</div>
+    ${coutHtml}
     <div class="fiche-section-titre">Ingrédients</div>
     <div class="fiche-ingredient fiche-ingredient-labels">
       <span class="fiche-ing-nom">Nom</span>
@@ -1348,7 +1349,6 @@ async function ouvrirFicheProduit(pro_id) {
       <span class="fiche-ing-qte">Qté</span>
     </div>
     <div class="fiche-ingredients">${ingsHtml}</div>
-    ${coutHtml}
     <div class="fiche-section-titre">Formats disponibles</div>
     <div class="fiche-ingredients">${formatsHtml}</div>
   `;
