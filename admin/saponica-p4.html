@@ -70,59 +70,58 @@
     line-height: 1;
   }
 
-  .p4-photo {
-    height: 360px;
+  .p4-photo-wrap {
+    height: 400px;
     flex-shrink: 0;
+    position: relative;
+  }
+
+  .p4-photo {
+    width: 100%;
+    height: 100%;
     background-image: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1773699699/saponica_yvg3if.jpg');
-    background-size: cover;
-    background-position: center 30%;
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+
+  .p4-photo-fondu {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, var(--blanc));
   }
 
   .p4-texte {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 52px 72px 0 0;
-    gap: 20px;
-  }
-
-  .p4-eyebrow {
-    font-size: 9px;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: var(--gris);
-    font-weight: 400;
+    justify-content: flex-start;
+    padding: 32px 72px 0 0;
+    gap: 16px;
   }
 
   .p4-nom {
     font-family: 'Playfair Display', serif;
-    font-size: 68px;
-    font-weight: 700;
+    font-size: 56px;
+    font-weight: 400;
     color: var(--gris-fonce);
-    line-height: 0.92;
-    letter-spacing: -0.01em;
+    line-height: 1;
   }
 
   .p4-slogan {
     font-family: 'Birthstone', cursive;
-    font-size: 30px;
-    color: var(--gris);
+    font-size: 28px;
+    color: var(--accent);
     line-height: 1.4;
   }
 
-  .p4-trait {
-    width: 36px;
-    height: 1px;
-    background: var(--col-hex);
-  }
-
   .p4-description {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 300;
-    color: var(--gris);
-    line-height: 2;
-    max-width: 500px;
+    color: var(--gris-fonce);
+    line-height: 2.1;
+    max-width: 520px;
   }
 </style>
 </head>
@@ -131,14 +130,15 @@
 <div class="page page-g">
   <div class="page-int">
 
-    <div class="p4-photo"></div>
+    <div class="p4-photo-wrap">
+      <div class="p4-photo"></div>
+      <div class="p4-photo-fondu"></div>
+    </div>
 
     <div class="p4-texte">
-      <div class="p4-eyebrow">Collection</div>
       <div class="p4-nom">SAPONICA</div>
       <div class="p4-slogan">Simplement la nature qui prend soin de vous</div>
-      <div class="p4-trait"></div>
-      <div class="p4-description">SAPONICA, c'est le savon dans sa forme la plus pure. Huile de tournesol, huile de coco, beurre de karité — une base généreuse, soigneusement surgraissée, qui nettoie sans jamais décaper. La même âme, des personnalités radicalement différentes.</div>
+      <div class="p4-description">SAPONICA, c'est le savon dans sa forme la plus pure. Huile de tournesol, huile de coco, beurre de karité — une base généreuse, soigneusement surgraissée, qui nettoie sans jamais décaper. Sa mousse crémeuse enveloppe, sa glycérine naturelle hydrate, et votre peau ressort douce, sans avoir besoin de rien d'autre. La même âme, des personnalités radicalement différentes.</div>
     </div>
 
   </div>
