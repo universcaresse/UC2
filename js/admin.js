@@ -3159,8 +3159,11 @@ function ifSyncDate() {
 }
 
 function ifRecalculerSousTotal() {
-  const sousTotal = ifItems.reduce((sum, item) => sum + ((parseFloat(item.prixUnitaire)||0) * (parseFloat(item.quantite)||1)), 0);
-  document.getElementById('if-soustotal').value = sousTotal.toFixed(2);
+  const sousTotal = ifItems.reduce((sum, item) => {
+    if (!item.formatQte || parseFloat(item.formatQte) <= 0) return sum;
+    return sum + ((parseFloat(item.prixUnitaire)||0) * (parseFloat(item.quantite)||1));
+  }, 0);
+  document.getElementById('if-soustotal-calcule').value = sousTotal.toFixed(2);
   const tps = parseFloat(document.getElementById('if-tps').value) || 0;
   const tvq = parseFloat(document.getElementById('if-tvq').value) || 0;
   const liv = parseFloat(document.getElementById('if-livraison').value) || 0;
