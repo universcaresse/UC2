@@ -3665,6 +3665,9 @@ async function confirmerImportFacture() {
   ifItems = [];
   btn.disabled = false;
   btn.textContent = texteOriginal;
+  toutesFactures = [];
+  await chargerFactures();
+  voirDetailFacture(ach_id);
 }
 
 /* ════════════════════════════════
