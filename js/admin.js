@@ -3356,6 +3356,7 @@ async function ifAjouterLigneManuelle() {
     ifCatalogueItems = res.items;
     afficherMsg('import-facture', '');
   }
+  const idx = ifItems.length;
   ifItems.push({
     description:  '',
     categorie:    '',
@@ -3366,7 +3367,50 @@ async function ifAjouterLigneManuelle() {
     total:        0,
     manuel:       true
   });
-  afficherApercuItems(ifFournisseurActif);
+  const tbody = document.getElementById('if-tbody');
+  const catsManuel = [...new Set(ifCatalogueItems.map(i => i.categorie).filter(Boolean))].sort((a,b) => a.localeCompare(b,'fr'));
+  const tr = document.createElement('tr');
+  tr.className = 'ligne-rouge';
+  tr.innerHTML = `
+    <td>
+      <select class="form-ctrl" id="if-man-cat-${idx}" onchange="ifManuelChangeCat(${idx})">
+        <option value="">— Catégorie —</option>
+        ${catsManuel.map(c => `<option value="${c}">${c}</option>`).join('')}
+      </select>
+      <select class="form-ctrl" id="if-man-item-${idx}" onchange="ifManuelChangeItem(${idx})">
+        <option value="">— Item —</option>
+      </select>
+    </td>
+    <td>
+      <div style="display:flex;gap:4px;align-items:center;">
+        <input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="" placeholder="Qté" onchange="ifItems[${idx}].formatQte=this.value">
+        <select class="form-ctrl" id="if-fmt-unite-${idx}" onchange="ifItems[${idx}].formatUnite=this.value">
+          <option value="g">g</option>
+          <option value="ml">ml</option>
+          <option value="kg">kg</option>
+          <option value="L">L</option>
+          <option value="lbs">lbs</option>
+        </select>
+      </div>
+    </td>
+    <td><input type="text" inputmode="decimal" class="form-ctrl" value="1" onchange="ifItems[${idx}].quantite=parseFloat(this.value)||1; ifRecalculerSousTotal()"></td>
+    <td><input type="text" inputmode="decimal" class="form-ctrl" value="" placeholder="0.00" onchange="ifItems[${idx}].prixUnitaire=parseFloat(this.value)||0; ifRecalculerSousTotal()"></td>
+    <td>0.00 $</td>
+    <td>
+      <select class="form-ctrl" id="if-type-${idx}" onchange="ifOnChangeCat(${idx})">
+        <option value="">— Catégorie —</option>
+        ${[...listesDropdown.types].sort((a,b) => (listesDropdown.categoriesMap?.[a]||a).localeCompare(listesDropdown.categoriesMap?.[b]||b,'fr')).map(t => `<option value="${t}">${listesDropdown.categoriesMap?.[t]||t}</option>`).join('')}
+        <option value="__nouvelle_cat__">+ Créer</option>
+      </select>
+    </td>
+    <td>
+      <select class="form-ctrl" id="if-nomuc-${idx}" onchange="ifOnChangeNom(${idx})">
+        <option value="">— Choisir —</option>
+        <option value="__nouveau__">+ Créer</option>
+      </select>
+    </td>
+    <td><button class="bouton bouton-petit bouton-rouge" onclick="ifSupprimerLigne(${idx})">✕</button></td>`;
+  tbody.appendChild(tr);
   ifRecalculerSousTotal();
 }
 
