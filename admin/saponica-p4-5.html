@@ -8,12 +8,9 @@
   :root {
     --blanc:      #ffffff;
     --beige:      #f2e4cf;
-    --beige-40:   rgba(242,228,207,0.4);
     --gris:       #8b8680;
     --gris-fonce: #3d3b39;
     --accent:     #d4a445;
-    --blanc-70:   rgba(255,255,255,0.7);
-    --blanc-80:   rgba(255,255,255,0.8);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,7 +19,7 @@
     background: #e8e4de;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
     padding: 40px 20px;
     font-family: 'DM Sans', sans-serif;
@@ -34,7 +31,6 @@
     box-shadow: 0 8px 40px rgba(0,0,0,0.22);
   }
 
-  /* PAGE 8.5×11 */
   .page {
     width: 816px;
     height: 1056px;
@@ -46,13 +42,11 @@
     flex-shrink: 0;
   }
 
-  .page + .page {
-    border-left: 1px solid rgba(0,0,0,0.06);
-  }
+  .page + .page { border-left: 1px solid rgba(0,0,0,0.06); }
 
-  /* BANDES BLANCHES */
-  .page-g > .page-int { margin: 36px 0 0 36px; }
-  .page-d > .page-int { margin: 36px 36px 0 0; }
+  /* BANDES BLANCHES — reliure côté intérieur = 0 */
+  .page-g > .page-int { margin: 36px 0 36px 36px; }
+  .page-d > .page-int { margin: 36px 36px 36px 0; }
 
   .page-int {
     flex: 1;
@@ -62,38 +56,44 @@
     min-height: 0;
   }
 
-  /* PIED */
+  /* PIED — dans la zone imprimable */
   .cat-pied {
-    padding: 10px 48px;
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid var(--beige);
-    flex-shrink: 0;
     font-size: 9px;
     color: var(--gris);
     letter-spacing: 0.06em;
-    margin-top: auto;
+    padding: 10px 0;
   }
+  .page-g .cat-pied { margin: 0 0 0 36px; padding-right: 0; }
+  .page-d .cat-pied { margin: 0 36px 0 0; padding-left: 0; }
+
   .cat-pied .logo-tagline {
     font-family: 'Playfair Display', serif;
     font-size: 13px;
     font-style: italic;
   }
 
-  /* ── PAGE 4 (GAUCHE) ── */
-  .p4-photo-collection {
-    flex: 1;
+  /* ══ PAGE 4 — GAUCHE ══ */
+
+  .p4-photo {
+    height: 420px;
+    flex-shrink: 0;
     background-image: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1773699699/saponica_yvg3if.jpg');
     background-size: cover;
-    background-position: center;
-    position: relative;
-    min-height: 0;
+    background-position: center top;
   }
 
-  .p4-bloc-texte {
-    padding: 32px 40px 24px 0;
-    flex-shrink: 0;
+  .p4-texte {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 48px 32px 0;
+    gap: 16px;
   }
 
   .p4-eyebrow {
@@ -101,89 +101,84 @@
     letter-spacing: 0.3em;
     text-transform: uppercase;
     color: var(--gris);
-    margin-bottom: 10px;
     font-weight: 300;
   }
 
   .p4-nom {
     font-family: 'Playfair Display', serif;
-    font-size: 52px;
+    font-size: 56px;
     font-weight: 700;
     color: var(--gris-fonce);
     line-height: 0.9;
-    margin-bottom: 14px;
   }
 
   .p4-slogan {
     font-family: 'Birthstone', cursive;
-    font-size: 22px;
+    font-size: 26px;
     color: var(--gris);
     line-height: 1.4;
-    margin-bottom: 16px;
   }
 
   .p4-trait {
     width: 32px;
     height: 1px;
     background: #e5900a;
-    margin-bottom: 16px;
   }
 
   .p4-description {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 300;
     color: var(--gris);
-    line-height: 1.9;
-    max-width: 580px;
+    line-height: 2;
   }
 
-  /* ── PAGE 5 (DROITE) — GAMME + PRODUITS ── */
+  /* ══ PAGE 5 — DROITE ══ */
+
   .p5-gamme {
-    padding: 0 0 28px;
     flex-shrink: 0;
+    padding: 0 0 32px;
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    gap: 28px;
+    gap: 32px;
   }
 
-  .p5-gamme-texte {
-    flex: 1;
-  }
+  .p5-gamme-texte { flex: 1; }
 
   .p5-gamme-nom {
     font-family: 'Playfair Display', serif;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 400;
     color: var(--gris-fonce);
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 
   .p5-gamme-trait {
     width: 24px;
     height: 1px;
     background: #c1882e;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
 
   .p5-gamme-desc {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 300;
     color: var(--gris);
     line-height: 1.9;
   }
 
   .p5-atelier {
-    width: 200px;
+    width: 220px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    padding-top: 4px;
   }
 
-  .p5-atelier-photo {
-    width: 200px;
-    height: 180px;
+  .p5-atelier img {
+    width: 220px;
+    height: 200px;
     object-fit: cover;
     display: block;
   }
@@ -193,26 +188,25 @@
     font-weight: 300;
     color: var(--gris);
     font-style: italic;
-    letter-spacing: 0.04em;
   }
 
-  /* PRODUITS */
+  /* PRODUITS — même flex, même proportion */
   .p5-produits {
     flex: 1;
     display: flex;
     flex-direction: row;
-    gap: 20px;
+    gap: 24px;
     min-height: 0;
+    align-items: flex-start;
   }
 
-  /* Produit A — grand, hex horizontal bas */
-  .prod-a {
-    flex: 1.3;
+  .prod {
+    flex: 1;
     display: flex;
     flex-direction: column;
   }
 
-  .prod-a-photo {
+  .prod-photo {
     width: 100%;
     aspect-ratio: 1 / 1;
     object-fit: cover;
@@ -220,74 +214,40 @@
     flex-shrink: 0;
   }
 
-  .prod-a-hex {
-    height: 28px;
+  /* hex horizontal bas — même hauteur pour les 2 */
+  .prod-hex-bas {
+    height: 36px;
     flex-shrink: 0;
   }
 
-  .prod-a-info {
-    padding: 10px 0 0;
+  .prod-info {
+    padding: 12px 0 0;
   }
 
-  /* Produit B — hex vertical gauche */
-  .prod-b {
-    flex: 1;
-    display: flex;
-    flex-direction: row;
-    gap: 0;
-  }
-
-  .prod-b-hex-v {
-    width: 20px;
-    flex-shrink: 0;
-    align-self: stretch;
-  }
-
-  .prod-b-contenu {
-    flex: 1;
-    padding-left: 10px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .prod-b-photo {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    display: block;
-    flex-shrink: 0;
-  }
-
-  .prod-b-info {
-    padding: 10px 0 0;
-  }
-
-  /* INFO PRODUIT */
   .prod-nom {
     font-family: 'Playfair Display', serif;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--gris-fonce);
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     line-height: 1.2;
   }
 
   .prod-emb {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 300;
     color: var(--gris);
     font-style: italic;
-    line-height: 1.6;
-    margin-bottom: 6px;
+    line-height: 1.7;
+    margin-bottom: 8px;
   }
 
   .prod-prix {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 400;
     color: var(--gris-fonce);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
   }
-
 </style>
 </head>
 <body>
@@ -297,8 +257,8 @@
   <!-- ══ PAGE 4 — GAUCHE ══ -->
   <div class="page page-g">
     <div class="page-int">
-      <div class="p4-photo-collection"></div>
-      <div class="p4-bloc-texte">
+      <div class="p4-photo"></div>
+      <div class="p4-texte">
         <div class="p4-eyebrow">Collection</div>
         <div class="p4-nom">SAPONICA</div>
         <div class="p4-slogan">Simplement la nature qui prend soin de vous</div>
@@ -317,7 +277,6 @@
   <div class="page page-d">
     <div class="page-int">
 
-      <!-- GAMME + photo atelier -->
       <div class="p5-gamme">
         <div class="p5-gamme-texte">
           <div class="p5-gamme-nom">Savon</div>
@@ -325,41 +284,36 @@
           <div class="p5-gamme-desc">Une barre, un geste, une mousse crémeuse qui prend soin sans détour. Chaque savon Saponica est saponifié à froid, surgraissé à 8% — pour que la peau garde sa douceur naturelle, lavage après lavage.</div>
         </div>
         <div class="p5-atelier">
-          <img class="p5-atelier-photo"
-            src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774627932/a-warm-inviting-photograph-of-an-artisan_uCbddMjKSkWQWJrd_XQJdg_VTqWCfYYQ_Kna8JgcGw28A_lmm3kj.jpg"
-            alt="Atelier">
+          <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774627932/a-warm-inviting-photograph-of-an-artisan_uCbddMjKSkWQWJrd_XQJdg_VTqWCfYYQ_Kna8JgcGw28A_lmm3kj.jpg" alt="Atelier">
           <div class="p5-atelier-legende">Saponification à froid — atelier Univers Caresse</div>
         </div>
       </div>
 
-      <!-- PRODUITS -->
       <div class="p5-produits">
 
-        <!-- Produit A : Brise des lagunes — hex bas horizontal -->
-        <div class="prod-a">
-          <img class="prod-a-photo"
+        <!-- Produit 1 : Brise des lagunes — hex bas -->
+        <div class="prod">
+          <img class="prod-photo"
             src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/Brisedeslagunes_nurrcu.jpg"
             alt="Brise des lagunes">
-          <div class="prod-a-hex" style="background:#3EAF85;"></div>
-          <div class="prod-a-info">
+          <div class="prod-hex-bas" style="background:#3EAF85;"></div>
+          <div class="prod-info">
             <div class="prod-nom">Brise des lagunes</div>
             <div class="prod-emb">La fraîcheur des eaux secrètes, la caresse des vents marins.</div>
             <div class="prod-prix">7,00 $ · 90 g</div>
           </div>
         </div>
 
-        <!-- Produit B : Délicat — hex vertical gauche -->
-        <div class="prod-b">
-          <div class="prod-b-hex-v" style="background:#AF99A4;"></div>
-          <div class="prod-b-contenu">
-            <img class="prod-b-photo"
-              src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/D%C3%A9licat_vdewef.jpg"
-              alt="Délicat">
-            <div class="prod-b-info">
-              <div class="prod-nom">Délicat</div>
-              <div class="prod-emb">Pivoine et Lavande. L'élégance d'un voile parfumé.</div>
-              <div class="prod-prix">7,00 $ · 90 g</div>
-            </div>
+        <!-- Produit 2 : Délicat — hex bas aussi, même proportion -->
+        <div class="prod">
+          <img class="prod-photo"
+            src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/D%C3%A9licat_vdewef.jpg"
+            alt="Délicat">
+          <div class="prod-hex-bas" style="background:#AF99A4;"></div>
+          <div class="prod-info">
+            <div class="prod-nom">Délicat</div>
+            <div class="prod-emb">Pivoine et Lavande. L'élégance d'un voile parfumé.</div>
+            <div class="prod-prix">7,00 $ · 90 g</div>
           </div>
         </div>
 
