@@ -3054,6 +3054,7 @@ async function importerFacturePDF() {
   document.getElementById('if-catalogue-zone').classList.remove('cache');
   document.getElementById('if-apercu').classList.remove('cache');
   document.getElementById('if-bloc-upload').classList.add('cache');
+  document.getElementById('if-catalogue-zone').classList.add('cache');
   afficherMsg('import-facture', '');
 }
 
@@ -3199,6 +3200,31 @@ function ifAjouterDepuisCatalogue() {
   afficherApercuItems(ifFournisseurActif);
 }
 
+function ifManuelChangeCat(idx) {
+  const cat = document.getElementById(`if-man-cat-${idx}`)?.value;
+  const items = cat ? ifCatalogueItems.filter(i => i.categorie === cat).sort((a,b) => (a.nom||'').localeCompare(b.nom||'','fr')) : [];
+  const sel = document.getElementById(`if-man-item-${idx}`);
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Item —</option>' + items.map(i => `<option value="${i.nom}">${i.nom}</option>`).join('');
+}
+
+function ifManuelChangeItem(idx) {
+  const nom = document.getElementById(`if-man-item-${idx}`)?.value;
+  if (!nom) return;
+  ifItems[idx].description = nom;
+  const mapping = trouverMappingItem(nom, ifFournisseurActif);
+  if (mapping) {
+    const cat_UC = Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === mapping.categorie_UC) || '';
+    const selType = document.getElementById(`if-type-${idx}`);
+    if (selType) { selType.value = cat_UC; ifFiltrerNoms(idx); }
+    const selNom = document.getElementById(`if-nomuc-${idx}`);
+    if (selNom) selNom.value = mapping.nom_UC;
+    ifItems[idx].manuel = false;
+    const tr = selType?.closest('tr');
+    if (tr) tr.classList.remove('ligne-rouge');
+  }
+}
+
 function normaliserPourMapping(s) {
   return (s || '').toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -3241,8 +3267,16 @@ ifFournisseurActif = fournisseur;
     const tr = document.createElement('tr');
     tr.className = rouge ? 'ligne-rouge' : '';
    
+   const catsManuel = item.manuel ? [...new Set(ifCatalogueItems.map(i => i.categorie).filter(Boolean))].sort((a,b) => a.localeCompare(b,'fr')) : [];
    tr.innerHTML = `
-      <td>${item.description}</td>
+      <td>${item.manuel ? `
+        <select class="form-ctrl" id="if-man-cat-${idx}" onchange="ifManuelChangeCat(${idx})">
+          <option value="">— Catégorie —</option>
+          ${catsManuel.map(c => `<option value="${c}">${c}</option>`).join('')}
+        </select>
+        <select class="form-ctrl" id="if-man-item-${idx}" onchange="ifManuelChangeItem(${idx})">
+          <option value="">— Item —</option>
+        </select>` : item.description}</td>
       <td>
         ${(() => {
           const ingObj = listesDropdown.fullData?.find(d => d.nom_UC === nom_UC);
@@ -3311,7 +3345,17 @@ function ifSupprimerLigne(idx) {
   ifRecalculerSousTotal();
 }
 
-function ifAjouterLigneManuelle() {
+async function ifAjouterLigneManuelle() {
+  if (!ifCatalogueItems.length) {
+    afficherMsg('import-facture', 'Chargement du catalogue…');
+    const res = await appelAPI('getScrapingFournisseur', { source: ifFournisseurActif });
+    if (!res || !res.success || !res.items.length) {
+      afficherMsg('import-facture', 'Aucun item trouvé pour ce fournisseur.', 'erreur');
+      return;
+    }
+    ifCatalogueItems = res.items;
+    afficherMsg('import-facture', '');
+  }
   ifItems.push({
     description:  '',
     categorie:    '',
@@ -3319,7 +3363,8 @@ function ifAjouterLigneManuelle() {
     formatUnite:  'g',
     prixUnitaire: 0,
     quantite:     1,
-    total:        0
+    total:        0,
+    manuel:       true
   });
   afficherApercuItems(ifFournisseurActif);
   ifRecalculerSousTotal();
