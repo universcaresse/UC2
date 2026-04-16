@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>SAPONICA — Pages 4-5</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Birthstone&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blanc:      #ffffff;
+    --beige:      #f2e4cf;
+    --beige-40:   rgba(242,228,207,0.4);
+    --gris:       #8b8680;
+    --gris-fonce: #3d3b39;
+    --accent:     #d4a445;
+    --blanc-70:   rgba(255,255,255,0.7);
+    --blanc-80:   rgba(255,255,255,0.8);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #e8e4de;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .double-page {
+    display: flex;
+    flex-direction: row;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+  }
+
+  /* PAGE 8.5×11 */
+  .page {
+    width: 816px;
+    height: 1056px;
+    background: var(--blanc);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .page + .page {
+    border-left: 1px solid rgba(0,0,0,0.06);
+  }
+
+  /* BANDES BLANCHES */
+  .page-g > .page-int { margin: 36px 0 0 36px; }
+  .page-d > .page-int { margin: 36px 36px 0 0; }
+
+  .page-int {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* PIED */
+  .cat-pied {
+    padding: 10px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--beige);
+    flex-shrink: 0;
+    font-size: 9px;
+    color: var(--gris);
+    letter-spacing: 0.06em;
+    margin-top: auto;
+  }
+  .cat-pied .logo-tagline {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  /* ── PAGE 4 (GAUCHE) ── */
+  .p4-photo-collection {
+    flex: 1;
+    background-image: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1773699699/saponica_yvg3if.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    min-height: 0;
+  }
+
+  .p4-bloc-texte {
+    padding: 32px 40px 24px 0;
+    flex-shrink: 0;
+  }
+
+  .p4-eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gris);
+    margin-bottom: 10px;
+    font-weight: 300;
+  }
+
+  .p4-nom {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--gris-fonce);
+    line-height: 0.9;
+    margin-bottom: 14px;
+  }
+
+  .p4-slogan {
+    font-family: 'Birthstone', cursive;
+    font-size: 22px;
+    color: var(--gris);
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+
+  .p4-trait {
+    width: 32px;
+    height: 1px;
+    background: #e5900a;
+    margin-bottom: 16px;
+  }
+
+  .p4-description {
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--gris);
+    line-height: 1.9;
+    max-width: 580px;
+  }
+
+  /* ── PAGE 5 (DROITE) — GAMME + PRODUITS ── */
+  .p5-gamme {
+    padding: 0 0 28px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 28px;
+  }
+
+  .p5-gamme-texte {
+    flex: 1;
+  }
+
+  .p5-gamme-nom {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--gris-fonce);
+    margin-bottom: 8px;
+  }
+
+  .p5-gamme-trait {
+    width: 24px;
+    height: 1px;
+    background: #c1882e;
+    margin-bottom: 12px;
+  }
+
+  .p5-gamme-desc {
+    font-size: 10px;
+    font-weight: 300;
+    color: var(--gris);
+    line-height: 1.9;
+  }
+
+  .p5-atelier {
+    width: 200px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .p5-atelier-photo {
+    width: 200px;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .p5-atelier-legende {
+    font-size: 8px;
+    font-weight: 300;
+    color: var(--gris);
+    font-style: italic;
+    letter-spacing: 0.04em;
+  }
+
+  /* PRODUITS */
+  .p5-produits {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    min-height: 0;
+  }
+
+  /* Produit A — grand, hex horizontal bas */
+  .prod-a {
+    flex: 1.3;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .prod-a-photo {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .prod-a-hex {
+    height: 28px;
+    flex-shrink: 0;
+  }
+
+  .prod-a-info {
+    padding: 10px 0 0;
+  }
+
+  /* Produit B — hex vertical gauche */
+  .prod-b {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+  }
+
+  .prod-b-hex-v {
+    width: 20px;
+    flex-shrink: 0;
+    align-self: stretch;
+  }
+
+  .prod-b-contenu {
+    flex: 1;
+    padding-left: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .prod-b-photo {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .prod-b-info {
+    padding: 10px 0 0;
+  }
+
+  /* INFO PRODUIT */
+  .prod-nom {
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gris-fonce);
+    margin-bottom: 5px;
+    line-height: 1.2;
+  }
+
+  .prod-emb {
+    font-size: 9px;
+    font-weight: 300;
+    color: var(--gris);
+    font-style: italic;
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+
+  .prod-prix {
+    font-size: 9px;
+    font-weight: 400;
+    color: var(--gris-fonce);
+    letter-spacing: 0.04em;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="double-page">
+
+  <!-- ══ PAGE 4 — GAUCHE ══ -->
+  <div class="page page-g">
+    <div class="page-int">
+      <div class="p4-photo-collection"></div>
+      <div class="p4-bloc-texte">
+        <div class="p4-eyebrow">Collection</div>
+        <div class="p4-nom">SAPONICA</div>
+        <div class="p4-slogan">Simplement la nature qui prend soin de vous</div>
+        <div class="p4-trait"></div>
+        <div class="p4-description">SAPONICA, c'est le savon dans sa forme la plus pure. Huile de tournesol, huile de coco, beurre de karité — une base généreuse, soigneusement surgraissée, qui nettoie sans jamais décaper. La même âme, des personnalités radicalement différentes.</div>
+      </div>
+    </div>
+    <div class="cat-pied">
+      <span class="logo-tagline">Univers Caresse</span>
+      <span>universcaresse.ca</span>
+      <span>4</span>
+    </div>
+  </div>
+
+  <!-- ══ PAGE 5 — DROITE ══ -->
+  <div class="page page-d">
+    <div class="page-int">
+
+      <!-- GAMME + photo atelier -->
+      <div class="p5-gamme">
+        <div class="p5-gamme-texte">
+          <div class="p5-gamme-nom">Savon</div>
+          <div class="p5-gamme-trait"></div>
+          <div class="p5-gamme-desc">Une barre, un geste, une mousse crémeuse qui prend soin sans détour. Chaque savon Saponica est saponifié à froid, surgraissé à 8% — pour que la peau garde sa douceur naturelle, lavage après lavage.</div>
+        </div>
+        <div class="p5-atelier">
+          <img class="p5-atelier-photo"
+            src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774627932/a-warm-inviting-photograph-of-an-artisan_uCbddMjKSkWQWJrd_XQJdg_VTqWCfYYQ_Kna8JgcGw28A_lmm3kj.jpg"
+            alt="Atelier">
+          <div class="p5-atelier-legende">Saponification à froid — atelier Univers Caresse</div>
+        </div>
+      </div>
+
+      <!-- PRODUITS -->
+      <div class="p5-produits">
+
+        <!-- Produit A : Brise des lagunes — hex bas horizontal -->
+        <div class="prod-a">
+          <img class="prod-a-photo"
+            src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/Brisedeslagunes_nurrcu.jpg"
+            alt="Brise des lagunes">
+          <div class="prod-a-hex" style="background:#3EAF85;"></div>
+          <div class="prod-a-info">
+            <div class="prod-nom">Brise des lagunes</div>
+            <div class="prod-emb">La fraîcheur des eaux secrètes, la caresse des vents marins.</div>
+            <div class="prod-prix">7,00 $ · 90 g</div>
+          </div>
+        </div>
+
+        <!-- Produit B : Délicat — hex vertical gauche -->
+        <div class="prod-b">
+          <div class="prod-b-hex-v" style="background:#AF99A4;"></div>
+          <div class="prod-b-contenu">
+            <img class="prod-b-photo"
+              src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773418760/D%C3%A9licat_vdewef.jpg"
+              alt="Délicat">
+            <div class="prod-b-info">
+              <div class="prod-nom">Délicat</div>
+              <div class="prod-emb">Pivoine et Lavande. L'élégance d'un voile parfumé.</div>
+              <div class="prod-prix">7,00 $ · 90 g</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    <div class="cat-pied">
+      <span class="logo-tagline">Univers Caresse</span>
+      <span>universcaresse.ca</span>
+      <span>5</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
