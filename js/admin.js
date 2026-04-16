@@ -2317,7 +2317,7 @@ function afficherItemsFacture() {
         <td>${item.type}</td>
         <td>${item.ingredient}</td>
         <td>
-        <input type="text" inputmode="decimal" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte || ''}" placeholder="Qté" style="width:65px">
+        <input type="text" inputmode="decimal" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte || ''}" placeholder="-" style="width:65px">
         <select class="form-ctrl" id="if-fmt-unite-${idx}">
           <option value="g" ${item.formatUnite==='g'?'selected':''}>g</option>
           <option value="kg" ${item.formatUnite==='kg'?'selected':''}>kg</option>
@@ -3385,7 +3385,7 @@ async function ifAjouterLigneManuelle() {
     </td>
     <td>
       <div style="display:flex;gap:4px;align-items:center;">
-        <input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="" placeholder="Qté" onchange="ifItems[${idx}].formatQte=this.value">
+        <input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="" placeholder="-" onchange="ifItems[${idx}].formatQte=this.value">
         <select class="form-ctrl" id="if-fmt-unite-${idx}" onchange="ifItems[${idx}].formatUnite=this.value">
           <option value="g">g</option>
           <option value="ml">ml</option>
