@@ -3391,7 +3391,7 @@ async function ifAjouterLigneManuelle() {
           <option value="ml">ml</option>
           <option value="kg">kg</option>
           <option value="L">L</option>
-          <option value="lbs">lbs</option>
+          <option value="lbs">lbs</option> <option value="unité">unité</option>
         </select>
       </div>
     </td>
