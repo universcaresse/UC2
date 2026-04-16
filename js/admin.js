@@ -3295,6 +3295,7 @@ ifFournisseurActif = fournisseur;
                 <option value="kg" ${item.formatUnite==='kg'?'selected':''}>kg</option>
                 <option value="L" ${item.formatUnite==='L'?'selected':''}>L</option>
                 <option value="lbs" ${item.formatUnite==='lbs'?'selected':''}>lbs</option>
+                <option value="unité" ${item.formatUnite==='unité'?'selected':''}>unité</option>
               </select>
             </span>`;
           } else {
@@ -3306,6 +3307,7 @@ ifFournisseurActif = fournisseur;
                 <option value="kg" ${item.formatUnite==='kg'?'selected':''}>kg</option>
                 <option value="L" ${item.formatUnite==='L'?'selected':''}>L</option>
                 <option value="lbs" ${item.formatUnite==='lbs'?'selected':''}>lbs</option>
+				<option value="unité" ${item.formatUnite==='unité'?'selected':''}>unité</option>
               </select></div>`;
           }
         })()}
