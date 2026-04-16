@@ -2410,8 +2410,8 @@ async function chargerFactures() {
     ...a,
     numero:      a.ach_id,
     fournisseur: fournisseursMap[a.four_id] || a.four_id || '—',
-    dateRaw:     a.date ? a.date.split('T')[0] : '',
-    dateAff:     a.date ? (a.date.split('T')[0].split('-').reverse().join('/')) : '—',
+    dateRaw:     a.date ? a.date.split('/').reverse().join('-') : '',
+    dateAff:     a.date || '—',
     total:       a.total,
     statut:      a.statut
   }));
@@ -3395,8 +3395,8 @@ async function ifAjouterLigneManuelle() {
         </select>
       </div>
     </td>
-    <td><input type="text" inputmode="decimal" class="form-ctrl" value="1" onchange="ifItems[${idx}].quantite=parseFloat(this.value)||1; document.getElementById('if-total-ligne-${idx}').textContent=(ifItems[${idx}].prixUnitaire*(ifItems[${idx}].quantite||1)).toFixed(2)+' $'; ifRecalculerSousTotal()"></td>
-    <td><input type="text" inputmode="decimal" class="form-ctrl" value="" placeholder="0.00" onchange="ifItems[${idx}].prixUnitaire=parseFloat(this.value)||0; document.getElementById('if-total-ligne-${idx}').textContent=(ifItems[${idx}].prixUnitaire*(ifItems[${idx}].quantite||1)).toFixed(2)+' $'; ifRecalculerSousTotal()"></td>
+    <td><input type="text" inputmode="decimal" class="form-ctrl" id="if-man-qte-${idx}" value="1" onchange="ifItems[${idx}].quantite=parseFloat(this.value)||1; document.getElementById('if-total-ligne-${idx}').textContent=(ifItems[${idx}].prixUnitaire*(ifItems[${idx}].quantite||1)).toFixed(2)+' $'; ifRecalculerSousTotal()"></td>
+    <td><input type="text" inputmode="decimal" class="form-ctrl" id="if-man-prix-${idx}" value="" placeholder="0.00" onchange="ifItems[${idx}].prixUnitaire=parseFloat(this.value)||0; document.getElementById('if-total-ligne-${idx}').textContent=(ifItems[${idx}].prixUnitaire*(ifItems[${idx}].quantite||1)).toFixed(2)+' $'; ifRecalculerSousTotal()"></td>
     <td id="if-total-ligne-${idx}">0.00 $</td>
 	
     <td>
@@ -3722,8 +3722,8 @@ async function confirmerImportFacture() {
     const cat_UC = document.getElementById(`if-type-${idx}`)?.value  || '';
     if (!nom_UC || !cat_UC) continue;
     const ingObj     = listesDropdown.fullData.find(d => d.nom_UC === nom_UC);
-    const fmtQte     = parseFloat(item.formatQte) || 0;
-    const fmtUnite   = item.formatUnite || 'g';
+    const fmtQte     = parseFloat(document.getElementById(`if-fmt-qte-${idx}`)?.value || item.formatQte) || 0;
+    const fmtUnite   = document.getElementById(`if-fmt-unite-${idx}`)?.value || item.formatUnite || 'g';
     let grammes  = fmtQte;
     if (fmtUnite === 'l')   grammes = fmtQte * 1000;
     if (fmtUnite === 'L')   grammes = fmtQte * 1000;
@@ -3756,7 +3756,8 @@ async function confirmerImportFacture() {
     format_unite:  fmtUnite,
     prix_unitaire: item.prixUnitaire,
     prix_par_g:    prixParG.toFixed(6),
-    quantite:      item.quantite
+    quantite:      parseFloat(document.getElementById(`if-man-qte-${idx}`)?.value) || item.quantite || 1,
+    prix_unitaire: parseFloat(document.getElementById(`if-man-prix-${idx}`)?.value) || item.prixUnitaire || 0
   }));
   const resLignes = await appelAPIPost('addAchatLignes', { lignes: payload });
   if (!resLignes || !resLignes.success) {
