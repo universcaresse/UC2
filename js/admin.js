@@ -3300,7 +3300,7 @@ ifFournisseurActif = fournisseur;
             </span>`;
           } else {
             return `<div style="display:flex;gap:4px;align-items:center;">
-              <input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte}" placeholder="Qté" style="width:55px" onchange="ifItems[${idx}].formatQte=this.value">
+              <input type="text" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte}" placeholder="-" style="width:55px" onchange="ifItems[${idx}].formatQte=this.value">
               <select class="form-ctrl" id="if-fmt-unite-${idx}" onchange="ifItems[${idx}].formatUnite=this.value" style="width:65px">
                 <option value="g" ${item.formatUnite==='g'?'selected':''}>g</option>
                 <option value="ml" ${item.formatUnite==='ml'?'selected':''}>ml</option>
