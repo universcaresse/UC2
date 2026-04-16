@@ -3049,7 +3049,9 @@ async function importerFacturePDF() {
   document.getElementById('if-soustotal').value = facture.sousTotal;
   document.getElementById('if-total').value     = facture.total || (facture.sousTotal + facture.tps + facture.tvq + facture.livraison).toFixed(2);
   afficherApercuItems(fournisseur);
+  ifRecalculerSousTotal();
   validerTotaux(facture);
+  document.getElementById('if-catalogue-zone').classList.remove('cache');
   document.getElementById('if-apercu').classList.remove('cache');
   document.getElementById('if-bloc-upload').classList.add('cache');
   afficherMsg('import-facture', '');
@@ -3305,6 +3307,20 @@ ifFournisseurActif = fournisseur;
 
 function ifSupprimerLigne(idx) {
   ifItems.splice(idx, 1);
+  afficherApercuItems(ifFournisseurActif);
+  ifRecalculerSousTotal();
+}
+
+function ifAjouterLigneManuelle() {
+  ifItems.push({
+    description:  '',
+    categorie:    '',
+    formatQte:    '',
+    formatUnite:  'g',
+    prixUnitaire: 0,
+    quantite:     1,
+    total:        0
+  });
   afficherApercuItems(ifFournisseurActif);
   ifRecalculerSousTotal();
 }
