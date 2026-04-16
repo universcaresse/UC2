@@ -3393,9 +3393,10 @@ async function ifAjouterLigneManuelle() {
         </select>
       </div>
     </td>
-    <td><input type="text" inputmode="decimal" class="form-ctrl" value="1" onchange="ifItems[${idx}].quantite=parseFloat(this.value)||1; ifRecalculerSousTotal()"></td>
-    <td><input type="text" inputmode="decimal" class="form-ctrl" value="" placeholder="0.00" onchange="ifItems[${idx}].prixUnitaire=parseFloat(this.value)||0; ifRecalculerSousTotal()"></td>
-    <td>0.00 $</td>
+    <td><input type="text" inputmode="decimal" class="form-ctrl" value="1" onchange="ifItems[${idx}].quantite=parseFloat(this.value)||1; document.getElementById('if-total-ligne-${idx}').textContent=(ifItems[${idx}].prixUnitaire*(ifItems[${idx}].quantite||1)).toFixed(2)+' $'; ifRecalculerSousTotal()"></td>
+    <td><input type="text" inputmode="decimal" class="form-ctrl" value="" placeholder="0.00" onchange="ifItems[${idx}].prixUnitaire=parseFloat(this.value)||0; document.getElementById('if-total-ligne-${idx}').textContent=(ifItems[${idx}].prixUnitaire*(ifItems[${idx}].quantite||1)).toFixed(2)+' $'; ifRecalculerSousTotal()"></td>
+    <td id="if-total-ligne-${idx}">0.00 $</td>
+	
     <td>
       <select class="form-ctrl" id="if-type-${idx}" onchange="ifOnChangeCat(${idx})">
         <option value="">— Catégorie —</option>
