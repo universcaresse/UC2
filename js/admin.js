@@ -2499,7 +2499,7 @@ async function voirDetailFacture(ach_id) {
   const facture = toutesFactures.find(f => f.ach_id === ach_id);
   const modal   = document.getElementById('modal-facture');
   modal.classList.add('ouvert');
-  document.getElementById('modal-facture-titre').textContent = 'Facture ' + ach_id;
+  document.getElementById('modal-facture-titre').textContent = 'Facture ' + (facture?.numero_facture || ach_id);
   document.getElementById('modal-facture-info').textContent  = facture ? facture.date + ' — ' + facture.fournisseur : '';
   document.getElementById('contenu-detail-facture').innerHTML = '';
   document.getElementById('loading-detail-facture').classList.remove('cache');
