@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>SAPONICA — Page 4</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Birthstone&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blanc:      #ffffff;
+    --beige:      #f2e4cf;
+    --gris:       #8b8680;
+    --gris-fonce: #3d3b39;
+    --col-hex:    #e5900a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #e8e4de;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 20px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* PAGE 8.5×11 — page gauche, bande blanche à gauche */
+  .page {
+    width: 816px;
+    height: 1056px;
+    background: var(--blanc);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+  }
+
+  /* bande blanche gauche + haut + bas — reliure à droite = 0 */
+  .page-int {
+    margin: 36px 0 0 36px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* PIED — dans la zone imprimable */
+  .cat-pied {
+    margin: 0 0 36px 36px;
+    padding: 10px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--beige);
+    flex-shrink: 0;
+    font-size: 10px;
+    color: var(--gris);
+    letter-spacing: 0.06em;
+  }
+  .cat-pied .logo-tagline {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  /* PHOTO — taille raisonnable, sujet visible */
+  .p4-photo {
+    width: 480px;
+    height: 380px;
+    flex-shrink: 0;
+    background-image: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1773699699/saponica_yvg3if.jpg');
+    background-size: cover;
+    background-position: center center;
+  }
+
+  /* ZONE TEXTE */
+  .p4-texte {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px 80px 40px 0;
+    gap: 18px;
+  }
+
+  .p4-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--col-hex);
+    font-weight: 300;
+  }
+
+  .p4-nom {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--gris-fonce);
+    line-height: 0.92;
+  }
+
+  .p4-slogan {
+    font-family: 'Birthstone', cursive;
+    font-size: 28px;
+    color: var(--gris);
+    line-height: 1.4;
+  }
+
+  .p4-trait {
+    width: 36px;
+    height: 1px;
+    background: var(--col-hex);
+  }
+
+  .p4-description {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--gris);
+    line-height: 2;
+    max-width: 520px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="page-int">
+
+    <div class="p4-photo"></div>
+
+    <div class="p4-texte">
+      <div class="p4-eyebrow">Collection</div>
+      <div class="p4-nom">SAPONICA</div>
+      <div class="p4-slogan">Simplement la nature qui prend soin de vous</div>
+      <div class="p4-trait"></div>
+      <div class="p4-description">SAPONICA, c'est le savon dans sa forme la plus pure. Huile de tournesol, huile de coco, beurre de karité — une base généreuse, soigneusement surgraissée, qui nettoie sans jamais décaper. La même âme, des personnalités radicalement différentes.</div>
+    </div>
+
+  </div>
+  <div class="cat-pied">
+    <span class="logo-tagline">Univers Caresse</span>
+    <span>universcaresse.ca</span>
+    <span>4</span>
+  </div>
+</div>
+
+</body>
+</html>
