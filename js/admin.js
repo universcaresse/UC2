@@ -2317,7 +2317,7 @@ function afficherItemsFacture() {
         <td>${item.type}</td>
         <td>${item.ingredient}</td>
         <td>
-        <input type="text" inputmode="decimal" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte || ''}" placeholder="Qté" style="width:60px">
+        <input type="text" inputmode="decimal" class="form-ctrl" id="if-fmt-qte-${idx}" value="${item.formatQte || ''}" placeholder="Qté" style="width:65px">
         <select class="form-ctrl" id="if-fmt-unite-${idx}">
           <option value="g" ${item.formatUnite==='g'?'selected':''}>g</option>
           <option value="kg" ${item.formatUnite==='kg'?'selected':''}>kg</option>
