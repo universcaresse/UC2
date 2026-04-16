@@ -3611,8 +3611,8 @@ async function confirmerImportFacture() {
     const cat_UC = document.getElementById(`if-type-${idx}`)?.value  || '';
     if (!nom_UC || !cat_UC) continue;
     const ingObj     = listesDropdown.fullData.find(d => d.nom_UC === nom_UC);
-    const fmtQte     = parseFloat(document.getElementById(`if-fmt-qte-${idx}`)?.value) || item.formatQte;
-    const fmtUnite   = document.getElementById(`if-fmt-unite-${idx}`)?.value || item.formatUnite;
+    const fmtQte     = parseFloat(item.formatQte) || 0;
+    const fmtUnite   = item.formatUnite || 'g';
     let grammes  = fmtQte;
     if (fmtUnite === 'l')   grammes = fmtQte * 1000;
     if (fmtUnite === 'L')   grammes = fmtQte * 1000;
