@@ -3141,7 +3141,7 @@ function ifInitSelects(valeur) {
   selAnnee.innerHTML = [anneeEnCours-1, anneeEnCours, anneeEnCours+1].map(a=>`<option value="${a}">${a}</option>`).join('');
   if (valeur) {
     const parts = valeur.split('-');
-    if (parts.length === 3) { selAnnee.value = parts[0]; selMois.value = parts[1]; selJour.value = parts[2]; }
+    if (parts.length === 3) { selAnnee.value = parts[0]; selMois.value = parts[1]; selJour.value = parts[2]; ifSyncDate(); }
   } else {
     const today = new Date();
     selAnnee.value = String(today.getFullYear());
