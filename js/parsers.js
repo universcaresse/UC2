@@ -21,7 +21,7 @@ function parserFacturePA(texte) {
   if (mTotal) facture.total = parseFloat(mTotal[1].replace(/\s/g,'').replace(',','.'));
   const mLiv   = texte.match(/Livraison\s*[:\s]+([\d\s,\.]+)\s*\$/i);
   if (mLiv && !/gratuite/i.test(mLiv[0])) facture.livraison = parseFloat(mLiv[1].replace(/\s/g,'').replace(',','.'));
-  const ligneItem = /([A-ZÀ-Ÿa-zà-ÿ0-9][A-ZÀ-Ÿa-zà-ÿ0-9\s\/&\(\)\-\']+)\s*\((\d+)\)\s*([\d]+(?:ml|g|L|kg|oz)[^\n]*?)?\s*([\d,\.\s]+)[\s\n]*\$[\s\n]*CAD/gi;
+  const ligneItem = /([A-ZÀ-Ÿa-zà-ÿ][A-ZÀ-Ÿa-zà-ÿ\s\/&\(\)\-\']+)\s*\((\d+)\)\s*([\d]+(?:ml|g|L|kg|oz)[^\n]*?)?\s*([\d,\.\s]+)[\s\n]*\$[\s\n]*CAD/gi;
   let m;
   while ((m = ligneItem.exec(texte)) !== null) {
     const desc = m[1].trim();
