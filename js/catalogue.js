@@ -4,7 +4,29 @@
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec';
 
-/* ── FORMATAGE ── */
+/* ── UTILITAIRES PRODUIT ── */
+function estHexClair(hex) {
+  if (!hex) return false;
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substr(0,2),16);
+  const g = parseInt(h.substr(2,2),16);
+  const b = parseInt(h.substr(4,2),16);
+  return (r * 299 + g * 587 + b * 114) / 1000 > 160;
+}
+
+function creerSapProduit(p, posHex) {
+  const hex = p.couleur_hex || '#888888';
+  const texte = estHexClair(hex) ? '#3d3b39' : '#ffffff';
+  const prixPoids = formaterPrixPoids(p.formats);
+  const photo = '<img class="sap-prod-photo" src="' + (p.image_url || '') + '" alt="">';
+  const bloc = '<div class="sap-prod-hex" style="--prod-hex:' + hex + '; --prod-texte:' + texte + ';">'
+    + '<div class="sap-prod-nom">' + (p.nom || '') + '</div>'
+    + '<div class="sap-prod-prix">' + prixPoids + '</div>'
+    + '</div>';
+  return '<div class="sap-prod">' + (posHex === 'haut' ? bloc + photo : photo + bloc) + '</div>';
+}
+
+
 function formaterPrix(formats) {
   if (!formats || formats.length === 0) return '';
   const f = formats[0];
@@ -151,6 +173,68 @@ async function chargerCatalogue() {
           + '</div>';
       }
     });
+
+    // ── PAGES 4-5 SAPONICA (COL-001) ──
+    const saponica = parCollection['COL-001'];
+    if (saponica) {
+      const col = saponica.collection;
+      const produits = saponica.produits.filter(function(p) { return p.statut === 'public'; });
+
+      const elSap4Photo = document.querySelector('.sap4-photo');
+      if (elSap4Photo && col.photo_url) {
+        elSap4Photo.style.backgroundImage = 'url(' + col.photo_url + ')';
+      }
+
+      const elNom = document.getElementById('sap4-nom');
+      if (elNom) elNom.textContent = col.nom;
+      const elSlogan = document.getElementById('sap4-slogan');
+      if (elSlogan) elSlogan.textContent = col.slogan;
+      const elDesc = document.getElementById('sap4-description');
+      if (elDesc) elDesc.textContent = col.description;
+
+      const elCitTexte = document.getElementById('sap4-citation-texte');
+      if (elCitTexte) elCitTexte.textContent = contenu.citation_texte || '';
+      const elCitAuteur = document.getElementById('sap4-citation-auteur');
+      if (elCitAuteur) elCitAuteur.textContent = contenu.citation_auteur || '';
+
+      const elCitation = document.querySelector('.sap4-citation');
+      if (elCitation && col.couleur_hex) elCitation.style.background = col.couleur_hex;
+
+      const elSap4Bas = document.getElementById('sap4-bas');
+      if (elSap4Bas && produits.length > 0) {
+        elSap4Bas.innerHTML = creerSapProduit(produits[0], 'bas');
+      }
+
+      const gammes = {};
+      produits.forEach(function(p) {
+        if (!gammes[p.gam_id]) {
+          gammes[p.gam_id] = { nom: p.nom_gamme, desc: p.desc_gamme, couleur_hex: p.couleur_hex, produits: [] };
+        }
+        gammes[p.gam_id].produits.push(p);
+      });
+
+      const gam = Object.values(gammes)[0];
+      if (gam) {
+        const elCube = document.getElementById('sap5-gamme-cube');
+        if (elCube) elCube.style.background = gam.couleur_hex || '#c1882e';
+        const elTrait = document.getElementById('sap5-gamme-trait');
+        if (elTrait) elTrait.style.background = gam.couleur_hex || '#c1882e';
+        const elGNom = document.getElementById('sap5-gamme-nom');
+        if (elGNom) elGNom.textContent = gam.nom;
+        const elGDesc = document.getElementById('sap5-gamme-desc');
+        if (elGDesc) elGDesc.textContent = gam.desc;
+
+        const produitsP5 = gam.produits.slice(1);
+        const r1 = document.getElementById('sap5-rangee-1');
+        const r2 = document.getElementById('sap5-rangee-2');
+        if (r1) produitsP5.slice(0, 3).forEach(function(p, i) {
+          r1.innerHTML += creerSapProduit(p, i === 1 ? 'haut' : 'bas');
+        });
+        if (r2) produitsP5.slice(3, 6).forEach(function(p, i) {
+          r2.innerHTML += creerSapProduit(p, i === 1 ? 'haut' : 'bas');
+        });
+      }
+    }
 
     // Pages collections — à construire
     conteneur.innerHTML = '';
