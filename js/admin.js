@@ -3749,7 +3749,7 @@ async function confirmerImportFacture() {
   await Promise.allSettled(promessesMapping);
 
   // Toutes les lignes en un seul appel
-  const payload = lignes.map(({ item, ingObj, prixParG, fmtQte, fmtUnite }) => ({
+  const payload = lignes.map(({ idx, item, ingObj, prixParG, fmtQte, fmtUnite }) => ({
     ach_id,
     ing_id:        ingObj?.ing_id || '',
     format_qte:    fmtQte,
