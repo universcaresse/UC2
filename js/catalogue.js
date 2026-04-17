@@ -16,11 +16,12 @@ function estHexClair(hex) {
 
 function creerSapProduit(p, posHex) {
   const hex = p.couleur_hex || '#888888';
-  const texte = estHexClair(hex) ? '#3d3b39' : '#ffffff';
+  const texte = estHexClair(hex) ? 'var(--gris-fonce)' : 'var(--blanc)';
   const prixPoids = formaterPrixPoids(p.formats);
   const photo = '<img class="sap-prod-photo" src="' + (p.image_url || '') + '" alt="">';
   const bloc = '<div class="sap-prod-hex" style="--prod-hex:' + hex + '; --prod-texte:' + texte + ';">'
     + '<div class="sap-prod-nom">' + (p.nom || '') + '</div>'
+    + (p.desc_emballage ? '<div class="sap-prod-emb">' + p.desc_emballage + '</div>' : '')
     + '<div class="sap-prod-prix">' + prixPoids + '</div>'
     + '</div>';
   return '<div class="sap-prod">' + (posHex === 'haut' ? bloc + photo : photo + bloc) + '</div>';
@@ -180,11 +181,13 @@ async function chargerCatalogue() {
       const col = saponica.collection;
       const produits = saponica.produits.filter(function(p) { return p.statut === 'public'; });
 
+      // Photo collection
       const elSap4Photo = document.querySelector('.sap4-photo');
       if (elSap4Photo && col.photo_url) {
         elSap4Photo.style.backgroundImage = 'url(' + col.photo_url + ')';
       }
 
+      // Texte collection
       const elNom = document.getElementById('sap4-nom');
       if (elNom) elNom.textContent = col.nom;
       const elSlogan = document.getElementById('sap4-slogan');
@@ -192,19 +195,19 @@ async function chargerCatalogue() {
       const elDesc = document.getElementById('sap4-description');
       if (elDesc) elDesc.textContent = col.description;
 
+      // Citation — fond var(--primary) fixe, pas touché
       const elCitTexte = document.getElementById('sap4-citation-texte');
       if (elCitTexte) elCitTexte.textContent = contenu.citation_texte || '';
       const elCitAuteur = document.getElementById('sap4-citation-auteur');
       if (elCitAuteur) elCitAuteur.textContent = contenu.citation_auteur || '';
 
-      const elCitation = document.querySelector('.sap4-citation');
-      if (elCitation && col.couleur_hex) elCitation.style.background = col.couleur_hex;
-
+      // 1 produit en bas page 4
       const elSap4Bas = document.getElementById('sap4-bas');
       if (elSap4Bas && produits.length > 0) {
         elSap4Bas.innerHTML = creerSapProduit(produits[0], 'bas');
       }
 
+      // Gamme SAVON — trouver la première gamme
       const gammes = {};
       produits.forEach(function(p) {
         if (!gammes[p.gam_id]) {
@@ -213,7 +216,7 @@ async function chargerCatalogue() {
         gammes[p.gam_id].produits.push(p);
       });
 
-      const gam = Object.values(gammes)[0];
+      const gam = Object.values(gammes).sort(function(a,b) { return (a.rang||99)-(b.rang||99); })[0];
       if (gam) {
         const elCube = document.getElementById('sap5-gamme-cube');
         if (elCube) elCube.style.background = gam.couleur_hex || '#c1882e';
@@ -224,13 +227,18 @@ async function chargerCatalogue() {
         const elGDesc = document.getElementById('sap5-gamme-desc');
         if (elGDesc) elGDesc.textContent = gam.desc;
 
+        // Produits page 5 — à partir du 2e (le 1er est page 4)
         const produitsP5 = gam.produits.slice(1);
+
+        // Rangée 1 : 2 produits
         const r1 = document.getElementById('sap5-rangee-1');
-        const r2 = document.getElementById('sap5-rangee-2');
-        if (r1) produitsP5.slice(0, 3).forEach(function(p, i) {
-          r1.innerHTML += creerSapProduit(p, i === 1 ? 'haut' : 'bas');
+        if (r1) produitsP5.slice(0, 2).forEach(function(p, i) {
+          r1.innerHTML += creerSapProduit(p, i === 0 ? 'haut' : 'bas');
         });
-        if (r2) produitsP5.slice(3, 6).forEach(function(p, i) {
+
+        // Rangée 2 : 3 produits
+        const r2 = document.getElementById('sap5-rangee-2');
+        if (r2) produitsP5.slice(2, 5).forEach(function(p, i) {
           r2.innerHTML += creerSapProduit(p, i === 1 ? 'haut' : 'bas');
         });
       }
