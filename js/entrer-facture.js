@@ -6,81 +6,178 @@
 
 // ─── ÉTAT ───
 var ef = {
-  factureActive:    null,  // { ach_id, numero, date, fournisseur, four_id }
-  lignes:           [],    // lignes sauvegardées
-  mapping:          [],    // [{fournisseur, categorie_fournisseur, nom_fournisseur, categorie_UC, nom_UC, ing_id}]
-  formats:          [],    // [{ing_id, contenant, quantite, unite, fournisseur}]
-  fournisseurs:     [],    // [{four_id, nom}]
-  scrapingItems:    [],    // items scraping du fournisseur actif [{nom, categorie}]
-  _saisieIngId:     null,  // ing_id sélectionné dans la ligne saisie
+  factureActive: null,  // { ach_id, numero, date, fournisseur, four_id, four_code }
+  lignes:        [],    // lignes sauvegardées
+  mapping:       [],    // [{fournisseur, categorie_fournisseur, nom_fournisseur, categorie_UC, nom_UC, ing_id}]
+  formats:       [],    // [{ing_id, contenant, quantite, unite, fournisseur}]
+  fournisseurs:  [],    // [{four_id, code, nom}]
+  scrapingItems: [],    // [{nom, categorie}]
+  _saisieIngId:  null,
+  _initEnCours:  false,
 };
 
-// Fournisseurs avec scraping
-var EF_SCRAPING_IDS = ['PA', 'MH', 'arbressence', 'DE'];
+// Codes fournisseurs avec scraping (colonne B de Fournisseurs_v2)
+var EF_SCRAPING_CODES = ['PA', 'MH', 'Arbressence', 'DE'];
 
-// ─── OBSERVER — déclenche efInit quand la section devient visible ───
-(function() {
-  document.addEventListener('DOMContentLoaded', function() {
-    const section = document.getElementById('section-entrer-facture');
-    if (!section) return;
-    new MutationObserver(function() {
-      if (section.classList.contains('visible')) efInit();
-    }).observe(section, { attributes: true, attributeFilter: ['class'] });
-  });
-})();
+// ─── parseFloat robuste — gère virgule et point ───
+function efParseFlt(val) {
+  if (val === null || val === undefined || val === '') return 0;
+  return parseFloat(String(val).replace(/\s/g, '').replace(',', '.')) || 0;
+}
 
-// ─── INIT ───
+// ─── INIT (appelé par admin.js via afficherSection) ───
 async function efInit() {
-  const [resFour, resInci, resCats, resMap, resFmt, resCfg] = await Promise.all([
-    appelAPI('getFournisseurs'),
-    appelAPI('getIngredientsInci'),
-    appelAPI('getCategoriesUC'),
-    appelAPI('getMappingFournisseurs'),
-    appelAPI('getFormatsIngredients'),
-    appelAPI('getConfig')
-  ]);
+  if (ef._initEnCours) return;
+  ef._initEnCours = true;
+  try {
+    const [resFour, resInci, resCats, resMap, resFmt, resCfg] = await Promise.all([
+      appelAPI('getFournisseurs'),
+      appelAPI('getIngredientsInci'),
+      appelAPI('getCategoriesUC'),
+      appelAPI('getMappingFournisseurs'),
+      appelAPI('getFormatsIngredients'),
+      appelAPI('getConfig')
+    ]);
 
-  if (resFour && resFour.success) {
-    ef.fournisseurs = resFour.items || [];
-    listesDropdown.fournisseurs = ef.fournisseurs.map(f => f.nom);
+    if (resFour && resFour.success) {
+      ef.fournisseurs = resFour.items || [];
+      listesDropdown.fournisseurs = ef.fournisseurs.map(f => f.nom);
+    }
+    if (resInci && resInci.success) {
+      listesDropdown.fullData = resInci.items || [];
+      listesDropdown.types = [...new Set(resInci.items.map(i => i.cat_id))].filter(Boolean).sort();
+    }
+    if (resCats && resCats.success) {
+      listesDropdown.categoriesMap = {};
+      (resCats.items || []).forEach(c => { listesDropdown.categoriesMap[c.cat_id] = c.nom; });
+    }
+    if (resMap && resMap.success) ef.mapping = resMap.items || [];
+    if (resFmt && resFmt.success) ef.formats = resFmt.items || [];
+    if (resCfg && resCfg.success) {
+      listesDropdown.config = {};
+      (resCfg.items || []).forEach(c => {
+        listesDropdown.config[c.type] = {
+          densite:       parseFloat(c.densite)         || 1,
+          unite:         c.unite                       || 'g',
+          margePertePct: parseFloat(c.marge_perte_pct) || 0
+        };
+      });
+    }
+
+    efPopulerFournisseurs();
+    efInitDate();
+
+    // Vérifier s'il y a une facture En cours à reprendre
+    await efVerifierFactureEnCours();
+
+    if (ef.factureActive) {
+      efAfficherZoneItems();
+      efRendreLigneSaisie();
+      efMajBanniere();
+    } else {
+      document.getElementById('ef-zone-items')?.classList.add('cache');
+      document.getElementById('ef-bandeau-reprise')?.classList.add('cache');
+    }
+  } finally {
+    ef._initEnCours = false;
   }
-  if (resInci && resInci.success) {
-    listesDropdown.fullData = resInci.items || [];
-    listesDropdown.types = [...new Set(resInci.items.map(i => i.cat_id))].filter(Boolean).sort();
+}
+
+// ─── VÉRIFIER FACTURE EN COURS ───
+async function efVerifierFactureEnCours() {
+  if (ef.factureActive) return; // déjà active en mémoire
+  const resAch = await appelAPI('getAchatsEntete');
+  if (!resAch || !resAch.success) return;
+  const enCours = (resAch.items || []).find(a => a.statut === 'En cours');
+  if (!enCours) return;
+
+  // Trouver le nom du fournisseur
+  const four = ef.fournisseurs.find(f => f.four_id === enCours.four_id);
+  const fourNom  = four?.nom  || enCours.four_id;
+  const fourCode = four?.code || '';
+
+  // Afficher le bandeau de reprise
+  const bandeau = document.getElementById('ef-bandeau-reprise');
+  const texte   = document.getElementById('ef-bandeau-reprise-texte');
+  if (bandeau && texte) {
+    texte.textContent = `Facture ${enCours.numero_facture || enCours.ach_id} — ${fourNom} — ${enCours.date || ''}`;
+    bandeau.classList.remove('cache');
   }
-  if (resCats && resCats.success) {
-    listesDropdown.categoriesMap = {};
-    (resCats.items || []).forEach(c => { listesDropdown.categoriesMap[c.cat_id] = c.nom; });
+
+  // Stocker temporairement pour reprise
+  ef._factureEnAttente = {
+    ach_id:      enCours.ach_id,
+    numero:      enCours.numero_facture || enCours.ach_id,
+    date:        enCours.date || '',
+    fournisseur: fourNom,
+    four_id:     enCours.four_id,
+    four_code:   fourCode
+  };
+}
+
+async function efReprendreFacture() {
+  if (!ef._factureEnAttente) return;
+
+  const f = ef._factureEnAttente;
+  ef.factureActive = f;
+
+  // Charger scraping si applicable
+  ef.scrapingItems = [];
+  if (f.four_code && EF_SCRAPING_CODES.includes(f.four_code)) {
+    const resScraping = await appelAPI('getScrapingFournisseur', { source: f.four_code });
+    if (resScraping && resScraping.success) ef.scrapingItems = resScraping.items || [];
   }
-  if (resMap && resMap.success) ef.mapping = resMap.items || [];
-  if (resFmt && resFmt.success) ef.formats = resFmt.items || [];
-  if (resCfg && resCfg.success) {
-    listesDropdown.config = {};
-    (resCfg.items || []).forEach(c => {
-      listesDropdown.config[c.type] = {
-        densite:       parseFloat(c.densite)         || 1,
-        unite:         c.unite                       || 'g',
-        margePertePct: parseFloat(c.marge_perte_pct) || 0
-      };
+
+  // Charger les lignes existantes
+  const resLignes = await appelAPI('getAchatsLignes', { ach_id: f.ach_id });
+  ef.lignes = [];
+  if (resLignes && resLignes.success) {
+    (resLignes.items || []).forEach(l => {
+      const ing   = (listesDropdown.fullData || []).find(d => d.ing_id === l.ing_id);
+      const nomUC = ing?.nom_UC || '';
+      const cat_id = ing?.cat_id || '';
+      const catUC  = listesDropdown.categoriesMap?.[cat_id] || '';
+      ef.lignes.push({
+        ing_id:       l.ing_id,
+        nomUC,
+        catFourn:     '',
+        nomFourn:     '',
+        catUC,
+        formatQte:    l.format_qte,
+        formatUnite:  l.format_unite,
+        contenant:    l.notes || '',
+        prixUnitaire: l.prix_unitaire,
+        quantite:     l.quantite,
+        prixTotal:    l.prix_total,
+        prixParG:     l.prix_par_g
+      });
     });
   }
 
-  efPopulerFournisseurs();
-  efInitDate();
+  document.getElementById('ef-bandeau-reprise')?.classList.add('cache');
+  efAfficherZoneItems();
+  efRendreLignesSauvegardees();
+  efRendreLigneSaisie();
+  efMajBanniere();
+  ef._factureEnAttente = null;
+}
 
-  if (ef.factureActive) {
-    efAfficherZoneItems();
-    efRendreLigneSaisie();
-    efMajBanniere();
+async function efAnnulerFactureEnCours() {
+  if (!ef._factureEnAttente) return;
+  const ach_id = ef._factureEnAttente.ach_id;
+  const res = await appelAPIPost('deleteAchat', { ach_id });
+  if (res && res.success) {
+    ef._factureEnAttente = null;
+    document.getElementById('ef-bandeau-reprise')?.classList.add('cache');
+    afficherMsg('ef', 'Facture annulée.', 'succes');
   } else {
-    document.getElementById('ef-zone-items')?.classList.add('cache');
-    document.getElementById('ef-btn-creer')?.removeAttribute('disabled');
+    afficherMsg('ef', res?.message || 'Erreur lors de l\'annulation.', 'erreur');
   }
 }
 
 // ─── CALCUL PRIX/G ───
 function efCalculerGrammes(formatQte, formatUnite, cat_id) {
-  const qte     = parseFloat(formatQte) || 0;
+  const qte     = efParseFlt(formatQte);
   const cfg     = listesDropdown.config?.[cat_id] || {};
   const densite = cfg.densite || 1;
   if (formatUnite === 'g')     return qte;
@@ -97,10 +194,10 @@ function efCalculerPrixParG(prixUnitaire, formatQte, formatUnite, cat_id) {
   if (formatUnite === 'unité') return 0;
   const grammes = efCalculerGrammes(formatQte, formatUnite, cat_id);
   if (grammes <= 0) return 0;
-  return parseFloat(prixUnitaire) / grammes;
+  return efParseFlt(prixUnitaire) / grammes;
 }
 
-// ─── DATE ───
+// ─── DATE (sans valeur prédéfinie) ───
 function efInitDate() {
   const selJour  = document.getElementById('ef-date-jour');
   const selAnnee = document.getElementById('ef-date-annee');
@@ -118,12 +215,8 @@ function efInitDate() {
     selAnnee.innerHTML = [anneeActuelle-1, anneeActuelle, anneeActuelle+1]
       .map(a => `<option value="${a}">${a}</option>`).join('');
   }
-
-  const today = new Date();
-  selJour.value = String(today.getDate()).padStart(2,'0');
-  document.getElementById('ef-date-mois').value = String(today.getMonth()+1).padStart(2,'0');
-  selAnnee.value = String(today.getFullYear());
-  efSyncDate();
+  // Pas de valeur prédéfinie — l'utilisateur choisit
+  document.getElementById('ef-date').value = '';
 }
 
 function efSyncDate() {
@@ -143,7 +236,10 @@ function efPopulerFournisseurs() {
     .sort((a, b) => (a.nom||'').localeCompare(b.nom||'','fr'))
     .forEach(f => {
       const opt = document.createElement('option');
-      opt.value = f.four_id; opt.dataset.nom = f.nom; opt.textContent = f.nom;
+      opt.value        = f.four_id;
+      opt.dataset.nom  = f.nom;
+      opt.dataset.code = f.code || '';
+      opt.textContent  = f.nom;
       sel.appendChild(opt);
     });
   const optNew = document.createElement('option');
@@ -161,23 +257,22 @@ function efOnChangeFournisseur() {
 
 // ─── CRÉER LA FACTURE ───
 async function efCreerFacture() {
-  if (ef.factureActive) {
-    efAfficherZoneItems();
-    return;
-  }
+  if (ef.factureActive) { efAfficherZoneItems(); return; }
 
-  const selFour = document.getElementById('ef-fournisseur');
-  const numero  = document.getElementById('ef-numero')?.value?.trim();
-  const date    = document.getElementById('ef-date')?.value;
-  let   four_id = selFour?.value;
-  let   fourNom = selFour?.options[selFour.selectedIndex]?.dataset?.nom
-                || selFour?.options[selFour.selectedIndex]?.textContent || '';
+  const selFour  = document.getElementById('ef-fournisseur');
+  const numero   = document.getElementById('ef-numero')?.value?.trim();
+  const date     = document.getElementById('ef-date')?.value;
+  let   four_id  = selFour?.value;
+  let   fourNom  = selFour?.options[selFour.selectedIndex]?.dataset?.nom
+                 || selFour?.options[selFour.selectedIndex]?.textContent || '';
+  let   fourCode = selFour?.options[selFour.selectedIndex]?.dataset?.code || '';
 
   if (four_id === '__nouveau__') {
     const champNouv = document.getElementById('ef-fournisseur-nouveau')?.value?.trim();
     if (!champNouv) { afficherMsg('ef', 'Entrez le nom du nouveau fournisseur.', 'erreur'); return; }
-    four_id = champNouv;
-    fourNom = champNouv;
+    four_id  = champNouv;
+    fourNom  = champNouv;
+    fourCode = '';
   }
 
   if (!four_id || !date || !numero) {
@@ -188,10 +283,10 @@ async function efCreerFacture() {
   const btn = document.getElementById('ef-btn-creer');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
 
-  // Charger le scraping si fournisseur connu
+  // Charger le scraping via le CODE du fournisseur
   ef.scrapingItems = [];
-  if (EF_SCRAPING_IDS.includes(four_id)) {
-    const resScraping = await appelAPI('getScrapingFournisseur', { source: four_id });
+  if (fourCode && EF_SCRAPING_CODES.includes(fourCode)) {
+    const resScraping = await appelAPI('getScrapingFournisseur', { source: fourCode });
     if (resScraping && resScraping.success) ef.scrapingItems = resScraping.items || [];
   }
 
@@ -205,7 +300,7 @@ async function efCreerFacture() {
     return;
   }
 
-  ef.factureActive = { ach_id, numero, date, fournisseur: fourNom, four_id };
+  ef.factureActive = { ach_id, numero, date, fournisseur: fourNom, four_id, four_code: fourCode };
   efAfficherZoneItems();
   efRendreLigneSaisie();
   efMajBanniere();
@@ -238,9 +333,9 @@ function efMajSousTotal() {
 
 function efCalculerTotal() {
   const sousTotal = ef.lignes.reduce((s, l) => s + (l.prixTotal || 0), 0);
-  const tps       = parseFloat(document.getElementById('ef-tps')?.value)       || 0;
-  const tvq       = parseFloat(document.getElementById('ef-tvq')?.value)       || 0;
-  const livraison = parseFloat(document.getElementById('ef-livraison')?.value) || 0;
+  const tps       = efParseFlt(document.getElementById('ef-tps')?.value);
+  const tvq       = efParseFlt(document.getElementById('ef-tvq')?.value);
+  const livraison = efParseFlt(document.getElementById('ef-livraison')?.value);
   const elTotal   = document.getElementById('ef-total');
   if (elTotal) elTotal.value = formaterPrix(sousTotal + tps + tvq + livraison);
 }
@@ -253,10 +348,7 @@ function efRendreLigneSaisie() {
   const ancienne = document.getElementById('ef-ligne-saisie');
   if (ancienne) ancienne.remove();
 
-  // Catégories fournisseur :
-  // 1. Scraping si disponible
-  // 2. Sinon mapping existant pour ce fournisseur
-  // 3. Sinon catégories UC
+  // Catégories fournisseur : scraping > mapping > catégories UC
   const catsScrap = [...new Set(
     ef.scrapingItems.map(i => i.categorie).filter(Boolean)
   )].sort((a,b) => a.localeCompare(b,'fr'));
@@ -383,13 +475,15 @@ function efOnChangeSaisieNomFourn() {
           .find(k => listesDropdown.categoriesMap[k] === mapping.categorie_UC) || '';
         selCatUC.value = cat_id;
         efOnChangeSaisieCatUC();
-        const selNomUC = document.getElementById('ef-saisie-nom-uc');
-        if (selNomUC) {
-          const ing = (listesDropdown.fullData || []).find(d => d.nom_UC === mapping.nom_UC && d.cat_id === cat_id);
-          if (ing) { selNomUC.value = ing.ing_id; ef._saisieIngId = ing.ing_id; }
-        }
+        setTimeout(() => {
+          const selNomUC = document.getElementById('ef-saisie-nom-uc');
+          if (selNomUC && mapping.ing_id) {
+            selNomUC.value = mapping.ing_id;
+            ef._saisieIngId = mapping.ing_id;
+            efPopulerFormats(mapping.ing_id);
+          }
+        }, 50);
       }
-      if (mapping.ing_id) efPopulerFormats(mapping.ing_id);
     } else {
       efReinitDepuisNom();
     }
@@ -444,14 +538,16 @@ function efOnChangeSaisieCatUC() {
   const cat_id = selCatUC.value;
 
   selNomUC.innerHTML = '<option value="">— Nom UC —</option>';
-  (listesDropdown.fullData || [])
-    .filter(d => d.cat_id === cat_id)
-    .sort((a,b) => (a.nom_UC||'').localeCompare(b.nom_UC||'','fr'))
-    .forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = d.ing_id; opt.textContent = d.nom_UC;
-      selNomUC.appendChild(opt);
-    });
+  if (cat_id) {
+    (listesDropdown.fullData || [])
+      .filter(d => d.cat_id === cat_id)
+      .sort((a,b) => (a.nom_UC||'').localeCompare(b.nom_UC||'','fr'))
+      .forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.ing_id; opt.textContent = d.nom_UC;
+        selNomUC.appendChild(opt);
+      });
+  }
   const optNew = document.createElement('option');
   optNew.value = '__nouveau__'; optNew.textContent = '+ Nouvel ingrédient…';
   selNomUC.appendChild(optNew);
@@ -477,8 +573,8 @@ function efOnChangeSaisieNomUC() {
 }
 
 function efMajLigneTotal() {
-  const prix = parseFloat(document.getElementById('ef-saisie-prix')?.value) || 0;
-  const qte  = parseFloat(document.getElementById('ef-saisie-qte')?.value)  || 0;
+  const prix = efParseFlt(document.getElementById('ef-saisie-prix')?.value);
+  const qte  = efParseFlt(document.getElementById('ef-saisie-qte')?.value);
   const el   = document.getElementById('ef-saisie-total');
   if (el) el.textContent = prix && qte ? formaterPrix(prix * qte) : '—';
 }
@@ -493,10 +589,9 @@ async function efAjouterLigne() {
     : selCatF?.value;
 
   const selNomF = document.getElementById('ef-saisie-nom-fourn');
-  let nomFourn = selNomF?.value === '__nouveau__'
+  let nomFourn = selNomF?.value === '__nouveau__' || !selNomF?.value
     ? document.getElementById('ef-saisie-nom-fourn-nouveau')?.value?.trim()
-    : (selNomF?.value || document.getElementById('ef-saisie-nom-fourn-nouveau')?.value?.trim());
-  if (!nomFourn) nomFourn = document.getElementById('ef-saisie-nom-fourn-nouveau')?.value?.trim();
+    : selNomF?.value;
 
   const selFmt = document.getElementById('ef-saisie-format');
   let formatQte = '', formatUnite = 'g', contenant = '';
@@ -520,18 +615,20 @@ async function efAjouterLigne() {
   if (!quantite)  { afficherMsg('ef-items', 'Quantité requise.', 'erreur'); return; }
   if (!ing_id)    { afficherMsg('ef-items', 'Ingrédient UC requis.', 'erreur'); return; }
 
-  const prixTotal = parseFloat(quantite) * parseFloat(prixUnit);
-  const prixParG  = efCalculerPrixParG(prixUnit, formatQte, formatUnite, cat_id);
-  const fourNom   = ef.factureActive.fournisseur;
+  const prixUnitNum = efParseFlt(prixUnit);
+  const quantiteNum = efParseFlt(quantite);
+  const prixTotal   = quantiteNum * prixUnitNum;
+  const prixParG    = efCalculerPrixParG(prixUnitNum, formatQte, formatUnite, cat_id);
+  const fourNom     = ef.factureActive.fournisseur;
 
   const res = await appelAPIPost('addAchatLigne', {
     ach_id:        ef.factureActive.ach_id,
     ing_id,
-    format_qte:    parseFloat(formatQte),
+    format_qte:    efParseFlt(formatQte),
     format_unite:  formatUnite,
-    prix_unitaire: parseFloat(prixUnit),
+    prix_unitaire: prixUnitNum,
     prix_par_g:    prixParG,
-    quantite:      parseFloat(quantite),
+    quantite:      quantiteNum,
     fournisseur:   fourNom,
     notes:         contenant
   });
@@ -554,18 +651,18 @@ async function efAjouterLigne() {
 
   // Mémoriser format si nouveau
   const fmtExiste = ef.formats.find(f =>
-    f.ing_id === ing_id && parseFloat(f.quantite) === parseFloat(formatQte) &&
+    f.ing_id === ing_id && efParseFlt(f.quantite) === efParseFlt(formatQte) &&
     f.unite === formatUnite && f.fournisseur === fourNom
   );
   if (!fmtExiste) {
-    ef.formats.push({ ing_id, contenant, quantite: parseFloat(formatQte), unite: formatUnite, fournisseur: fourNom });
+    ef.formats.push({ ing_id, contenant, quantite: efParseFlt(formatQte), unite: formatUnite, fournisseur: fourNom });
   }
 
   const catUCNom = listesDropdown.categoriesMap?.[cat_id] || cat_id;
   ef.lignes.push({
     ing_id, nomUC, catFourn, nomFourn, catUC: catUCNom,
-    formatQte: parseFloat(formatQte), formatUnite, contenant,
-    prixUnitaire: parseFloat(prixUnit), quantite: parseFloat(quantite),
+    formatQte: efParseFlt(formatQte), formatUnite, contenant,
+    prixUnitaire: prixUnitNum, quantite: quantiteNum,
     prixTotal, prixParG
   });
 
@@ -619,9 +716,9 @@ async function efFinaliser() {
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span> Finalisation…'; }
 
   const sousTotal = ef.lignes.reduce((s, l) => s + (l.prixTotal || 0), 0);
-  const tps       = parseFloat(document.getElementById('ef-tps')?.value)       || 0;
-  const tvq       = parseFloat(document.getElementById('ef-tvq')?.value)       || 0;
-  const livraison = parseFloat(document.getElementById('ef-livraison')?.value) || 0;
+  const tps       = efParseFlt(document.getElementById('ef-tps')?.value);
+  const tvq       = efParseFlt(document.getElementById('ef-tvq')?.value);
+  const livraison = efParseFlt(document.getElementById('ef-livraison')?.value);
 
   const res = await appelAPIPost('finaliserAchat', {
     ach_id: ef.factureActive.ach_id,
@@ -643,15 +740,14 @@ async function efFinaliser() {
     ef.scrapingItems  = [];
     if (btn) { btn.disabled = false; btn.innerHTML = 'Finaliser'; }
     document.getElementById('ef-fournisseur').value = '';
-    document.getElementById('ef-fournisseur-nouveau').value = '';
-    document.getElementById('ef-fournisseur-nouveau').classList.add('cache');
+    document.getElementById('ef-fournisseur-nouveau')?.classList.add('cache');
     document.getElementById('ef-numero').value    = '';
     document.getElementById('ef-tps').value       = '';
     document.getElementById('ef-tvq').value       = '';
     document.getElementById('ef-livraison').value = '';
     document.getElementById('ef-soustotal').value = '';
     document.getElementById('ef-total').value     = '';
-    document.getElementById('ef-zone-items').classList.add('cache');
+    document.getElementById('ef-zone-items')?.classList.add('cache');
     document.getElementById('ef-tbody').innerHTML = '';
     efInitDate();
     afficherMsg('ef-final', '');
@@ -664,7 +760,7 @@ function efOuvrirModalFormat() {
   if (!modal) return;
   document.getElementById('modal-ef-fmt-unite').value = 'g';
   document.getElementById('modal-ef-fmt-qte').value   = '';
-  document.getElementById('modal-ef-fmt-qte-bloc').classList.remove('cache');
+  document.getElementById('modal-ef-fmt-qte-bloc')?.classList.remove('cache');
   modal.classList.add('ouvert');
   document.getElementById('modal-ef-fmt-unite').focus();
 }
@@ -688,7 +784,7 @@ function efConfirmerModalFormat() {
   const selFmt = document.getElementById('ef-saisie-format');
   if (selFmt) {
     const opt = document.createElement('option');
-    opt.value = JSON.stringify({ quantite: parseFloat(qte)||1, unite, contenant: '' });
+    opt.value = JSON.stringify({ quantite: efParseFlt(qte)||1, unite, contenant: '' });
     opt.textContent = unite === 'unité' ? 'unité' : qte + ' ' + unite;
     opt.selected = true;
     const optNew = [...selFmt.options].find(o => o.value === '__nouveau__');
@@ -812,18 +908,19 @@ async function efConfirmerModalIngredient() {
   const selCatUC = document.getElementById('ef-saisie-cat-uc');
   const selNomUC = document.getElementById('ef-saisie-nom-uc');
   if (selCatUC) { selCatUC.value = cat_id; efOnChangeSaisieCatUC(); }
-  if (selNomUC) {
-    let opt = [...selNomUC.options].find(o => o.value === ing_id);
-    if (!opt) {
-      opt = document.createElement('option');
-      opt.value = ing_id; opt.textContent = nomUC;
-      const optNew = [...selNomUC.options].find(o => o.value === '__nouveau__');
-      if (optNew) selNomUC.insertBefore(opt, optNew);
-      else selNomUC.appendChild(opt);
+  setTimeout(() => {
+    if (selNomUC) {
+      let opt = [...selNomUC.options].find(o => o.value === ing_id);
+      if (!opt) {
+        opt = document.createElement('option');
+        opt.value = ing_id; opt.textContent = nomUC;
+        const optNew = [...selNomUC.options].find(o => o.value === '__nouveau__');
+        if (optNew) selNomUC.insertBefore(opt, optNew);
+        else selNomUC.appendChild(opt);
+      }
+      selNomUC.value = ing_id;
     }
-    selNomUC.value = ing_id;
-  }
-
-  efPopulerFormats(ing_id);
-  efFermerModalIngredient();
+    efPopulerFormats(ing_id);
+    efFermerModalIngredient();
+  }, 50);
 }
