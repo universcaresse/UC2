@@ -230,7 +230,7 @@ nav.scrolled { box-shadow: none; }
 .nav-links { display: flex; gap: 32px; list-style: none; margin-left: auto; }
 .nav-links a, .nav-admin-btn {
   font-family: 'Playfair Display', serif;
-  font-size: var(--texte-105);
+  font-size: var(--texte-115);
   letter-spacing: 0.1em;
   text-transform: lowercase;
   color: var(--gris);
@@ -1019,7 +1019,7 @@ tr.cliquable { cursor: pointer; }
     display: block;
     width: 100%;
     padding: 11px 20px;
-    font-size: var(--texte-95);
+    font-size: var(--texte-105);
     font-family: 'Playfair Display', serif;
     text-transform: lowercase;
     background: none;
