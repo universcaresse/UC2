@@ -176,6 +176,7 @@ if (id === 'familles')       afficherFamilles();
   const cible = document.getElementById('section-' + id);
   if (cible) reobserverFadeIn(cible);
   if (id === 'nouvelle-facture' && !factureActive) initialiserNouvelleFacture();
+  if (id === 'entrer-facture') efInit();
 }
 
 // ─── STATS ACCUEIL ───
