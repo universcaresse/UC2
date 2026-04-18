@@ -532,9 +532,10 @@ function efOnChangeSaisieCatUC() {
   const cat_id = selCatUC.value;
 
   selNomUC.innerHTML = '<option value="">— Nom UC —</option>';
+  const items = (listesDropdown.fullData || []).filter(d => d.cat_id === cat_id);
+  console.log('cat_id:', cat_id, 'items trouvés:', items.length, 'fullData total:', listesDropdown.fullData?.length);
   if (cat_id) {
-    (listesDropdown.fullData || [])
-      .filter(d => d.cat_id === cat_id)
+    items
       .sort((a,b) => (a.nom_UC||'').localeCompare(b.nom_UC||'','fr'))
       .forEach(d => {
         const opt = document.createElement('option');
@@ -752,7 +753,7 @@ async function efFinaliser() {
 function efOuvrirModalFormat() {
   const modal = document.getElementById('modal-ef-format');
   if (!modal) return;
-  document.getElementById('modal-ef-fmt-unite').value = 'g';
+  document.getElementById('modal-ef-fmt-unite').value = '';
   document.getElementById('modal-ef-fmt-qte').value   = '';
   document.getElementById('modal-ef-fmt-qte-bloc')?.classList.remove('cache');
   modal.classList.add('ouvert');
