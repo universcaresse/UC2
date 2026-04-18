@@ -182,8 +182,10 @@
   --texte-85:  0.85rem;
   --texte-90:  0.90rem;
   --texte-95:  0.95rem;
+    --texte-100: 1.00rem;
   --texte-105: 1.05rem;
-  --texte-115: 1.15rem;
+  --texte-110: 1.10rem;
+   --texte-115: 1.15rem;
   --texte-130: 1.30rem;
   --texte-150: 1.50rem;
   --texte-200: 2rem;
@@ -230,7 +232,7 @@ nav.scrolled { box-shadow: none; }
 .nav-links { display: flex; gap: 32px; list-style: none; margin-left: auto; }
 .nav-links a, .nav-admin-btn {
   font-family: 'Playfair Display', serif;
-  font-size: var(--texte-115);
+  font-size: var(--texte-110);
   letter-spacing: 0.1em;
   text-transform: lowercase;
   color: var(--gris);
