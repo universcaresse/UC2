@@ -257,7 +257,12 @@ async function chargerCatalogue() {
         var elGNom = document.getElementById('sap5-gamme-nom');
         if (elGNom) elGNom.textContent = gam.nom;
         var elGCube = document.getElementById('sap5-gamme-cube');
-        if (elGCube) elGCube.style.setProperty('--gam-hex', gam.couleur_hex);
+        if (elGCube) {
+          elGCube.style.setProperty('--gam-hex', gam.couleur_hex);
+          elGCube.style.setProperty('background', gam.couleur_hex);
+        }
+        var elGTrait = document.querySelector('.sap5-gamme-trait');
+        if (elGTrait) elGTrait.style.setProperty('background', gam.couleur_hex);
         var elGDesc = document.getElementById('sap5-gamme-desc');
         if (elGDesc) elGDesc.textContent = gam.desc;
 
