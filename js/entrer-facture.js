@@ -202,20 +202,14 @@ function efInitDate() {
   const selJour  = document.getElementById('ef-date-jour');
   const selAnnee = document.getElementById('ef-date-annee');
   if (!selJour || !selAnnee) return;
-
-  if (!selJour.options.length) {
-    selJour.innerHTML = Array.from({length:31}, (_,i) => {
-      const j = String(i+1).padStart(2,'0');
-      return `<option value="${j}">${j}</option>`;
-    }).join('');
-  }
-
+  selJour.innerHTML = '<option value="">—</option>' + Array.from({length:31}, (_,i) => {
+    const j = String(i+1).padStart(2,'0');
+    return `<option value="${j}">${j}</option>`;
+  }).join('');
   const anneeActuelle = new Date().getFullYear();
-  if (!selAnnee.options.length) {
-    selAnnee.innerHTML = [anneeActuelle-1, anneeActuelle, anneeActuelle+1]
-      .map(a => `<option value="${a}">${a}</option>`).join('');
-  }
-  // Pas de valeur prédéfinie — l'utilisateur choisit
+  selAnnee.innerHTML = '<option value="">—</option>' + [anneeActuelle-1, anneeActuelle, anneeActuelle+1]
+    .map(a => `<option value="${a}">${a}</option>`).join('');
+  document.getElementById('ef-date-mois').value = '';
   document.getElementById('ef-date').value = '';
 }
 
