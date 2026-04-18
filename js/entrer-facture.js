@@ -43,7 +43,7 @@ async function efInit() {
       ef.fournisseurs = resFour.items || [];
       listesDropdown.fournisseurs = ef.fournisseurs.map(f => f.nom);
     }
-    if (resInci && resInci.success) {
+    if (resInci && resInci.success && resInci.items && resInci.items.length > 0) {
       listesDropdown.fullData = resInci.items || [];
       listesDropdown.types = [...new Set(resInci.items.map(i => i.cat_id))].filter(Boolean).sort();
     }
