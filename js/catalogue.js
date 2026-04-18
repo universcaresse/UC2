@@ -14,17 +14,43 @@ function estHexClair(hex) {
   return (r * 299 + g * 587 + b * 114) / 1000 > 160;
 }
 
-function creerSapProduit(p, posHex) {
-  const hex = p.couleur_hex || '#888888';
-  const texte = estHexClair(hex) ? 'var(--gris-fonce)' : 'var(--blanc)';
-  const prixPoids = formaterPrixPoids(p.formats);
-  const photo = '<img class="sap-prod-photo" src="' + (p.image_url || '') + '" alt="">';
-  const bloc = '<div class="sap-prod-hex" style="--prod-hex:' + hex + '; --prod-texte:' + texte + ';">'
-    + '<div class="sap-prod-nom">' + (p.nom || '') + '</div>'
-    + (p.desc_emballage ? '<div class="sap-prod-emb">' + p.desc_emballage + '</div>' : '')
-    + '<div class="sap-prod-prix">' + prixPoids + '</div>'
+var _pos_v = ['haut', 'bas', 'separe'];
+var _pos_h = ['gauche', 'droite'];
+
+function posAleatoire(type) {
+  var opts = type === 'h' ? _pos_h : _pos_v;
+  return opts[Math.floor(Math.random() * opts.length)];
+}
+
+function creerProduitCarte(p, orientation, posHex) {
+  var hex = p.couleur_hex || '#888888';
+  var texte = estHexClair(hex) ? 'var(--gris-fonce)' : 'var(--blanc)';
+  var prixPoids = formaterPrixPoids(p.formats);
+
+  var photo = '<div class="prod-photo-wrap">'
+    + '<img class="prod-photo" src="' + (p.image_url || '') + '" alt="' + (p.nom || '') + '">'
     + '</div>';
-  return '<div class="sap-prod">' + (posHex === 'haut' ? bloc + photo : photo + bloc) + '</div>';
+
+  var hexBloc = '<div class="prod-hex" style="--prod-hex:' + hex + '; --prod-texte:' + texte + ';">'
+    + '<div class="prod-hex-nom">' + (p.nom || '') + '</div>'
+    + (p.desc_emballage ? '<div class="prod-hex-emb">' + p.desc_emballage + '</div>' : '')
+    + (prixPoids ? '<div class="prod-hex-prix">' + prixPoids + '</div>' : '')
+    + '</div>';
+
+  var classes = 'prod-carte';
+  if (orientation === 'h') classes += ' prod-h';
+  if (posHex === 'separe') classes += ' prod-separe';
+
+  var contenu = '';
+  if (posHex === 'haut' || posHex === 'gauche') {
+    contenu = hexBloc + photo;
+  } else if (posHex === 'bas' || posHex === 'droite') {
+    contenu = photo + hexBloc;
+  } else if (posHex === 'separe') {
+    contenu = hexBloc + photo + hexBloc;
+  }
+
+  return '<div class="' + classes + '">' + contenu + '</div>';
 }
 
 
@@ -176,71 +202,104 @@ async function chargerCatalogue() {
     });
 
     // ── PAGES 4-5 SAPONICA (COL-001) ──
-    const saponica = parCollection['COL-001'];
+    var saponica = parCollection['COL-001'];
     if (saponica) {
-      const col = saponica.collection;
-      const produits = saponica.produits.filter(function(p) { return p.statut === 'public'; });
+      var col = saponica.collection;
+      var produits = saponica.produits.filter(function(p) { return p.statut === 'public'; });
 
       // Photo collection
-      const elSap4Photo = document.querySelector('.sap4-photo');
+      var elSap4Photo = document.getElementById('sap4-photo');
       if (elSap4Photo && col.photo_url) {
-        elSap4Photo.style.backgroundImage = 'url(' + col.photo_url + ')';
+        elSap4Photo.src = col.photo_url;
+        elSap4Photo.alt = col.nom;
       }
 
       // Texte collection
-      const elNom = document.getElementById('sap4-nom');
+      var elNom = document.getElementById('sap4-nom');
       if (elNom) elNom.textContent = col.nom;
-      const elSlogan = document.getElementById('sap4-slogan');
+      var elSlogan = document.getElementById('sap4-slogan');
       if (elSlogan) elSlogan.textContent = col.slogan;
-      const elDesc = document.getElementById('sap4-description');
+      var elDesc = document.getElementById('sap4-description');
       if (elDesc) elDesc.textContent = col.description;
 
-      // Citation — fond var(--primary) fixe, pas touché
-      const elCitTexte = document.getElementById('sap4-citation-texte');
+      // Citation
+      var elCitTexte = document.getElementById('sap4-citation-texte');
       if (elCitTexte) elCitTexte.textContent = contenu.citation_texte || '';
-      const elCitAuteur = document.getElementById('sap4-citation-auteur');
+      var elCitAuteur = document.getElementById('sap4-citation-auteur');
       if (elCitAuteur) elCitAuteur.textContent = contenu.citation_auteur || '';
 
-      // 1 produit en bas page 4
-      const elSap4Bas = document.getElementById('sap4-bas');
-      if (elSap4Bas && produits.length > 0) {
-        elSap4Bas.innerHTML = creerSapProduit(produits[0], 'bas');
+      // 1 produit page 4
+      var elProd1 = document.getElementById('sap4-produit-1');
+      if (elProd1 && produits.length > 0) {
+        elProd1.innerHTML = creerProduitCarte(produits[0], 'v', posAleatoire('v'));
       }
 
-      // Gamme SAVON — trouver la première gamme
-      const gammes = {};
+      // Grouper par gamme
+      var gammes = {};
       produits.forEach(function(p) {
-        if (!gammes[p.gam_id]) {
-          gammes[p.gam_id] = { nom: p.nom_gamme, desc: p.desc_gamme, couleur_hex: p.couleur_hex, produits: [] };
+        var gamId = p['GAM-id'] || p.gam_id || 'sans-gamme';
+        if (!gammes[gamId]) {
+          gammes[gamId] = {
+            nom: p.nom_gamme || '',
+            desc: p.desc_gamme || '',
+            couleur_hex: p.couleur_hex || '#c1882e',
+            rang: p.rang_gamme || 99,
+            produits: []
+          };
         }
-        gammes[p.gam_id].produits.push(p);
+        gammes[gamId].produits.push(p);
       });
 
-      const gam = Object.values(gammes).sort(function(a,b) { return (a.rang||99)-(b.rang||99); })[0];
+      var gam = Object.values(gammes).sort(function(a, b) { return a.rang - b.rang; })[0];
       if (gam) {
-        const elCube = document.getElementById('sap5-gamme-cube');
-        if (elCube) elCube.style.background = gam.couleur_hex || '#c1882e';
-        const elTrait = document.getElementById('sap5-gamme-trait');
-        if (elTrait) elTrait.style.background = gam.couleur_hex || '#c1882e';
-        const elGNom = document.getElementById('sap5-gamme-nom');
+
+        // Entête gamme page 5
+        var elGNom = document.getElementById('sap5-gamme-nom');
         if (elGNom) elGNom.textContent = gam.nom;
-        const elGDesc = document.getElementById('sap5-gamme-desc');
+        var elGCube = document.getElementById('sap5-gamme-cube');
+        if (elGCube) elGCube.style.setProperty('--gam-hex', gam.couleur_hex);
+        var elGDesc = document.getElementById('sap5-gamme-desc');
         if (elGDesc) elGDesc.textContent = gam.desc;
 
         // Produits page 5 — à partir du 2e (le 1er est page 4)
-        const produitsP5 = gam.produits.slice(1);
+        var produitsP5 = gam.produits.slice(1);
 
-        // Rangée 1 : 2 produits
-        const r1 = document.getElementById('sap5-rangee-1');
-        if (r1) produitsP5.slice(0, 2).forEach(function(p, i) {
-          r1.innerHTML += creerSapProduit(p, i === 0 ? 'haut' : 'bas');
-        });
+        // Rangée 1 : 3 produits
+        var r1 = document.getElementById('sap5-rangee-1');
+        if (r1) {
+          produitsP5.slice(0, 3).forEach(function(p) {
+            r1.innerHTML += creerProduitCarte(p, 'v', posAleatoire('v'));
+          });
+        }
 
         // Rangée 2 : 3 produits
-        const r2 = document.getElementById('sap5-rangee-2');
-        if (r2) produitsP5.slice(2, 5).forEach(function(p, i) {
-          r2.innerHTML += creerSapProduit(p, i === 1 ? 'haut' : 'bas');
-        });
+        var r2 = document.getElementById('sap5-rangee-2');
+        if (r2) {
+          produitsP5.slice(3, 6).forEach(function(p) {
+            r2.innerHTML += creerProduitCarte(p, 'v', posAleatoire('v'));
+          });
+        }
+
+        // Overflow — produits restants dans #sap-pages-suite
+        var produitsReste = produitsP5.slice(6);
+        var elSuite = document.getElementById('sap-pages-suite');
+        if (elSuite && produitsReste.length > 0) {
+          var htmlSuite = '';
+          for (var i = 0; i < produitsReste.length; i += 3) {
+            var lot = produitsReste.slice(i, i + 3);
+            var cote = (Math.floor(i / 3) % 2 === 0) ? 'page-g' : 'page-d';
+            htmlSuite += '<div class="page ' + cote + ' p-sap-suite" style="--col-hex:#e5900a">'
+              + '<div class="page-int">'
+              + '<div class="sap5-rangee">';
+            lot.forEach(function(p) {
+              htmlSuite += creerProduitCarte(p, 'v', posAleatoire('v'));
+            });
+            htmlSuite += '</div></div>'
+              + '<div class="cat-pied"><div class="cat-pied-ligne"></div><span></span></div>'
+              + '</div>';
+          }
+          elSuite.innerHTML = htmlSuite;
+        }
       }
     }
 

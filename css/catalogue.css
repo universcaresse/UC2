@@ -40,56 +40,122 @@
 
 /* ── PAGES 4-5 SAPONICA ── */
 
-/* PAGE 4 — photo puis texte en dessous, colonne */
-.sap4-haut { flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+/* PAGE 4 — deux colonnes : photo+texte gauche / produit droite */
+.sap4-haut {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  min-height: 0;
+  margin-bottom: 20px;
+}
 
-.sap4-photo-wrap { position: relative; flex-shrink: 0; }
-.sap4-photo { width: 260px; height: 220px; background-size: cover; background-position: center; background-repeat: no-repeat; }
-.sap4-photo-fondu { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to bottom, transparent, var(--blanc)); }
+.sap4-col-gauche {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sap4-col-droite {
+  width: 192px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.sap4-photo-wrap { flex-shrink: 0; overflow: hidden; margin-bottom: 20px; }
+.sap4-photo { width: 100%; height: 260px; object-fit: cover; display: block; }
 
 .sap4-texte { display: flex; flex-direction: column; gap: 10px; }
 .sap4-nom { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 400; color: var(--gris-fonce); line-height: 1; }
-.sap4-slogan { font-family: 'Birthstone', cursive; font-size: 24px; color: var(--accent); line-height: 1.4; }
-.sap4-description { font-size: 11px; font-weight: 300; color: var(--gris-fonce); line-height: 2; }
+.sap4-slogan { font-family: 'Playfair Display', serif; font-size: 18px; font-style: italic; color: var(--col-hex); line-height: 1.4; }
+.sap4-description { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300; color: var(--gris-fonce); line-height: 2; }
 
-/* CITATION — bloc avec marges des deux côtés, fond var(--primary) FIXE */
+/* CITATION — fond var(--primary) FIXE, largeur partielle */
 .sap4-citation {
   flex-shrink: 0;
   background: var(--primary);
-  padding: 28px 32px;
-  margin: 0 32px 0 0;
+  padding: 24px 32px;
+  margin-right: 96px;
 }
-.sap4-citation-texte { font-family: 'Playfair Display', serif; font-size: 14px; font-style: italic; color: var(--blanc); line-height: 1.9; text-align: center; }
-.sap4-citation-auteur { font-size: 8px; font-weight: 400; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.65); text-align: center; margin-top: 12px; }
-
-/* PRODUIT PAGE 4 — aligné avec rangée 1 page 5 */
-.sap4-bas { flex: 1; display: flex; align-items: flex-start; padding-top: 14px; min-height: 0; }
+.sap4-citation-texte { font-family: 'Playfair Display', serif; font-size: 13px; font-style: italic; color: var(--blanc); line-height: 1.9; }
+.sap4-citation-auteur { font-family: 'DM Sans', sans-serif; font-size: 8px; font-weight: 300; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-top: 10px; }
 
 /* PAGE 5 — gamme */
-.sap5-gamme { flex-shrink: 0; padding: 0 0 16px; }
-.sap5-gamme-entete { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
-.sap5-gamme-cube { width: 24px; height: 24px; flex-shrink: 0; }
+.sap5-gamme { flex-shrink: 0; margin-bottom: 20px; }
+.sap5-gamme-entete { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .sap5-gamme-nom { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; color: var(--gris-fonce); }
-.sap5-gamme-trait { height: 1px; width: 32px; margin-bottom: 10px; }
-.sap5-gamme-desc { font-size: 11px; font-weight: 300; color: var(--gris); line-height: 1.9; }
+.sap5-gamme-cube { width: 24px; height: 24px; flex-shrink: 0; background: var(--gam-hex, #c1882e); }
+.sap5-gamme-trait { height: 1px; width: 32px; background: var(--gam-hex, #c1882e); margin-bottom: 12px; }
+.sap5-gamme-desc { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300; color: var(--gris); line-height: 1.9; }
 
 /* PAGE 5 — grille produits */
-.sap5-produits { flex: 1; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
-.sap5-rangee { display: flex; flex-direction: row; gap: 12px; flex: 1; }
+.sap5-produits { flex: 1; display: flex; flex-direction: column; gap: 48px; min-height: 0; }
+.sap5-rangee { display: flex; flex-direction: row; gap: 48px; }
 
-/* PRODUIT commun */
-.sap-prod { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-.sap-prod-photo { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; flex-shrink: 0; }
-.sap-prod-hex {
-  background: var(--prod-hex);
-  padding: 12px 10px;
-  display: flex; flex-direction: column; gap: 4px;
-  min-height: 50%;
+/* ══════════════════════════════════════
+   CARTE PRODUIT UNIVERSELLE
+   Verticale : 192px × 432px (2" × 4.5")
+   Horizontale : 432px × 192px (4.5" × 2")
+   Photo : jamais coupée — object-fit: contain
+   Hex : 50% de la carte
+══════════════════════════════════════ */
+.prod-carte {
+  width: 192px;
+  height: 432px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
-.sap-prod-nom { font-family: 'Playfair Display', serif; font-size: 10px; font-weight: 600; color: var(--prod-texte); line-height: 1.3; }
-.sap-prod-emb { font-size: 8px; font-weight: 300; color: var(--prod-texte); font-style: italic; line-height: 1.4; opacity: 0.9; }
-.sap-prod-prix { font-size: 8px; font-weight: 300; color: var(--prod-texte); opacity: 0.85; letter-spacing: 0.04em; margin-top: 2px; }
+
+.prod-carte.prod-h {
+  width: 432px;
+  height: 192px;
+  flex-direction: row;
+}
+
+/* Photo — jamais coupée */
+.prod-photo-wrap {
+  flex: 1;
+  background: var(--beige);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.prod-carte:not(.prod-h) .prod-photo-wrap { height: 216px; flex: none; }
+.prod-carte.prod-h .prod-photo-wrap { width: 216px; flex: none; height: 100%; }
+
+.prod-photo { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* Hex */
+.prod-hex {
+  background: var(--prod-hex);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 12px 14px;
+}
+
+.prod-carte:not(.prod-h) .prod-hex { height: 216px; flex: none; }
+.prod-carte.prod-h .prod-hex { width: 216px; flex: none; height: 100%; }
+
+/* Hex séparé — 25% + photo 50% + 25% */
+.prod-carte.prod-separe .prod-hex { height: 108px; }
+.prod-carte.prod-separe .prod-photo-wrap { height: 216px; }
+
+/* Alignement texte */
+.prod-carte .prod-hex { text-align: left; }
+.prod-carte.prod-h .prod-hex:last-child { text-align: right; }
+
+/* Texte dans le hex */
+.prod-hex-nom { font-family: 'Playfair Display', serif; font-size: 10px; font-weight: 600; color: var(--prod-texte); line-height: 1.3; }
+.prod-hex-emb { font-family: 'DM Sans', sans-serif; font-size: 8px; font-weight: 300; font-style: italic; color: var(--prod-texte); line-height: 1.4; opacity: 0.9; }
+.prod-hex-prix { font-family: 'DM Sans', sans-serif; font-size: 8px; font-weight: 300; color: var(--prod-texte); opacity: 0.85; letter-spacing: 0.04em; margin-top: 4px; }
 
 
 /* ── UTILITAIRES PARTAGÉS ── */
