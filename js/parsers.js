@@ -48,36 +48,6 @@ function parserFacturePA(texte) {
     }
     return false;
   });
-
-  // ─── 2e PASSAGE : capturer les items manqués (ex: débute par chiffre, prix séparé sur plusieurs lignes) ───
-  const descDejaVus = new Set(facture.items.map(i => i.description.toLowerCase().trim()));
-  const lignes = texte.split('\n').map(l => l.trim()).filter(Boolean);
-  const motsAIgnorer = /^(voir l'item|page \d|https?:|numéro|adresse|statut|type de|lieu de|livraison|sous-total|tps|tvq|total|succès|card|visa|cad|canada|\d{4}-\d{2}-\d{2}|\d{2}:\d{2})/i;
-  for (let i = 0; i < lignes.length; i++) {
-    const mNom = lignes[i].match(/^(.+?)\s*\((\d+)\)\s*$/);
-    if (!mNom) continue;
-    const desc = mNom[1].trim();
-    const qte  = parseInt(mNom[2]);
-    if (motsAIgnorer.test(desc)) continue;
-    if (descDejaVus.has(desc.toLowerCase().trim())) continue;
-    let prix = 0, fmt = '';
-    for (let j = i + 1; j < Math.min(i + 8, lignes.length); j++) {
-      if (!fmt) { const mF = lignes[j].match(/^([\d.]+)\s*(ml|g|L|kg|lbs)/i); if (mF) fmt = lignes[j]; }
-      const mP = lignes[j].match(/^([\d,]+)$/);
-      if (mP) { prix = parseFloat(mP[1].replace(',', '.')); break; }
-    }
-    if (prix <= 0) continue;
-    const fmtMatch = fmt.match(/^([\d\.]+)\s*(ml|g|L|kg)/i) || desc.match(/([\d\.]+)\s*(ml|g|L|kg)/i);
-    facture.items.push({
-      description:  desc,
-      formatQte:    fmtMatch ? parseFloat(fmtMatch[1]) : 0,
-      formatUnite:  fmtMatch ? fmtMatch[2].toLowerCase() : 'unité',
-      prixUnitaire: prix,
-      quantite:     qte
-    });
-    descDejaVus.add(desc.toLowerCase().trim());
-  }
-
   return facture;
 }
 
