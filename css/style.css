@@ -1316,7 +1316,7 @@ tr.cliquable { cursor: pointer; }
 .edu-tableau tbody tr:hover td { background: var(--primary-04); }
 .filtres-ligne { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; margin-bottom: 8px; }
 .tableau-admin { width: 100%; border-collapse: collapse; }
-.tableau-admin th, .tableau-admin td { padding: 10px 12px; border-bottom: 1px solid var(--beige); }
+.tableau-admin th, .tableau-admin td { padding: 10px 12px; border-bottom: 1px solid var(--beige); white-space: nowrap; }
 .tableau-admin td:last-child { white-space: normal; width: 15%; }
 .texte-brut { white-space: normal; word-break: break-word; }
 .accordeon-detail { background: var(--beige-15); }
