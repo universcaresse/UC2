@@ -67,7 +67,6 @@ async function efInit() {
     efPopulerFournisseurs();
     efInitDate();
 
-    // Vérifier s'il y a une facture En cours à reprendre
     await efVerifierFactureEnCours();
 
     if (ef.factureActive) {
@@ -85,18 +84,16 @@ async function efInit() {
 
 // ─── VÉRIFIER FACTURE EN COURS ───
 async function efVerifierFactureEnCours() {
-  if (ef.factureActive) return; // déjà active en mémoire
+  if (ef.factureActive) return;
   const resAch = await appelAPI('getAchatsEntete');
   if (!resAch || !resAch.success) return;
   const enCours = (resAch.items || []).find(a => a.statut === 'En cours');
   if (!enCours) return;
 
-  // Trouver le nom du fournisseur
-  const four = ef.fournisseurs.find(f => f.four_id === enCours.four_id);
+  const four     = ef.fournisseurs.find(f => f.four_id === enCours.four_id);
   const fourNom  = four?.nom  || enCours.four_id;
   const fourCode = four?.code || '';
 
-  // Afficher le bandeau de reprise
   const bandeau = document.getElementById('ef-bandeau-reprise');
   const texte   = document.getElementById('ef-bandeau-reprise-texte');
   if (bandeau && texte) {
@@ -104,7 +101,6 @@ async function efVerifierFactureEnCours() {
     bandeau.classList.remove('cache');
   }
 
-  // Stocker temporairement pour reprise
   ef._factureEnAttente = {
     ach_id:      enCours.ach_id,
     numero:      enCours.numero_facture || enCours.ach_id,
@@ -121,20 +117,18 @@ async function efReprendreFacture() {
   const f = ef._factureEnAttente;
   ef.factureActive = f;
 
-  // Charger scraping si applicable
   ef.scrapingItems = [];
   if (f.four_code && EF_SCRAPING_CODES.includes(f.four_code)) {
     const resScraping = await appelAPI('getScrapingFournisseur', { source: f.four_code });
     if (resScraping && resScraping.success) ef.scrapingItems = resScraping.items || [];
   }
 
-  // Charger les lignes existantes
   const resLignes = await appelAPI('getAchatsLignes', { ach_id: f.ach_id });
   ef.lignes = [];
   if (resLignes && resLignes.success) {
     (resLignes.items || []).forEach(l => {
-      const ing   = (listesDropdown.fullData || []).find(d => d.ing_id === l.ing_id);
-      const nomUC = ing?.nom_UC || '';
+      const ing    = (listesDropdown.fullData || []).find(d => d.ing_id === l.ing_id);
+      const nomUC  = ing?.nom_UC || '';
       const cat_id = ing?.cat_id || '';
       const catUC  = listesDropdown.categoriesMap?.[cat_id] || '';
       ef.lignes.push({
@@ -197,18 +191,21 @@ function efCalculerPrixParG(prixUnitaire, formatQte, formatUnite, cat_id) {
   return efParseFlt(prixUnitaire) / grammes;
 }
 
-// ─── DATE (sans valeur prédéfinie) ───
+// ─── DATE ───
 function efInitDate() {
   const selJour  = document.getElementById('ef-date-jour');
   const selAnnee = document.getElementById('ef-date-annee');
   if (!selJour || !selAnnee) return;
+
   selJour.innerHTML = '<option value="">—</option>' + Array.from({length:31}, (_,i) => {
     const j = String(i+1).padStart(2,'0');
     return `<option value="${j}">${j}</option>`;
   }).join('');
+
   const anneeActuelle = new Date().getFullYear();
-  selAnnee.innerHTML = '<option value="">—</option>' + [anneeActuelle-1, anneeActuelle, anneeActuelle+1]
-    .map(a => `<option value="${a}">${a}</option>`).join('');
+  selAnnee.innerHTML = '<option value="">—</option>' +
+    [anneeActuelle-1, anneeActuelle, anneeActuelle+1].map(a => `<option value="${a}">${a}</option>`).join('');
+
   const selMois = document.getElementById('ef-date-mois');
   if (selMois) {
     selMois.innerHTML = '<option value="">— Mois —</option>' +
@@ -285,7 +282,6 @@ async function efCreerFacture() {
   const btn = document.getElementById('ef-btn-creer');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
 
-  // Charger le scraping via le CODE du fournisseur
   ef.scrapingItems = [];
   if (fourCode && EF_SCRAPING_CODES.includes(fourCode)) {
     const resScraping = await appelAPI('getScrapingFournisseur', { source: fourCode });
@@ -375,41 +371,41 @@ function efRendreLigneSaisie() {
   const tr = document.createElement('tr');
   tr.id = 'ef-ligne-saisie';
   tr.innerHTML = `
-    <td style="min-width:130px">
-      <select class="form-ctrl" id="ef-saisie-cat-fourn" onchange="efOnChangeSaisieCatFourn()" style="width:100%">
+    <td>
+      <select class="form-ctrl" id="ef-saisie-cat-fourn" onchange="efOnChangeSaisieCatFourn()">
         <option value="">— Catégorie —</option>
         ${optsCatFourn}
         <option value="__nouveau__">+ Autre…</option>
       </select>
       <input type="text" class="form-ctrl cache" id="ef-saisie-cat-fourn-nouveau" placeholder="Nouvelle catégorie" autocomplete="off">
     </td>
-    <td style="min-width:150px">
-      <select class="form-ctrl" id="ef-saisie-nom-fourn" onchange="efOnChangeSaisieNomFourn()" style="width:100%">
+    <td>
+      <select class="form-ctrl" id="ef-saisie-nom-fourn" onchange="efOnChangeSaisieNomFourn()">
         <option value="">— Nom —</option>
       </select>
       <input type="text" class="form-ctrl cache" id="ef-saisie-nom-fourn-nouveau" placeholder="Nom sur la facture" autocomplete="off" oninput="efOnSaisieNomFournTexte()">
     </td>
-    <td style="min-width:130px">
-      <select class="form-ctrl" id="ef-saisie-format" onchange="efOnChangeSaisieFormat()" style="width:100%">
+    <td>
+      <select class="form-ctrl" id="ef-saisie-format" onchange="efOnChangeSaisieFormat()">
         <option value="">— Format —</option>
         <option value="__nouveau__">+ Nouveau format…</option>
       </select>
     </td>
-    <td style="width:70px">
-      <input type="text" inputmode="decimal" class="form-ctrl" id="ef-saisie-qte" placeholder="Qté" autocomplete="off" oninput="efMajLigneTotal()" style="width:70px">
+    <td>
+      <input type="text" inputmode="decimal" class="form-ctrl" id="ef-saisie-qte" placeholder="Qté" autocomplete="off" oninput="efMajLigneTotal()">
     </td>
-    <td style="width:90px">
-      <input type="text" inputmode="decimal" class="form-ctrl" id="ef-saisie-prix" placeholder="Prix $" autocomplete="off" oninput="efMajLigneTotal()" style="width:90px">
+    <td>
+      <input type="text" inputmode="decimal" class="form-ctrl" id="ef-saisie-prix" placeholder="Prix $" autocomplete="off" oninput="efMajLigneTotal()">
     </td>
-    <td id="ef-saisie-total" style="color:var(--primary);font-weight:500;white-space:nowrap">—</td>
-    <td style="min-width:130px">
-      <select class="form-ctrl" id="ef-saisie-cat-uc" onchange="efOnChangeSaisieCatUC()" style="width:100%">
+    <td id="ef-saisie-total">—</td>
+    <td>
+      <select class="form-ctrl" id="ef-saisie-cat-uc" onchange="efOnChangeSaisieCatUC()">
         <option value="">— Cat. UC —</option>
         ${optsCatUC}
       </select>
     </td>
-    <td style="min-width:150px">
-      <select class="form-ctrl" id="ef-saisie-nom-uc" onchange="efOnChangeSaisieNomUC()" style="width:100%">
+    <td>
+      <select class="form-ctrl" id="ef-saisie-nom-uc" onchange="efOnChangeSaisieNomUC()">
         <option value="">— Nom UC —</option>
       </select>
       <input type="text" class="form-ctrl cache" id="ef-saisie-nom-uc-nouveau" placeholder="Nouveau nom UC" autocomplete="off">
@@ -421,6 +417,8 @@ function efRendreLigneSaisie() {
 }
 
 // ─── CASCADES ───
+
+// Catégorie fournisseur → peuple Nom fournisseur + reset format
 function efOnChangeSaisieCatFourn() {
   const sel   = document.getElementById('ef-saisie-cat-fourn');
   const champ = document.getElementById('ef-saisie-cat-fourn-nouveau');
@@ -431,13 +429,13 @@ function efOnChangeSaisieCatFourn() {
   efPopulerNomsFourn(sel.value);
 }
 
+// Peuple la liste des noms fournisseur + reset format
 function efPopulerNomsFourn(catFourn) {
   const sel   = document.getElementById('ef-saisie-nom-fourn');
   const champ = document.getElementById('ef-saisie-nom-fourn-nouveau');
   if (!sel) return;
   const fourNom = ef.factureActive?.fournisseur || '';
 
-  // Noms depuis scraping si disponible, sinon mapping
   const nomsScrap = ef.scrapingItems
     .filter(i => !catFourn || i.categorie === catFourn)
     .map(i => i.nom).filter(Boolean)
@@ -456,21 +454,29 @@ function efPopulerNomsFourn(catFourn) {
     '<option value="__nouveau__">+ Nouveau nom…</option>';
 
   if (champ) champ.classList.add('cache');
-  efReinitDepuisNom();
+  efResetFormat();
 }
 
+// Nom fournisseur → peuple Format via mapping si connu, sinon reset format
 function efOnChangeSaisieNomFourn() {
   const sel   = document.getElementById('ef-saisie-nom-fourn');
   const champ = document.getElementById('ef-saisie-nom-fourn-nouveau');
   if (!sel || !champ) return;
+
   const isNew = sel.value === '__nouveau__';
   champ.classList.toggle('cache', !isNew);
-  if (isNew) { champ.focus(); efReinitDepuisNom(); return; }
+
+  if (isNew) {
+    champ.focus();
+    efResetFormat();
+    return;
+  }
 
   if (sel.value) {
     const fourNom = ef.factureActive?.fournisseur || '';
     const mapping = ef.mapping.find(m => m.fournisseur === fourNom && m.nom_fournisseur === sel.value);
     if (mapping) {
+      // Pré-remplir Cat UC et Nom UC depuis le mapping
       const selCatUC = document.getElementById('ef-saisie-cat-uc');
       if (selCatUC) {
         const cat_id = Object.keys(listesDropdown.categoriesMap || {})
@@ -482,26 +488,31 @@ function efOnChangeSaisieNomFourn() {
           if (selNomUC && mapping.ing_id) {
             selNomUC.value = mapping.ing_id;
             ef._saisieIngId = mapping.ing_id;
-            efPopulerFormats(mapping.ing_id);
           }
+          if (mapping.ing_id) efPopulerFormats(mapping.ing_id);
         }, 50);
       }
     } else {
-      efReinitDepuisNom();
+      efResetFormat();
     }
+  } else {
+    efResetFormat();
   }
 }
 
+// Nom fournisseur tapé manuellement → reset format
 function efOnSaisieNomFournTexte() {
-  efReinitDepuisNom();
+  efResetFormat();
 }
 
-function efReinitDepuisNom() {
+// Reset du format uniquement
+function efResetFormat() {
   const selFmt = document.getElementById('ef-saisie-format');
   if (selFmt) selFmt.innerHTML = '<option value="">— Format —</option><option value="__nouveau__">+ Nouveau format…</option>';
   ef._saisieIngId = null;
 }
 
+// Peuple le format pour un ingrédient donné
 function efPopulerFormats(ing_id) {
   const selFmt  = document.getElementById('ef-saisie-format');
   if (!selFmt) return;
@@ -532,6 +543,7 @@ function efOnChangeSaisieFormat() {
   }
 }
 
+// Catégorie UC → peuple Nom UC (ne touche pas au format)
 function efOnChangeSaisieCatUC() {
   const selCatUC  = document.getElementById('ef-saisie-cat-uc');
   const selNomUC  = document.getElementById('ef-saisie-nom-uc');
@@ -540,10 +552,9 @@ function efOnChangeSaisieCatUC() {
   const cat_id = selCatUC.value;
 
   selNomUC.innerHTML = '<option value="">— Nom UC —</option>';
-  const items = (listesDropdown.fullData || []).filter(d => d.cat_id === cat_id);
-  console.log('cat_id:', cat_id, 'items trouvés:', items.length, 'fullData total:', listesDropdown.fullData?.length);
   if (cat_id) {
-    items
+    (listesDropdown.fullData || [])
+      .filter(d => d.cat_id === cat_id)
       .sort((a,b) => (a.nom_UC||'').localeCompare(b.nom_UC||'','fr'))
       .forEach(d => {
         const opt = document.createElement('option');
@@ -559,6 +570,7 @@ function efOnChangeSaisieCatUC() {
   ef._saisieIngId = null;
 }
 
+// Nom UC → enregistre l'ingrédient sélectionné (ne touche pas au format)
 function efOnChangeSaisieNomUC() {
   const sel   = document.getElementById('ef-saisie-nom-uc');
   const champ = document.getElementById('ef-saisie-nom-uc-nouveau');
@@ -572,11 +584,6 @@ function efOnChangeSaisieNomUC() {
 
   champ.classList.add('cache');
   ef._saisieIngId = sel.value || null;
-  if (ef._saisieIngId) {
-    const selFmt = document.getElementById('ef-saisie-format');
-    const fmtActuel = selFmt ? selFmt.value : '';
-    if (!fmtActuel || fmtActuel === '__nouveau__') efPopulerFormats(ef._saisieIngId);
-  }
 }
 
 function efMajLigneTotal() {
@@ -618,12 +625,17 @@ async function efAjouterLigne() {
   let   ing_id   = ef._saisieIngId || document.getElementById('ef-saisie-nom-uc')?.value || '';
   let   nomUC    = (listesDropdown.fullData || []).find(d => d.ing_id === ing_id)?.nom_UC || '';
 
-  if (!catFourn)  { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Catégorie fournisseur requise.', 'erreur'); return; }
-  if (!nomFourn)  { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Nom fournisseur requis.', 'erreur'); return; }
-  if (!formatQte) { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Format requis.', 'erreur'); return; }
-  if (!prixUnit)  { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Prix unitaire requis.', 'erreur'); return; }
-  if (!quantite)  { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Quantité requise.', 'erreur'); return; }
-  if (!ing_id)    { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Ingrédient UC requis.', 'erreur'); return; }
+  const erreur = (msg) => {
+    if (btn) { btn.disabled = false; btn.innerHTML = '+'; }
+    afficherMsg('ef-items', msg, 'erreur');
+  };
+
+  if (!catFourn)  return erreur('Catégorie fournisseur requise.');
+  if (!nomFourn)  return erreur('Nom fournisseur requis.');
+  if (!formatQte) return erreur('Format requis.');
+  if (!prixUnit)  return erreur('Prix unitaire requis.');
+  if (!quantite)  return erreur('Quantité requise.');
+  if (!ing_id)    return erreur('Ingrédient UC requis.');
 
   const prixUnitNum = efParseFlt(prixUnit);
   const quantiteNum = efParseFlt(quantite);
@@ -693,16 +705,16 @@ function efRendreLignesSauvegardees() {
 
   ef.lignes.forEach((l, idx) => {
     const fmt = (l.contenant ? l.contenant + ' — ' : '') + l.formatQte + ' ' + l.formatUnite;
-    const tr = document.createElement('tr');
+    const tr  = document.createElement('tr');
     tr.innerHTML = `
-      <td style="font-size:0.82rem;color:var(--gris)">${l.catFourn}</td>
-      <td style="font-weight:500">${l.nomFourn}</td>
-      <td style="font-size:0.82rem;color:var(--gris)">${fmt}</td>
+      <td>${l.catFourn}</td>
+      <td>${l.nomFourn}</td>
+      <td>${fmt}</td>
       <td>${l.quantite}</td>
       <td>${formaterPrix(l.prixUnitaire)}</td>
-      <td style="color:var(--primary);font-weight:500">${formaterPrix(l.prixTotal)}</td>
-      <td style="font-size:0.82rem;color:var(--gris)">${l.catUC}</td>
-      <td style="font-weight:500">${l.nomUC}</td>
+      <td>${formaterPrix(l.prixTotal)}</td>
+      <td>${l.catUC}</td>
+      <td>${l.nomUC}</td>
       <td><button class="bouton bouton-petit bouton-rouge" onclick="efSupprimerLigne(${idx})">✕</button></td>`;
     if (ligneSaisie) tbody.insertBefore(tr, ligneSaisie);
     else tbody.appendChild(tr);
@@ -766,11 +778,11 @@ async function efFinaliser() {
 function efOuvrirModalFormat() {
   const modal = document.getElementById('modal-ef-format');
   if (!modal) return;
-  document.getElementById('modal-ef-fmt-unite').value = '';
   document.getElementById('modal-ef-fmt-qte').value   = '';
+  document.getElementById('modal-ef-fmt-unite').value = '';
   document.getElementById('modal-ef-fmt-qte-bloc')?.classList.remove('cache');
   modal.classList.add('ouvert');
-  document.getElementById('modal-ef-fmt-unite').focus();
+  document.getElementById('modal-ef-fmt-qte').focus();
 }
 
 function efFermerModalFormat() {
@@ -912,12 +924,16 @@ async function efConfirmerModalIngredient() {
     nomUC = (listesDropdown.fullData || []).find(d => d.ing_id === ing_id)?.nom_UC || '';
   }
 
+  // Mettre à jour Cat UC et Nom UC dans la ligne de saisie — sans toucher au format
   ef._saisieIngId = ing_id;
   const selCatUC = document.getElementById('ef-saisie-cat-uc');
   const selNomUC = document.getElementById('ef-saisie-nom-uc');
-  const selFmt   = document.getElementById('ef-saisie-format');
-  const fmtSauve = selFmt ? selFmt.value : '';
-  if (selCatUC) { selCatUC.value = cat_id; efOnChangeSaisieCatUC(); }
+
+  if (selCatUC) {
+    selCatUC.value = cat_id;
+    efOnChangeSaisieCatUC();
+  }
+
   setTimeout(() => {
     if (selNomUC) {
       let opt = [...selNomUC.options].find(o => o.value === ing_id);
@@ -929,11 +945,6 @@ async function efConfirmerModalIngredient() {
         else selNomUC.appendChild(opt);
       }
       selNomUC.value = ing_id;
-    }
-    if (fmtSauve && fmtSauve !== "__nouveau__" && selFmt && selFmt.value !== fmtSauve) {
-      selFmt.value = fmtSauve;
-    } else {
-      efPopulerFormats(ing_id);
     }
     efFermerModalIngredient();
   }, 50);
