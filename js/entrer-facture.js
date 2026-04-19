@@ -419,8 +419,8 @@ function efRendreLigneSaisie() {
 // Catégorie fournisseur → peuple Nom fournisseur + reset format
 function efOnChangeSaisieCatFourn() {
   const sel   = document.getElementById('ef-saisie-cat-fourn');
-  const champ = document.getElementById('ef-saisie-cat-fourn-nouveau');
-  if (!sel || !champ) return;
+ const champ = document.getElementById('ef-saisie-cat-fourn-nouveau');
+  if (!sel) return;
   const isNew = sel.value === '__nouveau__';
   champ.classList.toggle('cache', !isNew);
   if (isNew) { efOuvrirModalCatFourn(); return; }
@@ -459,7 +459,7 @@ function efPopulerNomsFourn(catFourn) {
 function efOnChangeSaisieNomFourn() {
   const sel   = document.getElementById('ef-saisie-nom-fourn');
   const champ = document.getElementById('ef-saisie-nom-fourn-nouveau');
-  if (!sel || !champ) return;
+  if (!sel) return;
 
   const isNew = sel.value === '__nouveau__';
   champ.classList.toggle('cache', !isNew);
