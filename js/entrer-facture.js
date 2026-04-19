@@ -552,7 +552,7 @@ function efOnChangeSaisieCatUC() {
 
   if (cat_id === '__nouvelle_cat__') {
     selCatUC.value = '';
-    efOuvrirModalIngredient();
+    efOuvrirModalNouvelleCatUC();
     return;
   }
 
@@ -818,24 +818,11 @@ function efConfirmerModalFormat() {
 
 // ─── MODAL NOUVEL INGRÉDIENT UC ───
 function efOuvrirModalIngredient() {
-  const modal  = document.getElementById('modal-ef-ingredient');
-  const selCat = document.getElementById('modal-ef-ing-cat');
-  const selNom = document.getElementById('modal-ef-ing-nomuc');
-  if (!modal || !selCat || !selNom) return;
-
-  selCat.innerHTML = '<option value="">— Catégorie UC —</option>' +
-    Object.keys(listesDropdown.categoriesMap || {})
-      .sort((a,b) => (listesDropdown.categoriesMap[a]||'').localeCompare(listesDropdown.categoriesMap[b]||'','fr'))
-      .map(k => `<option value="${k}">${listesDropdown.categoriesMap[k]}</option>`).join('') +
-    '<option value="__nouvelle_cat__">+ Créer une nouvelle catégorie</option>';
-
-  document.getElementById('modal-ef-ing-nouvelle-cat-groupe')?.classList.add('cache');
-  document.getElementById('modal-ef-ing-nouvelle-cat').value  = '';
-  document.getElementById('modal-ef-ing-nouveau-nom-groupe')?.classList.add('cache');
-  document.getElementById('modal-ef-ing-nouveau-nom').value   = '';
-  selNom.innerHTML = '<option value="">— Choisir ou créer —</option>';
-  selNom.classList.add('cache');
+  const modal = document.getElementById('modal-ef-ingredient');
+  if (!modal) return;
+  document.getElementById('modal-ef-ing-nouveau-nom').value = '';
   modal.classList.add('ouvert');
+  setTimeout(() => document.getElementById('modal-ef-ing-nouveau-nom').focus(), 100);
 }
 
 function efFermerModalIngredient() {
@@ -883,73 +870,79 @@ function efOnChangeModalIngNom() {
 }
 
 async function efConfirmerModalIngredient() {
-  let cat_id = document.getElementById('modal-ef-ing-cat')?.value;
-  const nouvelleCat = document.getElementById('modal-ef-ing-nouvelle-cat')?.value?.trim();
-
-  if (cat_id === '__nouvelle_cat__') {
-    if (!nouvelleCat) { document.getElementById('modal-ef-ing-nouvelle-cat').focus(); return; }
-    const resCat = await appelAPIPost('saveCategorieUC', { nom: nouvelleCat });
-    if (!resCat || !resCat.success) { afficherMsg('ef-items', 'Erreur création catégorie.', 'erreur'); return; }
-    cat_id = resCat.cat_id || ('CAT-' + Date.now());
-    listesDropdown.categoriesMap[cat_id] = nouvelleCat;
-    listesDropdown.types.push(cat_id);
-  }
-
-  if (!cat_id) { document.getElementById('modal-ef-ing-cat').focus(); return; }
-
-  const selNom     = document.getElementById('modal-ef-ing-nomuc');
-  let   ing_id     = selNom?.value && selNom.value !== '__nouveau__' ? selNom.value : '';
-  let   nomUC      = '';
   const nouveauNom = document.getElementById('modal-ef-ing-nouveau-nom')?.value?.trim();
+  if (!nouveauNom) { document.getElementById('modal-ef-ing-nouveau-nom').focus(); return; }
 
-  if (!ing_id || ing_id === '__nouveau__') {
-    if (!nouveauNom) { document.getElementById('modal-ef-ing-nouveau-nom').focus(); return; }
-    const ingExistant = (listesDropdown.fullData || []).find(d => d.nom_UC === nouveauNom && d.cat_id === cat_id);
-    if (ingExistant) {
-      ing_id = ingExistant.ing_id;
-      nomUC  = ingExistant.nom_UC;
-    } else {
-      ing_id = 'ING-' + Date.now();
-      const nomFournSaisie = document.getElementById('ef-saisie-nom-fourn-nouveau')?.value?.trim()
-                          || document.getElementById('ef-saisie-nom-fourn')?.value || '';
-      const res = await appelAPIPost('createIngredientInci', {
-        ing_id, cat_id, nom_UC: nouveauNom,
-        nom_fournisseur: nomFournSaisie || nouveauNom,
-        inci: '', statut: 'actif'
-      });
-      if (!res || !res.success) { afficherMsg('ef-items', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
-      listesDropdown.fullData.push({ ing_id, cat_id, nom_UC: nouveauNom, inci: '' });
-      nomUC = nouveauNom;
-    }
+  const cat_id = document.getElementById('ef-saisie-cat-uc')?.value || '';
+  if (!cat_id) { afficherMsg('ef', 'Choisir une catégorie UC avant d\'ajouter un ingrédient.', 'erreur'); efFermerModalIngredient(); return; }
+
+  let ing_id, nomUC;
+  const ingExistant = (listesDropdown.fullData || []).find(d => d.nom_UC === nouveauNom && d.cat_id === cat_id);
+  if (ingExistant) {
+    ing_id = ingExistant.ing_id;
+    nomUC  = ingExistant.nom_UC;
   } else {
-    nomUC = (listesDropdown.fullData || []).find(d => d.ing_id === ing_id)?.nom_UC || '';
+    ing_id = 'ING-' + Date.now();
+    const nomFourn = document.getElementById('ef-saisie-nom-fourn')?.value || '';
+    const res = await appelAPIPost('createIngredientInci', {
+      ing_id, cat_id, nom_UC: nouveauNom,
+      nom_fournisseur: nomFourn || nouveauNom,
+      inci: '', statut: 'actif'
+    });
+    if (!res || !res.success) { afficherMsg('ef', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
+    listesDropdown.fullData.push({ ing_id, cat_id, nom_UC: nouveauNom, inci: '' });
+    nomUC = nouveauNom;
   }
 
-  // Mettre à jour Cat UC et Nom UC dans la ligne de saisie — sans toucher au format
   ef._saisieIngId = ing_id;
-  const selCatUC = document.getElementById('ef-saisie-cat-uc');
   const selNomUC = document.getElementById('ef-saisie-nom-uc');
+  if (selNomUC) {
+    let opt = [...selNomUC.options].find(o => o.value === ing_id);
+    if (!opt) {
+      opt = document.createElement('option');
+      opt.value = ing_id; opt.textContent = nomUC;
+      const optNew = [...selNomUC.options].find(o => o.value === '__nouveau__');
+      if (optNew) selNomUC.insertBefore(opt, optNew);
+      else selNomUC.appendChild(opt);
+    }
+    selNomUC.value = ing_id;
+  }
+  efFermerModalIngredient();
+}
+// ─── MODAL NOUVELLE CATÉGORIE UC ───
+function efOuvrirModalNouvelleCatUC() {
+  const modal = document.getElementById('modal-ef-nouvelle-cat-uc');
+  if (!modal) return;
+  document.getElementById('modal-ef-nouvelle-cat-uc-valeur').value = '';
+  modal.classList.add('ouvert');
+  setTimeout(() => document.getElementById('modal-ef-nouvelle-cat-uc-valeur').focus(), 100);
+}
 
+function efFermerModalNouvelleCatUC() {
+  document.getElementById('modal-ef-nouvelle-cat-uc')?.classList.remove('ouvert');
+}
+
+async function efConfirmerModalNouvelleCatUC() {
+  const val = document.getElementById('modal-ef-nouvelle-cat-uc-valeur')?.value?.trim();
+  if (!val) { document.getElementById('modal-ef-nouvelle-cat-uc-valeur').focus(); return; }
+  const res = await appelAPIPost('saveCategorieUC', { nom: val });
+  if (!res || !res.success) { afficherMsg('ef', 'Erreur création catégorie.', 'erreur'); return; }
+  const cat_id = res.cat_id || ('CAT-' + Date.now());
+  listesDropdown.categoriesMap[cat_id] = val;
+  const selCatUC = document.getElementById('ef-saisie-cat-uc');
   if (selCatUC) {
+    const opt = document.createElement('option');
+    opt.value = cat_id; opt.textContent = val;
+    const optNew = [...selCatUC.options].find(o => o.value === '__nouvelle_cat__');
+    if (optNew) selCatUC.insertBefore(opt, optNew);
+    else selCatUC.appendChild(opt);
     selCatUC.value = cat_id;
     efOnChangeSaisieCatUC();
   }
-
-  setTimeout(() => {
-    if (selNomUC) {
-      let opt = [...selNomUC.options].find(o => o.value === ing_id);
-      if (!opt) {
-        opt = document.createElement('option');
-        opt.value = ing_id; opt.textContent = nomUC;
-        const optNew = [...selNomUC.options].find(o => o.value === '__nouveau__');
-        if (optNew) selNomUC.insertBefore(opt, optNew);
-        else selNomUC.appendChild(opt);
-      }
-      selNomUC.value = ing_id;
-    }
-    efFermerModalIngredient();
-  }, 50);
+  efFermerModalNouvelleCatUC();
+  afficherMsg('ef', `✅ Catégorie "${val}" créée.`);
 }
+
 // ─── MODAL NOUVELLE CATÉGORIE FOURNISSEUR ───
 function efOuvrirModalCatFourn() {
   const modal = document.getElementById('modal-ef-cat-fourn');
