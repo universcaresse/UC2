@@ -415,7 +415,7 @@ function efRendreLigneSaisie() {
       <input type="text" class="form-ctrl cache" id="ef-saisie-nom-uc-nouveau" placeholder="Nouveau nom UC" autocomplete="off">
     </td>
     <td>
-      <button class="bouton bouton-petit" onclick="efAjouterLigne()" title="Ajouter">+</button>
+      <button class="bouton bouton-petit" id="ef-btn-ajouter" onclick="efAjouterLigne()" title="Ajouter">+</button>
     </td>`;
   tbody.appendChild(tr);
 }
@@ -572,7 +572,12 @@ function efOnChangeSaisieNomUC() {
 
   champ.classList.add('cache');
   ef._saisieIngId = sel.value || null;
-  if (ef._saisieIngId) efPopulerFormats(ef._saisieIngId);
+  if (ef._saisieIngId) {
+    const selFmt = document.getElementById('ef-saisie-format');
+    const fmtActuel = selFmt ? selFmt.value : '';
+    efPopulerFormats(ef._saisieIngId);
+    if (fmtActuel && fmtActuel !== '__nouveau__' && selFmt) selFmt.value = fmtActuel;
+  }
 }
 
 function efMajLigneTotal() {
@@ -585,6 +590,9 @@ function efMajLigneTotal() {
 // ─── AJOUTER LIGNE ───
 async function efAjouterLigne() {
   if (!ef.factureActive) { afficherMsg('ef-items', 'Aucune facture active.', 'erreur'); return; }
+
+  const btn = document.getElementById('ef-btn-ajouter');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
 
   const selCatF = document.getElementById('ef-saisie-cat-fourn');
   let catFourn = selCatF?.value === '__nouveau__'
@@ -611,12 +619,12 @@ async function efAjouterLigne() {
   let   ing_id   = ef._saisieIngId || document.getElementById('ef-saisie-nom-uc')?.value || '';
   let   nomUC    = (listesDropdown.fullData || []).find(d => d.ing_id === ing_id)?.nom_UC || '';
 
-  if (!catFourn)  { afficherMsg('ef-items', 'Catégorie fournisseur requise.', 'erreur'); return; }
-  if (!nomFourn)  { afficherMsg('ef-items', 'Nom fournisseur requis.', 'erreur'); return; }
-  if (!formatQte) { afficherMsg('ef-items', 'Format requis.', 'erreur'); return; }
-  if (!prixUnit)  { afficherMsg('ef-items', 'Prix unitaire requis.', 'erreur'); return; }
-  if (!quantite)  { afficherMsg('ef-items', 'Quantité requise.', 'erreur'); return; }
-  if (!ing_id)    { afficherMsg('ef-items', 'Ingrédient UC requis.', 'erreur'); return; }
+  if (!catFourn)  { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Catégorie fournisseur requise.', 'erreur'); return; }
+  if (!nomFourn)  { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Nom fournisseur requis.', 'erreur'); return; }
+  if (!formatQte) { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Format requis.', 'erreur'); return; }
+  if (!prixUnit)  { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Prix unitaire requis.', 'erreur'); return; }
+  if (!quantite)  { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Quantité requise.', 'erreur'); return; }
+  if (!ing_id)    { if (btn) { btn.disabled = false; btn.innerHTML = '+'; } afficherMsg('ef-items', 'Ingrédient UC requis.', 'erreur'); return; }
 
   const prixUnitNum = efParseFlt(prixUnit);
   const quantiteNum = efParseFlt(quantite);
@@ -637,6 +645,7 @@ async function efAjouterLigne() {
   });
 
   if (!res || !res.success) {
+    if (btn) { btn.disabled = false; btn.innerHTML = '+'; }
     afficherMsg('ef-items', res?.message || 'Erreur ajout ligne.', 'erreur');
     return;
   }
@@ -685,14 +694,11 @@ function efRendreLignesSauvegardees() {
 
   ef.lignes.forEach((l, idx) => {
     const fmt = (l.contenant ? l.contenant + ' — ' : '') + l.formatQte + ' ' + l.formatUnite;
-    const prixGAff = l.formatUnite === 'unité'
-      ? formaterPrix(l.prixUnitaire) + '/u'
-      : (l.prixParG > 0 ? l.prixParG.toFixed(4) + ' $/g' : '—');
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="font-size:0.82rem;color:var(--gris)">${l.catFourn}</td>
       <td style="font-weight:500">${l.nomFourn}</td>
-      <td style="font-size:0.82rem;color:var(--gris)">${fmt}<br><span style="font-size:0.72rem">${prixGAff}</span></td>
+      <td style="font-size:0.82rem;color:var(--gris)">${fmt}</td>
       <td>${l.quantite}</td>
       <td>${formaterPrix(l.prixUnitaire)}</td>
       <td style="color:var(--primary);font-weight:500">${formaterPrix(l.prixTotal)}</td>
