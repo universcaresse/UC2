@@ -375,7 +375,7 @@ function efRendreLigneSaisie() {
       <select class="form-ctrl" id="ef-saisie-cat-fourn" onchange="efOnChangeSaisieCatFourn()">
         <option value="">— Catégorie —</option>
         ${optsCatFourn}
-        <option value="__nouveau__">+ Autre…</option>
+        <option value="__nouveau__">+ Nouvelle catégorie…</option>
       </select>
         </td>
     <td>
