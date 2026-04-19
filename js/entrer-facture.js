@@ -575,8 +575,7 @@ function efOnChangeSaisieNomUC() {
   if (ef._saisieIngId) {
     const selFmt = document.getElementById('ef-saisie-format');
     const fmtActuel = selFmt ? selFmt.value : '';
-    efPopulerFormats(ef._saisieIngId);
-    if (fmtActuel && fmtActuel !== '__nouveau__' && selFmt) selFmt.value = fmtActuel;
+    if (!fmtActuel || fmtActuel === '__nouveau__') efPopulerFormats(ef._saisieIngId);
   }
 }
 
