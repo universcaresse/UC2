@@ -245,6 +245,7 @@ function afficherMsg(zone, texte, type = 'succes') {
     toast.className = 'toast';
     document.body.appendChild(toast);
   }
+  if (!texte) return;
   toast.textContent = texte;
   toast.className = `toast toast-${type}`;
   setTimeout(() => toast.classList.add('visible'), 10);

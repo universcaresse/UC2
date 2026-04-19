@@ -752,7 +752,7 @@ async function efFinaliser() {
     return;
   }
 
-  afficherMsg('ef-final', `✅ Facture finalisée — Total : ${formaterPrix(res.total)}`);
+  afficherMsg('ef', `✅ Facture finalisée — Total : ${formaterPrix(res.total)}`);
 
   setTimeout(() => {
     ef.factureActive  = null;
