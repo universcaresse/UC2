@@ -377,14 +377,12 @@ function efRendreLigneSaisie() {
         ${optsCatFourn}
         <option value="__nouveau__">+ Autre…</option>
       </select>
-      <input type="text" class="form-ctrl cache" id="ef-saisie-cat-fourn-nouveau" placeholder="Nouvelle catégorie" autocomplete="off">
-    </td>
+        </td>
     <td>
       <select class="form-ctrl" id="ef-saisie-nom-fourn" onchange="efOnChangeSaisieNomFourn()">
         <option value="">— Nom —</option>
       </select>
-      <input type="text" class="form-ctrl cache" id="ef-saisie-nom-fourn-nouveau" placeholder="Nom sur la facture" autocomplete="off" oninput="efOnSaisieNomFournTexte()">
-    </td>
+      </td>
     <td>
       <select class="form-ctrl" id="ef-saisie-format" onchange="efOnChangeSaisieFormat()">
         <option value="">— Format —</option>
@@ -425,7 +423,7 @@ function efOnChangeSaisieCatFourn() {
   if (!sel || !champ) return;
   const isNew = sel.value === '__nouveau__';
   champ.classList.toggle('cache', !isNew);
-  if (isNew) { champ.focus(); return; }
+  if (isNew) { efOuvrirModalCatFourn(); return; }
   efPopulerNomsFourn(sel.value);
 }
 
@@ -466,8 +464,8 @@ function efOnChangeSaisieNomFourn() {
   const isNew = sel.value === '__nouveau__';
   champ.classList.toggle('cache', !isNew);
 
-  if (isNew) {
-    champ.focus();
+   if (isNew) {
+    efOuvrirModalNomFourn();
     efResetFormat();
     return;
   }
@@ -601,14 +599,10 @@ async function efAjouterLigne() {
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
 
   const selCatF = document.getElementById('ef-saisie-cat-fourn');
-  let catFourn = selCatF?.value === '__nouveau__'
-    ? document.getElementById('ef-saisie-cat-fourn-nouveau')?.value?.trim()
-    : selCatF?.value;
+  let catFourn = selCatF?.value === '__nouveau__' ? '' : selCatF?.value;
 
   const selNomF = document.getElementById('ef-saisie-nom-fourn');
-  let nomFourn = selNomF?.value === '__nouveau__' || !selNomF?.value
-    ? document.getElementById('ef-saisie-nom-fourn-nouveau')?.value?.trim()
-    : selNomF?.value;
+  let nomFourn = selNomF?.value === '__nouveau__' ? '' : selNomF?.value;
 
   const selFmt = document.getElementById('ef-saisie-format');
   let formatQte = '', formatUnite = 'g', contenant = '';
@@ -948,4 +942,64 @@ async function efConfirmerModalIngredient() {
     }
     efFermerModalIngredient();
   }, 50);
+}
+// ─── MODAL NOUVELLE CATÉGORIE FOURNISSEUR ───
+function efOuvrirModalCatFourn() {
+  const modal = document.getElementById('modal-ef-cat-fourn');
+  if (!modal) return;
+  document.getElementById('modal-ef-cat-fourn-valeur').value = '';
+  modal.classList.add('ouvert');
+  setTimeout(() => document.getElementById('modal-ef-cat-fourn-valeur').focus(), 100);
+}
+
+function efFermerModalCatFourn() {
+  const sel = document.getElementById('ef-saisie-cat-fourn');
+  if (sel) sel.value = '';
+  document.getElementById('modal-ef-cat-fourn')?.classList.remove('ouvert');
+}
+
+function efConfirmerModalCatFourn() {
+  const val = document.getElementById('modal-ef-cat-fourn-valeur')?.value?.trim();
+  if (!val) { document.getElementById('modal-ef-cat-fourn-valeur').focus(); return; }
+  const sel = document.getElementById('ef-saisie-cat-fourn');
+  if (sel) {
+    const opt = document.createElement('option');
+    opt.value = val; opt.textContent = val;
+    const optNew = [...sel.options].find(o => o.value === '__nouveau__');
+    if (optNew) sel.insertBefore(opt, optNew);
+    else sel.appendChild(opt);
+    sel.value = val;
+  }
+  document.getElementById('modal-ef-cat-fourn')?.classList.remove('ouvert');
+  efPopulerNomsFourn(val);
+}
+
+// ─── MODAL NOUVEAU NOM FOURNISSEUR ───
+function efOuvrirModalNomFourn() {
+  const modal = document.getElementById('modal-ef-nom-fourn');
+  if (!modal) return;
+  document.getElementById('modal-ef-nom-fourn-valeur').value = '';
+  modal.classList.add('ouvert');
+  setTimeout(() => document.getElementById('modal-ef-nom-fourn-valeur').focus(), 100);
+}
+
+function efFermerModalNomFourn() {
+  const sel = document.getElementById('ef-saisie-nom-fourn');
+  if (sel) sel.value = '';
+  document.getElementById('modal-ef-nom-fourn')?.classList.remove('ouvert');
+}
+
+function efConfirmerModalNomFourn() {
+  const val = document.getElementById('modal-ef-nom-fourn-valeur')?.value?.trim();
+  if (!val) { document.getElementById('modal-ef-nom-fourn-valeur').focus(); return; }
+  const sel = document.getElementById('ef-saisie-nom-fourn');
+  if (sel) {
+    const opt = document.createElement('option');
+    opt.value = val; opt.textContent = val;
+    const optNew = [...sel.options].find(o => o.value === '__nouveau__');
+    if (optNew) sel.insertBefore(opt, optNew);
+    else sel.appendChild(opt);
+    sel.value = val;
+  }
+  document.getElementById('modal-ef-nom-fourn')?.classList.remove('ouvert');
 }
