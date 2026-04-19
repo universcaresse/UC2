@@ -701,7 +701,7 @@ function efRendreLignesSauvegardees() {
       <td style="font-size:0.82rem;color:var(--gris)">${fmt}</td>
       <td>${l.quantite}</td>
       <td>${formaterPrix(l.prixUnitaire)}</td>
-      <td style="color:var(--primary);font-weight:500;white-space:nowrap">${formaterPrix(l.prixTotal)}</td>
+      <td style="color:var(--primary);font-weight:500">${formaterPrix(l.prixTotal)}</td>
       <td style="font-size:0.82rem;color:var(--gris)">${l.catUC}</td>
       <td style="font-weight:500">${l.nomUC}</td>
       <td><button class="bouton bouton-petit bouton-rouge" onclick="efSupprimerLigne(${idx})">✕</button></td>`;
