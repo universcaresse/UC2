@@ -422,7 +422,7 @@ function efOnChangeSaisieCatFourn() {
  const champ = document.getElementById('ef-saisie-cat-fourn-nouveau');
   if (!sel) return;
   const isNew = sel.value === '__nouveau__';
-  champ.classList.toggle('cache', !isNew);
+  if (champ) champ.classList.toggle('cache', !isNew);
   if (isNew) { efOuvrirModalCatFourn(); return; }
   efPopulerNomsFourn(sel.value);
 }
@@ -462,7 +462,7 @@ function efOnChangeSaisieNomFourn() {
   if (!sel) return;
 
   const isNew = sel.value === '__nouveau__';
-  champ.classList.toggle('cache', !isNew);
+  if (champ) champ.classList.toggle('cache', !isNew);
 
    if (isNew) {
     efOuvrirModalNomFourn();
