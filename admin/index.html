@@ -1820,25 +1820,35 @@
     </div>
     <div class="modal-admin-body">
       <div class="form-groupe">
-        <label class="form-label">Catégorie UC</label>
-        <select class="form-ctrl" id="modal-ef-ing-cat" onchange="efOnChangeModalIngCat()"></select>
-      </div>
-      <div class="form-groupe cache" id="modal-ef-ing-nouvelle-cat-groupe">
-        <label class="form-label">Nouvelle catégorie UC</label>
-        <input type="text" class="form-ctrl" id="modal-ef-ing-nouvelle-cat" placeholder="Ex: Ingrédients Secs">
-      </div>
-      <div class="form-groupe" id="modal-ef-ing-nom-groupe">
-        <select class="form-ctrl cache" id="modal-ef-ing-nomuc" onchange="efOnChangeModalIngNom()"></select>
-      </div>
-      <div class="form-groupe cache" id="modal-ef-ing-nouveau-nom-groupe">
-        <label class="form-label">Nouveau nom UC</label>
-        <input type="text" class="form-ctrl" id="modal-ef-ing-nouveau-nom" placeholder="Ex: Cire émulsifiante">
+        <label class="form-label">Nom de l'ingrédient</label>
+        <input type="text" class="form-ctrl" id="modal-ef-ing-nouveau-nom" placeholder="Ex: Cire émulsifiante" autocomplete="off">
       </div>
     </div>
     <div class="modal-admin-body">
       <div class="form-actions">
         <button class="bouton bouton-petit bouton-contour" onclick="efFermerModalIngredient()">Annuler</button>
         <button class="bouton bouton-petit" onclick="efConfirmerModalIngredient()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <div class="modal-admin-overlay" id="modal-ef-nouvelle-cat-uc">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Nouvelle catégorie UC</div>
+      <button class="btn-fermer-panneau" onclick="efFermerModalNouvelleCatUC()" title="Fermer">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe">
+        <label class="form-label">Nom de la catégorie</label>
+        <input type="text" class="form-ctrl" id="modal-ef-nouvelle-cat-uc-valeur" placeholder="Ex: Huiles essentielles" autocomplete="off">
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-petit bouton-contour" onclick="efFermerModalNouvelleCatUC()">Annuler</button>
+        <button class="bouton bouton-petit" onclick="efConfirmerModalNouvelleCatUC()">Confirmer</button>
       </div>
     </div>
   </div>
