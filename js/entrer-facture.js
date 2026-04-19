@@ -915,6 +915,8 @@ async function efConfirmerModalIngredient() {
   ef._saisieIngId = ing_id;
   const selCatUC = document.getElementById('ef-saisie-cat-uc');
   const selNomUC = document.getElementById('ef-saisie-nom-uc');
+  const selFmt   = document.getElementById('ef-saisie-format');
+  const fmtSauve = selFmt ? selFmt.value : '';
   if (selCatUC) { selCatUC.value = cat_id; efOnChangeSaisieCatUC(); }
   setTimeout(() => {
     if (selNomUC) {
@@ -928,7 +930,11 @@ async function efConfirmerModalIngredient() {
       }
       selNomUC.value = ing_id;
     }
-    efPopulerFormats(ing_id);
+    if (fmtSauve && fmtSauve !== "__nouveau__" && selFmt && selFmt.value !== fmtSauve) {
+      selFmt.value = fmtSauve;
+    } else {
+      efPopulerFormats(ing_id);
+    }
     efFermerModalIngredient();
   }, 50);
 }
