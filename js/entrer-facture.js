@@ -366,7 +366,8 @@ function efRendreLigneSaisie() {
 
   const optsCatUC = Object.keys(listesDropdown.categoriesMap || {})
     .sort((a,b) => (listesDropdown.categoriesMap[a]||'').localeCompare(listesDropdown.categoriesMap[b]||'','fr'))
-    .map(k => `<option value="${k}">${listesDropdown.categoriesMap[k]}</option>`).join('');
+    .map(k => `<option value="${k}">${listesDropdown.categoriesMap[k]}</option>`).join('') +
+    '<option value="__nouvelle_cat__">+ Nouvelle catégorie UC…</option>';
 
   const tr = document.createElement('tr');
   tr.id = 'ef-ligne-saisie';
@@ -546,8 +547,14 @@ function efOnChangeSaisieCatUC() {
   const selCatUC  = document.getElementById('ef-saisie-cat-uc');
   const selNomUC  = document.getElementById('ef-saisie-nom-uc');
   const champNouv = document.getElementById('ef-saisie-nom-uc-nouveau');
-  if (!selCatUC || !selNomUC) return;
+ if (!selCatUC || !selNomUC) return;
   const cat_id = selCatUC.value;
+
+  if (cat_id === '__nouvelle_cat__') {
+    selCatUC.value = '';
+    efOuvrirModalIngredient();
+    return;
+  }
 
   selNomUC.innerHTML = '<option value="">— Nom UC —</option>';
   if (cat_id) {
