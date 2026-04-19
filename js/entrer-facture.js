@@ -209,7 +209,15 @@ function efInitDate() {
   const anneeActuelle = new Date().getFullYear();
   selAnnee.innerHTML = '<option value="">—</option>' + [anneeActuelle-1, anneeActuelle, anneeActuelle+1]
     .map(a => `<option value="${a}">${a}</option>`).join('');
-  document.getElementById('ef-date-mois').value = '';
+  const selMois = document.getElementById('ef-date-mois');
+  if (selMois) {
+    selMois.innerHTML = '<option value="">— Mois —</option>' +
+      [['01','Janvier'],['02','Février'],['03','Mars'],['04','Avril'],
+       ['05','Mai'],['06','Juin'],['07','Juillet'],['08','Août'],
+       ['09','Septembre'],['10','Octobre'],['11','Novembre'],['12','Décembre']]
+      .map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+    selMois.value = '';
+  }
   document.getElementById('ef-date').value = '';
 }
 

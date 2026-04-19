@@ -89,7 +89,7 @@ if (resGam && resGam.success) {
    });
     donneesProduits = donneesProduits.map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
   }
-  if (resInci && resInci.success) {
+  if (resInci && resInci.success && resInci.items && resInci.items.length > 0) {
     listesDropdown.fullData = resInci.items || [];
     listesDropdown.types    = [...new Set(resInci.items.map(i => i.cat_id))].filter(Boolean);
   }
