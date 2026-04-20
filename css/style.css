@@ -703,18 +703,18 @@ footer > * { position: relative; z-index: 1; }
 .carte-infos.carte-infos-clair .carte-collection-badge { color: var(--blanc-pur-75); }
 .carte-infos.carte-infos-clair .carte-nom { color: var(--blanc); }
 .carte-infos.carte-infos-clair .carte-ligne { color: var(--blanc-pur-70); }
-
 .carte-infos.carte-infos-clair .carte-prix { color: var(--blanc); }
-.carte-infos.carte-infos-clair .carte-bas { border-top-color: var(--blanc-pur-30); }
+.carte-infos.carte-infos-clair .carte-bas { border-top-color: rgba(0,0,0,0.15); }
 .carte-infos.carte-infos-clair .carte-format-prix { color: var(--blanc); }
 .carte-infos.carte-infos-clair .carte-format-poids { color: var(--blanc); }
 
 .carte-infos.carte-infos-fonce .carte-collection-badge { color: rgba(0,0,0,0.55); }
 .carte-infos.carte-infos-fonce .carte-nom { color: rgba(0,0,0,0.85); }
 .carte-infos.carte-infos-fonce .carte-ligne { color: rgba(0,0,0,0.55); }
-
-
 .carte-infos.carte-infos-fonce .carte-prix { color: rgba(0,0,0,0.85); }
+.carte-infos.carte-infos-fonce .carte-bas { border-top-color: var(--blanc-pur-30); }
+
+
 .carte-collection-badge { display: inline-block; font-family: 'DM Sans', sans-serif; font-size: var(--texte-70); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; font-weight: 500; }
 .carte-nom { font-family: 'DM Sans', sans-serif; font-size: var(--texte-105); font-weight: 500; color: var(--gris-fonce); margin-bottom: 4px; line-height: 1.2; min-height: 2.52rem; }
 .carte-ligne { font-family: 'DM Sans', sans-serif; font-size: var(--texte-75); color: var(--gris); margin-bottom: 12px; font-weight: 300; }
