@@ -22,44 +22,39 @@
   <!-- NAVIGATION -->
 <nav id="nav">
   <ul class="nav-admin-links">
-      <li class="nav-admin-item">
+      
+	  <li class="nav-admin-item">
         <button class="nav-admin-btn" onclick="afficherSection('accueil', null)">Accueil</button>
-      </li>
+	 </li>
+	 
       <li class="nav-admin-item">
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Création <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
           <button class="nav-dropdown-item" onclick="afficherSection('collections', null)">Collections</button>
-		  
-          <button class="nav-dropdown-item" onclick="afficherSection('gammes', null)">Gammes</button>
-<button class="nav-dropdown-item" onclick="afficherSection('familles', null)">Familles</button>
-		  
-         <button class="nav-dropdown-item" onclick="afficherSection('produits', null)">Produits</button>
-		 
-		  
-         <!--  <button class="nav-dropdown-item" onclick="afficherSection('import-recettes', null)">Import recettes</button>-->
-		 
-		 
-          <a class="nav-dropdown-item" href="catalogue.html" target="_blank">Catalogue</a>
-<button class="nav-dropdown-item" onclick="afficherSection('catalogue-builder', null)">Catalogue PDF</button>
+		  <button class="nav-dropdown-item" onclick="afficherSection('gammes', null)">Gammes</button>
+		  <button class="nav-dropdown-item" onclick="afficherSection('familles', null)">Familles</button>
+		  <button class="nav-dropdown-item" onclick=	"afficherSection('produits', null)">Produits</button>
+		  <button class="nav-dropdown-item" onclick="afficherSection('catalogue-builder', null)">Catalogue PDF</button>
         </div>
       </li>
+	  
       <li class="nav-admin-item">
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Achats <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
-          <!--  <button class="nav-dropdown-item" onclick="afficherSection('nouvelle-facture', null)">Nouvelle facture</button>-->
-           <button class="nav-dropdown-item" onclick="afficherSection('import-facture', null)">Entrer une facture</button>
-           <button class="nav-dropdown-item" onclick="afficherSection('entrer-facture', null)">Entrer une facture V3</button>
-          <button class="nav-dropdown-item" onclick="afficherSection('factures', null)">Les factures</button>
-          <button class="nav-dropdown-item" onclick="afficherSection('inventaire', null)">Inventaire</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('entrer-facture', null)">Entrer les factures</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('factures', null)">Les factures</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('inventaire', null)">Inventaire</button>
         </div>
       </li>
+	  
       <li class="nav-admin-item">
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Production <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
-          <button class="nav-dropdown-item" onclick="afficherSection('fabrication', this)">Fabrication</button>
-          <button class="nav-dropdown-item bientot">Ventes</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('fabrication', this)">Fabrication</button>
+		<button class="nav-dropdown-item bientot">Ventes</button>
         </div>
       </li>
+	  
       <li class="nav-admin-item">
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Statistiques <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
@@ -69,26 +64,29 @@
           <button class="nav-dropdown-item bientot">Bilan</button>
         </div>
       </li>
+	  
       <li class="nav-admin-item">
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Système <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
-          <button class="nav-dropdown-item" onclick="afficherSection('inci', null)">INCI</button>
-          <button class="nav-dropdown-item" onclick="afficherSection('densites', null)">Densité</button>
-          <button class="nav-dropdown-item" onclick="afficherSection('contenu-site', null)">Contenu du site</button>
-          <button class="nav-dropdown-item" onclick="afficherSection('mediatheque', null)">Médiathèque</button>
-          <button class="nav-dropdown-item bientot">Corrections inventaire</button>
-
-          <a class="nav-dropdown-item" href="../index.html" target="_blank">Site public</a>
-          <button class="nav-dropdown-item" onclick="seDeconnecter()">Déconnexion</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('inci', null)">INCI</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('densites', null)">Densité</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('contenu-site', null)">Contenu du site</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('mediatheque', null)">Médiathèque</button>
+		<button class="nav-dropdown-item bientot">Corrections stock</button>
+		<a class="nav-dropdown-item" href="../index.html" target="_blank">Site public</a>
+		<button class="nav-dropdown-item" onclick="seDeconnecter()">Déconnexion</button>
         </div>
       </li>
+	  
     </ul>
+	
+	
   </nav>
-  <button class="burger burger-flottant" id="burger-admin" onclick="toggleSidebarAdmin()" aria-label="Menu">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
+		<button class="burger burger-flottant" id="burger-admin" onclick="toggleSidebarAdmin()" aria-label="Menu">
+		<span></span>
+		<span></span>
+		<span></span>
+		</button>
 
   <!-- LAYOUT -->
   <div class="admin-layout">
@@ -109,25 +107,21 @@
 <button class="sidebar-lien" onclick="afficherSection('familles', this)">Familles</button>
 		
  <button class="sidebar-lien" onclick="afficherSection('produits', this)">Produits</button>
-       
-      <!--   <button class="sidebar-lien" onclick="afficherSection('import-recettes', this)">Import recettes</button>-->
-        <a class="sidebar-lien" href="catalogue.html" target="_blank">Catalogue</a>
 <button class="sidebar-lien" onclick="afficherSection('catalogue-builder', this)">Catalogue PDF</button>
       </div>
       <div class="sidebar-sep"></div>
       <div class="sidebar-groupe">
         <div class="sidebar-titre">Achats</div>
-        <button class="sidebar-lien" onclick="afficherSection('nouvelle-facture', this)">Nouvelle facture</button>
-        <button class="sidebar-lien" onclick="afficherSection('entrer-facture', this)">Entrer une facture V3</button>
-      <!--   <button class="sidebar-lien" onclick="afficherSection('import-facture', this)">Import PDF</button>-->
-        <button class="sidebar-lien" onclick="afficherSection('factures', this)">Les factures</button>
+         <button class="sidebar-lien" onclick="afficherSection('entrer-facture', this)">Entrer les factures</button>
+           <button class="sidebar-lien" onclick="afficherSection('factures', this)">Les factures</button>
         <button class="sidebar-lien" onclick="afficherSection('inventaire', this)">Inventaire</button>
       </div>
       <div class="sidebar-sep"></div>
       <div class="sidebar-groupe">
         <div class="sidebar-titre">Production</div>
         <button class="sidebar-lien" onclick="afficherSection('fabrication', this)">Fabrication</button>
-        <button class="sidebar-lien" onclick="afficherSection('inventaire-production', this)">Inventaire</button>
+        <button class="sidebar-lien" onclick="afficherSection('inventaire-production', this)">Stock</button>
+		<button class="sidebar-lien bientot">Corrections Stock</button>
       </div>
       <div class="sidebar-sep"></div>
      <div class="sidebar-groupe">
@@ -136,7 +130,7 @@
         <button class="sidebar-lien" onclick="afficherSection('densites', this)">Densité</button>
         <button class="sidebar-lien" onclick="afficherSection('contenu-site', this)">Contenu du site</button>
         <button class="sidebar-lien" onclick="afficherSection('mediatheque', this)">Médiathèque</button>
-     <button class="sidebar-lien bientot">Corrections inventaire</button>
+     
       </div>
       <div class="sidebar-sep"></div>
       <div class="sidebar-groupe">
@@ -147,27 +141,14 @@
 
     <!-- CONTENU -->
     <main class="admin-contenu">
-
-
-
-   <!-- ════════════════════════════════════════
-     ACCUEIL — Tableau de bord
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       afficherSection()
-       afficherStatsAccueil()
-
-     CSS (style.css)
-       .accueil-admin, .accueil-gauche, .accueil-droite
-       .accueil-grande-tuile, .accueil-tuile
-       .tuile-icone, .tuile-nom
-       .hero-stat-num, .hero-stat-label, .hero-logo-img
-       .accueil-chantal, .accueil-bonjour
-     ════════════════════════════════════════ -->
-   <div class="section-admin" id="section-accueil">
-        <div class="accueil-admin">
-      <div class="accueil-gauche">
+			<!-- ════════════════════════════════════════
+			 ACCUEIL — Tableau de bord
+			 ════════════════════════════════════════ -->
+			<div class="section-admin" id="section-accueil">
+			<div class="accueil-admin">
+			
+			
+			<div class="accueil-gauche">
                     <img src="../Images/Logofinal.png" alt="Univers Caresse" class="hero-logo-img fade-in delay-2">
             <div class="accueil-chantal fade-in delay-3">Bonjour <span class="accueil-bonjour">Chantal</span></div>
             <div class="hero-stats fade-in delay-5">
