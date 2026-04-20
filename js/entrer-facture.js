@@ -880,10 +880,9 @@ async function efFinaliser() {
 function efOuvrirModalFormat() {
   const modal = document.getElementById('modal-ef-format');
   if (!modal) return;
-  document.getElementById('modal-ef-fmt-qte').value   = '';
-  document.getElementById('modal-ef-fmt-unite').value = '';
-  const label = document.getElementById('modal-ef-fmt-qte-label');
-  if (label) label.textContent = 'Quantité';
+  document.getElementById('modal-ef-fmt-qte').value      = '';
+  document.getElementById('modal-ef-fmt-qte').placeholder = 'Ex: 500';
+  document.getElementById('modal-ef-fmt-unite').value     = '';
   document.getElementById('modal-ef-fmt-qte-bloc')?.classList.remove('cache');
   modal.classList.add('ouvert');
   document.getElementById('modal-ef-fmt-qte').focus();
