@@ -717,6 +717,7 @@ function efRendreLignesSauvegardees() {
   ef.lignes.forEach((l, idx) => {
     const fmt = (l.contenant ? l.contenant + ' — ' : '') + l.formatQte + ' ' + l.formatUnite;
     const tr  = document.createElement('tr');
+    if (idx === ef._editIdx) tr.classList.add('cache');
     tr.innerHTML = `
       <td>${l.catFourn}</td>
       <td>${l.nomFourn}</td>
@@ -793,6 +794,7 @@ function efEditerLigne(idx) {
 
 function efAnnulerEdit() {
   ef._editIdx = null;
+  efRendreLignesSauvegardees();
   efRendreLigneSaisie();
 }
 
