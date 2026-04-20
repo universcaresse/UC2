@@ -141,6 +141,7 @@ function appliquerCouleursHex() {
 }
 
 function afficherSection(id, bouton) {
+  setTimeout(appliquerCouleursHex, 300);
   history.pushState({ section: id }, '', '#' + id);
   document.querySelectorAll('.nav-admin-item.ouvert').forEach(i => i.classList.remove('ouvert'));
   document.querySelectorAll('.section-admin').forEach(s => s.classList.remove('visible'));
