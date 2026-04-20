@@ -300,6 +300,7 @@ async function efCreerFacture() {
   }
 
   ef.factureActive = { ach_id, numero, date, fournisseur: fourNom, four_id, four_code: fourCode };
+  document.getElementById('ef-btn-creer')?.classList.add('cache');
   efAfficherZoneItems();
   efRendreLigneSaisie();
   efMajBanniere();
