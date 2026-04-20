@@ -1410,7 +1410,7 @@ async function ouvrirFicheProduit(pro_id) {
     <div class="fiche-section-titre">Formats disponibles</div>
     <div class="fiche-ingredients">${formatsHtml}</div>
     <div class="fiche-section-titre">Export</div>
-    <button class="bouton bouton-contour" onclick="exporterFicheProduit()">Copier pour le graphiste</button>
+    <button class="bouton" onclick="exporterFicheProduit()">Copier pour le graphiste</button>
   `;
 
   fermerFormProduit();
