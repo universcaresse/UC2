@@ -2801,8 +2801,10 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
 
   inciDonnees.forEach(l => {
     if (recherche && !(l.nom_UC || '').toLowerCase().includes(recherche)) return;
-    if (filtreStatut === 'a-valider' && l.inci) return;
-    if (filtreStatut === 'valide'    && !l.inci) return;
+    const catsSansInci = ['CAT-1776369774938', 'CAT-1776641557249', 'CAT-014'];
+    const exempteSansInci = catsSansInci.includes(l.cat_id);
+    if (filtreStatut === 'a-valider' && (l.inci || exempteSansInci)) return;
+    if (filtreStatut === 'valide'    && !l.inci && !exempteSansInci) return;
     if (filtreSource !== 'tout'      && l.source !== filtreSource) return;
     const catObj = inciCategoriesUC.find(c => c.cat_id === l.cat_id);
     const cat = catObj?.nom || l.cat_id || 'Sans catégorie';
@@ -2837,7 +2839,7 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
       </div>
       <div class="form-body inci-accord-body cache">
         <div class="tableau-wrap">
-          <table class="tableau-admin">
+          <table class="tableau-admin tableau-inci">
             <tbody>
               ${lignes.sort((a,b) => (a.nom_UC||'').localeCompare(b.nom_UC||'','fr')).map((l, i) => inciRendreLigne(l, cat, `${idx}-${i}`)).join('')}
             </tbody>

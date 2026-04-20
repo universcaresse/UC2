@@ -887,10 +887,10 @@ async function efConfirmerModalIngredient() {
     const res = await appelAPIPost('createIngredientInci', {
       ing_id, cat_id, nom_UC: nouveauNom,
       nom_fournisseur: nomFourn || nouveauNom,
-      inci: '', statut: 'actif'
+      inci: '', statut: 'actif', source: ef.factureActive?.four_code || ''
     });
     if (!res || !res.success) { afficherMsg('ef', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
-    listesDropdown.fullData.push({ ing_id, cat_id, nom_UC: nouveauNom, inci: '' });
+    listesDropdown.fullData.push({ ing_id, cat_id, nom_UC: nouveauNom, inci: '', source: ef.factureActive?.four_code || '', nom_fournisseur: nomFourn || nouveauNom });
     nomUC = nouveauNom;
   }
 
