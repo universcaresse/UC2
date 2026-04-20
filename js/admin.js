@@ -345,8 +345,17 @@ function ouvrirFicheFamille(fam_id) {
   if (!fam) return;
   const col = donneesCollections.find(c => c.col_id === fam.col_id);
   document.getElementById('fiche-famille-titre').textContent      = (fam.nom || '').toUpperCase();
+  document.getElementById('fiche-famille-slogan').textContent     = fam.slogan || '';
   document.getElementById('fiche-famille-collection').textContent = col?.nom || '—';
   document.getElementById('fiche-famille-desc').textContent       = fam.description || '—';
+
+  let wrapHtml = '';
+  if (fam.photo_url)      wrapHtml += `<img src="${fam.photo_url}" class="fiche-visuel-photo">`;
+  if (fam.photo_noel_url) wrapHtml += `<img src="${fam.photo_noel_url}" class="fiche-visuel-photo">`;
+  if (fam.couleur_hex)    wrapHtml += `<div class="fiche-visuel-hex" style="background:${fam.couleur_hex}"></div>`;
+  const ficheExtras = document.getElementById('fiche-famille-extras');
+  if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class="fiche-visuel">${wrapHtml}</div>` : '';
+
   document.getElementById('fiche-famille-modifier').onclick = () => {
     fermerFicheFamille();
     modifierFamille(fam_id);
@@ -355,6 +364,7 @@ function ouvrirFicheFamille(fam_id) {
   document.getElementById('contenu-familles').classList.add('cache');
   document.getElementById('btn-nouvelle-famille').classList.add('cache');
   document.getElementById('fiche-famille').classList.remove('cache');
+  setTimeout(appliquerCouleursHex, 300);
   window.scrollTo(0, 0);
 }
 
