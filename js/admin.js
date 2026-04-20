@@ -125,6 +125,21 @@ document.addEventListener('click', function(e) {
   }
 });
 
+function appliquerCouleursHex() {
+  document.querySelectorAll('input.form-ctrl').forEach(input => {
+    const val = (input.value || '').trim();
+    if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+      input.style.background = val;
+      const r = parseInt(val.slice(1,3),16), g = parseInt(val.slice(3,5),16), b = parseInt(val.slice(5,7),16);
+      const luminance = (0.299*r + 0.587*g + 0.114*b) / 255;
+      input.style.color = luminance > 0.5 ? '#333' : '#fff';
+    } else {
+      input.style.background = '';
+      input.style.color = '';
+    }
+  });
+}
+
 function afficherSection(id, bouton) {
   history.pushState({ section: id }, '', '#' + id);
   document.querySelectorAll('.nav-admin-item.ouvert').forEach(i => i.classList.remove('ouvert'));
