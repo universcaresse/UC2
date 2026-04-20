@@ -368,7 +368,7 @@ main { padding-top: var(--nav-h); }
   width: 100%; padding: 14px 14px 10px;
   font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 300;
   border: 1px solid var(--beige); background: white; color: var(--gris-fonce);
-  outline: none; transition: border-color 0.2s; -webkit-appearance: none; appearance: none;
+  outline: none; transition: border-color 0.2s, background 0.3s, color 0.3s; -webkit-appearance: none; appearance: none;
 }
 .form-control:focus, .form-ctrl:focus { border-color: var(--primary); }
 textarea.form-control, textarea.form-ctrl { resize: vertical; min-height: 120px; line-height: 1.6; }
