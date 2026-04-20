@@ -842,6 +842,7 @@ async function efFinaliser() {
     document.getElementById('ef-livraison').value = '';
     document.getElementById('ef-soustotal').value = '';
     document.getElementById('ef-total').value     = '';
+   document.getElementById('ef-btn-creer')?.classList.remove('cache');
     document.getElementById('ef-zone-items')?.classList.add('cache');
     document.getElementById('ef-tbody').innerHTML = '';
     efInitDate();
