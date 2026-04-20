@@ -1,18 +1,18 @@
 /* ═══════════════════════════════════════
    UNIVERS CARESSE — entrer-facture.js
-   Module saisie facture V3 — corrigé
+   Module saisie facture V3
    Tous les IDs sont préfixés ef-
    ═══════════════════════════════════════ */
 
 // ─── ÉTAT ───
 var ef = {
   factureActive: null,  // { ach_id, numero, date, fournisseur, four_id, four_code }
-  lignes:        [],    // lignes sauvegardées { ..., rowIndex }
+  lignes:        [],    // lignes sauvegardées
   mapping:       [],    // [{fournisseur, categorie_fournisseur, nom_fournisseur, categorie_UC, nom_UC, ing_id}]
   formats:       [],    // [{ing_id, contenant, quantite, unite, fournisseur}]
   fournisseurs:  [],    // [{four_id, code, nom}]
   scrapingItems: [],    // [{nom, categorie}]
-  _saisieIngId:  null,
+ _saisieIngId:  null,
   _initEnCours:  false,
   _editIdx:      null,
 };
@@ -132,18 +132,11 @@ async function efReprendreFacture() {
       const nomUC  = ing?.nom_UC || '';
       const cat_id = ing?.cat_id || '';
       const catUC  = listesDropdown.categoriesMap?.[cat_id] || '';
-
-      // Reconstruire catFourn et nomFourn depuis le mapping
-      const mappingEntry = ef.mapping.find(m => m.ing_id === l.ing_id && m.fournisseur === f.fournisseur);
-      const catFourn = mappingEntry?.categorie_fournisseur || '';
-      const nomFourn = mappingEntry?.nom_fournisseur || '';
-
       ef.lignes.push({
-        rowIndex:     l.rowIndex,
         ing_id:       l.ing_id,
         nomUC,
-        catFourn,
-        nomFourn,
+        catFourn:     '',
+        nomFourn:     '',
         catUC,
         formatQte:    l.format_qte,
         formatUnite:  l.format_unite,
@@ -177,9 +170,7 @@ async function efAnnulerFactureEnCours() {
   }
 }
 
-// ─── CALCUL PRIX/G ou PRIX/UNITÉ ───
-// Pour 'unité' : formatQte = nb d'unités dans le contenant
-// prix_par_g = prix_unitaire / nb_unites_contenant = prix par unité individuelle
+// ─── CALCUL PRIX/G ───
 function efCalculerGrammes(formatQte, formatUnite, cat_id) {
   const qte     = efParseFlt(formatQte);
   const cfg     = listesDropdown.config?.[cat_id] || {};
@@ -190,11 +181,12 @@ function efCalculerGrammes(formatQte, formatUnite, cat_id) {
   if (formatUnite === 'ml')    return qte * densite;
   if (formatUnite === 'L')     return qte * 1000 * densite;
   if (formatUnite === 'l')     return qte * 1000 * densite;
-  if (formatUnite === 'unité') return qte; // nb unités dans le contenant
+  if (formatUnite === 'unité') return 0;
   return qte;
 }
 
 function efCalculerPrixParG(prixUnitaire, formatQte, formatUnite, cat_id) {
+  if (formatUnite === 'unité') return 0;
   const grammes = efCalculerGrammes(formatQte, formatUnite, cat_id);
   if (grammes <= 0) return 0;
   return efParseFlt(prixUnitaire) / grammes;
@@ -366,9 +358,8 @@ function efRendreLigneSaisie() {
     ef.mapping.filter(m => m.fournisseur === fourNom).map(m => m.categorie_fournisseur).filter(Boolean)
   )].sort((a,b) => a.localeCompare(b,'fr'));
 
-  // Fusionner scraping + mapping pour avoir toutes les catégories connues
-  const toutesLesCats = [...new Set([...catsScrap, ...catsMapping])].sort((a,b) => a.localeCompare(b,'fr'));
-  const cats = toutesLesCats.length > 0 ? toutesLesCats
+  const cats = catsScrap.length > 0 ? catsScrap
+    : catsMapping.length > 0 ? catsMapping
     : Object.keys(listesDropdown.categoriesMap || {})
         .sort((a,b) => (listesDropdown.categoriesMap[a]||'').localeCompare(listesDropdown.categoriesMap[b]||'','fr'))
         .map(k => listesDropdown.categoriesMap[k]);
@@ -389,12 +380,12 @@ function efRendreLigneSaisie() {
         ${optsCatFourn}
         <option value="__nouveau__">+ Nouvelle catégorie…</option>
       </select>
-    </td>
+        </td>
     <td>
       <select class="form-ctrl" id="ef-saisie-nom-fourn" onchange="efOnChangeSaisieNomFourn()">
         <option value="">— Nom —</option>
       </select>
-    </td>
+      </td>
     <td>
       <select class="form-ctrl" id="ef-saisie-format" onchange="efOnChangeSaisieFormat()">
         <option value="">— Format —</option>
@@ -429,10 +420,10 @@ function efRendreLigneSaisie() {
 
 // ─── CASCADES ───
 
-// Catégorie fournisseur → peuple Nom fournisseur
+// Catégorie fournisseur → peuple Nom fournisseur + reset format
 function efOnChangeSaisieCatFourn() {
   const sel   = document.getElementById('ef-saisie-cat-fourn');
-  const champ = document.getElementById('ef-saisie-cat-fourn-nouveau');
+ const champ = document.getElementById('ef-saisie-cat-fourn-nouveau');
   if (!sel) return;
   const isNew = sel.value === '__nouveau__';
   if (champ) champ.classList.toggle('cache', !isNew);
@@ -440,7 +431,7 @@ function efOnChangeSaisieCatFourn() {
   efPopulerNomsFourn(sel.value);
 }
 
-// Peuple la liste des noms fournisseur — fusionne scraping + mapping
+// Peuple la liste des noms fournisseur + reset format
 function efPopulerNomsFourn(catFourn) {
   const sel   = document.getElementById('ef-saisie-nom-fourn');
   const champ = document.getElementById('ef-saisie-nom-fourn-nouveau');
@@ -449,14 +440,16 @@ function efPopulerNomsFourn(catFourn) {
 
   const nomsScrap = ef.scrapingItems
     .filter(i => !catFourn || i.categorie === catFourn)
-    .map(i => i.nom).filter(Boolean);
+    .map(i => i.nom).filter(Boolean)
+    .sort((a,b) => a.localeCompare(b,'fr'));
 
-  const nomsMapping = ef.mapping
-    .filter(m => m.fournisseur === fourNom && (!catFourn || m.categorie_fournisseur === catFourn))
-    .map(m => m.nom_fournisseur).filter(Boolean);
+  const nomsMapping = [...new Set(
+    ef.mapping
+      .filter(m => m.fournisseur === fourNom && (!catFourn || m.categorie_fournisseur === catFourn))
+      .map(m => m.nom_fournisseur).filter(Boolean)
+  )].sort((a,b) => a.localeCompare(b,'fr'));
 
-  // Fusionner les deux sources — scraping + mapping historique
-  const noms = [...new Set([...nomsScrap, ...nomsMapping])].sort((a,b) => a.localeCompare(b,'fr'));
+  const noms = nomsScrap.length > 0 ? nomsScrap : nomsMapping;
 
   sel.innerHTML = '<option value="">— Nom —</option>' +
     noms.map(n => `<option value="${n}">${n}</option>`).join('') +
@@ -466,7 +459,7 @@ function efPopulerNomsFourn(catFourn) {
   efResetFormat();
 }
 
-// Nom fournisseur → auto-remplit Cat UC + Nom UC + Formats si connu dans le mapping
+// Nom fournisseur → peuple Format via mapping si connu, sinon reset format
 function efOnChangeSaisieNomFourn() {
   const sel   = document.getElementById('ef-saisie-nom-fourn');
   const champ = document.getElementById('ef-saisie-nom-fourn-nouveau');
@@ -475,7 +468,7 @@ function efOnChangeSaisieNomFourn() {
   const isNew = sel.value === '__nouveau__';
   if (champ) champ.classList.toggle('cache', !isNew);
 
-  if (isNew) {
+   if (isNew) {
     efOuvrirModalNomFourn();
     efResetFormat();
     return;
@@ -485,7 +478,7 @@ function efOnChangeSaisieNomFourn() {
     const fourNom = ef.factureActive?.fournisseur || '';
     const mapping = ef.mapping.find(m => m.fournisseur === fourNom && m.nom_fournisseur === sel.value);
     if (mapping) {
-      // Pré-remplir Cat UC depuis le mapping
+      // Pré-remplir Cat UC et Nom UC depuis le mapping
       const selCatUC = document.getElementById('ef-saisie-cat-uc');
       if (selCatUC) {
         const cat_id = Object.keys(listesDropdown.categoriesMap || {})
@@ -493,18 +486,15 @@ function efOnChangeSaisieNomFourn() {
         selCatUC.value = cat_id;
         efOnChangeSaisieCatUC();
         setTimeout(() => {
-          // Pré-remplir Nom UC
           const selNomUC = document.getElementById('ef-saisie-nom-uc');
           if (selNomUC && mapping.ing_id) {
             selNomUC.value = mapping.ing_id;
             ef._saisieIngId = mapping.ing_id;
           }
-          // Pré-remplir Formats
           if (mapping.ing_id) efPopulerFormats(mapping.ing_id);
         }, 50);
       }
     } else {
-      // Nom connu dans scraping mais pas encore dans le mapping → reset
       efResetFormat();
     }
   } else {
@@ -512,6 +502,7 @@ function efOnChangeSaisieNomFourn() {
   }
 }
 
+// Nom fournisseur tapé manuellement → reset format
 function efOnSaisieNomFournTexte() {
   efResetFormat();
 }
@@ -523,7 +514,7 @@ function efResetFormat() {
   ef._saisieIngId = null;
 }
 
-// Peuple la liste des formats pour un ingrédient donné
+// Peuple le format pour un ingrédient donné
 function efPopulerFormats(ing_id) {
   const selFmt  = document.getElementById('ef-saisie-format');
   if (!selFmt) return;
@@ -554,12 +545,12 @@ function efOnChangeSaisieFormat() {
   }
 }
 
-// Catégorie UC → peuple Nom UC
+// Catégorie UC → peuple Nom UC (ne touche pas au format)
 function efOnChangeSaisieCatUC() {
   const selCatUC  = document.getElementById('ef-saisie-cat-uc');
   const selNomUC  = document.getElementById('ef-saisie-nom-uc');
   const champNouv = document.getElementById('ef-saisie-nom-uc-nouveau');
-  if (!selCatUC || !selNomUC) return;
+ if (!selCatUC || !selNomUC) return;
   const cat_id = selCatUC.value;
 
   if (cat_id === '__nouvelle_cat__') {
@@ -587,7 +578,7 @@ function efOnChangeSaisieCatUC() {
   ef._saisieIngId = null;
 }
 
-// Nom UC → enregistre l'ingrédient et charge ses formats
+// Nom UC → enregistre l'ingrédient sélectionné (ne touche pas au format)
 function efOnChangeSaisieNomUC() {
   const sel   = document.getElementById('ef-saisie-nom-uc');
   const champ = document.getElementById('ef-saisie-nom-uc-nouveau');
@@ -601,9 +592,6 @@ function efOnChangeSaisieNomUC() {
 
   champ.classList.add('cache');
   ef._saisieIngId = sel.value || null;
-
-  // Charger les formats pour cet ingrédient
-  if (ef._saisieIngId) efPopulerFormats(ef._saisieIngId);
 }
 
 function efMajLigneTotal() {
@@ -677,7 +665,7 @@ async function efAjouterLigne() {
     return;
   }
 
-  // Sauvegarder mapping si nouveau lien fournisseur ↔ UC
+  // Sauvegarder mapping si nouveau
   const mappingExiste = ef.mapping.find(m => m.fournisseur === fourNom && m.nom_fournisseur === nomFourn);
   if (!mappingExiste) {
     const catUCNom = listesDropdown.categoriesMap?.[cat_id] || cat_id;
@@ -690,10 +678,8 @@ async function efAjouterLigne() {
 
   // Mémoriser format si nouveau
   const fmtExiste = ef.formats.find(f =>
-    f.ing_id === ing_id &&
-    efParseFlt(f.quantite) === efParseFlt(formatQte) &&
-    f.unite === formatUnite &&
-    f.fournisseur === fourNom
+    f.ing_id === ing_id && efParseFlt(f.quantite) === efParseFlt(formatQte) &&
+    f.unite === formatUnite && f.fournisseur === fourNom
   );
   if (!fmtExiste) {
     ef.formats.push({ ing_id, contenant, quantite: efParseFlt(formatQte), unite: formatUnite, fournisseur: fourNom });
@@ -701,7 +687,6 @@ async function efAjouterLigne() {
 
   const catUCNom = listesDropdown.categoriesMap?.[cat_id] || cat_id;
   const nouvelleLigne = {
-    rowIndex:     res.rowIndex || 0,
     ing_id, nomUC, catFourn, nomFourn, catUC: catUCNom,
     formatQte: efParseFlt(formatQte), formatUnite, contenant,
     prixUnitaire: prixUnitNum, quantite: quantiteNum,
@@ -715,7 +700,6 @@ async function efAjouterLigne() {
     ef.lignes.push(nouvelleLigne);
   }
 
-  if (btn) { btn.disabled = false; btn.innerHTML = '+'; }
   afficherMsg('ef-items', '');
   efRendreLignesSauvegardees();
   efRendreLigneSaisie();
@@ -757,21 +741,26 @@ function efEditerLigne(idx) {
   if (!l) return;
   ef._editIdx = idx;
 
+  // Catégorie fournisseur
   const selCatF = document.getElementById('ef-saisie-cat-fourn');
   if (selCatF) { selCatF.value = l.catFourn; efPopulerNomsFourn(l.catFourn); }
 
+  // Nom fournisseur
   setTimeout(() => {
     const selNomF = document.getElementById('ef-saisie-nom-fourn');
     if (selNomF) selNomF.value = l.nomFourn;
 
+    // Cat UC
     const selCatUC = document.getElementById('ef-saisie-cat-uc');
     const cat_id = Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === l.catUC) || '';
     if (selCatUC) { selCatUC.value = cat_id; efOnChangeSaisieCatUC(); }
 
     setTimeout(() => {
+      // Nom UC
       const selNomUC = document.getElementById('ef-saisie-nom-uc');
       if (selNomUC) { selNomUC.value = l.ing_id; ef._saisieIngId = l.ing_id; }
 
+      // Format
       efPopulerFormats(l.ing_id);
       setTimeout(() => {
         const selFmt = document.getElementById('ef-saisie-format');
@@ -786,12 +775,14 @@ function efEditerLigne(idx) {
             selFmt.insertBefore(opt, selFmt.options[0]);
           }
         }
+        // Prix et quantité
         const elPrix = document.getElementById('ef-saisie-prix');
         const elQte  = document.getElementById('ef-saisie-qte');
         if (elPrix) elPrix.value = l.prixUnitaire;
         if (elQte)  elQte.value  = l.quantite;
         efMajLigneTotal();
 
+        // Boutons
         const btnAjouter = document.getElementById('ef-btn-ajouter');
         const btnAnnuler = document.getElementById('ef-btn-annuler-edit');
         if (btnAjouter) btnAjouter.innerHTML = '✓';
@@ -807,21 +798,7 @@ function efAnnulerEdit() {
   efRendreLigneSaisie();
 }
 
-// Supprime la ligne dans Sheets ET en mémoire
 async function efSupprimerLigne(idx) {
-  const ligne = ef.lignes[idx];
-  if (!ligne) return;
-
-  if (ligne.rowIndex) {
-    const res = await appelAPIPost('deleteAchatLigne', { rowIndex: ligne.rowIndex });
-    if (!res || !res.success) {
-      afficherMsg('ef-items', res?.message || 'Erreur suppression ligne.', 'erreur');
-      return;
-    }
-    // Décrémenter les rowIndex des lignes suivantes (le sheet a décalé)
-    ef.lignes.forEach(l => { if (l.rowIndex > ligne.rowIndex) l.rowIndex--; });
-  }
-
   ef.lignes.splice(idx, 1);
   efRendreLignesSauvegardees();
   efMajBanniere();
@@ -858,7 +835,6 @@ async function efFinaliser() {
     ef.lignes         = [];
     ef._saisieIngId   = null;
     ef.scrapingItems  = [];
-    ef._editIdx       = null;
     if (btn) { btn.disabled = false; btn.innerHTML = 'Finaliser'; }
     document.getElementById('ef-fournisseur').value = '';
     document.getElementById('ef-fournisseur-nouveau')?.classList.add('cache');
@@ -868,7 +844,7 @@ async function efFinaliser() {
     document.getElementById('ef-livraison').value = '';
     document.getElementById('ef-soustotal').value = '';
     document.getElementById('ef-total').value     = '';
-    document.getElementById('ef-btn-creer')?.classList.remove('cache');
+   document.getElementById('ef-btn-creer')?.classList.remove('cache');
     document.getElementById('ef-zone-items')?.classList.add('cache');
     document.getElementById('ef-tbody').innerHTML = '';
     efInitDate();
@@ -882,8 +858,6 @@ function efOuvrirModalFormat() {
   if (!modal) return;
   document.getElementById('modal-ef-fmt-qte').value   = '';
   document.getElementById('modal-ef-fmt-unite').value = '';
-  const label = document.getElementById('modal-ef-fmt-qte-label');
-  if (label) label.textContent = 'Quantité';
   document.getElementById('modal-ef-fmt-qte-bloc')?.classList.remove('cache');
   modal.classList.add('ouvert');
   document.getElementById('modal-ef-fmt-qte').focus();
@@ -893,27 +867,23 @@ function efFermerModalFormat() {
   document.getElementById('modal-ef-format')?.classList.remove('ouvert');
 }
 
-// Pour 'unité' : le champ quantité reste visible — c'est le nb d'unités dans le contenant
 function efOnChangeModalFmtUnite() {
   const unite = document.getElementById('modal-ef-fmt-unite')?.value;
   const bloc  = document.getElementById('modal-ef-fmt-qte-bloc');
-  const input = document.getElementById('modal-ef-fmt-qte');
-  if (!bloc) return;
-  bloc.classList.remove('cache'); // toujours visible peu importe l'unité
-  if (input) input.placeholder = unite === 'unité' ? 'Nb d\'unités dans le contenant (ex: 25)' : 'Ex: 500';
+  if (bloc) bloc.classList.toggle('cache', unite === 'unité');
 }
 
 function efConfirmerModalFormat() {
   const unite = document.getElementById('modal-ef-fmt-unite')?.value;
-  const qte   = document.getElementById('modal-ef-fmt-qte')?.value?.trim();
+  const qte   = unite === 'unité' ? '1' : document.getElementById('modal-ef-fmt-qte')?.value?.trim();
   if (!unite) return;
-  if (!qte || efParseFlt(qte) <= 0) { document.getElementById('modal-ef-fmt-qte').focus(); return; }
+  if (unite !== 'unité' && !qte) { document.getElementById('modal-ef-fmt-qte').focus(); return; }
 
   const selFmt = document.getElementById('ef-saisie-format');
   if (selFmt) {
     const opt = document.createElement('option');
-    opt.value = JSON.stringify({ quantite: efParseFlt(qte), unite, contenant: '' });
-    opt.textContent = unite === 'unité' ? qte + ' unités' : qte + ' ' + unite;
+    opt.value = JSON.stringify({ quantite: efParseFlt(qte)||1, unite, contenant: '' });
+    opt.textContent = unite === 'unité' ? 'unité' : qte + ' ' + unite;
     opt.selected = true;
     const optNew = [...selFmt.options].find(o => o.value === '__nouveau__');
     if (optNew) selFmt.insertBefore(opt, optNew);
@@ -1014,11 +984,8 @@ async function efConfirmerModalIngredient() {
     }
     selNomUC.value = ing_id;
   }
-  // Charger les formats pour ce nouvel ingrédient (vide pour l'instant)
-  efPopulerFormats(ing_id);
   efFermerModalIngredient();
 }
-
 // ─── MODAL NOUVELLE CATÉGORIE UC ───
 function efOuvrirModalNouvelleCatUC() {
   const modal = document.getElementById('modal-ef-nouvelle-cat-uc');
@@ -1112,11 +1079,4 @@ function efConfirmerModalNomFourn() {
     sel.value = val;
   }
   document.getElementById('modal-ef-nom-fourn')?.classList.remove('ouvert');
-  // Nouveau nom = pas encore de mapping → reset Cat UC, Nom UC et Format
-  efResetFormat();
-  const selCatUC = document.getElementById('ef-saisie-cat-uc');
-  const selNomUC = document.getElementById('ef-saisie-nom-uc');
-  if (selCatUC) selCatUC.value = '';
-  if (selNomUC) selNomUC.innerHTML = '<option value="">— Nom UC —</option>';
-  ef._saisieIngId = null;
 }
