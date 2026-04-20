@@ -1316,7 +1316,22 @@ async function ouvrirFicheProduit(pro_id) {
         const coutIng    = prixParG2 > 0 ? (i.quantite_g * prixParG2).toFixed(2) + ' $' : '⚠';
         return `<div class="fiche-ingredient"><span class="fiche-ing-nom${sansInci ? ' fiche-label-manquant' : ''}">${sansInci ? '⚠ ' : ''}${i.nom_ingredient}</span><span class="fiche-ing-inci">${inciCode}</span><span class="fiche-ing-qte">${i.quantite_g} g</span><span class="fiche-ing-qte">${coutIng}</span></div>`;
       }).join('')
-    : '<div class="fiche-vide">Aucun ingrédient</div>';
+   : '<div class="fiche-vide">Aucun ingrédient</div>';
+
+  const inciLabel = ings
+    .filter(i => {
+      const obj = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient);
+      return obj?.inci;
+    })
+    .sort((a, b) => b.quantite_g - a.quantite_g)
+    .map(i => {
+      const obj = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient);
+      return obj.inci.trim();
+    })
+    .join(', ');
+  const inciLabelHtml = inciLabel
+    ? `<div class="inci-label-texte">${inciLabel}</div><button class="bouton bouton-petit bouton-contour" style="margin-top:8px" onclick="navigator.clipboard.writeText('${inciLabel.replace(/'/g,"\\'")}")">Copier</button>`
+    : '<div class="fiche-vide">Aucun code INCI disponible</div>';
 
   document.getElementById('fiche-recette-titre').textContent = pro.nom || '—';
   document.getElementById('fiche-recette-contenu').innerHTML = `
@@ -1351,6 +1366,8 @@ async function ouvrirFicheProduit(pro_id) {
       <span class="fiche-ing-qte">Qté</span>
     </div>
     <div class="fiche-ingredients">${ingsHtml}</div>
+    <div class="fiche-section-titre">Liste INCI pour étiquette</div>
+    <div class="fiche-inci-etiquette">${inciLabelHtml}</div>
     <div class="fiche-section-titre">Formats disponibles</div>
     <div class="fiche-ingredients">${formatsHtml}</div>
   `;
