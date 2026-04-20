@@ -111,60 +111,55 @@ function cbSupprimerBlocSelectionne() {
   cbRendreCanvas();
   cbRendreProps();
 }
-
 function cbRendreVueLivre() {
   const wrap = document.getElementById('cb-canvas-wrap');
   if (!wrap) return;
-  let voisin = document.getElementById('cb-canvas-voisin');
 
-  // Page voisine (gauche si page paire, droite si page impaire)
-  const indexVoisin = cbPageIndex % 2 === 0 ? cbPageIndex + 1 : cbPageIndex - 1;
+  // Supprimer l'ancien voisin s'il existe
+  const ancien = document.getElementById('cb-canvas-voisin');
+  if (ancien) ancien.remove();
+
+  // Index voisin : page paire (0,2,4) → voisin à droite, page impaire (1,3,5) → voisin à gauche
+  const estPaire   = cbPageIndex % 2 === 0;
+  const indexVoisin = estPaire ? cbPageIndex + 1 : cbPageIndex - 1;
   const pageVoisine = cbPages[indexVoisin];
 
-  if (!pageVoisine) {
-    // Pas de voisin — affichage simple
-    if (voisin) voisin.style.display = 'none';
-    return;
+  // Pas de voisin — on s'arrête
+  if (!pageVoisine) return;
+
+  // Créer le canvas voisin
+  const voisin = document.createElement('div');
+  voisin.id        = 'cb-canvas-voisin';
+  voisin.className = 'cb-canvas cb-canvas-voisin';
+  voisin.style.cssText = `width:${CB_W}px;height:${CB_H}px;cursor:pointer;opacity:0.65;flex-shrink:0`;
+  voisin.title     = 'Cliquer pour aller à ' + (pageVoisine.name || 'page voisine');
+  voisin.onclick   = () => cbAllerPage(indexVoisin);
+
+  // Placer à gauche ou à droite
+  const canvasActif = document.getElementById('cb-canvas');
+  if (estPaire) {
+    // Page paire = gauche → voisin à droite
+    canvasActif.after(voisin);
+  } else {
+    // Page impaire = droite → voisin à gauche
+    canvasActif.before(voisin);
   }
 
-  // Créer ou réutiliser le canvas voisin
-  if (!voisin) {
-    voisin = document.createElement('div');
-    voisin.id = 'cb-canvas-voisin';
-    voisin.className = 'cb-canvas cb-canvas-voisin';
-    voisin.style.cssText = `width:${CB_W}px;height:${CB_H}px;cursor:pointer`;
-    voisin.onclick = () => cbAllerPage(indexVoisin);
-    // Placer avant ou après selon parité
-    if (cbPageIndex % 2 === 0) wrap.insertBefore(voisin, document.getElementById('cb-canvas'));
-    else wrap.appendChild(voisin);
-  }
-
-  voisin.style.display = '';
-  voisin.onclick = () => cbAllerPage(indexVoisin);
-
-  // Remplir le canvas voisin avec les blocs de la page voisine
-  voisin.querySelectorAll('.cb-bloc').forEach(el => el.remove());
-  const vide = voisin.querySelector('.cb-canvas-vide');
-  if (vide) vide.remove();
-
+  // Remplir avec les blocs de la page voisine
   if (!pageVoisine.blocs || pageVoisine.blocs.length === 0) {
-    const ph = document.createElement('div');
-    ph.className = 'cb-canvas-vide';
-    ph.style.display = 'flex';
-    ph.textContent = pageVoisine.name || ('Page ' + (indexVoisin + 1));
-    voisin.appendChild(ph);
+    voisin.innerHTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:13px">${pageVoisine.name || 'Page voisine'}</div>`;
     return;
   }
 
   pageVoisine.blocs.forEach(b => {
     const el = document.createElement('div');
-    el.className = 'cb-bloc';
-    el.style.cssText = `left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;cursor:pointer`;
+    el.className     = 'cb-bloc';
+    el.style.cssText = `left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;cursor:pointer;outline:none`;
     const val = cbResoudreBinding(b.binding);
     if (b.type === 'image') {
       el.innerHTML = val
-        ? `<img src="${val}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'">`
-        : `<div class="cb-placeholder">⬜ Image</div>`;
+        ? `<img src="${val}" style="width:100%;height:100%;object-fit:cover;display:block">`
+        : `<div class="cb-placeholder">⬜</div>`;
     } else if (b.type === 'couleur') {
       el.style.background = val || '#e5900a';
     } else {
