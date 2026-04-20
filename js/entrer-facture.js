@@ -12,8 +12,9 @@ var ef = {
   formats:       [],    // [{ing_id, contenant, quantite, unite, fournisseur}]
   fournisseurs:  [],    // [{four_id, code, nom}]
   scrapingItems: [],    // [{nom, categorie}]
-  _saisieIngId:  null,
+ _saisieIngId:  null,
   _initEnCours:  false,
+  _editIdx:      null,
 };
 
 // Codes fournisseurs avec scraping (colonne B de Fournisseurs_v2)
@@ -411,6 +412,7 @@ function efRendreLigneSaisie() {
     </td>
     <td>
       <button class="bouton bouton-petit" id="ef-btn-ajouter" onclick="efAjouterLigne()" title="Ajouter">+</button>
+      <button class="bouton bouton-petit bouton-secondaire cache" id="ef-btn-annuler-edit" onclick="efAnnulerEdit()" title="Annuler">✕</button>
     </td>`;
   tbody.appendChild(tr);
 }
@@ -683,12 +685,19 @@ async function efAjouterLigne() {
   }
 
   const catUCNom = listesDropdown.categoriesMap?.[cat_id] || cat_id;
-  ef.lignes.push({
+  const nouvelleLigne = {
     ing_id, nomUC, catFourn, nomFourn, catUC: catUCNom,
     formatQte: efParseFlt(formatQte), formatUnite, contenant,
     prixUnitaire: prixUnitNum, quantite: quantiteNum,
     prixTotal, prixParG
-  });
+  };
+
+  if (ef._editIdx !== null) {
+    ef.lignes[ef._editIdx] = nouvelleLigne;
+    ef._editIdx = null;
+  } else {
+    ef.lignes.push(nouvelleLigne);
+  }
 
   afficherMsg('ef-items', '');
   efRendreLignesSauvegardees();
@@ -716,10 +725,74 @@ function efRendreLignesSauvegardees() {
       <td>${formaterPrix(l.prixTotal)}</td>
       <td>${l.catUC}</td>
       <td>${l.nomUC}</td>
-      <td><button class="bouton bouton-petit bouton-rouge" onclick="efSupprimerLigne(${idx})">✕</button></td>`;
+      <td>
+        <button class="bouton bouton-petit bouton-secondaire" onclick="efEditerLigne(${idx})" title="Modifier">✏️</button>
+        <button class="bouton bouton-petit bouton-rouge" onclick="efSupprimerLigne(${idx})">✕</button>
+      </td>`;
     if (ligneSaisie) tbody.insertBefore(tr, ligneSaisie);
     else tbody.appendChild(tr);
   });
+}
+
+function efEditerLigne(idx) {
+  const l = ef.lignes[idx];
+  if (!l) return;
+  ef._editIdx = idx;
+
+  // Catégorie fournisseur
+  const selCatF = document.getElementById('ef-saisie-cat-fourn');
+  if (selCatF) { selCatF.value = l.catFourn; efPopulerNomsFourn(l.catFourn); }
+
+  // Nom fournisseur
+  setTimeout(() => {
+    const selNomF = document.getElementById('ef-saisie-nom-fourn');
+    if (selNomF) selNomF.value = l.nomFourn;
+
+    // Cat UC
+    const selCatUC = document.getElementById('ef-saisie-cat-uc');
+    const cat_id = Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === l.catUC) || '';
+    if (selCatUC) { selCatUC.value = cat_id; efOnChangeSaisieCatUC(); }
+
+    setTimeout(() => {
+      // Nom UC
+      const selNomUC = document.getElementById('ef-saisie-nom-uc');
+      if (selNomUC) { selNomUC.value = l.ing_id; ef._saisieIngId = l.ing_id; }
+
+      // Format
+      efPopulerFormats(l.ing_id);
+      setTimeout(() => {
+        const selFmt = document.getElementById('ef-saisie-format');
+        if (selFmt) {
+          const val = JSON.stringify({ quantite: l.formatQte, unite: l.formatUnite, contenant: l.contenant || '' });
+          selFmt.value = val;
+          if (!selFmt.value) {
+            const opt = document.createElement('option');
+            opt.value = val;
+            opt.textContent = (l.contenant ? l.contenant + ' — ' : '') + l.formatQte + ' ' + l.formatUnite;
+            opt.selected = true;
+            selFmt.insertBefore(opt, selFmt.options[0]);
+          }
+        }
+        // Prix et quantité
+        const elPrix = document.getElementById('ef-saisie-prix');
+        const elQte  = document.getElementById('ef-saisie-qte');
+        if (elPrix) elPrix.value = l.prixUnitaire;
+        if (elQte)  elQte.value  = l.quantite;
+        efMajLigneTotal();
+
+        // Boutons
+        const btnAjouter = document.getElementById('ef-btn-ajouter');
+        const btnAnnuler = document.getElementById('ef-btn-annuler-edit');
+        if (btnAjouter) btnAjouter.innerHTML = '✓';
+        if (btnAnnuler) btnAnnuler.classList.remove('cache');
+      }, 50);
+    }, 50);
+  }, 50);
+}
+
+function efAnnulerEdit() {
+  ef._editIdx = null;
+  efRendreLigneSaisie();
 }
 
 async function efSupprimerLigne(idx) {
