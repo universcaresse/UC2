@@ -60,7 +60,8 @@ async function cbOnAfficher() {
   window.addEventListener('mousemove', cbGlobalMouseMove);
   window.addEventListener('mouseup',   cbGlobalMouseUp);
 
-  cbNouvellePageCatalogue();
+  const res = await cbChargerPages();
+  if (!cbPages.length) cbNouvellePageCatalogue();
 }
 
 // ── Pages ────────────────────────────────────────────────────────────────────
@@ -73,6 +74,7 @@ function cbNouvellePageCatalogue() {
 function cbRenommerPage(nom) {
   if (cbPages[cbPageIndex]) cbPages[cbPageIndex].name = nom;
   cbRendrePagesListe();
+  cbSauvegarderPage();
 }
 
 function cbAllerPage(idx) {
@@ -351,6 +353,7 @@ function cbOnChangeField() {
   if (bloc) bloc.binding.field = field;
   cbRendreApercu(bloc?.binding);
   cbRendreCanvas();
+  cbSauvegarderPage();
 }
 
 function cbUpdateDim() {
@@ -433,7 +436,34 @@ function cbGlobalMouseMove(e) {
   }
 }
 
-function cbGlobalMouseUp() { cbDragging=null; cbResizing=null; }
+function cbGlobalMouseUp() {
+  if (cbDragging || cbResizing) cbSauvegarderPage();
+  cbDragging=null;
+  cbResizing=null;
+}
+
+async function cbSauvegarderPage() {
+  const page = cbGetPage();
+  if (!page) return;
+  await appelAPIPost('saveCataloguePage', {
+    page_id:    page.id,
+    nom:        page.name,
+    ordre:      cbPageIndex + 1,
+    blocs_json: JSON.stringify(page.blocs)
+  });
+}
+
+async function cbChargerPages() {
+  const res = await appelAPI('getCataloguePages');
+  if (!res || !res.success || !res.items.length) return;
+  cbPages = res.items.map(p => ({
+    id:    p.page_id,
+    name:  p.nom,
+    blocs: JSON.parse(p.blocs_json || '[]')
+  }));
+  cbPageIndex = 0;
+  cbRendreInterface();
+}
 
 function cbDeselectionner() {
   cbSelId = null;
@@ -492,7 +522,7 @@ function cbInjectStyles() {
     .cb-palette-btn-new:hover { background:#2d2d44; color:#fff; }
     .cb-canvas-zone { flex:1; display:flex; flex-direction:column; overflow:hidden; }
     .cb-canvas-toolbar { background:#fff; border-bottom:1px solid #e5e5e5; padding:10px 14px; display:flex; align-items:center; gap:10px; flex-shrink:0; }
-    .cb-canvas-wrap { flex:1; overflow:auto; display:flex; justify-content:center; align-items:flex-start; padding:24px; background:#e0e0e0; gap:4px; }
+    .cb-canvas-wrap { flex:1; overflow:auto; display:flex; flex-direction:row; justify-content:center; align-items:flex-start; padding:24px; background:#e0e0e0; gap:12px; }
 .cb-canvas-voisin { opacity:0.6; transition:opacity .2s; }
 .cb-canvas-voisin:hover { opacity:0.85; }
     .cb-canvas { width:595px; height:842px; background:#fff; position:relative; box-shadow:0 4px 28px rgba(0,0,0,.2); flex-shrink:0; user-select:none; }
