@@ -917,16 +917,27 @@ function ouvrirFicheGamme2(gam_id) {
   if (!gam) return;
   const col = donneesCollections.find(c => c.col_id === gam.col_id);
   document.getElementById('fiche-gamme-titre').textContent      = (gam.nom || '').toUpperCase();
+  document.getElementById('fiche-gamme-slogan').textContent     = gam.slogan || '';
   document.getElementById('fiche-gamme-collection').textContent = col?.nom || '—';
   document.getElementById('fiche-gamme-desc').textContent       = gam.description || '—';
+
+  let wrapHtml = '';
+  if (gam.photo_url)      wrapHtml += `<img src="${gam.photo_url}" class="fiche-visuel-photo">`;
+  if (gam.photo_noel_url) wrapHtml += `<img src="${gam.photo_noel_url}" class="fiche-visuel-photo">`;
+  if (gam.couleur_hex)    wrapHtml += `<div class="fiche-visuel-hex" style="background:${gam.couleur_hex}"></div>`;
+  const ficheExtras = document.getElementById('fiche-gamme-extras');
+  if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class="fiche-visuel">${wrapHtml}</div>` : '';
+
   const produitsGamme = donneesProduits.filter(p => p.gam_id === gam_id);
   const elProduits = document.getElementById('fiche-gamme-produits');
   if (elProduits) elProduits.textContent = produitsGamme.length ? produitsGamme.map(p => p.nom).join(' — ') : 'Aucun produit';
+
   document.getElementById('fiche-gamme-modifier').onclick = () => { fermerFicheGamme2(); modifierGamme(gam_id); };
   document.getElementById('btn-supprimer-gamme').onclick  = () => supprimerGamme(gam_id);
   document.getElementById('contenu-gammes').classList.add('cache');
   document.getElementById('btn-nouvelle-gamme').classList.add('cache');
   document.getElementById('fiche-gamme').classList.remove('cache');
+  setTimeout(appliquerCouleursHex, 300);
   window.scrollTo(0, 0);
 }
 
