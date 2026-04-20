@@ -1323,6 +1323,7 @@ tr.cliquable { cursor: pointer; }
 .tableau-admin { width: 100%; border-collapse: collapse; }
 .tableau-admin th, .tableau-admin td { padding: 10px 12px; border-bottom: 1px solid var(--beige); white-space: nowrap; }
 .tableau-admin td:last-child { white-space: normal; width: 15%; }
+.tableau-inci td:nth-child(3) { white-space: normal; max-width: 300px; word-break: break-word; }
 .texte-brut { white-space: normal; word-break: break-word; }
 .accordeon-detail { background: var(--beige-15); }
 .accordeon-detail td { padding: 12px 16px; vertical-align: top; }
