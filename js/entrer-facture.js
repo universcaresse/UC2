@@ -1014,8 +1014,6 @@ async function efConfirmerModalIngredient() {
     }
     selNomUC.value = ing_id;
   }
-  // Charger les formats pour ce nouvel ingrédient (vide pour l'instant)
-  efPopulerFormats(ing_id);
   efFermerModalIngredient();
 }
 
