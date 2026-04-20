@@ -327,7 +327,7 @@ function cbCreerBlocEl(b, actif) {
 // ─── VUE LIVRE — PAGE VOISINE ────────────────────────────────────────────────
 function cbRendreVoisin() {
   document.getElementById('cb-canvas-voisin')?.remove();
-  const estPaire    = cbPageIndex%2===0;
+  const estPaire = cbPageIndex%2!==0;
   const indexVoisin = estPaire ? cbPageIndex+1 : cbPageIndex-1;
   const pageVoisine = cbPages[indexVoisin];
   if (!pageVoisine) return;
