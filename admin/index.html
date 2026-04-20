@@ -580,20 +580,17 @@
             <div class="form-panel-header">
               <div class="fiche-bandeau" id="fiche-famille-bandeau">
                 <span class="form-panel-titre" id="fiche-famille-titre"></span>
+                <span class="fiche-slogan" id="fiche-famille-slogan"></span>
               </div>
               <button class="btn-fermer-panneau" onclick="fermerFicheFamille()" title="Fermer">✕</button>
             </div>
           </div>
           <div class="form-panel">
             <div class="form-body">
-              <div class="form-groupe">
-                <label class="form-label">Collection</label>
-                <div class="form-valeur" id="fiche-famille-collection"></div>
-              </div>
-              <div class="form-groupe">
-                <label class="form-label">Description</label>
-                <div class="form-valeur" id="fiche-famille-desc"></div>
-              </div>
+              <div id="fiche-famille-extras"></div>
+              <div class="section-label">Collection</div>
+              <div class="form-valeur" id="fiche-famille-collection"></div>
+              <p class="fiche-desc" id="fiche-famille-desc"></p>
             </div>
           </div>
           <div class="form-panel form-body-actions">
