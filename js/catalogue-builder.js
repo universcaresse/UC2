@@ -118,7 +118,7 @@ function cbRendreVueLivre() {
   let voisin = document.getElementById('cb-canvas-voisin');
 
   // Page voisine (gauche si page paire, droite si page impaire)
-  const indexVoisin = cbPageIndex % 2 === 0 ? cbPageIndex - 1 : cbPageIndex + 1;
+  const indexVoisin = cbPageIndex % 2 === 0 ? cbPageIndex + 1 : cbPageIndex - 1;
   const pageVoisine = cbPages[indexVoisin];
 
   if (!pageVoisine) {
