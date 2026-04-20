@@ -336,7 +336,7 @@ main { padding-top: var(--nav-h); }
 .bouton-vert-pale { background: var(--gris); color: var(--blanc); }
 .bouton-rouge { background: var(--danger); }
 .bouton-or { background: var(--accent); }
-.bouton-contour { background: transparent; color: var(--gris); border: 1px solid var(--beige); }
+.bouton-contour { background: transparent; color: var(--blanc); border: 1px solid var(--beige); }
 .bouton-petit { padding: 7px 16px; font-size: 0.68rem; }
 #ef-btn-creer, #ef-btn-ajouter, #ef-btn-finaliser { padding: 10px 16px; height: 44px; min-width: 44px; box-sizing: border-box; }
 #ef-btn-creer .spinner, #ef-btn-ajouter .spinner, #ef-btn-finaliser .spinner { transform: scale(0.6); }
