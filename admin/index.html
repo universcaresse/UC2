@@ -40,6 +40,7 @@
 		 
 		 
           <a class="nav-dropdown-item" href="catalogue.html" target="_blank">Catalogue</a>
+<button class="nav-dropdown-item" onclick="afficherSection('catalogue-builder', null)">Catalogue PDF</button>
         </div>
       </li>
       <li class="nav-admin-item">
@@ -111,6 +112,7 @@
        
       <!--   <button class="sidebar-lien" onclick="afficherSection('import-recettes', this)">Import recettes</button>-->
         <a class="sidebar-lien" href="catalogue.html" target="_blank">Catalogue</a>
+<button class="sidebar-lien" onclick="afficherSection('catalogue-builder', this)">Catalogue PDF</button>
       </div>
       <div class="sidebar-sep"></div>
       <div class="sidebar-groupe">
@@ -2709,7 +2711,83 @@
   </div>
 
 
- <script src="https://media-library.cloudinary.com/global/all.js"></script>
+ <!-- CATALOGUE BUILDER -->
+<div class="section-admin" id="section-catalogue-builder">
+  <div class="page-entete fade-in">
+    <div>
+      <div class="page-entete-eyebrow">Mise en page du catalogue imprimable</div>
+      <div class="page-entete-titre">Catalogue <em>PDF</em></div>
+    </div>
+    <div class="form-actions">
+      <button class="bouton" onclick="cbImprimerPage()">🖨 Imprimer</button>
+    </div>
+  </div>
+  <div class="chargement" id="cb-chargement"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement des données…</div>
+  <div id="cb-layout" style="display:none">
+    <div class="cb-palette">
+      <div class="cb-section-titre">BLOCS</div>
+      <button class="cb-palette-btn" onclick="cbAjouterBloc('titre')">T — Titre</button>
+      <button class="cb-palette-btn" onclick="cbAjouterBloc('texte')">¶ — Texte</button>
+      <button class="cb-palette-btn" onclick="cbAjouterBloc('image')">⬜ — Image</button>
+      <button class="cb-palette-btn" onclick="cbAjouterBloc('couleur')">■ — Couleur</button>
+      <div class="cb-palette-sep"></div>
+      <div class="cb-section-titre">PAGES</div>
+      <div id="cb-liste-pages"></div>
+      <button class="cb-palette-btn cb-palette-btn-new" onclick="cbNouvellePageCatalogue()">+ Nouvelle page</button>
+    </div>
+    <div class="cb-canvas-zone">
+      <div class="cb-canvas-toolbar">
+        <input class="form-ctrl" id="cb-page-nom" style="width:200px;font-size:13px" placeholder="Nom de la page" oninput="cbRenommerPage(this.value)">
+        <button class="bouton bouton-petit bouton-contour" onclick="cbDeselectionner()">Désélectionner</button>
+        <button class="bouton bouton-petit bouton-rouge" id="cb-btn-supprimer-bloc" onclick="cbSupprimerBlocSelectionne()" style="display:none">🗑 Supprimer</button>
+      </div>
+      <div class="cb-canvas-wrap">
+        <div class="cb-canvas" id="cb-canvas" onmousedown="cbCanvasClick(event)" onmousemove="cbGlobalMouseMove(event)" onmouseup="cbGlobalMouseUp()">
+          <div class="cb-canvas-vide" id="cb-canvas-vide">← Ajoutez des blocs depuis le panneau gauche</div>
+        </div>
+      </div>
+    </div>
+    <div class="cb-props" id="cb-props">
+      <div id="cb-props-vide" style="color:#bbb;font-size:13px;text-align:center;margin-top:60px;line-height:1.8">
+        <div style="font-size:28px;margin-bottom:8px">←</div>
+        Cliquez sur un bloc<br>pour configurer<br>sa source
+      </div>
+      <div id="cb-props-contenu" style="display:none">
+        <div style="font-weight:700;font-size:13px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #f0f0f0" id="cb-props-type-label">Bloc</div>
+        <div class="form-groupe">
+          <label class="form-label">Onglet source</label>
+          <select class="form-ctrl" id="cb-src-sheet" onchange="cbOnChangeSheet()">
+            <option value="">— Choisir un onglet —</option>
+            <option value="Collections_v2">Collections</option>
+            <option value="Gammes_v2">Gammes</option>
+            <option value="Familles_v2">Familles</option>
+            <option value="Produits_v2">Produits</option>
+          </select>
+        </div>
+        <div class="form-groupe" id="cb-src-id-groupe" style="display:none">
+          <label class="form-label">ID</label>
+          <select class="form-ctrl" id="cb-src-id" onchange="cbOnChangeId()"></select>
+        </div>
+        <div class="form-groupe" id="cb-src-field-groupe" style="display:none">
+          <label class="form-label">Champ</label>
+          <select class="form-ctrl" id="cb-src-field" onchange="cbOnChangeField()"></select>
+        </div>
+        <div id="cb-apercu-zone" style="display:none;background:#f8f8f8;border-radius:6px;padding:10px;margin-bottom:12px;font-size:12px;color:#444;max-height:90px;overflow:auto">
+          <div style="font-size:9px;color:#aaa;font-weight:700;margin-bottom:4px">APERÇU</div>
+          <div id="cb-apercu-val"></div>
+        </div>
+        <div style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px">
+          <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px">DIMENSIONS</div>
+          <div class="form-grille">
+            <div class="form-groupe"><label class="form-label">Larg.</label><input type="number" class="form-ctrl" id="cb-dim-w" oninput="cbUpdateDim()"></div>
+            <div class="form-groupe"><label class="form-label">Haut.</label><input type="number" class="form-ctrl" id="cb-dim-h" oninput="cbUpdateDim()"></div>
+            <div class="form-groupe"><label class="form-label">X</label><input type="number" class="form-ctrl" id="cb-dim-x" oninput="cbUpdateDim()"></div>
+            <div class="form-groupe"><label class="form-label">Y</label><input type="number" class="form-ctrl" id="cb-dim-y" oninput="cbUpdateDim()"></div>
+          </div>
+        </div>
+        <div id="cb-typo-zone" style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px">
+          <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px">TYPOGRAPHIE</div>
+          <div class="form-grille">
 <script src="../js/main.js"></script>
 <script src="../js/parsers.js"></script>
   <script src="../js/admin.js"></script>
@@ -2873,6 +2951,7 @@
 
 <script src="../js/achats.js"></script>
 <script src="../js/entrer-facture.js"></script>
+<script src="../js/catalogue-builder.js"></script>
 </body>
 
 

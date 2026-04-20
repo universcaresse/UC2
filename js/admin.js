@@ -152,7 +152,8 @@ function afficherSection(id, bouton) {
   if (bouton) bouton.classList.add('actif');
   fermerSidebarMobile();
   document.querySelectorAll('.nav-admin-btn').forEach(b => b.blur());
-  window.scrollTo(0, 0);
+   window.scrollTo(0, 0);
+  if (id === 'catalogue-builder') cbOnAfficher();
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
   const contenu = document.querySelector('.admin-contenu');
