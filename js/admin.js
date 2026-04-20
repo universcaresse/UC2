@@ -1353,6 +1353,8 @@ async function ouvrirFicheProduit(pro_id) {
     <div class="fiche-texte">${pro.description || '—'}</div>
     <div class="fiche-section-titre">Instructions</div>
     <div class="fiche-texte">${pro.instructions || '—'}</div>
+    <div class="fiche-section-titre">Description pour emballage</div>
+    <div class="fiche-texte">${pro.desc_emballage || '—'}</div>
     <div class="fiche-section-titre">Notes</div>
     <div class="fiche-texte">${pro.notes || '—'}</div>
     <div class="fiche-section-titre">Avertissement</div>
@@ -1370,6 +1372,8 @@ async function ouvrirFicheProduit(pro_id) {
     <div class="fiche-inci-etiquette">${inciLabelHtml}</div>
     <div class="fiche-section-titre">Formats disponibles</div>
     <div class="fiche-ingredients">${formatsHtml}</div>
+    <div class="fiche-section-titre">Export</div>
+    <button class="bouton bouton-contour" onclick="exporterFicheProduit()">Copier pour le graphiste</button>
   `;
 
   fermerFormProduit();
@@ -1378,6 +1382,50 @@ async function ouvrirFicheProduit(pro_id) {
   document.getElementById('grille-produits').classList.add('cache');
   document.getElementById('btn-nouvelle-recette').classList.add('cache');
   document.querySelector('.admin-contenu').scrollTop = 0;
+}
+
+function exporterFicheProduit() {
+  if (!produitActif) return;
+  const pro = produitActif;
+  const col = donneesCollections.find(c => c.col_id === pro.col_id);
+  const gam = donneesGammes.find(g => g.gam_id === pro.gam_id);
+  const fam = donneesFamilles?.find(f => f.fam_id === pro.fam_id);
+  const ings = pro.ingredients || [];
+  const formats = pro.formats || [];
+
+  const inciLabel = ings
+    .filter(i => { const o = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient); return o?.inci; })
+    .sort((a, b) => b.quantite_g - a.quantite_g)
+    .map(i => { const o = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient); return o.inci.trim(); })
+    .join(', ');
+
+  const ingsTexte = ings.sort((a,b) => b.quantite_g - a.quantite_g)
+    .map(i => { const o = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient); return `  - ${i.nom_ingredient} | ${o?.inci || '⚠ INCI manquant'} | ${i.quantite_g} g`; })
+    .join('\n');
+
+  const formatsTexte = formats.map(f => `  - ${f.nom || f.format || ''} : ${f.prix || '—'} $`).join('\n');
+
+  const texte = [
+    `NOM : ${pro.nom || '—'}`,
+    `COLLECTION : ${col?.nom || '—'}`,
+    `GAMME : ${gam?.nom || '—'}`,
+    `FAMILLE : ${fam?.nom || '—'}`,
+    `STATUT : ${pro.statut || '—'}`,
+    `COULEUR HEX : ${pro.couleur_hex || '—'}`,
+    `IMAGE : ${pro.image_url || '—'}`,
+    `IMAGE NOËL : ${pro.image_noel_url || '—'}`,
+    `\nDESCRIPTION :\n${pro.description || '—'}`,
+    `\nDESCRIPTION EMBALLAGE :\n${pro.desc_emballage || '—'}`,
+    `\nINSTRUCTIONS :\n${pro.instructions || '—'}`,
+    `\nNOTES :\n${pro.notes || '—'}`,
+    `\nAVERTISSEMENT :\n${pro.avertissement || '—'}`,
+    `\nMODE D'EMPLOI :\n${pro.mode_emploi || '—'}`,
+    `\nLISTE INCI :\n${inciLabel || '—'}`,
+    `\nINGRÉDIENTS :\n${ingsTexte || '—'}`,
+    `\nFORMATS :\n${formatsTexte || '—'}`,
+  ].join('\n');
+
+  navigator.clipboard.writeText(texte).then(() => afficherMsg('produits', '✅ Copié dans le presse-papier.'));
 }
 
 function fermerFicheProduit() {
