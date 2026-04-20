@@ -2851,7 +2851,8 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
 }
 
 function inciRendreLigne(l, cat, uid) {
-  const aInci      = !!l.inci;
+  const catsSansInci2 = ['CAT-1776369774938', 'CAT-1776641557249', 'CAT-014'];
+  const aInci      = !!l.inci || catsSansInci2.includes(l.cat_id);
   const statutLabel = aInci ? '✅' : '🔴';
   const id         = `inci-${uid}`;
   const nomSafe    = (l.nom_UC || '').replace(/'/g, "\\'");
