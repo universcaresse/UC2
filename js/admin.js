@@ -1330,7 +1330,7 @@ async function ouvrirFicheProduit(pro_id) {
     })
     .join(', ');
   const inciLabelHtml = inciLabel
-    ? `<div class="inci-label-texte">${inciLabel}</div><button class="bouton bouton-petit bouton-contour" style="margin-top:8px" onclick="navigator.clipboard.writeText('${inciLabel.replace(/'/g,"\\'")}")">Copier</button>`
+    ? `<div class="inci-label-texte">${inciLabel}</div>`
     : '<div class="fiche-vide">Aucun code INCI disponible</div>';
 
   document.getElementById('fiche-recette-titre').textContent = pro.nom || '—';
