@@ -3571,7 +3571,7 @@ async function ifConfirmerNouveauNom(idx) {
   const item = ifItems[idx];
  const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: item?.description || nom, inci: '', source: ifFournisseurActif, statut: 'actif' });
   if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur.', 'erreur'); return; }
-  listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
+  listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '', source: ifFournisseurActif, nom_fournisseur: nom });
   if (ifFournisseurActif && item) {
     await appelAPIPost('saveMappingFournisseur', {
       fournisseur:            ifFournisseurActif,
@@ -3688,7 +3688,7 @@ async function modalIfConfirmer() {
     ing_id = 'ING-' + Date.now();
     const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: item?.description || nom, inci: '', source: ifFournisseurActif, statut: 'actif' });
     if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
-    listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
+    listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '', source: ifFournisseurActif, nom_fournisseur: nom });
   }
   await appelAPIPost('saveMappingFournisseur', {
     fournisseur,
@@ -3718,7 +3718,7 @@ async function ifConfirmerNomUC(idx, fournisseur) {
   const ing_id = 'ING-' + Date.now();
   const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: nom, inci: '', statut: 'actif' });
   if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
-  listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '' });
+  listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: '', source: ifFournisseurActif, nom_fournisseur: nom });
   const item = ifItems[idx];
   await appelAPIPost('saveMappingFournisseur', {
     fournisseur,
