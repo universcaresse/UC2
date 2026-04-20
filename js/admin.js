@@ -2833,7 +2833,7 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
       <div class="form-panel-header" onclick="inciToggleAccordeon(this)" style="cursor:pointer">
         <div class="form-panel-titre">${cat}</div>
         <div style="display:flex;gap:8px;align-items:center">
-          ${nbSansInci > 0 ? `<span class="badge-statut-cours">${nbSansInci} 🔴</span>` : ''}
+          ${nbSansInci > 0 && !['CAT-1776369774938', 'CAT-1776641557249', 'CAT-014'].includes(lignes[0]?.cat_id) ? `<span class="badge-statut-cours">${nbSansInci} 🔴</span>` : ''}
           <span class="badge-statut-ok">${nbInci} ✅</span>
         </div>
       </div>
