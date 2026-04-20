@@ -2,8 +2,8 @@
    CATALOGUE BUILDER — catalogue-builder.js
    ════════════════════════════════════════ */
 
-const CB_W = 595;
-const CB_H = 842;
+const CB_W = 816;
+const CB_H = 1056;
 
 const CB_SHEETS = {
   Collections_v2: { idField:'col_id', fields:['nom','slogan','description','couleur_hex','photo_url'] },
@@ -110,6 +110,68 @@ function cbSupprimerBlocSelectionne() {
   cbRendreProps();
 }
 
+function cbRendreVueLivre() {
+  const wrap = document.getElementById('cb-canvas-wrap');
+  if (!wrap) return;
+  let voisin = document.getElementById('cb-canvas-voisin');
+
+  // Page voisine (gauche si page paire, droite si page impaire)
+  const indexVoisin = cbPageIndex % 2 === 0 ? cbPageIndex - 1 : cbPageIndex + 1;
+  const pageVoisine = cbPages[indexVoisin];
+
+  if (!pageVoisine) {
+    // Pas de voisin — affichage simple
+    if (voisin) voisin.style.display = 'none';
+    return;
+  }
+
+  // Créer ou réutiliser le canvas voisin
+  if (!voisin) {
+    voisin = document.createElement('div');
+    voisin.id = 'cb-canvas-voisin';
+    voisin.className = 'cb-canvas cb-canvas-voisin';
+    voisin.style.cssText = `width:${CB_W}px;height:${CB_H}px;cursor:pointer`;
+    voisin.onclick = () => cbAllerPage(indexVoisin);
+    // Placer avant ou après selon parité
+    if (cbPageIndex % 2 === 0) wrap.insertBefore(voisin, document.getElementById('cb-canvas'));
+    else wrap.appendChild(voisin);
+  }
+
+  voisin.style.display = '';
+  voisin.onclick = () => cbAllerPage(indexVoisin);
+
+  // Remplir le canvas voisin avec les blocs de la page voisine
+  voisin.querySelectorAll('.cb-bloc').forEach(el => el.remove());
+  const vide = voisin.querySelector('.cb-canvas-vide');
+  if (vide) vide.remove();
+
+  if (!pageVoisine.blocs || pageVoisine.blocs.length === 0) {
+    const ph = document.createElement('div');
+    ph.className = 'cb-canvas-vide';
+    ph.style.display = 'flex';
+    ph.textContent = pageVoisine.name || ('Page ' + (indexVoisin + 1));
+    voisin.appendChild(ph);
+    return;
+  }
+
+  pageVoisine.blocs.forEach(b => {
+    const el = document.createElement('div');
+    el.className = 'cb-bloc';
+    el.style.cssText = `left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;cursor:pointer`;
+    const val = cbResoudreBinding(b.binding);
+    if (b.type === 'image') {
+      el.innerHTML = val
+        ? `<img src="${val}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'">`
+        : `<div class="cb-placeholder">⬜ Image</div>`;
+    } else if (b.type === 'couleur') {
+      el.style.background = val || '#e5900a';
+    } else {
+      el.innerHTML = `<div class="cb-bloc-texte" style="font-size:${b.fs}px;font-weight:${b.bold?'bold':'normal'}">${val || ''}</div>`;
+    }
+    voisin.appendChild(el);
+  });
+}
+
 function cbGetPage() { return cbPages[cbPageIndex] || null; }
 function cbGetBloc() { return cbGetPage()?.blocs.find(b => b.id === cbSelId) || null; }
 
@@ -140,6 +202,7 @@ function cbRendreCanvas() {
   const vide   = document.getElementById('cb-canvas-vide');
   if (!canvas) return;
   canvas.querySelectorAll('.cb-bloc').forEach(el => el.remove());
+  cbRendreVueLivre();
 
   const page = cbGetPage();
   if (!page || page.blocs.length === 0) {
@@ -429,7 +492,9 @@ function cbInjectStyles() {
     .cb-palette-btn-new:hover { background:#2d2d44; color:#fff; }
     .cb-canvas-zone { flex:1; display:flex; flex-direction:column; overflow:hidden; }
     .cb-canvas-toolbar { background:#fff; border-bottom:1px solid #e5e5e5; padding:10px 14px; display:flex; align-items:center; gap:10px; flex-shrink:0; }
-    .cb-canvas-wrap { flex:1; overflow:auto; display:flex; justify-content:center; align-items:flex-start; padding:24px; background:#e0e0e0; }
+    .cb-canvas-wrap { flex:1; overflow:auto; display:flex; justify-content:center; align-items:flex-start; padding:24px; background:#e0e0e0; gap:4px; }
+.cb-canvas-voisin { opacity:0.6; transition:opacity .2s; }
+.cb-canvas-voisin:hover { opacity:0.85; }
     .cb-canvas { width:595px; height:842px; background:#fff; position:relative; box-shadow:0 4px 28px rgba(0,0,0,.2); flex-shrink:0; user-select:none; }
     .cb-canvas-vide { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#ccc; font-size:13px; pointer-events:none; }
     .cb-bloc { position:absolute; cursor:grab; box-sizing:border-box; outline:1px dashed rgba(0,0,0,.12); overflow:hidden; }
