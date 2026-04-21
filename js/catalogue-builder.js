@@ -399,7 +399,7 @@ function cbCreerBlocEl(b, actif) {
     el.style.background = couleur;
     el.style.opacity    = b.opacite !== undefined ? b.opacite : 1;
   } else {
-    const style = `font-size:${b.fs||13}px;font-weight:${b.bold?'bold':'normal'};font-style:${b.italic?'italic':'normal'};font-family:'${b.police||'DM Sans'}',sans-serif;color:${b.couleur_texte||'#1a1a1a'};text-align:${b.align||'left'}`;
+    const style = `font-size:${b.fs||13}px;font-weight:${b.bold?'bold':'normal'};font-style:${b.italic?'italic':'normal'};font-family:'${b.police||'DM Sans'}',sans-serif;color:${b.couleur_texte||'#1a1a1a'};text-align:${b.align||'left'};white-space:pre-line`;
     el.innerHTML = `<div class="cb-bloc-texte" style="${style}">${val||`<span class="cb-placeholder-txt">${b.type==='titre'?'Titre…':'Texte…'}</span>`}</div>`;
   }
 
