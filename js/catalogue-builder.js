@@ -18,10 +18,12 @@ const CB_FIELDS = {
 };
 
 const CB_DEFAULTS = {
-  titre:   { w:500, h:70  },
-  texte:   { w:500, h:160 },
-  image:   { w:300, h:220 },
-  couleur: { w:200, h:60  },
+  titre:        { w:500, h:70  },
+  texte:        { w:500, h:160 },
+  image:        { w:300, h:220 },
+  couleur:      { w:200, h:60  },
+  'mosaique-v': { w:50,  h:300 },
+  'mosaique-h': { w:300, h:50  },
 };
 
 // ─── ÉTAT ────────────────────────────────────────────────────────────────────
@@ -361,6 +363,27 @@ function cbCreerBlocEl(b, actif) {
   el.style.cssText = `left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`;
 
   const val = b._texte_fixe || b._couleur_fixe || cbResoudreBinding(b.binding);
+
+  if (b.type==='mosaique-v' || b.type==='mosaique-h') {
+    const cols = cbData?.Collections_v2||[];
+    const carreS = 20;
+    const espace = 15;
+    const isV = b.type==='mosaique-v';
+    el.style.background = 'transparent';
+    el.style.outline = actif&&b.id===cbSelId ? '2px solid #2d7a50' : '1px dashed rgba(0,0,0,.1)';
+    cols.forEach((c, i) => {
+      const carre = document.createElement('div');
+      const pos = i * (carreS + espace);
+      carre.style.cssText = `position:absolute;width:${carreS}px;height:${carreS}px;background:${c.couleur_hex||'#ccc'};border-radius:2px;${isV ? `left:0;top:${pos}px` : `top:0;left:${pos}px`}`;
+      el.appendChild(carre);
+    });
+    if (actif&&b.id===cbSelId) {
+      const rz = document.createElement('div');
+      rz.className='cb-resize-handle'; rz.dataset.resize=b.id;
+      el.appendChild(rz);
+    }
+    return el;
+  }
 
   if (b.type==='image') {
     el.style.opacity = b.opacite !== undefined ? b.opacite : 1;
@@ -1055,7 +1078,16 @@ function cbRendrePageHTML(page,idx) {
   (page.blocs||[]).forEach(b=>{
     const val=b._texte_fixe||b._couleur_fixe||cbResoudreBinding(b.binding);
     let c='';
-    if (b.type==='image') {
+    if (b.type==='mosaique-v'||b.type==='mosaique-h') {
+      const cols=cbData?.Collections_v2||[];
+      const carreS=20, espace=15, isV=b.type==='mosaique-v';
+      c='<div style="position:relative;width:100%;height:100%">';
+      cols.forEach((col,i)=>{
+        const pos=i*(carreS+espace);
+        c+=`<div style="position:absolute;width:${carreS}px;height:${carreS}px;background:${col.couleur_hex||'#ccc'};border-radius:2px;${isV?`left:0;top:${pos}px`:`top:0;left:${pos}px`}"></div>`;
+      });
+      c+='</div>';
+    } else if (b.type==='image') {
       c=val?`<div style="opacity:${b.opacite!==undefined?b.opacite:1};width:100%;height:100%"><img src="${val}" style="width:100%;height:100%;object-fit:cover;display:block"></div>`:'';
     } else if (b.type==='couleur') {
       const couleur=(b.binding?.field&&val)?val:(b.couleur_libre||'#e5900a');
