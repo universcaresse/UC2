@@ -214,6 +214,7 @@ function cbSupprimerBlocSelectionne() {
   cbSelId = null;
   cbRendreCanvas();
   cbRendreProps();
+  cbRendreCalques();
   cbSauvegarderPage();
 }
 
@@ -267,6 +268,7 @@ function cbRendreInterface() {
   cbRendrePagesListe();
   cbRendreCanvas();
   cbRendreProps();
+  cbRendreCalques();
   cbVerifierMultiple4();
 }
 
@@ -695,7 +697,65 @@ function cbUpdateCouleurLibre(val) {
   cbRendreCanvas(); cbSauvegarderPage();
 }
 
-function cbDeselectionner() { cbSelId=null; cbRendreCanvas(); cbRendreProps(); }
+function cbDeselectionner() { cbSelId=null; cbRendreCanvas(); cbRendreProps(); cbRendreCalques(); }
+
+// ─── CALQUES ─────────────────────────────────────────────────────────────────
+function cbRendreCalques() {
+  const cont = document.getElementById('cb-calques-liste');
+  if (!cont) return;
+  const page = cbGetPage();
+  cont.innerHTML = '';
+  if (!page||!page.blocs.length) {
+    cont.innerHTML = '<div style="color:#ccc;font-size:11px;text-align:center;padding:8px">Aucun bloc</div>';
+    return;
+  }
+
+  // Afficher en ordre inverse (dernier = au-dessus)
+  [...page.blocs].reverse().forEach((b, iRev) => {
+    const iReel = page.blocs.length - 1 - iRev;
+    const el = document.createElement('div');
+    el.dataset.idx = iReel;
+    el.draggable = true;
+    el.style.cssText = `display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:12px;transition:background .1s;${b.id===cbSelId?'background:#e8f5ee;border:1px solid #2d7a50;':'background:#f8f8f8;border:1px solid transparent;'}`;
+
+    // Icône type
+    const icones = {titre:'T', texte:'¶', image:'⬜', couleur:'■'};
+    const ic = document.createElement('span');
+    ic.style.cssText = 'font-family:monospace;font-size:13px;width:16px;text-align:center;flex-shrink:0';
+    ic.textContent = icones[b.type]||'?';
+    el.appendChild(ic);
+
+    // Label
+    const lb = document.createElement('span');
+    lb.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#333';
+    const val = b._texte_fixe || cbResoudreBinding(b.binding);
+    lb.textContent = val ? String(val).slice(0,30) : (b.type==='couleur' ? (b.couleur_libre||'couleur') : b.type);
+    el.appendChild(lb);
+
+    // Clic pour sélectionner
+    el.onclick = () => { cbSelId=b.id; cbRendreCanvas(); cbRendreProps(); cbRendreCalques(); };
+
+    // Drag & drop
+    el.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', iReel); el.style.opacity='0.4'; });
+    el.addEventListener('dragend',   e => { el.style.opacity='1'; });
+    el.addEventListener('dragover',  e => { e.preventDefault(); el.style.background='#ddeedd'; });
+    el.addEventListener('dragleave', e => { el.style.background=b.id===cbSelId?'#e8f5ee':'#f8f8f8'; });
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+      const toIdx   = iReel;
+      if (fromIdx===toIdx) return;
+      const blocs = page.blocs;
+      const [moved] = blocs.splice(fromIdx, 1);
+      blocs.splice(toIdx, 0, moved);
+      cbRendreCanvas();
+      cbRendreCalques();
+      cbSauvegarderPage();
+    });
+
+    cont.appendChild(el);
+  });
+}
 
 // ─── DRAG & RESIZE ───────────────────────────────────────────────────────────
 function cbCanvasClick(e) {
