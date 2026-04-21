@@ -2734,6 +2734,9 @@
       <button class="cb-palette-btn" onclick="cbAjouterBloc('mosaique-v')">▦ — Verticale</button>
       <button class="cb-palette-btn" onclick="cbAjouterBloc('mosaique-h')">▦ — Horizontale</button>
       <div class="cb-palette-sep"></div>
+      <div class="cb-section-titre">GABARITS</div>
+      <button class="cb-palette-btn" onclick="cbOuvrirFicheProduit()">📦 Fiche produit</button>
+      <div class="cb-palette-sep"></div>
       <div class="cb-section-titre">PAGES</div>
       <div id="cb-liste-pages"></div>
       <button class="cb-palette-btn cb-palette-btn-new" onclick="cbNouvellePageCatalogue()">+ Nouvelle page</button>
@@ -3097,6 +3100,52 @@
 <script src="../js/achats.js"></script>
 <script src="../js/entrer-facture.js"></script>
 <script src="../js/catalogue-builder.js"></script>
+
+<!-- MODALE FICHE PRODUIT -->
+<div class="modal-admin-overlay" id="modal-cb-fiche" style="display:none">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Fiche produit</div>
+      <button class="btn-fermer-panneau" onclick="cbFermerFicheProduit()">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe">
+        <label class="form-label">Collection</label>
+        <select class="form-ctrl" id="modal-fp-col" onchange="cbModalFPonChangeCol()">
+          <option value="">— Choisir —</option>
+        </select>
+      </div>
+      <div class="form-groupe" id="modal-fp-gam-groupe" style="display:none">
+        <label class="form-label">Gamme</label>
+        <select class="form-ctrl" id="modal-fp-gam" onchange="cbModalFPonChangeGam()">
+          <option value="">— Choisir —</option>
+        </select>
+      </div>
+      <div class="form-groupe" id="modal-fp-pro-groupe" style="display:none">
+        <label class="form-label">Produit</label>
+        <select class="form-ctrl" id="modal-fp-pro">
+          <option value="">— Choisir —</option>
+        </select>
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Orientation</label>
+        <div style="display:flex;gap:10px;margin-top:6px">
+          <button class="bouton bouton-petit" id="modal-fp-btn-v" onclick="cbModalFPsetOrientation('v')"
+            style="flex:1;background:#2d7a50;color:#fff">Vertical</button>
+          <button class="bouton bouton-petit" id="modal-fp-btn-h" onclick="cbModalFPsetOrientation('h')"
+            style="flex:1">Horizontal</button>
+        </div>
+        <input type="hidden" id="modal-fp-orientation" value="v">
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-petit bouton-contour" onclick="cbFermerFicheProduit()">Annuler</button>
+        <button class="bouton bouton-petit" onclick="cbGenererFicheProduit()">Générer</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 
 

@@ -773,6 +773,125 @@ function cbUpdateCouleurLibre(val) {
 
 function cbDeselectionner() { cbSelId=null; cbRendreCanvas(); cbRendreProps(); cbRendreCalques(); }
 
+// ─── FICHE PRODUIT ───────────────────────────────────────────────────────────
+function cbOuvrirFicheProduit() {
+  const modal = document.getElementById('modal-cb-fiche');
+  if (!modal) return;
+
+  // Peupler collections
+  const selCol = document.getElementById('modal-fp-col');
+  selCol.innerHTML = '<option value="">— Choisir —</option>';
+  (cbData?.Collections_v2||[]).forEach(c=>{
+    const opt=document.createElement('option');
+    opt.value=c.col_id; opt.textContent=c.nom||c.col_id;
+    selCol.appendChild(opt);
+  });
+
+  document.getElementById('modal-fp-gam-groupe').style.display='none';
+  document.getElementById('modal-fp-pro-groupe').style.display='none';
+  modal.style.display='flex';
+}
+
+function cbFermerFicheProduit() {
+  document.getElementById('modal-cb-fiche').style.display='none';
+}
+
+function cbModalFPonChangeCol() {
+  const col_id = document.getElementById('modal-fp-col').value;
+  const grp    = document.getElementById('modal-fp-gam-groupe');
+  const sel    = document.getElementById('modal-fp-gam');
+  if (!col_id) { grp.style.display='none'; return; }
+
+  const gammes = (cbData?.Gammes_v2||[]).filter(g=>g.col_id===col_id);
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  gammes.forEach(g=>{
+    const opt=document.createElement('option');
+    opt.value=g.gam_id; opt.textContent=g.nom||g.gam_id;
+    sel.appendChild(opt);
+  });
+  grp.style.display='';
+  document.getElementById('modal-fp-pro-groupe').style.display='none';
+}
+
+function cbModalFPonChangeGam() {
+  const col_id = document.getElementById('modal-fp-col').value;
+  const gam_id = document.getElementById('modal-fp-gam').value;
+  const grp    = document.getElementById('modal-fp-pro-groupe');
+  const sel    = document.getElementById('modal-fp-pro');
+  if (!gam_id) { grp.style.display='none'; return; }
+
+  const produits = (cbData?.Produits_v2||[]).filter(p=>p.col_id===col_id&&p.gam_id===gam_id);
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  produits.forEach(p=>{
+    const opt=document.createElement('option');
+    opt.value=p.pro_id; opt.textContent=p.nom||p.pro_id;
+    sel.appendChild(opt);
+  });
+  grp.style.display='';
+}
+
+function cbModalFPsetOrientation(ori) {
+  document.getElementById('modal-fp-orientation').value=ori;
+  document.getElementById('modal-fp-btn-v').style.background = ori==='v'?'#2d7a50':'';
+  document.getElementById('modal-fp-btn-v').style.color      = ori==='v'?'#fff':'';
+  document.getElementById('modal-fp-btn-h').style.background = ori==='h'?'#2d7a50':'';
+  document.getElementById('modal-fp-btn-h').style.color      = ori==='h'?'#fff':'';
+}
+
+function cbGenererFicheProduit() {
+  const col_id = document.getElementById('modal-fp-col').value;
+  const gam_id = document.getElementById('modal-fp-gam').value;
+  const pro_id = document.getElementById('modal-fp-pro').value;
+  const ori    = document.getElementById('modal-fp-orientation').value;
+
+  if (!pro_id) { alert('Choisis un produit !'); return; }
+
+  const produit = (cbData?.Produits_v2||[]).find(p=>p.pro_id===pro_id);
+  const col     = (cbData?.Collections_v2||[]).find(c=>c.col_id===col_id);
+  if (!produit) return;
+
+  const page = cbGetPage();
+  if (!page) return;
+
+  const binding = (field) => ({sheet:'Produits_v2', col_id, gam_id, fam_id:'', id:pro_id, field});
+
+  if (ori==='v') {
+    // ── VERTICAL — hex grand rectangle à gauche ──
+    const hexW = 280, hexH = 600, hexX = CB_MARGE, hexY = CB_MARGE + 20;
+    const photoS = 220;
+    const photoX = hexX + (hexW - photoS) / 2;
+    const photoY = hexY + 20;
+    const texteX = hexX + hexW + 20;
+    const texteW = CB_W - texteX - CB_MARGE;
+
+    page.blocs.push({id:cbGenId(),type:'couleur',x:hexX,y:hexY,w:hexW,h:hexH,binding:binding('couleur_hex'),fs:13,bold:false,italic:false,police:'DM Sans',couleur_texte:'#fff',couleur_libre:col?.couleur_hex||'#e5900a',opacite:1,align:'left'});
+    page.blocs.push({id:cbGenId(),type:'image',x:photoX,y:photoY,w:photoS,h:photoS,binding:binding('image_url'),fs:13,bold:false,italic:false,police:'DM Sans',couleur_texte:'#fff',couleur_libre:'#e5900a',opacite:1,align:'left'});
+    page.blocs.push({id:cbGenId(),type:'titre',x:texteX,y:hexY+20,w:texteW,h:50,binding:binding('nom'),fs:22,bold:true,italic:false,police:'Playfair Display',couleur_texte:'#1a1a1a',couleur_libre:'#e5900a',opacite:1,align:'left'});
+    page.blocs.push({id:cbGenId(),type:'texte',x:texteX,y:hexY+80,w:texteW,h:120,binding:binding('description'),fs:12,bold:false,italic:false,police:'DM Sans',couleur_texte:'#444',couleur_libre:'#e5900a',opacite:1,align:'left'});
+    page.blocs.push({id:cbGenId(),type:'texte',x:texteX,y:hexY+210,w:texteW,h:60,binding:binding('desc_emballage'),fs:11,bold:false,italic:true,police:'DM Sans',couleur_texte:'#666',couleur_libre:'#e5900a',opacite:1,align:'left'});
+
+  } else {
+    // ── HORIZONTAL — hex grand rectangle en haut ──
+    const hexW = CB_W - CB_MARGE*2, hexH = 320, hexX = CB_MARGE, hexY = CB_MARGE + 20;
+    const photoS = 200;
+    const photoX = hexX + 20;
+    const photoY = hexY + (hexH - photoS) / 2;
+    const texteX = photoX + photoS + 20;
+    const texteW = hexW - photoS - 60;
+
+    page.blocs.push({id:cbGenId(),type:'couleur',x:hexX,y:hexY,w:hexW,h:hexH,binding:binding('couleur_hex'),fs:13,bold:false,italic:false,police:'DM Sans',couleur_texte:'#fff',couleur_libre:col?.couleur_hex||'#e5900a',opacite:1,align:'left'});
+    page.blocs.push({id:cbGenId(),type:'image',x:photoX,y:photoY,w:photoS,h:photoS,binding:binding('image_url'),fs:13,bold:false,italic:false,police:'DM Sans',couleur_texte:'#fff',couleur_libre:'#e5900a',opacite:1,align:'left'});
+    page.blocs.push({id:cbGenId(),type:'titre',x:texteX,y:hexY+30,w:texteW,h:50,binding:binding('nom'),fs:22,bold:true,italic:false,police:'Playfair Display',couleur_texte:'#ffffff',couleur_libre:'#e5900a',opacite:1,align:'left'});
+    page.blocs.push({id:cbGenId(),type:'texte',x:texteX,y:hexY+90,w:texteW,h:120,binding:binding('description'),fs:12,bold:false,italic:false,police:'DM Sans',couleur_texte:'#ffffff',couleur_libre:'#e5900a',opacite:1,align:'left'});
+    page.blocs.push({id:cbGenId(),type:'texte',x:hexX,y:hexY+hexH+20,w:hexW,h:60,binding:binding('desc_emballage'),fs:11,bold:false,italic:true,police:'DM Sans',couleur_texte:'#666',couleur_libre:'#e5900a',opacite:1,align:'left'});
+  }
+
+  cbFermerFicheProduit();
+  cbRendreCanvas();
+  cbRendreCalques();
+  cbSauvegarderPage();
+}
+
 // ─── CALQUES ─────────────────────────────────────────────────────────────────
 function cbRendreCalques() {
   const cont = document.getElementById('cb-calques-liste');
