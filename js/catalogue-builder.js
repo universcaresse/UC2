@@ -391,7 +391,8 @@ function cbCreerBlocEl(b, actif) {
   const val = b._texte_fixe || b._couleur_fixe || cbResoudreBinding(b.binding);
 
   if (b.type==='mosaique-v' || b.type==='mosaique-h') {
-    const cols = cbData?.Collections_v2||[];
+    const colsUsees = new Set(cbPages.map(p=>p.col_id).filter(Boolean));
+    const cols = (cbData?.Collections_v2||[]).filter(c=>colsUsees.has(c.col_id));
     const carreS = 20;
     const espace = 15;
     const isV = b.type==='mosaique-v';
@@ -1268,7 +1269,8 @@ function cbOuvrirVueLecture() {
       el.style.cssText=`position:absolute;left:${b.x*sc}px;top:${b.y*sc}px;width:${b.w*sc}px;height:${b.h*sc}px;overflow:hidden`;
      const val=b._texte_fixe||b._couleur_fixe||cbResoudreBinding(b.binding);
         if (b.type==='mosaique-v'||b.type==='mosaique-h') {
-          const cols=cbData?.Collections_v2||[];
+          const colsUsees = new Set(cbPages.map(p=>p.col_id).filter(Boolean));
+          const cols=(cbData?.Collections_v2||[]).filter(c=>colsUsees.has(c.col_id));
           const carreS=20*sc, espace=15*sc, isV=b.type==='mosaique-v';
           el.style.background='transparent';
           cols.forEach((c,i)=>{
@@ -1350,7 +1352,8 @@ function cbRendrePageHTML(page,idx) {
     const val=b._texte_fixe||b._couleur_fixe||cbResoudreBinding(b.binding);
     let c='';
     if (b.type==='mosaique-v'||b.type==='mosaique-h') {
-      const cols=cbData?.Collections_v2||[];
+      const colsUsees = new Set(cbPages.map(p=>p.col_id).filter(Boolean));
+      const cols=(cbData?.Collections_v2||[]).filter(c=>colsUsees.has(c.col_id));
       const carreS=20, espace=15, isV=b.type==='mosaique-v';
       c='<div style="position:relative;width:100%;height:100%">';
       cols.forEach((col,i)=>{
@@ -1401,6 +1404,8 @@ function cbInjectStyles() {
     .cb-palette-btn-actif{background:#2d7a50!important}
     .cb-palette-btn-new{border:1px dashed #444;background:transparent!important;color:#888;margin-top:4px}
     .cb-palette-btn-new:hover{background:#2d2d44!important;color:#fff}
+    .cb-palette-btn-insert{border:none;background:transparent;color:#ffffff33;font-size:10px;cursor:pointer;padding:2px 10px;width:100%;text-align:center;transition:color .15s}
+    .cb-palette-btn-insert:hover{color:#2d7a50}
     .cb-canvas-zone{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
     .cb-canvas-toolbar{background:#fff;border-bottom:1px solid #e5e5e5;padding:8px 12px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
     .cb-canvas-wrap{flex:1;overflow:auto;display:flex;flex-direction:row;justify-content:center;align-items:flex-start;padding:24px;background:#d0d0d0;gap:0px}
