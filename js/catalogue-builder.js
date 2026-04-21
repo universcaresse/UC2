@@ -878,6 +878,7 @@ function cbResoudreBinding(binding) {
 }
 
 // ─── TABLE DES MATIÈRES ──────────────────────────────────────────────────────
+
 function cbGenererTDMPage() {
   const page = cbPages[2];
   if (!page) return;
@@ -886,6 +887,7 @@ function cbGenererTDMPage() {
 
   page.blocs = [];
 
+  // Titre
   page.blocs.push({
     id:cbGenId(), type:'titre',
     x:CB_MARGE+20, y:CB_MARGE+20,
@@ -893,45 +895,60 @@ function cbGenererTDMPage() {
     binding:{sheet:'',col_id:'',gam_id:'',fam_id:'',id:'',field:''},
     fs:32, bold:true, italic:false, police:'Playfair Display',
     couleur_texte:'#1a1a1a', couleur_libre:'#e5900a', opacite:1,
-    _texte_fixe:'Table des matières'
+    align:'left', _texte_fixe:'Table des matières'
   });
 
-  let y = CB_MARGE + 100;
-  const ligneH = 70;
+  let y = CB_MARGE + 110;
+  const ligneH    = 80;
+  const carreW    = 48;
+  const carreH    = 48;
+  const texteX    = CB_MARGE + carreW + 16;
+  const texteW    = Math.round((CB_W - CB_MARGE*2) * 0.65);
+  const numX      = CB_W - CB_MARGE - 36;
+  const numW      = 36;
 
   tdm.forEach(item => {
+    // Carré couleur
     page.blocs.push({
       id:cbGenId(), type:'couleur',
-      x:CB_MARGE, y, w:8, h:ligneH-8,
+      x:CB_MARGE, y:y+4,
+      w:carreW, h:carreH,
       binding:{sheet:'',col_id:'',gam_id:'',fam_id:'',id:'',field:''},
       fs:13, bold:false, italic:false, police:'DM Sans',
       couleur_texte:'#1a1a1a', couleur_libre:item.hex, opacite:1,
       _couleur_fixe:item.hex
     });
+    // Nom collection
     page.blocs.push({
       id:cbGenId(), type:'titre',
-      x:CB_MARGE+20, y:y+4, w:CB_W-CB_MARGE*2-80, h:30,
+      x:texteX, y:y+4,
+      w:texteW, h:26,
       binding:{sheet:'',col_id:'',gam_id:'',fam_id:'',id:'',field:''},
-      fs:16, bold:true, italic:false, police:'Playfair Display',
+      fs:15, bold:true, italic:false, police:'Playfair Display',
       couleur_texte:'#1a1a1a', couleur_libre:'#e5900a', opacite:1,
-      _texte_fixe:item.nom
+      align:'left', _texte_fixe:item.nom
     });
+    // Slogan
     page.blocs.push({
       id:cbGenId(), type:'texte',
-      x:CB_MARGE+20, y:y+36, w:CB_W-CB_MARGE*2-80, h:24,
+      x:texteX, y:y+32,
+      w:texteW, h:22,
       binding:{sheet:'',col_id:'',gam_id:'',fam_id:'',id:'',field:''},
       fs:11, bold:false, italic:true, police:'DM Sans',
-      couleur_texte:'#666666', couleur_libre:'#e5900a', opacite:1,
-      _texte_fixe:item.slogan
+      couleur_texte:'#888888', couleur_libre:'#e5900a', opacite:1,
+      align:'left', _texte_fixe:item.slogan
     });
+    // Numéro de page
     page.blocs.push({
       id:cbGenId(), type:'texte',
-      x:CB_W-CB_MARGE-50, y:y+20, w:40, h:30,
+      x:numX, y:y+14,
+      w:numW, h:26,
       binding:{sheet:'',col_id:'',gam_id:'',fam_id:'',id:'',field:''},
-      fs:14, bold:true, italic:false, police:'DM Sans',
+      fs:15, bold:true, italic:false, police:'DM Sans',
       couleur_texte:item.hex, couleur_libre:'#e5900a', opacite:1,
-      _texte_fixe:String(item.page)
+      align:'right', _texte_fixe:String(item.page)
     });
+
     y += ligneH;
   });
 
