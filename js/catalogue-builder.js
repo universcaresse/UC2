@@ -236,8 +236,12 @@ function cbRendrePagesListe() {
     btn.onclick     = ()=>cbAllerPage(i);
     cont.appendChild(btn);
   });
-  const inp = document.getElementById('cb-page-nom');
+const inp = document.getElementById('cb-page-nom');
   if (inp && cbPages[cbPageIndex]) inp.value = cbPages[cbPageIndex].name||'';
+
+  // Bouton TDM — visible seulement sur page 3
+  const btnTDM = document.getElementById('cb-btn-tdm');
+  if (btnTDM) btnTDM.style.display = cbPageIndex === 2 ? '' : 'none';
   const sel = document.getElementById('cb-page-collection');
   if (sel) {
     sel.innerHTML = '<option value="">— Aucune collection —</option>';
@@ -289,6 +293,7 @@ function cbRendreGuides(canvas, idx) {
 }
 
 function cbRendrePaginationSur(el, num) {
+  if (num < 4) return;
   const traitW = CB_W * 0.6;
   const pg = document.createElement('div');
   pg.className = 'cb-pagination';
@@ -302,7 +307,7 @@ function cbCreerBlocEl(b, actif) {
   el.className  = 'cb-bloc'+(actif&&b.id===cbSelId?' cb-bloc-sel':'');
   el.dataset.id = b.id;
   el.style.cssText = `left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`;
-  const val = cbResoudreBinding(b.binding);
+ const val = b._texte_fixe || b._couleur_fixe || cbResoudreBinding(b.binding);
 
   if (b.type==='image') {
     el.innerHTML = val
@@ -543,6 +548,84 @@ function cbResoudreBinding(binding) {
 }
 
 // ─── TABLE DES MATIÈRES ──────────────────────────────────────────────────────
+function cbGenererTDMPage() {
+  const page = cbPages[2]; // page 3
+  if (!page) return;
+
+  const tdm = cbGenererTDM();
+  if (!tdm.length) { alert('Aucune collection assignée aux pages. Assigne une collection à chaque page d\'abord.'); return; }
+
+  // Effacer les blocs existants
+  page.blocs = [];
+
+  // Titre
+  page.blocs.push({
+    id: cbGenId(), type: 'titre',
+    x: CB_MARGE + 20, y: CB_MARGE + 20,
+    w: CB_W - CB_MARGE*2 - 40, h: 60,
+    binding: { sheet:'', id:'', field:'' },
+    fs: 32, bold: true, italic: false,
+    police: 'Playfair Display',
+    couleur_texte: '#1a1a1a', opacite: 1,
+    _texte_fixe: 'Table des matières'
+  });
+
+  // Une ligne par collection
+  let y = CB_MARGE + 100;
+  const ligneH = 70;
+
+  tdm.forEach(item => {
+    // Bande de couleur
+    page.blocs.push({
+      id: cbGenId(), type: 'couleur',
+      x: CB_MARGE, y,
+      w: 8, h: ligneH - 8,
+      binding: { sheet:'', id:'', field:'' },
+      fs: 13, bold: false, italic: false,
+      police: 'DM Sans', couleur_texte: '#1a1a1a',
+      opacite: 1, _couleur_fixe: item.hex
+    });
+    // Nom collection
+    page.blocs.push({
+      id: cbGenId(), type: 'titre',
+      x: CB_MARGE + 20, y: y + 4,
+      w: CB_W - CB_MARGE*2 - 80, h: 30,
+      binding: { sheet:'', id:'', field:'' },
+      fs: 16, bold: true, italic: false,
+      police: 'Playfair Display',
+      couleur_texte: '#1a1a1a', opacite: 1,
+      _texte_fixe: item.nom
+    });
+    // Slogan
+    page.blocs.push({
+      id: cbGenId(), type: 'texte',
+      x: CB_MARGE + 20, y: y + 36,
+      w: CB_W - CB_MARGE*2 - 80, h: 24,
+      binding: { sheet:'', id:'', field:'' },
+      fs: 11, bold: false, italic: true,
+      police: 'DM Sans',
+      couleur_texte: '#666666', opacite: 1,
+      _texte_fixe: item.slogan
+    });
+    // Numéro de page
+    page.blocs.push({
+      id: cbGenId(), type: 'texte',
+      x: CB_W - CB_MARGE - 50, y: y + 20,
+      w: 40, h: 30,
+      binding: { sheet:'', id:'', field:'' },
+      fs: 14, bold: true, italic: false,
+      police: 'DM Sans',
+      couleur_texte: item.hex, opacite: 1,
+      _texte_fixe: String(item.page)
+    });
+
+    y += ligneH;
+  });
+
+  cbSauvegarderPage(2);
+  cbRendreInterface();
+}
+
 function cbGenererTDM() {
   const tdm=[], vues=new Set();
   cbPages.forEach((p,i)=>{
