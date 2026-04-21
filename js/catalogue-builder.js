@@ -1045,11 +1045,22 @@ function cbGlobalMouseMove(e) {
   const rect=canvas.getBoundingClientRect();
   const sc=CB_W/rect.width;
   const mx=(e.clientX-rect.left)*sc, my=(e.clientY-rect.top)*sc;
-  if (cbDragging) {
+ if (cbDragging) {
     const b=cbGetPage()?.blocs.find(b=>b.id===cbDragging.id);
     if (b){
-      b.x=Math.max(0,Math.min(CB_W-20,mx-cbDragging.ox));
-      b.y=Math.max(0,Math.min(CB_H-20,my-cbDragging.oy));
+      const newX=Math.max(0,Math.min(CB_W-20,mx-cbDragging.ox));
+      const newY=Math.max(0,Math.min(CB_H-20,my-cbDragging.oy));
+      const dx=newX-b.x, dy=newY-b.y;
+      if (cbSelIds.size>1) {
+        cbGetPage()?.blocs.forEach(bl=>{
+          if (cbSelIds.has(bl.id)){
+            bl.x=Math.max(0,Math.min(CB_W-20,bl.x+dx));
+            bl.y=Math.max(0,Math.min(CB_H-20,bl.y+dy));
+          }
+        });
+      } else {
+        b.x=newX; b.y=newY;
+      }
       cbRendreCanvas();
       document.getElementById('cb-dim-x').value=Math.round(b.x);
       document.getElementById('cb-dim-y').value=Math.round(b.y);
