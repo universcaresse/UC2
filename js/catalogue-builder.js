@@ -78,6 +78,7 @@ async function cbOnAfficher() {
 
   window.addEventListener('mousemove', cbGlobalMouseMove);
   window.addEventListener('mouseup',   cbGlobalMouseUp);
+  window.addEventListener('keydown',   cbGlobalKeyDown);
 
   document.getElementById('cb-chargement').style.display = 'none';
   document.getElementById('cb-layout').style.display     = 'flex';
@@ -1082,6 +1083,46 @@ function cbGlobalMouseMove(e) {
 function cbGlobalMouseUp() {
   if (cbDragging||cbResizing) cbSauvegarderPage();
   cbDragging=null; cbResizing=null;
+}
+
+function cbGlobalKeyDown(e) {
+  if (!cbSelId) return;
+  // Ignorer si on est dans un input
+  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+
+  const pas = e.shiftKey ? 10 : 1;
+  let dx=0, dy=0;
+  if (e.key==='ArrowLeft')  dx=-pas;
+  if (e.key==='ArrowRight') dx= pas;
+  if (e.key==='ArrowUp')    dy=-pas;
+  if (e.key==='ArrowDown')  dy= pas;
+  if (!dx&&!dy) return;
+
+  e.preventDefault();
+  const page = cbGetPage();
+  if (!page) return;
+
+  page.blocs.forEach(b=>{
+    if (cbSelIds.has(b.id)) {
+      b.x = Math.max(0, Math.min(CB_W-20, b.x+dx));
+      b.y = Math.max(0, Math.min(CB_H-20, b.y+dy));
+    }
+  });
+
+  cbRendreCanvas();
+
+  // Sync dims si un seul bloc
+  if (cbSelIds.size===1) {
+    const b = cbGetBloc();
+    if (b) {
+      document.getElementById('cb-dim-x').value = Math.round(b.x);
+      document.getElementById('cb-dim-y').value = Math.round(b.y);
+    }
+  }
+
+  // Sauvegarder après un délai pour ne pas spammer
+  clearTimeout(cbGlobalKeyDown._timer);
+  cbGlobalKeyDown._timer = setTimeout(()=>cbSauvegarderPage(), 800);
 }
 
 // ─── RÉSOUDRE BINDING ────────────────────────────────────────────────────────
