@@ -866,8 +866,8 @@ function cbGenererFicheProduit() {
   const hexCouleur = col?.couleur_hex||'#e5900a';
 
   // Formats texte
-  const formatsTexte = formats.length
-    ? formats.map(f=>`${parseFloat(f.prix_vente).toFixed(2).replace('.',',')} $\n${f.poids} ${f.unite}`).join('   ')
+   const formatsTexte = formats.length
+    ? formats.map(f=>`${parseFloat(f.prix_vente).toFixed(2).replace('.',',')} $\n${f.poids} ${f.unite}`).join('        ')
     : '';
 
   if (ori==='v') {
@@ -888,12 +888,15 @@ function cbGenererFicheProduit() {
     // Gamme
     page.blocs.push({...b(''), type:'texte', x:hexX+10, y:hexY+photoS+78, w:hexW-20, h:22,
       fs:11, italic:false, couleur_texte:'#ffffffaa', _texte_fixe:gam?.nom||''});
+    // Desc emballage
+    page.blocs.push({...b('desc_emballage'), type:'texte', x:hexX+10, y:hexY+photoS+102, w:hexW-20, h:22,
+      fs:10, italic:true, couleur_texte:'#ffffffcc'});
     // Ligne séparatrice
-    page.blocs.push({...b(''), type:'couleur', x:hexX+10, y:hexY+photoS+104, w:hexW-20, h:1,
+    page.blocs.push({...b(''), type:'couleur', x:hexX+10, y:hexY+photoS+128, w:hexW-20, h:1,
       couleur_libre:'#ffffff66', opacite:0.5});
     // Formats + prix
-    page.blocs.push({...b(''), type:'texte', x:hexX+10, y:hexY+photoS+116, w:hexW-20, h:50,
-      fs:12, bold:true, couleur_texte:'#ffffff', align:'center',
+    page.blocs.push({...b(''), type:'texte', x:hexX+10, y:hexY+photoS+136, w:hexW-20, h:50,
+      fs:11, bold:false, couleur_texte:'#ffffff', align:'center',
       _texte_fixe: formatsTexte});
 
   } else {
@@ -912,14 +915,17 @@ function cbGenererFicheProduit() {
     page.blocs.push({...b('nom'), type:'titre', x:hexX+photoS+16, y:hexY+40, w:hexW-photoS-26, h:40,
       fs:18, bold:true, police:'Playfair Display', couleur_texte:'#ffffff'});
     // Gamme
-    page.blocs.push({...b(''), type:'texte', x:hexX+photoS+16, y:hexY+82, w:hexW-photoS-26, h:22,
+     page.blocs.push({...b(''), type:'texte', x:hexX+photoS+16, y:hexY+82, w:hexW-photoS-26, h:22,
       fs:11, couleur_texte:'#ffffffaa', _texte_fixe:gam?.nom||''});
+    // Desc emballage
+    page.blocs.push({...b('desc_emballage'), type:'texte', x:hexX+photoS+16, y:hexY+106, w:hexW-photoS-26, h:20,
+      fs:10, italic:true, couleur_texte:'#ffffffcc'});
     // Ligne séparatrice
-    page.blocs.push({...b(''), type:'couleur', x:hexX+photoS+16, y:hexY+108, w:hexW-photoS-26, h:1,
+    page.blocs.push({...b(''), type:'couleur', x:hexX+photoS+16, y:hexY+130, w:hexW-photoS-26, h:1,
       couleur_libre:'#ffffff66', opacite:0.5});
     // Formats + prix
-    page.blocs.push({...b(''), type:'texte', x:hexX+photoS+16, y:hexY+120, w:hexW-photoS-26, h:50,
-      fs:12, bold:true, couleur_texte:'#ffffff', align:'center',
+    page.blocs.push({...b(''), type:'texte', x:hexX+photoS+16, y:hexY+138, w:hexW-photoS-26, h:50,
+      fs:11, bold:false, couleur_texte:'#ffffff', align:'center',
       _texte_fixe: formatsTexte});
   }
 
