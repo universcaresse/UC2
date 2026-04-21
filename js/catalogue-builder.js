@@ -425,12 +425,33 @@ function cbRendreProps() {
 
   document.getElementById('cb-props-type-label').textContent = 'Bloc · '+bloc.type;
 
-  // Cascade de sélection
-  cbRendreSelCollection(bloc.binding?.col_id);
-  cbRendreSelGamme(bloc.binding?.col_id, bloc.binding?.gam_id);
-  cbRendreSelFamille(bloc.binding?.col_id, bloc.binding?.fam_id);
-  cbRendreSelId(bloc.binding);
-  cbRendreSelField(bloc.binding?.sheet, bloc.binding?.field);
+
+  // Onglet
+  document.getElementById('cb-src-sheet').value = bloc.binding?.sheet||'';
+  const sheet = bloc.binding?.sheet||'';
+
+  // Filtres optionnels
+  const colGrp = document.getElementById('cb-src-col-groupe');
+  const gamGrp = document.getElementById('cb-src-gam-groupe');
+  const famGrp = document.getElementById('cb-src-fam-groupe');
+  const montrerCol = ['Gammes_v2','Familles_v2','Produits_v2'].includes(sheet);
+  const montrerGam = sheet==='Produits_v2';
+  const montrerFam = sheet==='Produits_v2';
+  if (colGrp) colGrp.style.display = montrerCol ? '' : 'none';
+  if (gamGrp) gamGrp.style.display = montrerGam ? '' : 'none';
+  if (famGrp) famGrp.style.display = montrerFam ? '' : 'none';
+  if (montrerCol) cbRendreSelCollection(bloc.binding?.col_id||'');
+  if (montrerGam) cbRendreSelGamme(bloc.binding?.col_id||'', bloc.binding?.gam_id||'');
+  if (montrerFam) cbRendreSelFamille(bloc.binding?.col_id||'', bloc.binding?.fam_id||'');
+
+  // Item + Champ
+  if (sheet==='Contenu_v2') {
+    document.getElementById('cb-src-id-groupe').style.display = 'none';
+    cbRendreSelField(sheet, bloc.binding?.field||'');
+  } else {
+    cbRendreSelId(bloc.binding);
+    cbRendreSelField(sheet, bloc.binding?.field||'');
+  }
   cbRendreApercu(bloc.binding);
 
   document.getElementById('cb-dim-w').value = Math.round(bloc.w);
@@ -629,12 +650,33 @@ function cbOnChangeFamille() {
 }
 
 function cbOnChangeSheet() {
-  const sheet=document.getElementById('cb-src-sheet').value;
-  const bloc=cbGetBloc();
-  if (bloc) bloc.binding={...bloc.binding, sheet, id:'', field:''};
-  cbRendreSelId(bloc?.binding||{sheet});
-  cbRendreSelField(sheet,'');
-  document.getElementById('cb-apercu-zone').style.display='none';
+  const sheet = document.getElementById('cb-src-sheet').value;
+  const bloc  = cbGetBloc();
+  if (bloc) bloc.binding = {...bloc.binding, sheet, id:'', field:''};
+
+  // Filtres optionnels selon l'onglet
+  const colGrp = document.getElementById('cb-src-col-groupe');
+  const gamGrp = document.getElementById('cb-src-gam-groupe');
+  const famGrp = document.getElementById('cb-src-fam-groupe');
+  const montrerCol = ['Gammes_v2','Familles_v2','Produits_v2'].includes(sheet);
+  const montrerGam = sheet === 'Produits_v2';
+  const montrerFam = sheet === 'Produits_v2';
+  if (colGrp) colGrp.style.display = montrerCol ? '' : 'none';
+  if (gamGrp) gamGrp.style.display = montrerGam ? '' : 'none';
+  if (famGrp) famGrp.style.display = montrerFam ? '' : 'none';
+
+  if (montrerCol) cbRendreSelCollection(bloc?.binding?.col_id||'');
+
+  // Contenu_v2 — pas d'item, champ direct
+  if (sheet === 'Contenu_v2') {
+    document.getElementById('cb-src-id-groupe').style.display = 'none';
+    cbRendreSelField(sheet, bloc?.binding?.field||'');
+  } else {
+    cbRendreSelId(bloc?.binding||{sheet});
+    cbRendreSelField('', '');
+  }
+
+  document.getElementById('cb-apercu-zone').style.display = 'none';
   cbRendreCanvas();
 }
 
