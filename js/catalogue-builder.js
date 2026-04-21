@@ -35,6 +35,7 @@ let cbDragging  = null;
 let cbResizing  = null;
 let cbInited    = false;
 let cbBlocCopie = null;
+let cbSelIds    = new Set();
 let cbIdCnt     = 0;
 const cbGenId   = () => 'cb' + Date.now() + '_' + (++cbIdCnt);
 
@@ -360,7 +361,7 @@ function cbRendrePaginationSur(el, num) {
 
 function cbCreerBlocEl(b, actif) {
   const el = document.createElement('div');
-  el.className  = 'cb-bloc'+(actif&&b.id===cbSelId?' cb-bloc-sel':'');
+  el.className  = 'cb-bloc'+(actif&&cbSelIds.has(b.id)?' cb-bloc-sel':'');
   el.dataset.id = b.id;
   el.style.cssText = `left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`;
 
@@ -968,7 +969,20 @@ function cbRendreCalques() {
     el.appendChild(lb);
 
     // Clic pour sélectionner
-    el.onclick = () => { cbSelId=b.id; cbRendreCanvas(); cbRendreProps(); cbRendreCalques(); };
+     el.onclick = (e) => {
+      if (e.shiftKey) {
+        if (cbSelIds.has(b.id)) cbSelIds.delete(b.id);
+        else cbSelIds.add(b.id);
+        cbSelId = b.id;
+      } else {
+        cbSelIds.clear();
+        cbSelId = b.id;
+        cbSelIds.add(b.id);
+      }
+      cbRendreCanvas();
+      cbRendreProps();
+      cbRendreCalques();
+    };
 
     // Drag & drop
     el.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', iReel); el.style.opacity='0.4'; });
@@ -1005,7 +1019,21 @@ function cbCanvasClick(e) {
   const blocEl=e.target.closest('.cb-bloc');
   if (blocEl&&blocEl.dataset.id) {
     const b=cbGetPage()?.blocs.find(b=>b.id===blocEl.dataset.id);
-    if (b){cbSelId=b.id;cbDragging={id:b.id,ox:(e.clientX-rect.left)*sc-b.x,oy:(e.clientY-rect.top)*sc-b.y};cbRendreCanvas();cbRendreProps();}
+    if (b){
+      if (!e.shiftKey) {
+        cbSelIds.clear();
+        cbSelIds.add(b.id);
+        cbSelId=b.id;
+      } else {
+        if (cbSelIds.has(b.id)) cbSelIds.delete(b.id);
+        else cbSelIds.add(b.id);
+        cbSelId=b.id;
+      }
+      cbDragging={id:b.id,ox:(e.clientX-rect.left)*sc-b.x,oy:(e.clientY-rect.top)*sc-b.y};
+      cbRendreCanvas();
+      cbRendreProps();
+      cbRendreCalques();
+    }
     return;
   }
   cbDeselectionner();
