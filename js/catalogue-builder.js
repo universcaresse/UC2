@@ -952,7 +952,8 @@ function cbRendreCalques() {
     const el = document.createElement('div');
     el.dataset.idx = iReel;
     el.draggable = true;
-    el.style.cssText = `display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:12px;transition:background .1s;${b.id===cbSelId?'background:#e8f5ee;border:1px solid #2d7a50;':'background:#f8f8f8;border:1px solid transparent;'}`;
+    const estSel = cbSelIds.has(b.id);
+    el.style.cssText = `display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:12px;transition:background .1s;${estSel?'background:#e8f5ee;border:1px solid #2d7a50;':'background:#f8f8f8;border:1px solid transparent;'}`;
 
     // Icône type
     const icones = {titre:'T', texte:'¶', image:'⬜', couleur:'■'};
