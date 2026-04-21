@@ -20,7 +20,7 @@ const CB_FIELDS = {
 const CB_DEFAULTS = {
   titre:        { w:500, h:70  },
   texte:        { w:500, h:160 },
-  image:        { w:300, h:220 },
+  image:        { w:300, h:210 },
   couleur:      { w:200, h:60  },
   'mosaique-v': { w:50,  h:300 },
   'mosaique-h': { w:300, h:50  },
@@ -874,8 +874,8 @@ function cbGenererFicheProduit() {
 
   if (ori==='v') {
     const hexX=CB_MARGE+20, hexY=CB_MARGE+20;
-    const hexW=220, hexH=480;
-    const photoS=220;
+    const hexW=210, hexH=470;
+    const photoS=210;
 
     // Hex
     page.blocs.push({...b('couleur_hex'), type:'couleur', x:hexX, y:hexY, w:hexW, h:hexH, couleur_libre:hexCouleur});
@@ -903,8 +903,8 @@ function cbGenererFicheProduit() {
 
   } else {
     const hexX=CB_MARGE+20, hexY=CB_MARGE+20;
-    const hexW=480, hexH=220;
-    const photoS=220;
+    const hexW=470, hexH=210;
+    const photoS=210;
 
     // Hex
     page.blocs.push({...b('couleur_hex'), type:'couleur', x:hexX, y:hexY, w:hexW, h:hexH, couleur_libre:hexCouleur});
