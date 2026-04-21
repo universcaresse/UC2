@@ -887,25 +887,18 @@ function cbGenererTDMPage() {
 
   page.blocs = [];
 
-  // Titre
-  page.blocs.push({
-    id:cbGenId(), type:'titre',
-    x:CB_MARGE+20, y:CB_MARGE+20,
-    w:CB_W-CB_MARGE*2-40, h:60,
-    binding:{sheet:'',col_id:'',gam_id:'',fam_id:'',id:'',field:''},
-    fs:32, bold:true, italic:false, police:'Playfair Display',
-    couleur_texte:'#1a1a1a', couleur_libre:'#e5900a', opacite:1,
-    align:'left', _texte_fixe:'Table des matières'
-  });
+  const ligneH = 80;
+  const carreW = 48;
+  const carreH = 48;
+  const startX = 240;
+  const texteX = startX + carreW + 16;
+  const texteW = Math.round((CB_W - startX - CB_MARGE) * 0.75);
+  const numX   = CB_W - CB_MARGE - 36;
+  const numW   = 36;
 
-  let y = CB_MARGE + 110;
-  const ligneH    = 80;
-  const carreW    = 48;
-  const carreH    = 48;
-  const texteX    = CB_MARGE + carreW + 16;
-  const texteW    = Math.round((CB_W - CB_MARGE*2) * 0.65);
-  const numX      = CB_W - CB_MARGE - 36;
-  const numW      = 36;
+  // Centrage vertical
+  const totalH = tdm.length * ligneH;
+  let y = Math.round((CB_H - totalH) / 2);
 
   tdm.forEach(item => {
     // Carré couleur
