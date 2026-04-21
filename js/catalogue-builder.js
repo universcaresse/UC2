@@ -280,6 +280,8 @@ function cbRendreCanvas() {
   cbRendreVoisin();
   const btnS = document.getElementById('cb-btn-supprimer-bloc');
   if (btnS) btnS.style.display = cbSelId?'':'none';
+  const btnC = document.getElementById('cb-btn-copier');
+  if (btnC) btnC.style.display = cbSelId?'':'none';
 }
 
 function cbRendreGuides(canvas, idx) {
@@ -536,6 +538,30 @@ function cbGlobalMouseMove(e) {
   }
 }
 function cbGlobalMouseUp() { if (cbDragging||cbResizing) cbSauvegarderPage(); cbDragging=null; cbResizing=null; }
+let cbBlocCopie = null;
+
+function cbCopierBloc() {
+  const b = cbGetBloc();
+  if (!b) return;
+  cbBlocCopie = JSON.parse(JSON.stringify(b));
+  document.getElementById('cb-btn-coller').style.display = '';
+}
+
+function cbCollerBloc() {
+  if (!cbBlocCopie) return;
+  const page = cbGetPage();
+  if (!page) return;
+  const nouveau = JSON.parse(JSON.stringify(cbBlocCopie));
+  nouveau.id = cbGenId();
+  nouveau.x  = nouveau.x + 20;
+  nouveau.y  = nouveau.y + 20;
+  page.blocs.push(nouveau);
+  cbSelId = nouveau.id;
+  cbRendreCanvas();
+  cbRendreProps();
+  cbSauvegarderPage();
+}
+
 function cbDeselectionner() { cbSelId=null; cbRendreCanvas(); cbRendreProps(); }
 
 // ─── RÉSOUDRE BINDING ────────────────────────────────────────────────────────
