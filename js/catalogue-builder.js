@@ -468,13 +468,8 @@ function cbRendreProps() {
   if (montrerFam) cbRendreSelFamille(bloc.binding?.col_id||'', bloc.binding?.fam_id||'');
 
   // Item + Champ
-  if (sheet==='Contenu_v2') {
-    document.getElementById('cb-src-id-groupe').style.display = 'none';
-    cbRendreSelField(sheet, bloc.binding?.field||'');
-  } else {
-    cbRendreSelId(bloc.binding);
-    cbRendreSelField(sheet, bloc.binding?.field||'');
-  }
+   cbRendreSelId(bloc.binding);
+  cbRendreSelField(sheet, bloc.binding?.field||'');
   cbRendreApercu(bloc.binding);
 
   document.getElementById('cb-dim-w').value = Math.round(bloc.w);
@@ -695,10 +690,11 @@ function cbOnChangeSheet() {
 
   if (montrerCol) cbRendreSelCollection(bloc?.binding?.col_id||'');
 
-  // Contenu_v2 — pas d'item, champ direct
+ // Contenu_v2 — liste des clés directement
   if (sheet === 'Contenu_v2') {
-    document.getElementById('cb-src-id-groupe').style.display = 'none';
-    cbRendreSelField(sheet, bloc?.binding?.field||'');
+    document.getElementById('cb-src-id-groupe').style.display = '';
+    cbRendreSelId(bloc?.binding||{sheet});
+    cbRendreSelField('', '');
   } else {
     cbRendreSelId(bloc?.binding||{sheet});
     cbRendreSelField('', '');
@@ -1021,6 +1017,7 @@ function cbOuvrirVueLecture() {
           el.style.opacity=b.opacite!==undefined?b.opacite:1;
           if(val)el.innerHTML=`<img src="${val}" style="width:100%;height:100%;object-fit:cover;display:block">`;
         } else if (b.type==='couleur'){
+			
         const couleur=(b.binding?.field&&val)?val:(b.couleur_libre||'#e5900a');
         el.style.background=couleur;
         el.style.opacity=b.opacite!==undefined?b.opacite:1;
