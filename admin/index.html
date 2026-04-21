@@ -2686,9 +2686,23 @@
   </div>
   <div class="chargement cache" id="med-chargement"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
   <div id="med-grille" class="collections-grille"></div>
+  
+
 </div>
 
-  <!-- CATALOGUE BUILDER -->
+
+
+
+
+
+
+
+
+ <!-- CATALOGUE BUILDER -->
+ 
+ 
+ 
+ 
 <div class="section-admin" id="section-catalogue-builder">
 
   <div class="page-entete fade-in">
@@ -2697,8 +2711,8 @@
       <div class="page-entete-titre">Catalogue <em>PDF</em></div>
     </div>
     <div class="form-actions">
-      <button class="bouton" onclick="cbOuvrirVueLecture()">👁 Vue lecture</button>
-      <button class="bouton" onclick="cbImprimerPage()">🖨 Page courante</button>
+      <button class="bouton bouton-contour" onclick="cbOuvrirVueLecture()">👁 Vue lecture</button>
+      <button class="bouton bouton-contour" onclick="cbImprimerPage()">🖨 Page courante</button>
       <button class="bouton" onclick="cbImprimerCatalogue()">📄 Imprimer catalogue</button>
     </div>
   </div>
@@ -2725,22 +2739,23 @@
     <div class="cb-canvas-zone">
 
       <div class="cb-canvas-toolbar">
-        <input class="form-ctrl" id="cb-page-nom" style="width:180px;font-size:13px" placeholder="Nom de la page" oninput="cbRenommerPage(this.value)">
-        <select class="form-ctrl" id="cb-page-collection" style="font-size:13px;max-width:180px" onchange="cbAssignerCollection(this.value)">
+        <input class="form-ctrl" id="cb-page-nom" style="width:150px;font-size:13px" placeholder="Nom de la page" oninput="cbRenommerPage(this.value)">
+        <select class="form-ctrl" id="cb-page-collection" style="font-size:13px;max-width:160px" onchange="cbAssignerCollection(this.value)">
           <option value="">— Collection —</option>
         </select>
-        <button class="bouton bouton-petit bouton-contour" onclick="cbDeselectionner()">Désélectionner</button>
+        <button class="bouton bouton-petit" id="cb-btn-tdm" onclick="cbGenererTDMPage()" style="display:none">📋 TDM</button>
+        <div style="flex:1"></div>
+        <button class="bouton bouton-petit bouton-contour" id="cb-btn-monter" onclick="cbMonterBloc()" style="display:none" title="Monter le bloc">↑</button>
+        <button class="bouton bouton-petit bouton-contour" id="cb-btn-descendre" onclick="cbDescendreBloc()" style="display:none" title="Descendre le bloc">↓</button>
+        <button class="bouton bouton-petit bouton-contour" id="cb-btn-copier" onclick="cbCopierBloc()" style="display:none">⧉ Copier</button>
+        <button class="bouton bouton-petit bouton-contour" id="cb-btn-coller" onclick="cbCollerBloc()" style="display:none">⧉ Coller</button>
         <button class="bouton bouton-petit bouton-rouge" id="cb-btn-supprimer-bloc" onclick="cbSupprimerBlocSelectionne()" style="display:none">🗑 Bloc</button>
-<button class="bouton bouton-petit" id="cb-btn-tdm" onclick="cbGenererTDMPage()" style="display:none">📋 Générer TDM</button>
-<button class="bouton bouton-petit" id="cb-btn-copier" onclick="cbCopierBloc()" style="display:none">⧉ Copier</button>
-<button class="bouton bouton-petit" id="cb-btn-coller" onclick="cbCollerBloc()" style="display:none">⧉ Coller</button>
         <button class="bouton bouton-petit bouton-rouge" onclick="cbSupprimerPage()">🗑 Page</button>
       </div>
 
       <div class="cb-canvas-wrap">
         <div class="cb-canvas" id="cb-canvas"
           onmousedown="cbCanvasClick(event)"
-          onmousemove="cbGlobalMouseMove(event)"
           onmouseup="cbGlobalMouseUp()">
           <div class="cb-canvas-vide" id="cb-canvas-vide">
             ← Ajoutez des blocs depuis le panneau gauche
@@ -2762,7 +2777,27 @@
 
         <div style="font-weight:700;font-size:13px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f0f0f0" id="cb-props-type-label">Bloc</div>
 
-        <!-- Source -->
+        <!-- Cascade Collection → Gamme → Famille -->
+        <div class="form-groupe">
+          <label class="form-label">Collection</label>
+          <select class="form-ctrl" id="cb-src-col" onchange="cbOnChangeCollection()">
+            <option value="">— Toutes —</option>
+          </select>
+        </div>
+        <div class="form-groupe" id="cb-src-gam-groupe" style="display:none">
+          <label class="form-label">Gamme</label>
+          <select class="form-ctrl" id="cb-src-gam" onchange="cbOnChangeGamme()">
+            <option value="">— Toutes —</option>
+          </select>
+        </div>
+        <div class="form-groupe" id="cb-src-fam-groupe" style="display:none">
+          <label class="form-label">Famille</label>
+          <select class="form-ctrl" id="cb-src-fam" onchange="cbOnChangeFamille()">
+            <option value="">— Toutes —</option>
+          </select>
+        </div>
+
+        <!-- Onglet source + ID + Champ -->
         <div class="form-groupe">
           <label class="form-label">Onglet source</label>
           <select class="form-ctrl" id="cb-src-sheet" onchange="cbOnChangeSheet()">
@@ -2777,7 +2812,7 @@
           </select>
         </div>
         <div class="form-groupe" id="cb-src-id-groupe" style="display:none">
-          <label class="form-label">ID</label>
+          <label class="form-label">Item</label>
           <select class="form-ctrl" id="cb-src-id" onchange="cbOnChangeId()"></select>
         </div>
         <div class="form-groupe" id="cb-src-field-groupe" style="display:none">
@@ -2787,6 +2822,15 @@
         <div id="cb-apercu-zone" style="display:none;background:#f8f8f8;border-radius:6px;padding:10px;margin-bottom:12px;font-size:12px;color:#444;max-height:100px;overflow:auto">
           <div style="font-size:9px;color:#aaa;font-weight:700;margin-bottom:4px;letter-spacing:.5px">APERÇU</div>
           <div id="cb-apercu-val"></div>
+        </div>
+
+        <!-- Couleur libre (bloc couleur sans binding) -->
+        <div id="cb-couleur-libre-zone" style="display:none;border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px">
+          <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:.5px">COULEUR</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="color" id="cb-couleur-libre-picker" oninput="cbUpdateCouleurLibre(this.value)" style="width:48px;height:36px;padding:2px;border:1px solid #e5e5e5;border-radius:6px;cursor:pointer">
+            <span style="font-size:12px;color:#666">Couleur libre</span>
+          </div>
         </div>
 
         <!-- Dimensions -->
@@ -2801,7 +2845,7 @@
         </div>
 
         <!-- Typographie -->
-        <div id="cb-typo-zone" style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px">
+        <div id="cb-typo-zone" style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px;display:none">
           <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:.5px">TYPOGRAPHIE</div>
           <div class="form-groupe">
             <label class="form-label">Police</label>
@@ -2827,12 +2871,21 @@
           </div>
         </div>
 
-        <!-- Opacité (couleur seulement) -->
+        <!-- Opacité couleur -->
         <div id="cb-opacite-zone" style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px;display:none">
           <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:.5px">TRANSPARENCE</div>
           <div style="display:flex;align-items:center;gap:10px">
             <input type="range" id="cb-opacite-slider" min="0" max="100" value="100" oninput="cbUpdateOpacite(this.value)" style="flex:1">
             <span id="cb-opacite-label" style="font-size:12px;color:#666;width:36px;text-align:right">100%</span>
+          </div>
+        </div>
+
+        <!-- Opacité image -->
+        <div id="cb-image-opacite-zone" style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px;display:none">
+          <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:.5px">TRANSPARENCE</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="range" id="cb-image-opacite-slider" min="0" max="100" value="100" oninput="cbUpdateImageOpacite(this.value)" style="flex:1">
+            <span id="cb-image-opacite-label" style="font-size:12px;color:#666;width:36px;text-align:right">100%</span>
           </div>
         </div>
 
@@ -2848,6 +2901,9 @@
   <button id="cb-vue-lecture-fermer" onclick="cbFermerVueLecture()">✕ Fermer</button>
   <div id="cb-vue-lecture-contenu"></div>
 </div>
+
+
+
 
 
  
