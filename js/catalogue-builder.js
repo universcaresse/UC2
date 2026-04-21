@@ -126,13 +126,18 @@ async function cbSupprimerPageAPI(page_id) {
 }
 
 // ─── PAGES ───────────────────────────────────────────────────────────────────
-function cbNouvellePageCatalogue() {
-  const p = {id:cbGenId(), name:'Page '+(cbPages.length+1), col_id:'', blocs:[], est_toc:false};
-  cbPages.push(p);
-  cbPageIndex = cbPages.length - 1;
+function cbNouvellePageCatalogue(apres) {
+  const pos = apres !== undefined ? apres + 1 : cbPages.length;
+  const p = {id:cbGenId(), name:'Page '+(pos+1), col_id:'', blocs:[], est_toc:false};
+  cbPages.splice(pos, 0, p);
+  // Renuméroter
+  cbPages.forEach((pg,i) => {
+    if (!pg.name || pg.name.match(/^Page \d+$/)) pg.name = 'Page '+(i+1);
+  });
+  cbPageIndex = pos;
   cbVerifierMultiple4();
   cbRendreInterface();
-  cbSauvegarderPage();
+  cbPages.forEach((_,i) => cbSauvegarderPage(i));
 }
 
 function cbSupprimerPage() {
@@ -141,11 +146,20 @@ function cbSupprimerPage() {
   if (!confirm('Supprimer "' + (page.name||'cette page') + '" ?')) return;
   cbSupprimerPageAPI(page.id);
   cbPages.splice(cbPageIndex, 1);
+  // Renuméroter les noms automatiquement
+  cbPages.forEach((p,i) => {
+    if (!p.name || p.name.match(/^Page \d+$/)) p.name = 'Page '+(i+1);
+  });
   cbPageIndex = Math.max(0, Math.min(cbPageIndex, cbPages.length-1));
   cbSelId = null;
+  cbSelIds.clear();
   cbVerifierMultiple4();
   if (!cbPages.length) cbNouvellePageCatalogue();
-  else cbRendreInterface();
+  else {
+    cbRendreInterface();
+    // Resauvegarder toutes les pages pour mettre à jour les ordres
+    cbPages.forEach((_,i) => cbSauvegarderPage(i));
+  }
 }
 
 function cbAllerPage(idx) {
@@ -213,11 +227,12 @@ function cbAjouterBloc(type) {
 }
 
 function cbSupprimerBlocSelectionne() {
-  if (!cbSelId) return;
+  if (!cbSelIds.size) return;
   const page = cbPages[cbPageIndex];
   if (!page) return;
-  page.blocs = page.blocs.filter(b=>b.id!==cbSelId);
+  page.blocs = page.blocs.filter(b=>!cbSelIds.has(b.id));
   cbSelId = null;
+  cbSelIds.clear();
   cbRendreCanvas();
   cbRendreProps();
   cbRendreCalques();
@@ -289,6 +304,13 @@ function cbRendrePagesListe() {
     btn.title       = p.col_id ? cbNomCollection(p.col_id) : '';
     btn.onclick     = ()=>cbAllerPage(i);
     cont.appendChild(btn);
+
+    // Bouton insérer après
+    const ins = document.createElement('button');
+    ins.className = 'cb-palette-btn-insert';
+    ins.textContent = '+ insérer';
+    ins.onclick = (e) => { e.stopPropagation(); cbNouvellePageCatalogue(i); };
+    cont.appendChild(ins);
   });
 
   const inp = document.getElementById('cb-page-nom');
