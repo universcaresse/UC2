@@ -45,13 +45,14 @@ async function cbOnAfficher() {
   cbInjectStyles();
 
   try {
-    const [rCat, rGam, rFam, rCont, rMed, rImg] = await Promise.all([
+    const [rCat, rGam, rFam, rCont, rMed, rImg, rFmt] = await Promise.all([
       appelAPI('getCatalogue'),
       appelAPI('getGammes'),
       appelAPI('getFamilles'),
       appelAPI('getContenu'),
       appelAPI('getMediatheque'),
       appelAPI('getImagesLocales'),
+      appelAPI('getProduitsFormats'),
     ]);
     const cols = rCat && rCat.success
       ? Object.entries(rCat.infoCollections||{}).map(([id,v])=>({col_id:id,...v}))
@@ -65,8 +66,9 @@ async function cbOnAfficher() {
       Familles_v2:       rFam && rFam.success  ? rFam.items    : [],
       Produits_v2:       rCat && rCat.success  ? rCat.produits : [],
       Contenu_v2:        contenu,
-      Mediatheque_v2:    rMed && rMed.success  ? rMed.items    : [],
-      Images_Locales_v2: rImg && rImg.success  ? rImg.items    : [],
+      Mediatheque_v2:     rMed && rMed.success  ? rMed.items    : [],
+      Images_Locales_v2:  rImg && rImg.success  ? rImg.items    : [],
+      Produits_Formats_v2:rFmt && rFmt.success  ? rFmt.items    : [],
     };
   } catch(e) {
     console.error('CB init:', e);
@@ -837,7 +839,6 @@ function cbModalFPsetOrientation(ori) {
   document.getElementById('modal-fp-btn-h').style.background = ori==='h'?'#2d7a50':'';
   document.getElementById('modal-fp-btn-h').style.color      = ori==='h'?'#fff':'';
 }
-
 function cbGenererFicheProduit() {
   const col_id = document.getElementById('modal-fp-col').value;
   const gam_id = document.getElementById('modal-fp-gam').value;
@@ -848,42 +849,78 @@ function cbGenererFicheProduit() {
 
   const produit = (cbData?.Produits_v2||[]).find(p=>p.pro_id===pro_id);
   const col     = (cbData?.Collections_v2||[]).find(c=>c.col_id===col_id);
+  const gam     = (cbData?.Gammes_v2||[]).find(g=>g.gam_id===gam_id);
+  const formats = (cbData?.Produits_Formats_v2||[]).filter(f=>f.pro_id===pro_id);
   if (!produit) return;
 
   const page = cbGetPage();
   if (!page) return;
 
-  const binding = (field) => ({sheet:'Produits_v2', col_id, gam_id, fam_id:'', id:pro_id, field});
+  const b = (field, extra={}) => ({
+    id:cbGenId(), binding:{sheet:'Produits_v2',col_id,gam_id,fam_id:'',id:pro_id,field},
+    fs:13, bold:false, italic:false, police:'DM Sans',
+    couleur_texte:'#ffffff', couleur_libre:col?.couleur_hex||'#e5900a',
+    opacite:1, align:'left', ...extra
+  });
+
+  const hexCouleur = col?.couleur_hex||'#e5900a';
+
+  // Formats texte
+  const formatsTexte = formats.length
+    ? formats.map(f=>`${parseFloat(f.prix_vente).toFixed(2).replace('.',',')} $\n${f.poids} ${f.unite}`).join('   ')
+    : '';
 
   if (ori==='v') {
-    // ── VERTICAL — hex grand rectangle à gauche ──
-    const hexW = 280, hexH = 600, hexX = CB_MARGE, hexY = CB_MARGE + 20;
-    const photoS = 220;
-    const photoX = hexX + (hexW - photoS) / 2;
-    const photoY = hexY + 20;
-    const texteX = hexX + hexW + 20;
-    const texteW = CB_W - texteX - CB_MARGE;
+    const hexX=CB_MARGE+20, hexY=CB_MARGE+20;
+    const hexW=220, hexH=480;
+    const photoS=220;
 
-    page.blocs.push({id:cbGenId(),type:'couleur',x:hexX,y:hexY,w:hexW,h:hexH,binding:binding('couleur_hex'),fs:13,bold:false,italic:false,police:'DM Sans',couleur_texte:'#fff',couleur_libre:col?.couleur_hex||'#e5900a',opacite:1,align:'left'});
-    page.blocs.push({id:cbGenId(),type:'image',x:photoX,y:photoY,w:photoS,h:photoS,binding:binding('image_url'),fs:13,bold:false,italic:false,police:'DM Sans',couleur_texte:'#fff',couleur_libre:'#e5900a',opacite:1,align:'left'});
-    page.blocs.push({id:cbGenId(),type:'titre',x:texteX,y:hexY+20,w:texteW,h:50,binding:binding('nom'),fs:22,bold:true,italic:false,police:'Playfair Display',couleur_texte:'#1a1a1a',couleur_libre:'#e5900a',opacite:1,align:'left'});
-    page.blocs.push({id:cbGenId(),type:'texte',x:texteX,y:hexY+80,w:texteW,h:120,binding:binding('description'),fs:12,bold:false,italic:false,police:'DM Sans',couleur_texte:'#444',couleur_libre:'#e5900a',opacite:1,align:'left'});
-    page.blocs.push({id:cbGenId(),type:'texte',x:texteX,y:hexY+210,w:texteW,h:60,binding:binding('desc_emballage'),fs:11,bold:false,italic:true,police:'DM Sans',couleur_texte:'#666',couleur_libre:'#e5900a',opacite:1,align:'left'});
+    // Hex
+    page.blocs.push({...b('couleur_hex'), type:'couleur', x:hexX, y:hexY, w:hexW, h:hexH, couleur_libre:hexCouleur});
+    // Photo
+    page.blocs.push({...b('image_url'), type:'image', x:hexX, y:hexY, w:photoS, h:photoS});
+    // Nom collection
+    page.blocs.push({...b(''), type:'titre', x:hexX+10, y:hexY+photoS+16, w:hexW-20, h:24,
+      fs:10, bold:false, couleur_texte:'#ffffff', _texte_fixe:(col?.nom||'').toUpperCase()});
+    // Nom produit
+    page.blocs.push({...b('nom'), type:'titre', x:hexX+10, y:hexY+photoS+40, w:hexW-20, h:36,
+      fs:18, bold:true, police:'Playfair Display', couleur_texte:'#ffffff'});
+    // Gamme
+    page.blocs.push({...b(''), type:'texte', x:hexX+10, y:hexY+photoS+78, w:hexW-20, h:22,
+      fs:11, italic:false, couleur_texte:'#ffffffaa', _texte_fixe:gam?.nom||''});
+    // Ligne séparatrice
+    page.blocs.push({...b(''), type:'couleur', x:hexX+10, y:hexY+photoS+104, w:hexW-20, h:1,
+      couleur_libre:'#ffffff66', opacite:0.5});
+    // Formats + prix
+    page.blocs.push({...b(''), type:'texte', x:hexX+10, y:hexY+photoS+116, w:hexW-20, h:50,
+      fs:12, bold:true, couleur_texte:'#ffffff', align:'center',
+      _texte_fixe: formatsTexte});
 
   } else {
-    // ── HORIZONTAL — hex grand rectangle en haut ──
-    const hexW = CB_W - CB_MARGE*2, hexH = 320, hexX = CB_MARGE, hexY = CB_MARGE + 20;
-    const photoS = 200;
-    const photoX = hexX + 20;
-    const photoY = hexY + (hexH - photoS) / 2;
-    const texteX = photoX + photoS + 20;
-    const texteW = hexW - photoS - 60;
+    const hexX=CB_MARGE+20, hexY=CB_MARGE+20;
+    const hexW=480, hexH=220;
+    const photoS=220;
 
-    page.blocs.push({id:cbGenId(),type:'couleur',x:hexX,y:hexY,w:hexW,h:hexH,binding:binding('couleur_hex'),fs:13,bold:false,italic:false,police:'DM Sans',couleur_texte:'#fff',couleur_libre:col?.couleur_hex||'#e5900a',opacite:1,align:'left'});
-    page.blocs.push({id:cbGenId(),type:'image',x:photoX,y:photoY,w:photoS,h:photoS,binding:binding('image_url'),fs:13,bold:false,italic:false,police:'DM Sans',couleur_texte:'#fff',couleur_libre:'#e5900a',opacite:1,align:'left'});
-    page.blocs.push({id:cbGenId(),type:'titre',x:texteX,y:hexY+30,w:texteW,h:50,binding:binding('nom'),fs:22,bold:true,italic:false,police:'Playfair Display',couleur_texte:'#ffffff',couleur_libre:'#e5900a',opacite:1,align:'left'});
-    page.blocs.push({id:cbGenId(),type:'texte',x:texteX,y:hexY+90,w:texteW,h:120,binding:binding('description'),fs:12,bold:false,italic:false,police:'DM Sans',couleur_texte:'#ffffff',couleur_libre:'#e5900a',opacite:1,align:'left'});
-    page.blocs.push({id:cbGenId(),type:'texte',x:hexX,y:hexY+hexH+20,w:hexW,h:60,binding:binding('desc_emballage'),fs:11,bold:false,italic:true,police:'DM Sans',couleur_texte:'#666',couleur_libre:'#e5900a',opacite:1,align:'left'});
+    // Hex
+    page.blocs.push({...b('couleur_hex'), type:'couleur', x:hexX, y:hexY, w:hexW, h:hexH, couleur_libre:hexCouleur});
+    // Photo
+    page.blocs.push({...b('image_url'), type:'image', x:hexX, y:hexY, w:photoS, h:photoS});
+    // Nom collection
+    page.blocs.push({...b(''), type:'titre', x:hexX+photoS+16, y:hexY+16, w:hexW-photoS-26, h:24,
+      fs:10, bold:false, couleur_texte:'#ffffff', _texte_fixe:(col?.nom||'').toUpperCase()});
+    // Nom produit
+    page.blocs.push({...b('nom'), type:'titre', x:hexX+photoS+16, y:hexY+40, w:hexW-photoS-26, h:40,
+      fs:18, bold:true, police:'Playfair Display', couleur_texte:'#ffffff'});
+    // Gamme
+    page.blocs.push({...b(''), type:'texte', x:hexX+photoS+16, y:hexY+82, w:hexW-photoS-26, h:22,
+      fs:11, couleur_texte:'#ffffffaa', _texte_fixe:gam?.nom||''});
+    // Ligne séparatrice
+    page.blocs.push({...b(''), type:'couleur', x:hexX+photoS+16, y:hexY+108, w:hexW-photoS-26, h:1,
+      couleur_libre:'#ffffff66', opacite:0.5});
+    // Formats + prix
+    page.blocs.push({...b(''), type:'texte', x:hexX+photoS+16, y:hexY+120, w:hexW-photoS-26, h:50,
+      fs:12, bold:true, couleur_texte:'#ffffff', align:'center',
+      _texte_fixe: formatsTexte});
   }
 
   cbFermerFicheProduit();
@@ -891,7 +928,6 @@ function cbGenererFicheProduit() {
   cbRendreCalques();
   cbSauvegarderPage();
 }
-
 // ─── CALQUES ─────────────────────────────────────────────────────────────────
 function cbRendreCalques() {
   const cont = document.getElementById('cb-calques-liste');
