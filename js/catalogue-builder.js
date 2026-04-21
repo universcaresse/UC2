@@ -284,8 +284,8 @@ function cbRendreCanvas() {
 
 function cbRendreGuides(canvas, idx) {
   const estPaire = idx%2===0;
-  const margeG   = estPaire ? CB_MARGE : 0;
-  const margeD   = estPaire ? 0 : CB_MARGE;
+  const margeG   = estPaire ? 0 : CB_MARGE;
+  const margeD   = estPaire ? CB_MARGE : 0;
   const guide    = document.createElement('div');
   guide.className = 'cb-guide';
   guide.style.cssText = `position:absolute;left:${margeG}px;top:${CB_MARGE}px;width:${CB_W-margeG-margeD}px;height:${CB_H-CB_MARGE*2}px;border:1px dashed rgba(99,102,241,0.25);pointer-events:none;box-sizing:border-box;z-index:1`;
