@@ -429,7 +429,7 @@ function modifierFamille(fam_id) {
   document.getElementById('ff-rang').value        = fam.rang || '';
   document.getElementById('ff-nom').value         = fam.nom || '';
   document.getElementById('ff-desc').value        = fam.description || '';
-  if (document.getElementById('ff-couleur-hex')) document.getElementById('ff-couleur-hex').value = fam.couleur_hex || '';
+  if (document.getElementById('ff-couleur-hex')) (document.getElementById('ff-couleur-hex') || {}).value = fam.couleur_hex || '';
   const sel = document.getElementById('ff-collection');
   sel.innerHTML = '<option value="">— Choisir —</option>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
@@ -969,7 +969,7 @@ function ouvrirFormGamme(col_id) {
   document.getElementById('fg-nom').value         = '';
   document.getElementById('fg-rang').value        = '';
   document.getElementById('fg-desc').value        = '';
-  document.getElementById('fg-couleur-hex').value = '';
+  (document.getElementById('fg-couleur-hex') || {}).value = '';
   const sel = document.getElementById('fg-collection');
   sel.innerHTML = '<option value="">— Choisir —</option>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
