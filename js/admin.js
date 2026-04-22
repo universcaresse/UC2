@@ -367,6 +367,7 @@ function ouvrirFicheFamille(fam_id) {
   document.getElementById('fiche-famille').classList.remove('cache');
   setTimeout(appliquerCouleursHex, 300);
   window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
 
 function fermerFicheFamille() {
@@ -954,6 +955,7 @@ function ouvrirFicheGamme2(gam_id) {
   document.getElementById('fiche-gamme').classList.remove('cache');
   setTimeout(appliquerCouleursHex, 300);
   window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
 
 function fermerFicheGamme2() {
@@ -1425,7 +1427,8 @@ async function ouvrirFicheProduit(pro_id) {
   document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
   document.getElementById('grille-produits').classList.add('cache');
   document.getElementById('btn-nouvelle-recette').classList.add('cache');
-  document.querySelector('.admin-contenu').scrollTop = 0;
+  window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
 
 function exporterFicheProduit() {
