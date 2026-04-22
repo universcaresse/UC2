@@ -1991,7 +1991,8 @@ function rafraichirListeIngredientsRecette() {
   const cats  = [...new Set(listesDropdown.fullData.map(d => d.cat_id))].filter(Boolean).sort();
   liste.innerHTML = ingredientsRecette.map((ing, i) => {
     const ingsDeType = listesDropdown.fullData.filter(d => d.cat_id === ing.type);
-    const inciVal    = (listesDropdown.fullData.find(d => d.ing_id === ing.ing_id) || listesDropdown.fullData.find(d => d.nom_UC === ing.nom) || {}).inci || '';
+    const inciObj    = listesDropdown.fullData.find(d => d.ing_id === ing.ing_id) || listesDropdown.fullData.find(d => d.nom_UC === ing.nom) || {};
+    const inciVal    = (inciObj.inci || '').trim();
     return `
     <div class="ingredient-rangee">
       <select class="form-ctrl ing-type" onchange="ingredientsRecette[${i}].type=this.value; ingredientsRecette[${i}].nom=''; rafraichirListeIngredientsRecette()">
