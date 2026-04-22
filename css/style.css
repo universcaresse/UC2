@@ -374,7 +374,7 @@ main { padding-top: var(--nav-h); }
 textarea.form-control, textarea.form-ctrl { resize: vertical; min-height: 120px; line-height: 1.6; }
 textarea.textarea-auto { resize: none; overflow: hidden; }
 select.form-control, select.form-ctrl { cursor: pointer; }
-.form-ctrl[readonly] { background: rgba(232,220,200,0.3); color: var(--gris); }
+.form-ctrl[readonly] { background: white; color: var(--gris); }
 
 .form-erreur { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; color: var(--danger); margin-bottom: 16px; }
 .form-actions { display: flex; gap: 10px;  flex-wrap: wrap; }

@@ -1700,17 +1700,7 @@ async function sauvegarderRecette() {
       d.formats = formatsRecette.map(f => ({ poids: f.poids, unite: f.unite, prix_vente: f.prix, emb_id: '' }));
     }
   }
-  if (d.statut === 'public') {
-    const sansInci = ingredientsRecette.filter(i => {
-      const inciObj = listesDropdown.fullData.find(d => d.ing_id === i.ing_id);
-      return !inciObj || !inciObj.inci || !inciObj.inci.trim();
-    });
-    if (sansInci.length > 0) {
-      afficherMsg('recettes', `Impossible de publier — ${sansInci.length} ingrédient(s) n'ont pas de code INCI valide.`, 'erreur');
-      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
-      return;
-    }
-  }
+  
   const res = await appelAPIPost('saveProduit', d);
   if (res && res.success) {
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
