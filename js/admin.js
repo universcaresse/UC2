@@ -1704,12 +1704,13 @@ async function sauvegarderRecette() {
   const res = await appelAPIPost('saveProduit', d);
   if (res && res.success) {
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
-    cacherChargement();
+  cacherChargement();
     fermerFormProduit();
     afficherMsg('recettes', id ? 'Produit mis à jour.' : 'Produit créé.');
     await chargerProduitsData();
-    document.querySelector('.admin-contenu')?.scrollTo(0, 0);
-  } else {
+    const contenu = document.querySelector('.admin-contenu');
+    if (contenu) contenu.scrollTop = scrollAvantProduit;
+ } else {
     cacherChargement();
     afficherMsg('recettes', 'Erreur.', 'erreur');
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
