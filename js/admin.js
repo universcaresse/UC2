@@ -727,7 +727,7 @@ async function modifierCollection(col_id) {
   const descCol = document.getElementById('fc-desc-col');
   if (descCol) { descCol.value = col.description || ''; ajusterHauteurTextarea(descCol); }
   if (document.getElementById('fc-couleur-hex')) document.getElementById('fc-couleur-hex').value = col.couleur_hex || '';
-  apercuCouleurCollection(document.getElementById('fc-couleur-hex'));
+  if (document.getElementById('fc-couleur-hex')) apercuCouleurCollection(document.getElementById('fc-couleur-hex'));
   document.getElementById('fc-photo-url').value        = col.photo_url || '';
   const preview = document.getElementById('fc-photo-preview');
   if (preview) preview.innerHTML = col.photo_url ? `<img src="${col.photo_url}" class="photo-preview">` : '';
