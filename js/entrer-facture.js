@@ -1000,6 +1000,9 @@ async function efConfirmerModalIngredient() {
     nomUC = nouveauNom;
   }
 
+  const selFmtAvant = document.getElementById('ef-saisie-format');
+  const valFmtAvant = selFmtAvant?.value;
+  const optsAvant   = selFmtAvant ? [...selFmtAvant.options].map(o => ({ value: o.value, text: o.textContent })) : [];
   ef._saisieIngId = ing_id;
   const selNomUC = document.getElementById('ef-saisie-nom-uc');
   if (selNomUC) {
@@ -1013,7 +1016,19 @@ async function efConfirmerModalIngredient() {
     }
     selNomUC.value = ing_id;
   }
-  efFermerModalIngredient();
+efFermerModalIngredient();
+
+  // Restaurer le format saisi avant
+  const selFmtApres = document.getElementById('ef-saisie-format');
+  if (selFmtApres && optsAvant.length > 0) {
+    selFmtApres.innerHTML = '';
+    optsAvant.forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o.value; opt.textContent = o.text;
+      selFmtApres.appendChild(opt);
+    });
+    if (valFmtAvant) selFmtApres.value = valFmtAvant;
+  }
 }
 
 // ─── MODAL NOUVELLE CATÉGORIE UC ───
