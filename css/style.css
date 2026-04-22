@@ -515,6 +515,21 @@ select.form-control, select.form-ctrl { cursor: pointer; }
 
 
 
+.overlay-chargement {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.85);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+
+
+
 
 /* ═══════════════════════════════════════
    FOOTER

@@ -741,8 +741,9 @@ async function modifierCollection(col_id) {
 }
 
 async function sauvegarderCollection() {
+  afficherChargement();
   const btnSauvegarder = document.querySelector('#form-collections .form-body-actions .bouton');
-  if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = '<span class="spinner"></span> Sauvegarde…'; }
+  if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = 'Sauvegarde…'; }
   const rowIndex = document.getElementById('fc-rowIndex').value;
   const mode     = document.getElementById('fc-mode').value;
 
@@ -806,10 +807,12 @@ async function sauvegarderCollection() {
   const res = await appelAPIPost('saveCollection', d);
   if (res && res.success) {
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    cacherChargement();
     fermerFormCollection();
     afficherMsg('collections', rowIndex ? 'Collection mise à jour.' : 'Collection ajoutée.');
-    chargerCollections();
+  chargerCollections();
   } else {
+    cacherChargement();
     afficherMsg('collections', 'Erreur lors de la sauvegarde.', 'erreur');
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
   }
@@ -2091,6 +2094,13 @@ function rafraichirListeFormatsRecette() {
 
 // ─── LISTES DROPDOWN V2 ───
 var listesDropdown = { types: [], fullData: [], config: {}, fournisseurs: [], formats: [] };
+
+function afficherChargement() {
+  document.getElementById('overlay-chargement')?.classList.remove('cache');
+}
+function cacherChargement() {
+  document.getElementById('overlay-chargement')?.classList.add('cache');
+}
 
 /* ════════════════════════════════
    NOUVELLE FACTURE
