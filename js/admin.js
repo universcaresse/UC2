@@ -726,7 +726,7 @@ async function modifierCollection(col_id) {
   document.getElementById('fc-slogan').value           = col.slogan || '';
   const descCol = document.getElementById('fc-desc-col');
   if (descCol) { descCol.value = col.description || ''; ajusterHauteurTextarea(descCol); }
-  if (document.getElementById('fc-couleur-hex')) document.getElementById('fc-couleur-hex').value = col.couleur_hex || '';
+  if (document.getElementById('fc-couleur-hex')) (document.getElementById('fc-couleur-hex') || {}).value = col.couleur_hex || '';
   if (document.getElementById('fc-couleur-hex')) apercuCouleurCollection(document.getElementById('fc-couleur-hex'));
   document.getElementById('fc-photo-url').value        = col.photo_url || '';
   const preview = document.getElementById('fc-photo-preview');
@@ -793,7 +793,7 @@ async function sauvegarderCollection() {
     nom:         document.getElementById('fc-collection').value.toUpperCase(),
     slogan:      document.getElementById('fc-slogan').value,
     description: document.getElementById('fc-desc-col').value,
-    couleur_hex: document.getElementById('fc-couleur-hex').value,
+    couleur_hex: (document.getElementById('fc-couleur-hex') || {}).value,
     photo_url:   document.getElementById('fc-photo-url').value,
     photo_noel_url: document.getElementById('fc-photo-url-noel')?.value || '',
     rowIndex:    rowIndex || null
