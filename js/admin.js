@@ -413,6 +413,7 @@ function ouvrirFormFamille() {
   document.getElementById('btn-nouvelle-famille').classList.add('cache');
   document.getElementById('form-familles').classList.remove('cache');
   window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
 
 function fermerFormFamille() {
@@ -702,6 +703,7 @@ async function modifierGamme(gam_id) {
   document.getElementById('btn-nouvelle-gamme').classList.add('cache');
   document.getElementById('form-gammes').classList.remove('cache');
   window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
 
 async function modifierCollection(col_id) {
@@ -1533,6 +1535,7 @@ async function ouvrirFormProduit() {
   rafraichirListeIngredientsRecette();
   rafraichirListeFormatsRecette();
   window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
 
 function fermerFormProduit() {
