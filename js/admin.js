@@ -741,7 +741,7 @@ async function modifierCollection(col_id) {
 }
 
 async function sauvegarderCollection() {
-  const btnSauvegarder = document.querySelector('#form-collections .bouton');
+  const btnSauvegarder = document.querySelector('#form-collections .form-body-actions .bouton');
   if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = '<span class="spinner"></span> Sauvegarde…'; }
   const rowIndex = document.getElementById('fc-rowIndex').value;
   const mode     = document.getElementById('fc-mode').value;
