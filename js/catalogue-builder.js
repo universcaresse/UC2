@@ -414,10 +414,12 @@ function cbCreerBlocEl(b, actif) {
 
   if (b.type==='image') {
     el.style.opacity = b.opacite !== undefined ? b.opacite : 1;
+    el.style.overflow = 'hidden';
     const posX = b.img_pos_x !== undefined ? b.img_pos_x : 50;
     const posY = b.img_pos_y !== undefined ? b.img_pos_y : 50;
+    const zoom = b.img_zoom !== undefined ? b.img_zoom : 100;
     el.innerHTML = val
-      ? `<img src="${val}" style="width:100%;height:100%;object-fit:cover;object-position:${posX}% ${posY}%;display:block" onerror="this.style.display='none'">`
+      ? `<img src="${val}" style="width:${zoom}%;height:${zoom}%;object-fit:cover;object-position:${posX}% ${posY}%;display:block;transform-origin:${posX}% ${posY}%;margin-left:${-(zoom-100)*posX/100}%;margin-top:${-(zoom-100)*posY/100}%" onerror="this.style.display='none'">`
       : `<div class="cb-placeholder">⬜ Image</div>`;
   } else if (b.type==='couleur') {
     // Couleur libre si pas de binding, sinon valeur du binding
@@ -551,6 +553,10 @@ function cbRendreProps() {
     if (sy) sy.value=bloc.img_pos_y!==undefined?bloc.img_pos_y:50;
     if (lx) lx.textContent=(bloc.img_pos_x!==undefined?bloc.img_pos_x:50)+'%';
     if (ly) ly.textContent=(bloc.img_pos_y!==undefined?bloc.img_pos_y:50)+'%';
+    const sz=document.getElementById('cb-image-zoom');
+    const lz=document.getElementById('cb-image-zoom-label');
+    if (sz) sz.value=bloc.img_zoom!==undefined?bloc.img_zoom:100;
+    if (lz) lz.textContent=(bloc.img_zoom!==undefined?bloc.img_zoom:100)+'%';
   }
 }
 
@@ -806,9 +812,11 @@ function cbUpdateImagePos() {
   const b=cbGetBloc(); if (!b) return;
   const x=document.getElementById('cb-image-pos-x').value;
   const y=document.getElementById('cb-image-pos-y').value;
-  b.img_pos_x=x; b.img_pos_y=y;
+  const z=document.getElementById('cb-image-zoom').value;
+  b.img_pos_x=x; b.img_pos_y=y; b.img_zoom=z;
   document.getElementById('cb-image-pos-x-label').textContent=x+'%';
   document.getElementById('cb-image-pos-y-label').textContent=y+'%';
+  document.getElementById('cb-image-zoom-label').textContent=z+'%';
   cbRendreCanvas(); cbSauvegarderPage();
 }
 
@@ -822,6 +830,14 @@ function cbSetCouleurPredefinie(val) {
   const b=cbGetBloc(); if (!b) return;
   b.couleur_libre=val;
   const picker=document.getElementById('cb-couleur-libre-picker');
+  if (picker) picker.value=val;
+  cbRendreCanvas(); cbSauvegarderPage();
+}
+
+function cbSetCouleurTexte(val) {
+  const b=cbGetBloc(); if (!b) return;
+  b.couleur_texte=val;
+  const picker=document.getElementById('cb-typo-couleur');
   if (picker) picker.value=val;
   cbRendreCanvas(); cbSauvegarderPage();
 }

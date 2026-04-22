@@ -2889,6 +2889,15 @@
               <input type="color" class="form-ctrl" id="cb-typo-couleur" oninput="cbUpdateTypo()" style="padding:2px;height:36px">
             </div>
           </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+            <div onclick="cbSetCouleurTexte('#5a8a3a')" title="Primary" style="width:22px;height:22px;border-radius:50%;background:#5a8a3a;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#4a6e2e')" title="Primary dark" style="width:22px;height:22px;border-radius:50%;background:#4a6e2e;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#d4a445')" title="Accent" style="width:22px;height:22px;border-radius:50%;background:#d4a445;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#ffffff')" title="Blanc" style="width:22px;height:22px;border-radius:50%;background:#ffffff;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#8b8680')" title="Gris" style="width:22px;height:22px;border-radius:50%;background:#8b8680;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#3d3b39')" title="Gris foncé" style="width:22px;height:22px;border-radius:50%;background:#3d3b39;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#333333')" title="Logo" style="width:22px;height:22px;border-radius:50%;background:#333333;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+          </div>
           <div style="display:flex;gap:8px;margin-top:6px">
             <button class="bouton bouton-petit" id="cb-typo-bold-btn" onclick="cbToggleBold()" style="font-weight:bold;flex:1">G</button>
             <button class="bouton bouton-petit" id="cb-typo-italic-btn" onclick="cbToggleItalic()" style="font-style:italic;flex:1">I</button>
@@ -2916,7 +2925,12 @@
             <input type="range" id="cb-image-opacite-slider" min="0" max="100" value="100" oninput="cbUpdateImageOpacite(this.value)" style="flex:1">
             <span id="cb-image-opacite-label" style="font-size:12px;color:#666;width:36px;text-align:right">100%</span>
           </div>
-          <div style="font-size:10px;font-weight:700;color:#888;margin-top:12px;margin-bottom:8px;letter-spacing:.5px">POSITION DANS LE CADRE</div>
+          <div style="font-size:10px;font-weight:700;color:#888;margin-top:12px;margin-bottom:8px;letter-spacing:.5px">ZOOM ET POSITION</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+            <span style="font-size:11px;color:#888;width:14px">🔍</span>
+            <input type="range" id="cb-image-zoom" min="100" max="300" value="100" oninput="cbUpdateImagePos()" style="flex:1">
+            <span id="cb-image-zoom-label" style="font-size:12px;color:#666;width:36px;text-align:right">100%</span>
+          </div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
             <span style="font-size:11px;color:#888;width:14px">X</span>
             <input type="range" id="cb-image-pos-x" min="0" max="100" value="50" oninput="cbUpdateImagePos()" style="flex:1">
