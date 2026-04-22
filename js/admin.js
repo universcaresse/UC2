@@ -400,7 +400,7 @@ function ouvrirFormFamille() {
   document.getElementById('ff-rang').value        = '';
   document.getElementById('ff-nom').value         = '';
   document.getElementById('ff-desc').value        = '';
-  document.getElementById('ff-couleur-hex').value = '';
+  (document.getElementById('ff-couleur-hex') || {}).value = '';
   const sel = document.getElementById('ff-collection');
   sel.innerHTML = '<option value="">— Choisir —</option>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
@@ -457,7 +457,7 @@ async function sauvegarderFamille() {
     rang:        positionChoisie + 1,
     nom,
     description: document.getElementById('ff-desc').value,
-    couleur_hex: document.getElementById('ff-couleur-hex').value
+    couleur_hex: (document.getElementById('ff-couleur-hex') || {}).value
   };
   const res = await appelAPIPost('saveFamille', d);
   if (res && res.success) {
@@ -689,7 +689,7 @@ async function modifierGamme(gam_id) {
   document.getElementById('fg-id').value          = gam.gam_id;
   document.getElementById('fg-nom').value         = gam.nom || '';
   document.getElementById('fg-desc').value        = gam.description || '';
-  if (document.getElementById('fg-couleur-hex')) document.getElementById('fg-couleur-hex').value = gam.couleur_hex || '';
+  if (document.getElementById('fg-couleur-hex')) (document.getElementById('fg-couleur-hex') || {}).value = gam.couleur_hex || '';
   const sel = document.getElementById('fg-collection');
   sel.innerHTML = '<option value="">— Choisir —</option>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
@@ -1006,7 +1006,7 @@ async function sauvegarderGamme2() {
     rang:        rangCalcule,
     nom,
     description: document.getElementById('fg-desc').value,
-    couleur_hex: document.getElementById('fg-couleur-hex').value || '',
+    couleur_hex: (document.getElementById('fg-couleur-hex') || {}).value || '',
     rowIndex:    rowIndex || null
   };
   const res = await appelAPIPost('saveGamme', d);
