@@ -1327,7 +1327,8 @@ function cbOuvrirVueLecture() {
           el.style.opacity=b.opacite!==undefined?b.opacite:1;
           const px=b.img_pos_x!==undefined?b.img_pos_x:50;
           const py=b.img_pos_y!==undefined?b.img_pos_y:50;
-          if(val)el.innerHTML=`<img src="${val}" style="width:100%;height:100%;object-fit:cover;object-position:${px}% ${py}%;display:block">`;
+          const pz=b.img_zoom!==undefined?b.img_zoom:100;
+          if(val)el.innerHTML=`<img src="${val}" style="width:${pz}%;height:${pz}%;object-fit:cover;object-position:${px}% ${py}%;display:block;margin-left:${-(pz-100)*px/100}%;margin-top:${-(pz-100)*py/100}%">`;
         } else if (b.type==='couleur'){
 			
         const couleur=(b.binding?.field&&val)?val:(b.couleur_libre||'#e5900a');
@@ -1410,7 +1411,8 @@ function cbRendrePageHTML(page,idx) {
     } else if (b.type==='image') {
       const px=b.img_pos_x!==undefined?b.img_pos_x:50;
       const py=b.img_pos_y!==undefined?b.img_pos_y:50;
-      c=val?`<div style="opacity:${b.opacite!==undefined?b.opacite:1};width:100%;height:100%"><img src="${val}" style="width:100%;height:100%;object-fit:cover;object-position:${px}% ${py}%;display:block"></div>`:'';
+      const pz=b.img_zoom!==undefined?b.img_zoom:100;
+      c=val?`<div style="opacity:${b.opacite!==undefined?b.opacite:1};width:100%;height:100%;overflow:hidden"><img src="${val}" style="width:${pz}%;height:${pz}%;object-fit:cover;object-position:${px}% ${py}%;display:block;margin-left:${-(pz-100)*px/100}%;margin-top:${-(pz-100)*py/100}%"></div>`:'';
     } else if (b.type==='couleur') {
       const couleur=(b.binding?.field&&val)?val:(b.couleur_libre||'#e5900a');
       c=`<div style="width:100%;height:100%;background:${couleur};opacity:${b.opacite!==undefined?b.opacite:1}"></div>`;
