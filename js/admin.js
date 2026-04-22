@@ -1408,10 +1408,11 @@ async function ouvrirFicheProduit(pro_id) {
     <div class="fiche-section-titre">Mode d'emploi</div>
     <div class="fiche-texte">${pro.mode_emploi || '—'}</div>
     <div class="fiche-section-titre">Ingrédients</div>
-    <div class="fiche-ingredient fiche-ingredient-labels">
+    a<div class="fiche-ingredient fiche-ingredient-labels">
       <span class="fiche-ing-nom">Nom</span>
       <span class="fiche-ing-inci">INCI</span>
       <span class="fiche-ing-qte">Qté</span>
+      <span class="fiche-ing-qte">Prix</span>
     </div>
     <div class="fiche-ingredients">${ingsHtml}</div>
     <div class="fiche-section-titre">Liste INCI pour étiquette</div>
