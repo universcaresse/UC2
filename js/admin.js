@@ -1042,6 +1042,7 @@ function fermerFormGamme2() {
 
 var donneesProduits   = []; // [{pro_id, col_id, gam_id, nom, statut, ...}]
 var produitActif      = null;
+var scrollAvantProduit = 0;
 var collectionsDisponibles = {};
 
 async function chargerProduitsData() {
@@ -1129,6 +1130,7 @@ async function afficherProduits() {
         div.className = 'carte-produit';
         div.dataset.proId = pro.pro_id;
         div.onclick = () => {
+          scrollAvantProduit = document.querySelector('.admin-contenu')?.scrollTop || window.scrollY;
           div.classList.add('carte-produit-chargement');
           div.insertAdjacentHTML('beforeend', '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>');
           ouvrirFicheProduit(pro.pro_id).finally(() => {
@@ -1474,6 +1476,9 @@ function fermerFicheProduit() {
   document.getElementById('filtre-recette-nom').value = '';
   filtrerRecettes();
   produitActif = null;
+  const contenu = document.querySelector('.admin-contenu');
+  if (contenu) contenu.scrollTop = scrollAvantProduit;
+  else window.scrollTo(0, scrollAvantProduit);
 }
 
 // Compatibilité noms V1 dans le HTML — fermerFicheRecette défini comme function ci-dessous
