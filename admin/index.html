@@ -34,7 +34,7 @@
 		  <button class="nav-dropdown-item" onclick="afficherSection('gammes', null)">Gammes</button>
 		  <button class="nav-dropdown-item" onclick="afficherSection('familles', null)">Familles</button>
 		  <button class="nav-dropdown-item" onclick=	"afficherSection('produits', null)">Produits</button>
-		  <button class="nav-dropdown-item" onclick="afficherSection('catalogue-builder', null)">Catalogue PDF</button>
+		  
         </div>
       </li>
 	  
@@ -71,6 +71,7 @@
 		<button class="nav-dropdown-item" onclick="afficherSection('inci', null)">INCI</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('densites', null)">Densité</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('contenu-site', null)">Contenu du site</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('catalogue-builder', null)">Catalogue PDF</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('mediatheque', null)">Médiathèque</button>
 		<button class="nav-dropdown-item bientot">Corrections stock</button>
 		<a class="nav-dropdown-item" href="../index.html" target="_blank">Site public</a>
@@ -107,7 +108,7 @@
 <button class="sidebar-lien" onclick="afficherSection('familles', this)">Familles</button>
 		
  <button class="sidebar-lien" onclick="afficherSection('produits', this)">Produits</button>
-<button class="sidebar-lien" onclick="afficherSection('catalogue-builder', this)">Catalogue PDF</button>
+
       </div>
       <div class="sidebar-sep"></div>
       <div class="sidebar-groupe">
@@ -129,6 +130,7 @@
         <button class="sidebar-lien" onclick="afficherSection('inci', this)">INCI</button>
         <button class="sidebar-lien" onclick="afficherSection('densites', this)">Densité</button>
         <button class="sidebar-lien" onclick="afficherSection('contenu-site', this)">Contenu du site</button>
+        <button class="sidebar-lien" onclick="afficherSection('catalogue-builder', this)">Catalogue PDF</button>
         <button class="sidebar-lien" onclick="afficherSection('mediatheque', this)">Médiathèque</button>
      
       </div>
@@ -457,11 +459,7 @@
                 <label class="form-label">Description collection</label>
                 <textarea class="form-ctrl textarea-auto" id="fc-desc-col" rows="5" oninput="ajusterHauteurTextarea(this)"></textarea>
               </div>
-              <div class="form-groupe col-petit">
-                <label class="form-label">Couleur HEX</label>
-                <input type="text" class="form-ctrl" id="fc-couleur-hex" oninput="apercuCouleurCollection(this)">
-                <div id="fc-couleur-apercu" class="couleur-apercu"></div>
-              </div>
+              
               <div class="form-groupe col-plein">
                 <label class="form-label">Photo collection</label>
                 <div class="cloudinary-zone">
@@ -635,10 +633,7 @@
                   <label class="form-label">Description</label>
                   <textarea class="form-ctrl textarea-auto" id="ff-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Couleur HEX</label>
-                  <input type="text" class="form-ctrl" id="ff-couleur-hex">
-                </div>
+               
               </div>
             </div>
           </div>
@@ -774,10 +769,7 @@
                   </select>
                 </div>
                 <input type="hidden" id="fg-rang">
-                <div class="form-groupe">
-                  <label class="form-label">Couleur HEX</label>
-                  <input type="text" class="form-ctrl" id="fg-couleur-hex">
-                </div>
+                
                 <div class="form-groupe col-plein">
                   <label class="form-label">Description</label>
                   <textarea class="form-ctrl textarea-auto" id="fg-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
