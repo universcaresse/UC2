@@ -447,6 +447,7 @@ function modifierFamille(fam_id) {
 }
 
 async function sauvegarderFamille() {
+  afficherChargement();
   const id     = document.getElementById('ff-id').value;
   const col_id = document.getElementById('ff-collection').value;
   const nom    = document.getElementById('ff-nom').value.trim().toUpperCase();
@@ -462,10 +463,12 @@ async function sauvegarderFamille() {
   };
   const res = await appelAPIPost('saveFamille', d);
   if (res && res.success) {
+    cacherChargement();
     fermerFormFamille();
     afficherMsg('familles', id ? 'Famille mise à jour.' : 'Famille ajoutée.');
     await chargerFamilles();
   } else {
+    cacherChargement();
     afficherMsg('familles', 'Erreur lors de la sauvegarde.', 'erreur');
   }
 }
@@ -991,7 +994,8 @@ function ouvrirFormGamme(col_id) {
 }
 
 async function sauvegarderGamme2() {
-  const btnSauvegarder = document.querySelector('#form-gammes .bouton');
+  afficherChargement();
+  const btnSauvegarder = document.querySelector('#form-gammes .form-body-actions .bouton');
   if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = '<span class="spinner"></span> Sauvegarde…'; }
   const rowIndex = document.getElementById('fg-id').value;
   const col_id   = document.getElementById('fg-collection').value;
@@ -1015,12 +1019,14 @@ async function sauvegarderGamme2() {
   const res = await appelAPIPost('saveGamme', d);
   if (res && res.success) {
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    cacherChargement();
     fermerFormGamme2();
     afficherMsg('gammes', rowIndex ? 'Gamme mise à jour.' : 'Gamme ajoutée.');
     const resGam = await appelAPI('getGammes');
     if (resGam && resGam.success) donneesGammes = resGam.items || [];
     afficherGammes();
   } else {
+    cacherChargement();
     afficherMsg('gammes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
   }
@@ -1627,7 +1633,8 @@ function modifierRecette(id) { return modifierProduit(id); }
 
 
 async function sauvegarderRecette() {
-  const btnSauvegarder = document.querySelector('#form-recettes .bouton');
+  afficherChargement();
+  const btnSauvegarder = document.querySelector('#form-recettes .form-body-actions .bouton');
   if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = '<span class="spinner"></span> Sauvegarde…'; }
 
   const id     = document.getElementById('fr-id').value;
@@ -1707,11 +1714,13 @@ async function sauvegarderRecette() {
   const res = await appelAPIPost('saveProduit', d);
   if (res && res.success) {
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
+    cacherChargement();
     fermerFormProduit();
-     afficherMsg('recettes', id ? 'Produit mis à jour.' : 'Produit créé.');
+    afficherMsg('recettes', id ? 'Produit mis à jour.' : 'Produit créé.');
     await chargerProduitsData();
     document.querySelector('.admin-contenu')?.scrollTo(0, 0);
   } else {
+    cacherChargement();
     afficherMsg('recettes', 'Erreur.', 'erreur');
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
   }
