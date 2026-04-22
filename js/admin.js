@@ -427,10 +427,10 @@ function modifierFamille(fam_id) {
   const fam = donneesFamilles.find(f => f.fam_id === fam_id);
   if (!fam) return;
   document.getElementById('form-familles-titre').textContent = 'Modifier la famille';
+  document.getElementById('ff-nom').value         = fam.nom || '';
   document.getElementById('ff-id').value          = fam.fam_id;
   document.getElementById('ff-rang').value        = fam.rang || '';
-  document.getElementById('ff-nom').value         = fam.nom || '';
-  document.getElementById('ff-desc').value        = fam.description || '';
+    document.getElementById('ff-desc').value        = fam.description || '';
   if (document.getElementById('ff-couleur-hex')) (document.getElementById('ff-couleur-hex') || {}).value = fam.couleur_hex || '';
   const sel = document.getElementById('ff-collection');
   sel.innerHTML = '<option value="">— Choisir —</option>';
@@ -687,8 +687,9 @@ async function modifierGamme(gam_id) {
   const gam = donneesGammes.find(g => g.gam_id === gam_id);
   if (!gam) return;
   document.getElementById('form-gammes-titre').textContent = 'Modifier la gamme';
-  document.getElementById('fg-id').value          = gam.gam_id;
-  document.getElementById('fg-nom').value         = gam.nom || '';
+   document.getElementById('fg-nom').value         = gam.nom || '';
+   document.getElementById('fg-id').value          = gam.gam_id;
+ 
   document.getElementById('fg-desc').value        = gam.description || '';
   if (document.getElementById('fg-couleur-hex')) (document.getElementById('fg-couleur-hex') || {}).value = gam.couleur_hex || '';
   const sel = document.getElementById('fg-collection');
