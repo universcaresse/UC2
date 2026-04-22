@@ -575,6 +575,7 @@ const gammesHtml = gammes.map(gam => `
   document.getElementById('btn-nouvelle-collection').classList.add('cache');
   fiche.classList.add('visible');
   window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
 
 function fermerFicheCollection() {
