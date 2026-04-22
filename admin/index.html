@@ -2842,6 +2842,15 @@
         <!-- Couleur libre (bloc couleur sans binding) -->
         <div id="cb-couleur-libre-zone" style="display:none;border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px">
           <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:.5px">COULEUR</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+            <div onclick="cbSetCouleurPredefinie('#5a8a3a')" title="Primary" style="width:22px;height:22px;border-radius:50%;background:#5a8a3a;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#4a6e2e')" title="Primary dark" style="width:22px;height:22px;border-radius:50%;background:#4a6e2e;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#d4a445')" title="Accent" style="width:22px;height:22px;border-radius:50%;background:#d4a445;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#ffffff')" title="Blanc" style="width:22px;height:22px;border-radius:50%;background:#ffffff;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#8b8680')" title="Gris" style="width:22px;height:22px;border-radius:50%;background:#8b8680;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#3d3b39')" title="Gris foncé" style="width:22px;height:22px;border-radius:50%;background:#3d3b39;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#333333')" title="Logo" style="width:22px;height:22px;border-radius:50%;background:#333333;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+          </div>
           <div style="display:flex;align-items:center;gap:10px">
             <input type="color" id="cb-couleur-libre-picker" oninput="cbUpdateCouleurLibre(this.value)" style="width:48px;height:36px;padding:2px;border:1px solid #e5e5e5;border-radius:6px;cursor:pointer">
             <span style="font-size:12px;color:#666">Couleur libre</span>
@@ -2906,6 +2915,17 @@
           <div style="display:flex;align-items:center;gap:10px">
             <input type="range" id="cb-image-opacite-slider" min="0" max="100" value="100" oninput="cbUpdateImageOpacite(this.value)" style="flex:1">
             <span id="cb-image-opacite-label" style="font-size:12px;color:#666;width:36px;text-align:right">100%</span>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:#888;margin-top:12px;margin-bottom:8px;letter-spacing:.5px">POSITION DANS LE CADRE</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+            <span style="font-size:11px;color:#888;width:14px">X</span>
+            <input type="range" id="cb-image-pos-x" min="0" max="100" value="50" oninput="cbUpdateImagePos()" style="flex:1">
+            <span id="cb-image-pos-x-label" style="font-size:12px;color:#666;width:36px;text-align:right">50%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:11px;color:#888;width:14px">Y</span>
+            <input type="range" id="cb-image-pos-y" min="0" max="100" value="50" oninput="cbUpdateImagePos()" style="flex:1">
+            <span id="cb-image-pos-y-label" style="font-size:12px;color:#666;width:36px;text-align:right">50%</span>
           </div>
         </div>
 
