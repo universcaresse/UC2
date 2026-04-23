@@ -937,19 +937,9 @@ tr.cliquable { cursor: pointer; }
 /* ═══════════════════════════════════════
    ADMIN — INVENTAIRE
    ═══════════════════════════════════════ */
-.inv-section { margin-bottom: 20px; margin-top: 16px; }
-.inv-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; width: 100%; }
-.inv-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--gris-fonce); font-style: italic; white-space: nowrap; }
-.inv-line { flex: 1; height: 1px; background: var(--beige); min-width: 0; }
 .inv-total { text-align: right; padding: 12px 0; border-top: 2px solid var(--beige); margin-top: 8px; }
 .inv-total-label { font-family: 'DM Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gris); }
 .inv-total-montant { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--primary); }
-.td-ing-nom { font-weight: 500; }
-.td-ing-nom-suite { font-weight: 300; }
-.td-ing-fourn { color: var(--gris); font-size: 0.8rem; }
-.td-ing-fourn-meilleur { color: var(--primary); font-size: 0.8rem; font-weight: 500; }
-.td-ing-format { color: var(--gris); font-size: 0.78rem; }
-.td-ing-valeur { color: var(--primary); font-weight: 500; }
 
 /* ═══════════════════════════════════════
    ADMIN — FACTURES
