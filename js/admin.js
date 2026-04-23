@@ -925,7 +925,7 @@ function afficherGammes() {
           <div class="collection-carte-lignes-haut"></div>
           <div class="collection-carte-contenu">
             <span class="collection-carte-nom">${(gam.nom || '').toUpperCase()}</span>
-            <span class="collection-carte-slogan">${gam.description || ''}</span>
+            <span class="collection-carte-slogan"></span>
           </div>
         </div>`;
     });
