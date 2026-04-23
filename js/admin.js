@@ -2820,7 +2820,8 @@ async function chargerInventaire() {
       (resCats.items || []).forEach(c => { listesDropdown.categoriesMap[c.cat_id] = c.nom; });
     }
   }
-  const res = await appelAPI('getStock');
+ const res = await appelAPI('getStock');
+  console.log('getStock result:', res);
   if (loading) loading.classList.add('cache');
   if (!res || !res.success) { afficherMsg('inventaire', 'Erreur.', 'erreur'); return; }
 
