@@ -2828,14 +2828,15 @@ async function chargerInventaire() {
     parCat[cat].push(item);
   });
 
-  let html  = '<div class="tableau-wrap"><table><thead><tr><th>Ingrédient</th><th>Stock (g)</th><th>Prix/g réel</th><th>Dernière màj</th></tr></thead><tbody>';
+ let html  = '';
   let total = 0;
 
   Object.keys(parCat).sort().forEach(cat => {
-    html += `<tr><td colspan="4" class="inv-titre-rangee">${listesDropdown.categoriesMap?.[cat] || cat}</td></tr>`;
+    const nomCat = listesDropdown.categoriesMap?.[cat] || cat;
+    let lignes = '';
     parCat[cat].forEach(item => {
       total += (item.qte_g || 0) * (item.prix_par_g_reel || 0);
-      html += `
+      lignes += `
         <tr>
           <td>${item.nom_UC || item.ing_id}</td>
           <td>${parseFloat(item.qte_g || 0).toFixed(0)} g</td>
@@ -2843,10 +2844,24 @@ async function chargerInventaire() {
           <td>${item.date_derniere_maj || '—'}</td>
         </tr>`;
     });
+    html += `
+      <div class="form-panel visible">
+        <div class="form-panel-header" onclick="inciToggleAccordeon(this)" style="cursor:pointer">
+          <div class="form-panel-titre">${nomCat}</div>
+          <span class="badge-statut-ok">${parCat[cat].length} ingrédient(s)</span>
+        </div>
+        <div class="form-body inci-accord-body cache">
+          <div class="tableau-wrap">
+            <table class="tableau-admin">
+              <thead><tr><th>Ingrédient</th><th>Stock (g)</th><th>Prix/g réel</th><th>Dernière màj</th></tr></thead>
+              <tbody>${lignes}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>`;
   });
 
-  html += `</tbody></table></div>
-    <div class="inv-total">
+  html += `<div class="inv-total">
       <div class="inv-total-label">Valeur totale de l'inventaire</div>
       <div class="inv-total-montant">${formaterPrix(total)}</div>
     </div>`;
@@ -2878,17 +2893,34 @@ function filtrerInventaire() {
     if (!parCat[cat]) parCat[cat] = [];
     parCat[cat].push(item);
   });
-  let html  = '<div class="tableau-wrap"><table><thead><tr><th>Ingrédient</th><th>Stock (g)</th><th>Prix/g réel</th><th>Dernière màj</th></tr></thead><tbody>';
+ 
+let html  = '';
   let total = 0;
- Object.keys(parCat).sort().forEach(cat => {
-    html += `<tr><td colspan="4" class="inv-titre-rangee">${listesDropdown.categoriesMap?.[cat] || cat}</td></tr>`;
+  Object.keys(parCat).sort().forEach(cat => {
+    const nomCat = listesDropdown.categoriesMap?.[cat] || cat;
+    let lignes = '';
     parCat[cat].forEach(item => {
       total += (item.qte_g || 0) * (item.prix_par_g_reel || 0);
-      html += `<tr><td>${item.nom_UC || item.ing_id}</td><td>${parseFloat(item.qte_g || 0).toFixed(0)} g</td><td>${item.prix_par_g_reel ? parseFloat(item.prix_par_g_reel).toFixed(4) + ' $/g' : '—'}</td><td>${item.date_derniere_maj || '—'}</td></tr>`;
+      lignes += `<tr><td>${item.nom_UC || item.ing_id}</td><td>${parseFloat(item.qte_g || 0).toFixed(0)} g</td><td>${item.prix_par_g_reel ? parseFloat(item.prix_par_g_reel).toFixed(4) + ' $/g' : '—'}</td><td>${item.date_derniere_maj || '—'}</td></tr>`;
     });
+    html += `
+      <div class="form-panel visible">
+        <div class="form-panel-header" onclick="inciToggleAccordeon(this)" style="cursor:pointer">
+          <div class="form-panel-titre">${nomCat}</div>
+          <span class="badge-statut-ok">${parCat[cat].length} ingrédient(s)</span>
+        </div>
+        <div class="form-body inci-accord-body cache">
+          <div class="tableau-wrap">
+            <table class="tableau-admin">
+              <thead><tr><th>Ingrédient</th><th>Stock (g)</th><th>Prix/g réel</th><th>Dernière màj</th></tr></thead>
+              <tbody>${lignes}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>`;
   });
-  html += `</tbody></table></div><div class="inv-total"><div class="inv-total-label">Valeur totale de l'inventaire</div><div class="inv-total-montant">${formaterPrix(total)}</div></div>`;
-  contenu.innerHTML = html;
+  html += `<div class="inv-total"><div class="inv-total-label">Valeur totale de l'inventaire</div><div class="inv-total-montant">${formaterPrix(total)}</div></div>`;
+ contenu.innerHTML = html;
 }
 
 function reinitialiserFiltresInventaire() {
