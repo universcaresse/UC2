@@ -49,7 +49,7 @@ async function achatsInit() {
   if (resCfg && resCfg.success) {
     listesDropdown.config = {};
     (resCfg.items || []).forEach(c => {
-      listesDropdown.config[c.type] = {
+      listesDropdown.config[c.cat_id] = {
         densite:       parseFloat(c.densite)         || 1,
         unite:         c.unite                       || 'g',
         margePertePct: parseFloat(c.marge_perte_pct) || 0

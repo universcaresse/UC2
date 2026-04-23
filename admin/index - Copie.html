@@ -1,0 +1,3197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="../Images/plume.png">
+  <title>Univers Caresse - Administration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Birthstone&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body> 
+
+  <!-- ACCÈS REFUSÉ -->
+  <div class="acces-refuse" id="acces-refuse">
+    <div class="acces-refuse-titre">Accès restreint</div>
+    <p class="acces-refuse-desc">Vous devez être connecté pour accéder à cette page.</p>
+    <a href="../index.html" class="bouton">Retour à l'accueil</a>
+  </div>
+
+  <!-- NAVIGATION -->
+<nav id="nav">
+  <ul class="nav-admin-links">
+      
+	  <li class="nav-admin-item">
+        <button class="nav-admin-btn" onclick="afficherSection('accueil', null)">Accueil</button>
+	 </li>
+	 
+      <li class="nav-admin-item">
+        <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Création <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-item" onclick="afficherSection('collections', null)">Collections</button>
+		  <button class="nav-dropdown-item" onclick="afficherSection('gammes', null)">Gammes</button>
+		  <button class="nav-dropdown-item" onclick="afficherSection('familles', null)">Familles</button>
+		  <button class="nav-dropdown-item" onclick=	"afficherSection('produits', null)">Produits</button>
+		  
+        </div>
+      </li>
+	  
+      <li class="nav-admin-item">
+        <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Achats <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
+        <div class="nav-dropdown">
+		<button class="nav-dropdown-item" onclick="afficherSection('entrer-facture', null)">Achats</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('factures', null)">Les factures</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('inventaire', null)">Inventaire</button>
+        </div>
+      </li>
+	  
+      <li class="nav-admin-item">
+        <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Production <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
+        <div class="nav-dropdown">
+		<button class="nav-dropdown-item" onclick="afficherSection('fabrication', this)">Fabrication</button>
+		<button class="nav-dropdown-item bientot">Ventes</button>
+        </div>
+      </li>
+	  
+      <li class="nav-admin-item">
+        <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Statistiques <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-item bientot">Les produits</button>
+          <button class="nav-dropdown-item bientot">Inventaire</button>
+          <button class="nav-dropdown-item bientot">Vente</button>
+          <button class="nav-dropdown-item bientot">Bilan</button>
+        </div>
+      </li>
+	  
+      <li class="nav-admin-item">
+        <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Système <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
+        <div class="nav-dropdown">
+		<button class="nav-dropdown-item" onclick="afficherSection('inci', null)">INCI</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('densites', null)">Densité</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('contenu-site', null)">Contenu du site</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('catalogue-builder', null)">Catalogue PDF</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('mediatheque', null)">Médiathèque</button>
+		<button class="nav-dropdown-item bientot">Corrections stock</button>
+		<a class="nav-dropdown-item" href="../index.html" target="_blank">Site public</a>
+		<button class="nav-dropdown-item" onclick="seDeconnecter()">Déconnexion</button>
+        </div>
+      </li>
+	  
+    </ul>
+	
+	
+  </nav>
+		<button class="burger burger-flottant" id="burger-admin" onclick="toggleSidebarAdmin()" aria-label="Menu">
+		<span></span>
+		<span></span>
+		<span></span>
+		</button>
+
+  <!-- LAYOUT -->
+  <div class="admin-layout">
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar-admin">
+    <div class="sidebar-groupe">
+        <button class="sidebar-lien" onclick="afficherSection('accueil', this)">Accueil</button>
+      </div>
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-groupe">
+        <div class="sidebar-titre">Création</div>
+        <button class="sidebar-lien actif" onclick="afficherSection('collections', this)">Collections</button>
+		
+		 <button class="sidebar-lien" onclick="afficherSection('gammes', this)">Gammes</button>
+<button class="sidebar-lien" onclick="afficherSection('familles', this)">Familles</button>
+		
+ <button class="sidebar-lien" onclick="afficherSection('produits', this)">Produits</button>
+
+      </div>
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-groupe">
+        <div class="sidebar-titre">Achats</div>
+         <button class="sidebar-lien" onclick="afficherSection('entrer-facture', this)">Achat</button>
+           <button class="sidebar-lien" onclick="afficherSection('factures', this)">Les factures</button>
+        <button class="sidebar-lien" onclick="afficherSection('inventaire', this)">Inventaire</button>
+      </div>
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-groupe">
+        <div class="sidebar-titre">Production</div>
+        <button class="sidebar-lien" onclick="afficherSection('fabrication', this)">Fabrication</button>
+        <button class="sidebar-lien" onclick="afficherSection('inventaire-production', this)">Stock</button>
+		<button class="sidebar-lien bientot">Corrections Stock</button>
+      </div>
+      <div class="sidebar-sep"></div>
+     <div class="sidebar-groupe">
+        <div class="sidebar-titre">Système</div>
+        <button class="sidebar-lien" onclick="afficherSection('inci', this)">INCI</button>
+        <button class="sidebar-lien" onclick="afficherSection('densites', this)">Densité</button>
+        <button class="sidebar-lien" onclick="afficherSection('contenu-site', this)">Contenu du site</button>
+        <button class="sidebar-lien" onclick="afficherSection('catalogue-builder', this)">Catalogue PDF</button>
+        <button class="sidebar-lien" onclick="afficherSection('mediatheque', this)">Médiathèque</button>
+     
+      </div>
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-groupe">
+        <a href="../index.html" target="_blank" class="sidebar-lien">Site public</a>
+        <button class="sidebar-lien" onclick="seDeconnecter()">Déconnexion</button>
+      </div>
+    </aside>
+
+    <!-- CONTENU -->
+    <main class="admin-contenu">
+			<!-- ════════════════════════════════════════
+			 ACCUEIL — Tableau de bord
+			 ════════════════════════════════════════ -->
+			<div class="section-admin" id="section-accueil">
+			<div class="accueil-admin">
+			
+			
+			<div class="accueil-gauche">
+                    <img src="../Images/Logofinal.png" alt="Univers Caresse" class="hero-logo-img fade-in delay-2">
+            <div class="accueil-chantal fade-in delay-3">Bonjour <span class="accueil-bonjour">Chantal</span></div>
+            <div class="hero-stats fade-in delay-5">
+                <div>
+                <div class="hero-stat-num" id="admin-stat-collections">—</div>
+                <div class="hero-stat-label">Collections</div>
+                </div>
+                <div>
+                <div class="hero-stat-num" id="admin-stat-produits">—</div>
+                <div class="hero-stat-label">Produits</div>
+                </div>
+                <div>
+                <div class="hero-stat-num">100%</div>
+                <div class="hero-stat-label">Artisanal</div>
+                </div>
+            </div>
+          </div>
+          
+         <div class="accueil-droite">
+  <div class="accueil-grande-tuile accueil-grande-tuile-vert">
+    <button class="accueil-tuile" onclick="afficherSection('collections', null)">
+      <span class="tuile-icone">
+        <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="12" height="20" rx="2"/>
+          <rect x="20" y="4" width="24" height="12" rx="2"/>
+          <rect x="20" y="20" width="11" height="24" rx="2"/>
+          <rect x="35" y="20" width="9" height="10" rx="2"/>
+          <rect x="4" y="28" width="12" height="16" rx="2"/>
+          <rect x="35" y="34" width="9" height="10" rx="2"/>
+        </svg>
+      </span>
+      <span class="tuile-nom">Collections</span>
+    </button>
+   <button class="accueil-tuile" onclick="afficherSection('produits', null)">
+      <span class="tuile-icone">
+        <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="6" y="14" width="22" height="26" rx="3"/>
+          <line x1="10" y1="22" x2="24" y2="22"/>
+          <line x1="10" y1="27" x2="24" y2="27"/>
+          <line x1="10" y1="32" x2="18" y2="32"/>
+          <path d="M26 10 C26 10 32 8 36 12 C40 16 38 22 34 24 C30 26 26 24 26 20 Z"/>
+          <circle cx="36" cy="8" r="2"/>
+          <circle cx="42" cy="12" r="1.5"/>
+          <circle cx="40" cy="18" r="1"/>
+        </svg>
+      </span>
+      <span class="tuile-nom">Produits</span>
+    </button>
+  </div>
+  <div class="accueil-grande-tuile accueil-grande-tuile-jaune">
+    <button class="accueil-tuile" onclick="afficherSection('nouvelle-facture', null)">
+      <span class="tuile-icone">
+        <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 18 L6 38 L42 38 L42 18 L22 18 L19 14 L6 14 Z"/>
+          <path d="M10 14 L10 10 L24 10 L27 14"/>
+          <path d="M28 18 L28 22 L42 22"/>
+          <line x1="12" y1="26" x2="22" y2="26"/>
+          <line x1="12" y1="30" x2="26" y2="30"/>
+          <line x1="30" y1="28" x2="38" y2="28"/>
+          <line x1="30" y1="32" x2="36" y2="32"/>
+        </svg>
+      </span>
+      <span class="tuile-nom">Achats</span>
+    </button>
+    <button class="accueil-tuile" onclick="afficherSection('factures', null)">
+      <span class="tuile-icone">
+        <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="10" y="6" width="28" height="36" rx="2"/>
+          <line x1="16" y1="16" x2="32" y2="16"/>
+          <line x1="16" y1="22" x2="32" y2="22"/>
+          <line x1="16" y1="28" x2="24" y2="28"/>
+        </svg>
+      </span>
+      <span class="tuile-nom">Factures</span>
+    </button>
+  </div>
+  <div class="accueil-grande-tuile accueil-grande-tuile-gris">
+    <button class="accueil-tuile" onclick="afficherSection('inventaire', null)">
+      <span class="tuile-icone">
+        <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 16 L24 8 L40 16 L40 36 L24 44 L8 36 Z"/>
+          <path d="M8 16 L24 24 L40 16"/>
+          <line x1="24" y1="24" x2="24" y2="44"/>
+          <path d="M16 12 L32 20"/>
+        </svg>
+      </span>
+      <span class="tuile-nom">Inventaire</span>
+    </button>
+    <button class="accueil-tuile" disabled>
+      <span class="tuile-icone">
+        <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="8" y="20" width="14" height="20" rx="2"/>
+          <rect x="26" y="14" width="14" height="26" rx="2"/>
+          <line x1="4" y1="40" x2="44" y2="40"/>
+          <line x1="12" y1="20" x2="12" y2="16"/>
+          <line x1="16" y1="20" x2="16" y2="16"/>
+        </svg>
+      </span>
+      <span class="tuile-nom">Stock</span>
+    </button>
+  </div>
+  <div class="accueil-grande-tuile accueil-grande-tuile-gris-fonce">
+    <button class="accueil-tuile" disabled>
+      <span class="tuile-icone">
+        <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="14" r="2.5"/>
+          <circle cx="12" cy="24" r="2.5"/>
+          <circle cx="12" cy="34" r="2.5"/>
+          <line x1="20" y1="14" x2="40" y2="14"/>
+          <line x1="20" y1="24" x2="40" y2="24"/>
+          <line x1="20" y1="34" x2="36" y2="34"/>
+        </svg>
+      </span>
+      <span class="tuile-nom">Liste</span>
+    </button>
+    <button class="accueil-tuile" disabled>
+      <span class="tuile-icone">
+        <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="24" r="6"/>
+          <path d="M24 6 L24 12 M24 36 L24 42 M6 24 L12 24 M36 24 L42 24 M10 10 L14 14 M34 34 L38 38 M38 10 L34 14 M14 34 L10 38"/>
+        </svg>
+      </span>
+      <span class="tuile-nom">Divers</span>
+    </button>
+  </div>
+</div>
+        </div>
+      </div>
+	  
+	  
+	  
+	  
+	  
+     <!-- ════════════════════════════════════════
+     COLLECTIONS — Liste, fiche et formulaire
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherCollections()
+       ouvrirFormCollection() / fermerFormCollection()
+       fermerFicheCollection()
+       sauvegarderCollection()
+       supprimerCollection()
+       ouvrirCloudinaryCollection() / ouvrirCloudinaryCollectionNoel()
+
+     CSS (style.css)
+     .collection-section
+       .fiche-bandeau, .fiche-slogan
+       .fiche-desc, .fiche-extras-wrap
+       .fiche-couleur, .fiche-photo
+       .fiche-ligne-item, .fiche-ligne-info, .fiche-ligne-nom
+     ════════════════════════════════════════ -->
+     <div class="section-admin visible" id="section-collections">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Gérer les collections</div>
+            <div class="page-entete-titre">Collections</div>
+          </div>
+          <button class="bouton" id="btn-nouvelle-collection" onclick="ouvrirFormCollection()">+ Nouvelle collection</button>
+        </div>
+        <div class="msg-zone" id="msg-collections"></div>
+		
+		
+		
+		
+      <!-- ════════════════════════════════════════
+     COLLECTIONS — Fiche d'une collection
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFicheCollection()
+       fermerFicheCollection()
+
+     CSS (style.css)
+       .fiche-bandeau, .fiche-slogan
+       .fiche-desc, .fiche-extras-wrap
+       .fiche-couleur, .fiche-photo
+     ════════════════════════════════════════ -->
+       <div id="fiche-collection">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="fiche-collection-bandeau">
+                <span class="form-panel-titre" id="fiche-collection-titre"></span>
+                <span class="fiche-slogan" id="fiche-collection-slogan"></span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFicheCollection()" title="Fermer">✕</button>
+            </div>
+          </div>
+          <div class="form-panel">
+            <div class="form-body">
+              <div id="fiche-collection-extras"></div>
+              <p class="fiche-desc" id="fiche-collection-desc"></p>
+              <div class="section-label">Gammes de produits</div>
+              <div id="fiche-collection-lignes"></div>
+            </div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" id="fiche-collection-modifier">Modifier cette collection</button>
+              <button class="bouton bouton-rouge" id="btn-supprimer-collection">Supprimer cette collection</button>
+              
+            </div>
+          </div>
+       </div>
+	   
+	   
+	   
+        <!-- ════════════════════════════════════════
+     COLLECTIONS — Fiche d'une gamme
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFicheGamme()
+       fermerFicheGamme() / fermerFicheLigne()
+
+     CSS (style.css)
+       .fiche-collection-bandeau, .fiche-collection-slogan
+       .fiche-ligne-actions
+       .fiche-ligne-item, .fiche-ligne-info
+       .fiche-ligne-nom, .fiche-ligne-format, .fiche-ligne-desc
+     ════════════════════════════════════════ -->
+      <div id="fiche-ligne" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="fiche-ligne-bandeau">
+                <span class="form-panel-titre" id="fiche-ligne-titre"></span>
+                <span class="fiche-slogan" id="fiche-ligne-format"></span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFicheLigne()" title="Fermer">✕</button>
+            </div>
+          </div>
+          <div class="form-panel">
+            <div class="form-body">
+              <div class="form-grille">
+                <div class="form-groupe">
+                  <label class="form-label">Collection</label>
+                  <div class="form-valeur" id="fiche-ligne-collection"></div>
+                </div>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Description de la gamme</label>
+                <div class="form-valeur" id="fiche-ligne-desc"></div>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Ingrédients de base</label>
+                <div id="fiche-ligne-ingredients"></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" id="fiche-ligne-modifier">Modifier cette gamme</button>
+              <button class="bouton bouton-rouge" id="btn-supprimer-ligne-fiche">Supprimer cette gamme</button>
+            </div>
+          </div>
+        </div>
+		
+		
+		<!-- ════════════════════════════════════════
+     COLLECTIONS — Formulaire nouvelle/modifier collection
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFormCollection()
+       fermerFormCollection()
+       sauvegarderCollection()
+       apercuCouleurCollection()
+       ouvrirCloudinaryCollection() / ouvrirCloudinaryCollectionNoel()
+       ouvrirMediatheque()
+
+     CSS (style.css)
+       .cloudinary-zone
+       .couleur-apercu
+     ════════════════════════════════════════ -->
+		<div id="form-collections" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="form-collections-bandeau">
+                <span class="form-panel-titre" id="form-collections-titre">Nouvelle collection</span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFormCollection()" title="Fermer">✕</button>
+            </div>
+          </div>
+          <div class="form-panel">
+            <div class="form-body">
+            <input type="hidden" id="fc-rowIndex">
+            <input type="hidden" id="fc-mode" value="collection">
+            <div id="fc-bloc-collection">
+            <div class="form-grille">
+              <div class="form-groupe col-petit">
+                <label class="form-label">Position</label>
+                <select class="form-ctrl" id="fc-position">
+                  <option value="0">En premier</option>
+                </select>
+              </div>
+              <input type="hidden" id="fc-rang">
+              <div class="form-groupe">
+                <label class="form-label">Collection</label>
+                <input type="text" class="form-ctrl" id="fc-collection">
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Slogan</label>
+                <input type="text" class="form-ctrl" id="fc-slogan">
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Description collection</label>
+                <textarea class="form-ctrl textarea-auto" id="fc-desc-col" rows="5" oninput="ajusterHauteurTextarea(this)"></textarea>
+              </div>
+              
+              <div class="form-groupe col-plein">
+                <label class="form-label">Photo collection</label>
+                <div class="cloudinary-zone">
+                  <input type="text" class="form-ctrl" id="fc-photo-url">
+                  <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryCollection()">Choisir une photo</button>
+                  <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url', 'fc-photo-preview', 'Collection')">Médiathèque</button>
+                </div>
+                <div id="fc-photo-preview"></div>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Photo collection — saisonnière</label>
+                <div class="cloudinary-zone">
+                  <input type="text" class="form-ctrl" id="fc-photo-url-noel">
+                  <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinaryCollectionNoel()">Choisir une photo</button>
+                  <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fc-photo-url-noel', 'fc-photo-preview-noel', 'Collection Noël')">Médiathèque</button>
+                </div>
+                <div id="fc-photo-preview-noel"></div>
+              </div>
+            </div>
+            </div>
+            <div id="fc-bloc-ligne" class="cache"></div>
+          </div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" onclick="sauvegarderCollection()">Enregistrer</button>
+              <button class="bouton bouton-contour" onclick="fermerFormCollection()">Annuler</button>
+            </div>
+          </div>
+        </div>
+		
+		
+    
+		
+		
+		
+		
+		
+		
+      <!-- ════════════════════════════════════════
+     COLLECTIONS — Liste des collections
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherCollections()
+
+     CSS (style.css)
+       .collection-section
+       .collection-carte, .collection-carte-bg, .collection-carte-overlay
+       .collection-carte-contenu, .collection-carte-nom, .collection-carte-slogan
+       .collection-carte-actions, .collection-carte-lignes
+     ════════════════════════════════════════ -->
+        <div class="chargement" id="loading-collections">
+		
+		
+		<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div id="contenu-collections"></div>
+        <div class="vide cache" id="vide-collections">
+          <div class="vide-titre">Aucune collection</div>
+          <div class="vide-desc">Créez votre première entrée</div>
+        </div>
+        </div>
+  
+        
+  
+  
+  
+  
+
+     <!-- FAMILLES -->
+      <div class="section-admin" id="section-familles">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Gérer les familles de produits</div>
+            <div class="page-entete-titre">Familles</div>
+          </div>
+          <button class="bouton" id="btn-nouvelle-famille" onclick="ouvrirFormFamille()">+ Nouvelle famille</button>
+        </div>
+        <div class="msg-zone" id="msg-familles"></div>
+		
+		
+		
+		
+        <!-- ════════════════════════════════════════
+     FAMILLES — Fiche d'une famille
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFicheFamille()
+       fermerFicheFamille()
+       modifierFamille()
+       supprimerFamille()
+
+     CSS (style.css)
+       .famille-groupe, .famille-groupe-titre, .famille-groupe-desc
+     ════════════════════════════════════════ -->
+        <div id="fiche-famille" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="fiche-famille-bandeau">
+                <span class="form-panel-titre" id="fiche-famille-titre"></span>
+                <span class="fiche-slogan" id="fiche-famille-slogan"></span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFicheFamille()" title="Fermer">✕</button>
+            </div>
+          </div>
+          <div class="form-panel">
+            <div class="form-body">
+              <div id="fiche-famille-extras"></div>
+              <p class="fiche-desc" id="fiche-famille-desc"></p>
+              <div class="section-label">Collection</div>
+              <div class="form-valeur" id="fiche-famille-collection"></div>
+            </div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" id="fiche-famille-modifier">Modifier cette famille</button>
+              <button class="bouton bouton-rouge" id="btn-supprimer-famille">Supprimer cette famille</button>
+            </div>
+          </div>
+        </div>
+		
+		
+		
+		
+		
+		
+        <!-- ════════════════════════════════════════
+     FAMILLES — Formulaire nouvelle/modifier famille
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFormFamille()
+       fermerFormFamille()
+       sauvegarderFamille()
+
+     CSS (style.css)
+       .famille-groupe, .famille-groupe-titre, .famille-groupe-desc
+     ════════════════════════════════════════ -->
+        <div id="form-familles" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="form-familles-bandeau">
+                <span class="form-panel-titre" id="form-familles-titre">Nouvelle famille</span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFormFamille()" title="Fermer">✕</button>
+            </div>
+          </div>
+          <div class="form-panel">
+            <div class="form-body">
+              <input type="hidden" id="ff-id">
+              <input type="hidden" id="ff-rang">
+              <div class="form-grille">
+                <div class="form-groupe">
+                  <label class="form-label">Collection</label>
+                  <select class="form-ctrl" id="ff-collection" onchange="peuplerPositionFamille(this.value, null)">
+                    <option value="">— Choisir —</option>
+                  </select>
+                </div>
+                <div class="form-groupe col-petit">
+                  <label class="form-label">Position</label>
+                  <select class="form-ctrl" id="ff-position">
+                    <option value="0">En premier</option>
+                  </select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Gamme</label>
+                  <input type="text" class="form-ctrl" id="ff-nom">
+                </div>
+                <div class="form-groupe col-plein">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-ctrl textarea-auto" id="ff-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
+                </div>
+               
+              </div>
+            </div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" onclick="sauvegarderFamille()">Enregistrer</button>
+              <button class="bouton bouton-contour" onclick="fermerFormFamille()">Annuler</button>
+            </div>
+          </div>
+        </div>
+		
+		
+		
+        <!-- ════════════════════════════════════════
+     FAMILLES — Liste des familles
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherFamilles()
+       chargerFamilles()
+
+     CSS (style.css)
+       .famille-groupe, .famille-groupe-titre, .famille-groupe-desc
+     ════════════════════════════════════════ -->
+        <div class="chargement" id="loading-familles">
+		
+		
+		
+		<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div id="contenu-familles"></div>
+        <div class="vide cache" id="vide-familles">
+          <div class="vide-titre">Aucune famille</div>
+          <div class="vide-desc">Créez votre première famille</div>
+        </div>
+      </div>
+	  
+	  
+
+      <!-- GAMMES -->
+      <div class="section-admin" id="section-gammes">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Gérer les gammes</div>
+            <div class="page-entete-titre">Gammes</div>
+          </div>
+          <button class="bouton" id="btn-nouvelle-gamme" onclick="ouvrirFormGamme(null)">+ Nouvelle gamme</button>
+        </div>
+        <div class="msg-zone" id="msg-gammes"></div>
+		
+		
+		
+      <!-- ════════════════════════════════════════
+     GAMMES — Fiche d'une gamme
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFicheGamme() / ouvrirFicheGamme2()
+       fermerFicheGamme() / fermerFicheLigne()
+       modifierGamme()
+       supprimerGamme()
+
+     CSS (style.css)
+       .fiche-collection-desc
+     ════════════════════════════════════════ -->
+       <div id="fiche-gamme" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau">
+                <span class="form-panel-titre" id="fiche-gamme-titre"></span>
+                <span class="fiche-slogan" id="fiche-gamme-slogan"></span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFicheGamme2()" title="Fermer">✕</button>
+            </div>
+          </div>
+          <div class="form-panel">
+            <div class="form-body">
+              <div id="fiche-gamme-extras"></div>
+              <p class="fiche-desc" id="fiche-gamme-desc"></p>
+              <div class="fiche-label section-label">Collection</div>
+              <div class="form-valeur" id="fiche-gamme-collection"></div>
+              <div class="section-label">Produits</div>
+              <p class="texte-secondaire" id="fiche-gamme-produits"></p>
+            </div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" id="fiche-gamme-modifier">Modifier la gamme</button>
+              <button class="bouton bouton-rouge" id="btn-supprimer-gamme">Supprimer la gamme</button>
+            </div>
+          </div>
+        </div>
+		
+		
+      <!-- ════════════════════════════════════════
+     GAMMES — Formulaire nouvelle/modifier gamme
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFormGamme()
+       fermerFormGamme2()
+       sauvegarderGamme2()
+
+     CSS (style.css)
+       .couleur-apercu
+     ════════════════════════════════════════ -->
+       <div id="form-gammes" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="form-gammes-bandeau">
+                <span class="form-panel-titre" id="form-gammes-titre">Nouvelle gamme</span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFormGamme2()" title="Fermer">✕</button>
+            </div>
+          </div>
+          <div class="form-panel">
+            <div class="form-body">
+              <input type="hidden" id="fg-id">
+              <div class="form-grille">
+                <div class="form-groupe col-demi">
+                  <label class="form-label">Famille</label>
+                  <input type="text" class="form-ctrl" id="fg-nom">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Collection</label>
+                  <select class="form-ctrl" id="fg-collection" onchange="peuplerPositionGamme(this.value, null)">
+                    <option value="">— Choisir —</option>
+                  </select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Position</label>
+                  <select class="form-ctrl" id="fg-position" onchange="">
+                    <option value="0">En premier</option>
+                  </select>
+                </div>
+                <input type="hidden" id="fg-rang">
+                
+                <div class="form-groupe col-plein">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-ctrl textarea-auto" id="fg-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" onclick="sauvegarderGamme2()">Enregistrer</button>
+              <button class="bouton bouton-contour" onclick="fermerFormGamme2()">Annuler</button>
+            </div>
+          </div>
+        </div>
+		
+		
+        <!-- ════════════════════════════════════════
+     GAMMES — Liste des gammes
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherGammes()
+
+     CSS (style.css)
+       .collection-section
+     ════════════════════════════════════════ -->
+        <div class="chargement" id="loading-gammes">
+		
+		<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div id="contenu-gammes"></div>
+        <div class="vide cache" id="vide-gammes">
+          <div class="vide-titre">Aucune gamme</div>
+          <div class="vide-desc">Créez votre première gamme</div>
+        </div>
+      </div>
+
+
+
+
+
+<!-- RECETTES -->
+      <div class="section-admin" id="section-produits">
+	  
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Gérer les produits</div>
+            <div class="page-entete-titre">Produits</div>
+          </div>
+          <button class="bouton" id="btn-nouvelle-recette" onclick="ouvrirFormRecette()">+ Nouveau produit</button>
+        </div>
+		
+		
+		
+       <div class="msg-zone" id="msg-produits"></div>
+	   
+    <!-- ════════════════════════════════════════
+     PRODUITS — Liste des produits + filtres
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherProduits()
+       filtrerRecettes()
+       peuplerFiltresRecettes()
+       reinitialiserFiltresRecettes()
+       onFiltreCollection()
+
+     CSS (style.css)
+       .filtres-bar, .filtre-select, .filtre-recherche
+       .recette-cartes-grille, .recette-section-collection
+       .recette-collection-titre, .recette-section-ligne
+       .recette-ligne-titre, .recette-carte-actions
+     ════════════════════════════════════════ -->
+        <div class="filtres-bar">
+          <select class="form-ctrl filtre-select" id="filtre-recette-collection" onchange="onFiltreCollection()">
+            <option value="">Collections</option>
+          </select>
+          <select class="form-ctrl filtre-select" id="filtre-recette-ligne" onchange="filtrerRecettes()" disabled>
+            <option value="">Gammes</option>
+          </select>
+          <select class="form-ctrl filtre-select" id="filtre-recette-statut" onchange="filtrerRecettes()">
+            <option value="">Statuts</option>
+            <option value="test">Test</option>
+            <option value="public">Public</option>
+          </select>
+          <input type="text" class="form-ctrl filtre-recherche" id="filtre-recette-nom" oninput="filtrerRecettes()" placeholder="Par nom">
+          <select class="form-ctrl filtre-select" id="filtre-recette-complet" onchange="filtrerRecettes()">
+            <option value="">Affichage</option>
+			 <option value="complet">Complètes</option>
+            <option value="incomplet">Incomplètes</option>
+          </select>
+          <button class="bouton bouton-petit bouton-contour" onclick="reinitialiserFiltresRecettes()" title="Réinitialiser">✕</button>
+        </div>
+		
+		
+		
+		
+		
+<!-- ════════════════════════════════════════
+     PRODUITS — Fiche d'un produit
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFicheProduit()
+       fermerFicheProduit() / fermerFicheRecette()
+       basculerModeEditionRecette()
+       supprimerRecetteActive()
+
+     CSS (style.css)
+       .recette-statut-badge, .recette-statut-public, .recette-statut-test
+     ════════════════════════════════════════ -->
+        <div id="fiche-recette" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="fiche-recette-bandeau">
+                <span class="form-panel-titre" id="fiche-recette-titre"></span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFicheRecette()" title="Fermer">✕</button>
+            </div>
+          </div>
+          <div class="form-panel">
+            <div class="form-body" id="fiche-recette-contenu"></div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" onclick="basculerModeEditionRecette()">Modifier</button>
+              <button class="bouton bouton-rouge" onclick="supprimerRecetteActive()">Supprimer</button>
+            </div>
+          </div>
+        </div>
+       
+         <!-- ════════════════════════════════════════
+     PRODUITS — Formulaire nouveau/modifier produit
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ouvrirFormProduit() / ouvrirFormRecette()
+       fermerFormProduit() / fermerFormRecette()
+       sauvegarderRecette()
+       modifierProduit()
+       apercuCouleurRecette()
+       ajouterIngredientRecette() / supprimerIngredientRecette()
+       rafraichirListeIngredientsRecette()
+       ajouterFormatRecette() / supprimerFormatRecette()
+       rafraichirListeFormatsRecette()
+       chargerIngredientsBaseRecette()
+       mettreAJourLignes()
+       ouvrirMediatheque()
+
+     CSS (style.css)
+       .couleur-apercu, .cloudinary-zone
+       .filtres-bar
+     ════════════════════════════════════════ -->
+         <div id="form-recettes" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau" id="form-recettes-bandeau">
+                <span class="form-panel-titre" id="form-recettes-titre">Nouveau produit</span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFormRecette()" title="Fermer">✕</button>
+            </div>
+          </div>
+          <div class="form-panel">
+          <div class="form-body">
+           <input type="hidden" id="fr-id">
+                <input type="hidden" id="fr-couleur">
+            <div class="form-grille">
+              <div class="form-groupe col-demi">
+                <label class="form-label">Nom</label>
+                <input type="text" class="form-ctrl" id="fr-nom">
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Collection</label>
+                <select class="form-ctrl" id="fr-collection" onchange="mettreAJourLignes()">
+                  <option value="">— Choisir —</option>
+                </select>
+              </div>
+			  
+			  
+             <div class="form-groupe">
+                <label class="form-label">Gammes</label>
+                <select class="form-ctrl" id="fr-ligne" onchange="chargerIngredientsBaseRecette()">
+                  <option value="">— Choisir collection —</option>
+                </select>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Famille (optionnel)</label>
+                <select class="form-ctrl" id="fr-famille">
+                  <option value="">— Aucune —</option>
+                </select>
+              </div>
+              
+              <div class="form-groupe col-plein">
+                <label class="form-label">Collections secondaires</label>
+                <div id="fr-collections-secondaires" class="checkboxes-groupe"></div>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Nb unités par recette</label>
+                <input type="text" inputmode="decimal" class="form-ctrl" id="fr-unites">
+              </div>
+              
+			  
+              <div class="form-groupe">
+                <label class="form-label">Cure (jours)</label>
+                <input type="text" inputmode="decimal" class="form-ctrl" id="fr-cure">
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Surgras (%)</label>
+                <input type="text" class="form-ctrl" id="fr-surgras">
+              </div>
+              
+       <div class="form-groupe col-plein">
+                <label class="form-label">Description</label>
+                <textarea class="form-ctrl" id="fr-description" rows="3"></textarea>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Description pour emballage</label>
+                <textarea class="form-ctrl" id="fr-desc-emballage" rows="2"></textarea>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Instructions</label>
+                <textarea class="form-ctrl" id="fr-instructions" rows="4"></textarea>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Notes</label>
+                <textarea class="form-ctrl" id="fr-notes" rows="2"></textarea>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Avertissement</label>
+                <textarea class="form-ctrl" id="fr-avertissement" rows="2"></textarea>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Mode d'emploi</label>
+                <textarea class="form-ctrl" id="fr-mode-emploi" rows="3"></textarea>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Statut</label>
+                <select class="form-ctrl" id="fr-statut">
+                  <option value="test">Test</option>
+                  <option value="public">Public</option>
+                </select>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Couleur HEX</label>
+                <input type="text" class="form-ctrl" id="fr-couleur-visible" oninput="apercuCouleurRecette(this)">
+                <div id="fr-couleur-apercu" class="couleur-apercu"></div>
+              </div>
+            </div>
+          <div class="form-groupe col-plein">
+              <label class="form-label">Photo principale</label>
+              <div class="cloudinary-zone">
+                <input type="text" class="form-ctrl" id="fr-image-url">
+                <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinary()">Choisir une photo</button>
+				<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">Médiathèque</button>
+              </div>
+              <div id="fr-image-preview"></div>
+            </div>
+           <div class="form-groupe col-plein">
+              <label class="form-label">Photo secondaire</label>
+              <div class="cloudinary-zone">
+                <input type="text" class="form-ctrl" id="fr-image-url-noel">
+                <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediaLibrary('fr-image-url-noel', 'fr-image-preview-noel')">Choisir une photo</button>
+				<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">Médiathèque</button>
+
+              </div>
+              <div id="fr-image-preview-noel"></div>
+            </div>
+           <div class="form-groupe col-plein" id="zone-ingredients-recette">
+              <label class="form-label">Ingrédients</label>
+              <div id="liste-ingredients-recette"></div>
+              <button type="button" class="bouton bouton-vert-pale btn-ajouter-ingredient" onclick="ajouterIngredientRecette()">+ Ajouter un ingrédient</button>
+            </div>
+            <div class="form-groupe col-plein" id="zone-formats-recette">
+              <label class="form-label">Formats disponibles</label>
+             <div class="ingredient-rangee ingredient-rangee-labels" id="labels-formats-recette">
+                <span class="form-label">Poids</span>
+                <span class="form-label">Unité</span>
+                <span class="form-label">Prix $</span>
+                <span></span>
+              </div>
+              <div class="ingredient-rangee ingredient-rangee-labels" id="labels-formats-recette">
+                <span class="form-label">Poids</span>
+                <span class="form-label">Unité</span>
+                <span class="form-label">Prix $</span>
+                <span class="form-label">Nb unités</span>
+                <span></span>
+              </div>
+              <div id="liste-formats-recette"></div>
+              <button type="button" class="bouton bouton-vert-pale btn-ajouter-ingredient" onclick="ajouterFormatRecette()">+ Ajouter un format</button>
+            </div>
+             </div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" onclick="sauvegarderRecette()">Enregistrer</button>
+              <button class="bouton bouton-contour" onclick="fermerFormRecette()">Annuler</button>
+            </div>
+          </div>
+        </div>
+      <!-- ════════════════════════════════════════
+     PRODUITS — Grille des produits
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       afficherProduits()
+
+     CSS (style.css)
+       .recette-cartes-grille
+       .recette-section-collection, .recette-collection-titre
+       .recette-section-ligne, .recette-ligne-titre
+       .recette-carte-actions
+       .recette-statut-badge, .recette-statut-public, .recette-statut-test
+     ════════════════════════════════════════ -->
+      <div class="chargement" id="loading-produits"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div class="recettes-grille cache" id="grille-produits"></div>
+      <div class="vide cache" id="vide-produits">
+          <div class="vide-titre">Aucun produit</div>
+          <div class="vide-desc">Créez votre premier produit</div>
+        </div>
+      </div>
+
+     <!-- ════════════════════════════════════════
+     SECTION : NOUVELLE FACTURE
+     À insérer dans admin/index.html
+     dans la zone des sections admin
+     ════════════════════════════════════════ -->
+
+      <div id="section-nouvelle-facture" class="section-admin">
+
+  <!-- EN-TÊTE DE PAGE -->
+  <div class="page-entete fade-in">
+    <div>
+      <div class="page-entete-eyebrow">Achats d'ingrédients</div>
+      <div class="page-entete-titre">Nouvelle <em>facture</em></div>
+    </div>
+  </div>
+
+  <!-- ZONE MESSAGES GLOBAUX -->
+  <div id="facture-msg" class="msg-zone"></div>
+
+  <!-- INDICATEUR D'ÉTAPES -->
+  <div class="wizard-etapes">
+    <div class="wizard-etape active" id="wizard-etape-1">
+      <div class="wizard-cercle">1</div>
+      <div class="wizard-label">Facture</div>
+    </div>
+    <div class="wizard-trait"></div>
+    <div class="wizard-etape" id="wizard-etape-2">
+      <div class="wizard-cercle">2</div>
+      <div class="wizard-label">Items</div>
+    </div>
+    <div class="wizard-trait"></div>
+    <div class="wizard-etape" id="wizard-etape-3">
+      <div class="wizard-cercle">3</div>
+      <div class="wizard-label">Finalisation</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       ÉTAPE 1 — EN-TÊTE FACTURE
+  ══════════════════════════════ -->
+  <!-- ════════════════════════════════════════
+     NOUVELLE FACTURE — Étape 1 : En-tête facture
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       initialiserNouvelleFacture()
+       wizardEtape2()
+       onChangeFournisseur()
+
+     CSS (style.css)
+       .wizard-etapes, .wizard-etape, .wizard-cercle
+       .wizard-label, .wizard-trait
+     ════════════════════════════════════════ -->
+  <div id="wizard-step-1" class="wizard-step">
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <div class="fiche-bandeau">
+          <span class="form-panel-titre">Informations de la facture</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-panel">
+      <div class="form-body">
+        <div class="form-grille">
+
+          <div class="form-groupe">
+            <label class="form-label">N° facture (ou ajout d'inventaire)</label>
+            <input type="text" id="facture-numero" class="form-ctrl" autocomplete="off">
+          </div>
+
+          <div class="form-groupe">
+            <label class="form-label">Date</label>
+            <input type="date" id="facture-date" class="form-ctrl">
+          </div>
+
+          <div class="form-groupe col-plein">
+            <label class="form-label">Fournisseur</label>
+            <select id="facture-fournisseur" class="form-ctrl" onchange="onChangeFournisseur()">
+              <option value=""></option>
+            </select>
+           <input type="text" id="facture-fournisseur-nouveau" class="form-ctrl cache" autocomplete="off">
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="form-panel form-body-actions">
+      <div class="form-actions">
+        <button class="bouton" onclick="wizardEtape2()">Suivant →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       ÉTAPE 2 — ITEMS
+  ══════════════════════════════ -->
+  <!-- ════════════════════════════════════════
+     NOUVELLE FACTURE — Étape 2 : Items
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       wizardEtape2()
+       wizardEtape3()
+       afficherBanniereFacture()
+       afficherItemsFacture()
+       onChangeType()
+       onChangeIngredient()
+       onChangeFormat()
+
+     CSS (style.css)
+       .facture-active-banner, .facture-active-titre, .facture-active-info
+     ════════════════════════════════════════ -->
+  <div id="wizard-step-2" class="wizard-step cache">
+
+    <!-- Bannière facture active -->
+    <div id="facture-banniere" class="facture-active-banner cache">
+      <div>
+        <div class="facture-active-titre">Facture <span id="banniere-numero"></span></div>
+        <div class="facture-active-info"><span id="banniere-fournisseur"></span></div>
+      </div>
+      <div class="text-right">
+        <div class="facture-sous-total-label">Sous-total</div>
+        <div class="facture-sous-total" id="banniere-sous-total">0,00 $</div>
+      </div>
+    </div>
+
+    <!-- Formulaire ajout item -->
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <div class="fiche-bandeau">
+          <span class="form-panel-titre">Ajouter un item</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-panel">
+      <div class="form-body">
+        <div id="item-msg" class="msg-zone"></div>
+        <div class="form-grille">
+
+          <div class="form-groupe">
+            <label class="form-label">Type</label>
+            <select id="item-type" class="form-ctrl" onchange="onChangeType()">
+              <option value=""></option>
+            </select>
+          </div>
+
+          <div class="form-groupe">
+            <label class="form-label">Ingrédient</label>
+            <select id="item-ingredient" class="form-ctrl" onchange="onChangeIngredient()">
+              <option value=""></option>
+            </select>
+          <input type="text" id="item-ingredient-nouveau" class="form-ctrl cache" autocomplete="off">
+          </div>
+			<div class="form-groupe">
+            <label class="form-label">Format</label>
+            <select id="item-format" class="form-ctrl" onchange="onChangeFormat()">
+              <option value="">— Choisir un format —</option>
+            </select>
+          </div>
+          <input type="hidden" id="item-format-qte">
+          <input type="hidden" id="item-format-unite">
+       
+          <div class="form-groupe cache" id="item-nouveau-qte-bloc">
+            <label class="form-label">Quantité du contenant</label>
+            <input type="text" inputmode="decimal" id="item-nouveau-qte" class="form-ctrl" autocomplete="off">
+          </div>
+          <div class="form-groupe cache" id="item-nouveau-unite-bloc">
+            <label class="form-label">Unité</label>
+            <select id="item-nouveau-unite" class="form-ctrl">
+              <option value="g">g</option>
+              <option value="ml">ml</option>
+              <option value="kg">kg</option>
+              <option value="L">L</option>
+              <option value="lbs">lbs</option>
+            </select>
+          </div>
+
+          <div class="form-groupe">
+            <label class="form-label">Prix unitaire ($)</label>
+            <input type="text" inputmode="decimal" id="item-prix-unitaire" class="form-ctrl" autocomplete="off">
+          </div>
+
+          <div class="form-groupe">
+            <label class="form-label">Quantité achetée</label>
+            <input type="text" inputmode="decimal" id="item-quantite" class="form-ctrl" autocomplete="off">
+          </div>
+
+          <div class="form-groupe col-plein">
+            <label class="form-label">Notes <span class="form-optionnel">(optionnel)</span></label>
+            <input type="text" id="item-notes" class="form-ctrl" autocomplete="off">
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="form-panel form-body-actions">
+      <div class="form-actions">
+        <button class="bouton" onclick="ajouterItem()">+ Ajouter</button>
+      </div>
+    </div>
+
+    <!-- Tableau des items -->
+    <div id="items-tableau-zone" class="mt-24"></div>
+
+    <!-- Navigation -->
+    <div class="form-actions mt-24">
+      <button class="bouton bouton-contour" onclick="wizardEtape1()">← Retour</button>
+      <button class="bouton bouton-vert-pale" onclick="terminerPlusTard()">Terminer plus tard</button>
+      <button class="bouton" onclick="wizardEtape3()">Suivant →</button>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════
+       ÉTAPE 3 — FINALISATION
+  ══════════════════════════════ -->
+  <!-- ════════════════════════════════════════
+     NOUVELLE FACTURE — Étape 3 : Finalisation
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       wizardEtape3()
+       calculerTotalFinal()
+       finaliserFacture()
+
+     CSS (style.css)
+       .finalisation-panel, .finalisation-titre
+     ════════════════════════════════════════ -->
+  <div id="wizard-step-3" class="wizard-step cache">
+
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <div class="fiche-bandeau">
+          <span class="form-panel-titre">Finalisation de la facture</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-panel">
+      <div class="form-body">
+        <div id="final-msg" class="msg-zone"></div>
+        <div class="form-grille">
+
+          <div class="form-groupe">
+            <label class="form-label">Sous-total</label>
+            <input type="text" id="final-sous-total" class="form-ctrl" readonly>
+          </div>
+
+          <div class="form-groupe">
+            <label class="form-label">Livraison ($)</label>
+            <input type="text" inputmode="decimal" id="final-livraison" class="form-ctrl"
+                   oninput="calculerTotalFinal()" autocomplete="off">
+          </div>
+
+          <div class="form-groupe">
+            <label class="form-label">TPS ($)</label>
+            <input type="text" inputmode="decimal" id="final-tps" class="form-ctrl"
+                   oninput="calculerTotalFinal()" autocomplete="off">
+          </div>
+
+          <div class="form-groupe">
+            <label class="form-label">TVQ ($)</label>
+            <input type="text" inputmode="decimal" id="final-tvq" class="form-ctrl"
+                   oninput="calculerTotalFinal()" autocomplete="off">
+          </div>
+
+        </div>
+        <div class="total-final-row">
+          <div>
+            <div class="total-final-label">Total</div>
+            <div class="total-final-montant" id="final-total-affichage">0,00 $</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-panel form-body-actions">
+      <div class="form-actions">
+        <button class="bouton bouton-contour" onclick="wizardEtape2()">← Retour</button>
+        <button class="bouton bouton-or" onclick="finaliserFacture()">Finaliser</button>
+      </div>
+    </div>
+
+  </div>
+
+      </div>
+
+      <!-- FACTURES -->
+      <!-- ════════════════════════════════════════
+     IMPORT FACTURE PDF
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       importerFacturePDF()
+       parserFacturePA()
+       afficherApercuItems()
+       confirmerImportFacture()
+
+     CSS (style.css)
+       .tableau-admin, .tableau-wrap
+       .form-grille-2
+     ════════════════════════════════════════ -->
+      <div class="section-admin" id="section-import-facture">
+        <div class="page-entete">
+          <div class="page-entete-titre">Entrer <em>une facture</em></div>
+        </div>
+        <div id="msg-import-facture" class="msg-zone"></div>
+		
+		
+        <div id="if-bloc-upload">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau">
+                <span class="form-panel-titre">Entrer facture</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-panel">
+            <div class="form-body">
+              <div class="form-groupe">
+                <label class="form-label">Fournisseur</label>
+                <select class="form-ctrl" id="if-fournisseur">
+                  <option value="">— Choisir —</option>
+                  <option value="PA">Pure Arôme</option>
+                  <option value="MH">Les Mauvaises Herbes</option>
+                  <option value="Arbressence">Arbressence</option>
+                  <option value="DE">Divine Essence</option>
+                  <option value="Amazon">Amazon</option>
+                </select>
+              </div>
+             <div class="form-groupe">
+                <label class="form-label">Fichier PDF</label>
+                <input type="file" class="cache" id="if-fichier" accept="application/pdf">
+              
+				<label for="if-fichier" class="bouton bouton-contour form-ctrl" id="if-fichier-label">Choisir un fichier</label>
+				
+				
+                <span class="texte-secondaire" id="if-fichier-nom">Aucun fichier choisi</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton" onclick="importerFacturePDF()">Lire le PDF</button>
+            <button class="bouton" onclick="voirTexteBrutPDF()">Texte brut</button>
+              <button class="bouton" onclick="saisirDepuisCatalogue()">Saisir depuis le catalogue</button>
+            </div>
+          </div>
+          <div id="if-texte-brut-zone" class="cache">
+            <div class="form-panel">
+              <div class="form-body">
+                <div class="form-groupe">
+                  <label class="form-label">Texte brut extrait du PDF</label>
+                  <textarea class="form-ctrl" id="if-texte-brut" rows="20" readonly></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+		
+		
+		
+        <div id="if-apercu" class="cache">
+      <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau">
+                <span class="form-panel-titre">Aperçu de la facture</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-panel">
+            <div class="form-body">
+			
+			
+			
+             <input type="hidden" id="if-date">
+              <div class="filtres-bar">
+                <div class="form-groupe">
+                  <label class="form-label">N° facture</label>
+                  <input type="text" class="form-ctrl" id="if-numero">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Jour</label>
+                  <select class="form-ctrl" id="if-date-jour" onchange="ifSyncDate()" style="width:70px"></select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Mois</label>
+                  <select class="form-ctrl" id="if-date-mois" onchange="ifSyncDate()">
+                    <option value="01">Janvier</option><option value="02">Février</option>
+                    <option value="03">Mars</option><option value="04">Avril</option>
+                    <option value="05">Mai</option><option value="06">Juin</option>
+                    <option value="07">Juillet</option><option value="08">Août</option>
+                    <option value="09">Septembre</option><option value="10">Octobre</option>
+                    <option value="11">Novembre</option><option value="12">Décembre</option>
+                  </select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Année</label>
+                  <select class="form-ctrl" id="if-date-annee" onchange="ifSyncDate()" style="width:90px"></select>
+                </div>
+              </div>
+			  
+			  
+			  
+              <div id="if-catalogue-zone" class="cache">
+			  
+			  
+           <div class="filtres-bar" style="margin-bottom:1rem;">
+              <div class="form-groupe">
+                <label class="form-label">Catégorie</label>
+                <select class="form-ctrl" id="if-cat-catalogue" onchange="ifOnChangeCatCatalogue()">
+                  <option value="">— Catégorie —</option>
+                </select>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Item</label>
+                <select class="form-ctrl" id="if-item-catalogue">
+                  <option value="">— Choisir —</option>
+                </select>
+              </div>
+            </div>
+			
+			
+			
+            <div class="form-actions" style="margin-bottom:1rem;">
+              <button class="bouton bouton-petit" onclick="ifAjouterDepuisCatalogue()">+ Ajouter</button>
+            </div>
+          </div>
+          <div class="tableau-wrap" style="margin-top:1rem;">
+                <table class="tableau-admin" id="if-tableau">
+                  <thead>
+                    <tr>
+                      <th>Description facture</th>
+                      <th>Format</th>
+                      <th>Qté</th>
+                      <th>Prix unit.</th>
+                      <th>Total</th>
+                      <th>Type UC</th>
+                      <th>Nom UC</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="if-tbody"></tbody>
+                </table>
+             </div>
+              <div class="form-actions">
+                <button class="bouton bouton-petit bouton-contour" onclick="ifAjouterLigneManuelle()">+ Ajouter une ligne</button>
+              </div>
+              <div class="form-grille-2" style="margin-top:1rem;">
+                <div class="form-groupe">
+                  <label class="form-label">Sous-total PDF</label>
+                  <input type="text" class="form-ctrl" id="if-soustotal" readonly>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Sous-total calculé</label>
+                  <input type="text" class="form-ctrl" id="if-soustotal-calcule" readonly>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">TPS</label>
+                <input type="text" class="form-ctrl" id="if-tps" onchange="ifRecalculerSousTotal()">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">TVQ</label>
+                  <input type="text" class="form-ctrl" id="if-tvq" onchange="ifRecalculerSousTotal()">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Livraison</label>
+                 <input type="text" class="form-ctrl" id="if-livraison" onchange="ifRecalculerSousTotal()">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Total</label>
+                  <input type="text" class="form-ctrl" id="if-total" readonly>
+                </div>
+              </div>
+              
+               <div id="if-validation" class="msg-zone"></div>
+            </div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton bouton-contour" onclick="document.getElementById('if-apercu').classList.add('cache'); document.getElementById('if-bloc-upload').classList.remove('cache')">Annuler</button>
+              <button class="bouton" id="if-btn-confirmer" onclick="confirmerImportFacture()">Confirmer l'import</button>
+            </div>
+          </div>
+		  
+		  
+		  
+        </div>
+      </div>
+	  
+	  
+	  
+	  
+	  
+	  <!-- ════════════════════════════════════════
+     ENTRER UNE FACTURE V3
+     Section autonome — IDs préfixés ef-
+     JS : entrer-facture.js
+     Ne pas modifier les sections existantes
+     ════════════════════════════════════════ -->
+
+      <div class="section-admin" id="section-entrer-facture">
+
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Achats d'ingrédients</div>
+            <div class="page-entete-titre">Entrer une <em>facture</em></div>
+          </div>
+        </div>
+
+        <div id="msg-ef" class="msg-zone"></div>
+
+        <!-- Bandeau reprise facture en cours -->
+        <div id="ef-bandeau-reprise" class="facture-active-banner cache" style="margin-bottom:16px">
+          <div>
+            <div class="facture-active-titre" style="color:var(--gris-fonce)">Facture en cours</div>
+            <div class="facture-active-info" id="ef-bandeau-reprise-texte"></div>
+          </div>
+          <div class="form-actions">
+            <button class="bouton bouton-petit bouton-contour" onclick="efAnnulerFactureEnCours()">Annuler</button>
+            <button class="bouton bouton-petit" onclick="efReprendreFacture()">Reprendre</button>
+          </div>
+        </div>
+
+        <!-- EN-TÊTE FACTURE — une ligne -->
+        <div class="form-panel visible" id="ef-panel-entete">
+          <div class="form-panel-header">
+            <span class="form-panel-titre">Informations de la facture</span>
+          </div>
+          <div class="form-body">
+            <div style="display:grid; grid-template-columns:2fr 1.5fr 80px 1.6fr 100px auto; gap:12px 16px; align-items:end;">
+
+              <div class="form-groupe">
+                <label class="form-label">Fournisseur</label>
+                <select id="ef-fournisseur" class="form-ctrl" onchange="efOnChangeFournisseur()">
+                  <option value="">— Choisir —</option>
+                </select>
+                <input type="text" id="ef-fournisseur-nouveau" class="form-ctrl cache" placeholder="Nouveau fournisseur" autocomplete="off" style="margin-top:6px">
+              </div>
+
+              <div class="form-groupe">
+                <label class="form-label">N° Facture</label>
+                <input type="text" id="ef-numero" class="form-ctrl" autocomplete="off">
+              </div>
+
+              <div class="form-groupe">
+                <label class="form-label">Jour</label>
+                <select id="ef-date-jour" class="form-ctrl" onchange="efSyncDate()"></select>
+              </div>
+
+              <div class="form-groupe">
+                <label class="form-label">Mois</label>
+                <select id="ef-date-mois" class="form-ctrl" onchange="efSyncDate()">
+                  <option value="">— Mois —</option>
+                  <option value="01">Janvier</option>
+                  <option value="02">Février</option>
+                  <option value="03">Mars</option>
+                  <option value="04">Avril</option>
+                  <option value="05">Mai</option>
+                  <option value="06">Juin</option>
+                  <option value="07">Juillet</option>
+                  <option value="08">Août</option>
+                  <option value="09">Septembre</option>
+                  <option value="10">Octobre</option>
+                  <option value="11">Novembre</option>
+                  <option value="12">Décembre</option>
+                </select>
+              </div>
+
+              <div class="form-groupe">
+                <label class="form-label">Année</label>
+                <select id="ef-date-annee" class="form-ctrl" onchange="efSyncDate()"></select>
+              </div>
+
+              <div class="form-groupe">
+                <label class="form-label">&nbsp;</label>
+                <button class="bouton" id="ef-btn-creer" onclick="efCreerFacture()">Créer</button>
+              </div>
+
+            </div>
+            <input type="hidden" id="ef-date">
+          </div>
+        </div>
+
+        <!-- ZONE ITEMS — cachée jusqu'à création facture -->
+        <div id="ef-zone-items" class="cache">
+
+          <!-- Bannière -->
+          <div id="ef-banniere" class="facture-active-banner" style="margin-bottom:16px">
+            <div>
+              <div class="facture-active-titre" style="color:var(--gris-fonce)">
+                Facture <span id="ef-banniere-numero" style="color:var(--primary)"></span>
+              </div>
+              <div class="facture-active-info"><span id="ef-banniere-fournisseur"></span></div>
+            </div>
+            <div class="text-right">
+              <div class="facture-sous-total-label">Sous-total</div>
+              <div class="facture-sous-total" id="ef-banniere-soustotal">0,00 $</div>
+            </div>
+          </div>
+
+          <!-- Tableau des items -->
+          <div class="tableau-wrap">
+            <table class="tableau-admin" id="ef-tableau" style="table-layout:fixed;width:100%;">
+              <thead>
+                <tr>
+                  <th>Cat. fournisseur</th>
+                  <th>Nom fournisseur</th>
+                  <th>Format</th>
+                  <th>Qté</th>
+                  <th>Prix unit.</th>
+                  <th>Total</th>
+                  <th>Cat UC</th>
+                  <th>Nom UC</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="ef-tbody"></tbody>
+            </table>
+          </div>
+
+          <div id="msg-ef-items" class="msg-zone" style="margin-top:8px"></div>
+
+          <!-- Totaux + Finaliser — une ligne -->
+          <div class="form-panel visible" style="margin-top:24px">
+            <div class="form-body">
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr auto; gap:12px 16px; align-items:end;">
+
+                <div class="form-groupe">
+                  <label class="form-label">Sous-total</label>
+                  <input type="text" id="ef-soustotal" class="form-ctrl" readonly>
+                </div>
+
+                <div class="form-groupe">
+                  <label class="form-label">TPS ($)</label>
+                  <input type="text" inputmode="decimal" id="ef-tps" class="form-ctrl" oninput="efCalculerTotal()" autocomplete="off">
+                </div>
+
+                <div class="form-groupe">
+                  <label class="form-label">TVQ ($)</label>
+                  <input type="text" inputmode="decimal" id="ef-tvq" class="form-ctrl" oninput="efCalculerTotal()" autocomplete="off">
+                </div>
+
+                <div class="form-groupe">
+                  <label class="form-label">Livraison ($)</label>
+                  <input type="text" inputmode="decimal" id="ef-livraison" class="form-ctrl" oninput="efCalculerTotal()" autocomplete="off">
+                </div>
+
+                <div class="form-groupe">
+                  <label class="form-label">Total</label>
+                  <input type="text" id="ef-total" class="form-ctrl" readonly>
+                </div>
+
+                <div class="form-groupe">
+                  <label class="form-label">&nbsp;</label>
+                  <button class="bouton bouton-or" id="ef-btn-finaliser" onclick="efFinaliser()">Finaliser</button>
+                </div>
+
+              </div>
+              <div id="msg-ef-final" class="msg-zone" style="margin-top:8px"></div>
+            </div>
+          </div>
+
+        </div><!-- fin ef-zone-items -->
+
+      </div><!-- fin section-entrer-facture -->
+
+
+<!-- ═══════════════════════════════
+     MODALE — Nouveau format
+     ═══════════════════════════════ -->
+<div class="modal-admin-overlay" id="modal-ef-format">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Nouveau format</div>
+      <button class="btn-fermer-panneau" onclick="efFermerModalFormat()" title="Fermer">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe" id="modal-ef-fmt-qte-bloc">
+        <label class="form-label">Format</label>
+        <input type="text" inputmode="decimal" class="form-ctrl" id="modal-ef-fmt-qte" placeholder="Ex: 500">
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Unité</label>
+        <select class="form-ctrl" id="modal-ef-fmt-unite" onchange="efOnChangeModalFmtUnite()">
+         <option value="">— Choisir —</option>
+          <option value="g">g</option>
+          <option value="ml">ml</option>
+          <option value="kg">kg</option>
+          <option value="L">L</option>
+          <option value="lbs">lbs</option>
+          <option value="unité">unité</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+             <button class="bouton bouton-petit" onclick="efConfirmerModalFormat()">Confirmer</button>
+			 <button class="bouton bouton-petit" onclick="efFermerModalFormat()">Annuler</button>
+  
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     MODALE — Nouvel ingrédient UC
+     ═══════════════════════════════ -->
+<div class="modal-admin-overlay" id="modal-ef-ingredient">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Nouvel ingrédient</div>
+      <button class="btn-fermer-panneau" onclick="efFermerModalIngredient()" title="Fermer">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe">
+        <label class="form-label">Nom de l'ingrédient</label>
+        <input type="text" class="form-ctrl" id="modal-ef-ing-nouveau-nom" placeholder="Ex: Cire émulsifiante" autocomplete="off">
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+            <button class="bouton bouton-petit" onclick="efConfirmerModalIngredient()">Confirmer</button>
+			<button class="bouton bouton-petit" onclick="efFermerModalIngredient()">Annuler</button>
+   
+      </div>
+    </div>
+  </div>
+</div>
+
+      <div class="modal-admin-overlay" id="modal-ef-nouvelle-cat-uc">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Nouvelle catégorie UC</div>
+      <button class="btn-fermer-panneau" onclick="efFermerModalNouvelleCatUC()" title="Fermer">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe">
+        <label class="form-label">Nom de la catégorie</label>
+        <input type="text" class="form-ctrl" id="modal-ef-nouvelle-cat-uc-valeur" placeholder="Ex: Huiles essentielles" autocomplete="off">
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-petit" onclick="efConfirmerModalNouvelleCatUC()">Confirmer</button>
+		<button class="bouton bouton-petit" onclick="efFermerModalNouvelleCatUC()">Annuler</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+      <div class="modal-admin-overlay" id="modal-ef-cat-fourn">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Nouvelle catégorie fournisseur</div>
+      <button class="btn-fermer-panneau" onclick="efFermerModalCatFourn()" title="Fermer">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe">
+        <label class="form-label">Catégorie</label>
+        <input type="text" class="form-ctrl" id="modal-ef-cat-fourn-valeur" placeholder="Ex: Huiles essentielles" autocomplete="off">
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-petit bouton-contour" onclick="efFermerModalCatFourn()">Annuler</button>
+        <button class="bouton bouton-petit" onclick="efConfirmerModalCatFourn()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-admin-overlay" id="modal-ef-nom-fourn">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Nouveau nom fournisseur</div>
+      <button class="btn-fermer-panneau" onclick="efFermerModalNomFourn()" title="Fermer">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe">
+        <label class="form-label">Nom sur la facture</label>
+        <input type="text" class="form-ctrl" id="modal-ef-nom-fourn-valeur" placeholder="Ex: Huile végétale Olive" autocomplete="off">
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-petit bouton-contour" onclick="efFermerModalNomFourn()">Annuler</button>
+        <button class="bouton bouton-petit" onclick="efConfirmerModalNomFourn()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <!-- ════════════════════════════════════════
+     LES FACTURES — Liste et détail
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerFactures()
+       filtrerFactures()
+       reinitialiserFiltres()
+       afficherFactures()
+       voirDetailFacture()
+       fermerModalFacture()
+       supprimerFacture()
+
+     CSS (style.css)
+       .filtres-bar, .factures-compte
+       .tableau-admin, .tableau-wrap
+       .facture-sous-total, .facture-sous-total-label
+       .inv-total, .inv-total-label, .inv-total-montant
+     ════════════════════════════════════════ -->
+      <div class="section-admin" id="section-factures">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Historique des factures d'achat</div>
+            <div class="page-entete-titre">Les factures</div>
+          </div>
+        </div>
+        <div class="msg-zone" id="msg-factures"></div>
+		
+		
+       <div class="filtres-bar">
+          <select class="form-ctrl filtre-select" id="filtre-fournisseur" onchange="filtrerFactures()">
+            <option value="">Tous les fournisseurs</option>
+          </select>
+          <select class="form-ctrl filtre-select" id="filtre-statut" onchange="filtrerFactures()">
+            <option value="">Tous les statuts</option>
+            <option value="En cours">En cours</option>
+            <option value="Finalisé">Finalisé</option>
+          </select>
+          <input class="form-ctrl filtre-select" type="date" id="filtre-date-debut" onchange="filtrerFactures()">
+          <input class="form-ctrl filtre-select" type="date" id="filtre-date-fin" onchange="filtrerFactures()">
+          <span id="factures-compte" class="factures-compte"></span>
+          <button class="bouton bouton-petit bouton-contour" onclick="reinitialiserFiltres()" title="Réinitialiser">✕</button>
+        </div>
+		
+		
+		
+        <div class="chargement" id="loading-factures"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div class="tableau-wrap">
+		
+		
+         <table id="tableau-factures" class="cache">
+            <thead>
+             <tr><th>Fournisseur</th><th>Numéro</th><th>Date</th><th>Total</th><th>Statut</th></tr>
+            </thead>
+            <tbody id="tbody-factures"></tbody>
+          </table>
+          <div id="factures-total" class="inv-total cache"></div>
+        </div>
+		
+		
+		
+        <div class="vide cache" id="vide-factures">
+          <div class="vide-titre">Aucune facture</div>
+          <div class="vide-desc">Créez votre première facture</div>
+        </div>
+        
+      </div>
+
+      <!-- INVENTAIRE -->
+      <!-- ════════════════════════════════════════
+     INVENTAIRE — Stocks ingrédients
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerInventaire()
+       filtrerInventaire()
+       reinitialiserFiltresInventaire()
+
+     CSS (style.css)
+       .filtres-bar
+       .inv-section, .inv-header, .inv-titre, .inv-line
+       .inv-total, .inv-total-label, .inv-total-montant
+     ════════════════════════════════════════ -->
+      <div class="section-admin" id="section-inventaire">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Stocks — factures finalisées seulement</div>
+            <div class="page-entete-titre">Inventaire</div>
+          </div>
+          <button class="bouton" onclick="chargerInventaire()">Actualiser</button>
+        </div>
+        <div class="msg-zone" id="msg-inventaire"></div>
+        <div class="filtres-bar" id="filtres-inventaire">
+          <select class="form-ctrl filtre-select" id="inv-filtre-type" onchange="filtrerInventaire()">
+            <option value="">Tous les types</option>
+          </select>
+          <select class="form-ctrl filtre-select" id="inv-filtre-fourn" onchange="filtrerInventaire()">
+            <option value="">Tous les fournisseurs</option>
+          </select>
+          <input type="text" class="form-ctrl filtre-select" id="inv-recherche" placeholder="Rechercher par nom…" oninput="filtrerInventaire()">
+          <button class="btn-fermer-panneau" onclick="reinitialiserFiltresInventaire()" title="Réinitialiser">✕</button>
+        </div>
+        <div class="chargement" id="loading-inventaire"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div id="contenu-inventaire"></div>
+        <div class="vide" id="vide-inventaire" style="display:none">
+          <div class="vide-titre">Aucun stock disponible</div>
+          <div class="vide-desc">Les stocks se calculent à partir des factures finalisées</div>
+        </div>
+      </div>
+
+<!-- FABRICATION -->
+      <!-- ════════════════════════════════════════
+     FABRICATION — Lots de production
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerFabrication()
+       afficherTableauFabrication()
+       ouvrirFormFabrication()
+       fermerFormFabrication()
+       fabFiltrerRecettes()
+       fabFiltrerFormats()
+       calculerApercuLot()
+
+     CSS (style.css)
+       .carte-admin, .carte-admin-entete
+     ════════════════════════════════════════ -->
+      <div class="section-admin" id="section-fabrication">
+        <div class="page-entete fade-in">
+          <div class="page-entete-gauche">
+            <div class="page-entete-eyebrow">Production</div>
+            <div class="page-entete-titre">Fabrication</div>
+          </div>
+          <button class="bouton" onclick="ouvrirFormFabrication()">+ Nouveau lot</button>
+          <button class="bouton bouton-contour" onclick="ouvrirFormFabrication(true)">Entrer un lot existant</button>
+        </div>
+        <div class="msg-zone" id="msg-fabrication"></div>
+        <div class="chargement" id="loading-fabrication"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div id="contenu-fabrication"></div>
+
+        <!-- FORMULAIRE NOUVEAU LOT -->
+		
+		<div id="form-fabrication" class="cache" data-mode="">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau">
+                <span class="form-panel-titre">Nouveau lot</span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFormFabrication()">✕</button>
+            </div>
+          </div>
+          <div class="form-panel">
+            <div class="form-body">
+              <div class="form-grille">
+
+                <div class="form-groupe col-plein">
+                  <label class="form-label">Collection</label>
+                  <select id="fab-collection" class="form-ctrl" onchange="fabFiltrerRecettes()">
+                    <option value="">— Choisir une collection —</option>
+                  </select>
+                </div>
+
+                <div class="form-groupe">
+                  <label class="form-label">Recette</label>
+                  <select id="fab-recette" class="form-ctrl" onchange="fabFiltrerFormats()">
+                    <option value="">— Choisir une recette —</option>
+                  </select>
+                </div>
+
+                <div class="form-groupe" id="fab-groupe-format">
+                  <label class="form-label">Format</label>
+                  <select id="fab-format" class="form-ctrl" onchange="calculerApercuLot()">
+                    <option value="">— Choisir un format —</option>
+                  </select>
+                </div>
+
+                <div class="form-groupe" id="fab-groupe-multiplicateur">
+                  <label class="form-label">Multiplicateur</label>
+                  <select id="fab-multiplicateur" class="form-ctrl" onchange="calculerApercuLot()">
+                    <option value="1">1×</option>
+                    <option value="2">2×</option>
+                    <option value="3">3×</option>
+                  </select>
+                </div>
+                <div class="form-groupe cache" id="fab-groupe-nb-unites">
+                  <label class="form-label">Nombre de savons</label>
+                  <input type="number" id="fab-nb-unites" class="form-ctrl" min="1" oninput="calculerApercuLot()">
+                </div>
+
+                <div class="form-groupe">
+                  <label class="form-label">Date de fabrication</label>
+                  <input type="date" id="fab-date" class="form-ctrl" onchange="calculerApercuLot()">
+                </div>
+
+              </div>
+
+              <div id="fab-apercu" class="carte-admin cache">
+                <div class="carte-admin-entete">Aperçu</div>
+                <div class="form-grille">
+                  <div class="form-groupe">
+                    <label class="form-label">Unités produites</label>
+                    <div id="fab-apercu-unites" class="texte-secondaire">—</div>
+                  </div>
+                  <div class="form-groupe">
+                    <label class="form-label">Disponible le</label>
+                    <div id="fab-apercu-dispo" class="texte-secondaire">—</div>
+                  </div>
+                  <div class="form-groupe">
+                    <label class="form-label">Coût estimé</label>
+                    <div id="fab-apercu-cout" class="texte-secondaire">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton bouton-contour" onclick="fermerFormFabrication()">Annuler</button>
+              <button class="bouton" onclick="sauvegarderLot()">Confirmer</button>
+            </div>
+          </div>
+        </div>
+       
+
+      </div>
+
+    <!-- INVENTAIRE PRODUCTION -->
+      <!-- ════════════════════════════════════════
+     INVENTAIRE PRODUCTION — Lots fabriqués
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       ⚠️ Cette section redirige vers section-inventaire
+       afficherSection('inventaire')
+
+     CSS (style.css)
+       .inv-section, .inv-header, .inv-titre, .inv-line
+     ════════════════════════════════════════ -->
+      <div class="section-admin" id="section-inventaire-production">
+        <div class="page-entete fade-in">
+          <div class="page-entete-gauche">
+            <div class="page-entete-eyebrow">Production</div>
+            <div class="page-entete-titre">Inventaire</div>
+          </div>
+        </div>
+        <div class="msg-zone" id="msg-inventaire-production"></div>
+        <div class="chargement" id="loading-inventaire-production"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div id="contenu-inventaire-production"></div>
+      </div>
+
+    <!-- CONTENU DU SITE -->
+      <!-- ════════════════════════════════════════
+     CONTENU DU SITE — Textes du site public
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerContenuSite()
+       sauvegarderContenuSite()
+       toggleModeSaisonnier()
+
+     CSS (style.css)
+       .form-panel, .form-panel-header, .form-panel-titre
+       .form-grille, .form-groupe, .form-ctrl
+     ════════════════════════════════════════ -->
+      <div class="section-admin" id="section-contenu-site">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Textes affichés sur le site public</div>
+            <div class="page-entete-titre">Contenu du site</div>
+          </div>
+          <div class="form-actions">
+            <button class="bouton" onclick="sauvegarderContenuSite()">Enregistrer</button>
+            
+          </div>
+        </div>
+        <div class="msg-zone" id="msg-contenu-site"></div>
+        <div class="chargement" id="loading-contenu-site"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+
+        <div id="corps-contenu-site" class="cache">
+
+          <div class="form-panel visible">
+            <div class="form-panel-header"><div class="form-panel-titre">Mode maintenance</div></div>
+            <div class="form-body">
+          <div class="form-groupe">
+                <label class="form-label">Activer le mode maintenance</label>
+                <select class="form-ctrl" id="cs-maintenance_active">
+                  <option value="0">Non — site accessible</option>
+                  <option value="1">Oui — afficher la page maintenance</option>
+                </select>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Mode saisonnier</label>
+                <button class="bouton bouton-vert-pale" id="btn-mode-saisonnier" onclick="toggleModeSaisonnier()">🌲 Mode saisonnier est OFF</button>
+              </div>
+            </div>
+          </div>
+		  
+
+          <div class="form-panel visible">
+            <div class="form-panel-header"><div class="form-panel-titre">Accueil — Hero</div></div>
+            <div class="form-body">
+              <div class="form-grille">
+                <div class="form-groupe">
+                  <label class="form-label">Eyebrow (ex: Collections 2026)</label>
+                  <input type="text" class="form-ctrl" id="cs-accueil_eyebrow">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Texte du bouton CTA</label>
+                  <input type="text" class="form-ctrl" id="cs-accueil_cta">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Stat — valeur (ex: 100%)</label>
+                  <input type="text" class="form-ctrl" id="cs-accueil_stat_valeur">
+                </div>
+               
+              </div>
+            </div>
+          </div>
+
+         <div class="form-panel visible">
+            <div class="form-panel-header"><div class="form-panel-titre">Qui sommes-nous</div></div>
+            <div class="form-body">
+              <div class="form-grille">
+                <div class="form-groupe">
+                  <label class="form-label">Eyebrow</label>
+                  <input type="text" class="form-ctrl" id="cs-qui_eyebrow">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Titre</label>
+                  <input type="text" class="form-ctrl" id="cs-qui_titre">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Titre — italique</label>
+                  <input type="text" class="form-ctrl" id="cs-qui_titre_em">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Nom signature</label>
+                  <input type="text" class="form-ctrl" id="cs-qui_signature_nom">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Titre signature</label>
+                  <input type="text" class="form-ctrl" id="cs-qui_signature_titre">
+                </div>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Texte principal</label>
+                <textarea class="form-ctrl" id="cs-qui_texte" rows="3"></textarea>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Paragraphe 1</label>
+                <textarea class="form-ctrl" id="cs-section_texte_p1" rows="3"></textarea>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Paragraphe 2</label>
+                <textarea class="form-ctrl" id="cs-section_texte_p2" rows="3"></textarea>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Paragraphe 3</label>
+                <textarea class="form-ctrl" id="cs-section_texte_p3" rows="3"></textarea>
+              </div>
+              <div class="form-grille">
+                <div class="form-groupe">
+                  <label class="form-label">Valeur 01 — titre</label>
+                  <input type="text" class="form-ctrl" id="cs-valeur_01_titre">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Valeur 01 — description</label>
+                  <textarea class="form-ctrl" id="cs-valeur_01_desc" rows="2"></textarea>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Valeur 02 — titre</label>
+                  <input type="text" class="form-ctrl" id="cs-valeur_02_titre">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Valeur 02 — description</label>
+                  <textarea class="form-ctrl" id="cs-valeur_02_desc" rows="2"></textarea>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Valeur 03 — titre</label>
+                  <input type="text" class="form-ctrl" id="cs-valeur_03_titre">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Valeur 03 — description</label>
+                  <textarea class="form-ctrl" id="cs-valeur_03_desc" rows="2"></textarea>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Valeur 04 — titre</label>
+                  <input type="text" class="form-ctrl" id="cs-valeur_04_titre">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Valeur 04 — description</label>
+                  <textarea class="form-ctrl" id="cs-valeur_04_desc" rows="2"></textarea>
+                </div>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Citation</label>
+                <textarea class="form-ctrl" id="cs-citation_texte" rows="2"></textarea>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Source citation</label>
+                <input type="text" class="form-ctrl" id="cs-citation_source">
+              </div>
+            </div>
+          </div>
+
+       <div class="form-panel visible">
+            <div class="form-panel-header"><div class="form-panel-titre">Bon à savoir — Engagements</div></div>
+            <div class="form-body">
+              <div class="form-grille">
+                <div class="form-groupe"><label class="form-label">Engagement 01 — titre</label><input type="text" class="form-ctrl" id="cs-bas_engagement_01_titre"></div>
+                <div class="form-groupe"><label class="form-label">Engagement 01 — texte</label><textarea class="form-ctrl" id="cs-bas_engagement_01_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Engagement 02 — titre</label><input type="text" class="form-ctrl" id="cs-bas_engagement_02_titre"></div>
+                <div class="form-groupe"><label class="form-label">Engagement 02 — texte</label><textarea class="form-ctrl" id="cs-bas_engagement_02_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Engagement 03 — titre</label><input type="text" class="form-ctrl" id="cs-bas_engagement_03_titre"></div>
+                <div class="form-groupe"><label class="form-label">Engagement 03 — texte</label><textarea class="form-ctrl" id="cs-bas_engagement_03_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Engagement 04 — titre</label><input type="text" class="form-ctrl" id="cs-bas_engagement_04_titre"></div>
+                <div class="form-groupe"><label class="form-label">Engagement 04 — texte</label><textarea class="form-ctrl" id="cs-bas_engagement_04_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Engagement 05 — titre</label><input type="text" class="form-ctrl" id="cs-bas_engagement_05_titre"></div>
+                <div class="form-groupe"><label class="form-label">Engagement 05 — texte</label><textarea class="form-ctrl" id="cs-bas_engagement_05_texte" rows="2"></textarea></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-panel visible">
+            <div class="form-panel-header"><div class="form-panel-titre">Bon à savoir — Notes importantes</div></div>
+            <div class="form-body">
+              <div class="form-grille">
+                <div class="form-groupe"><label class="form-label">Note 01 — titre</label><input type="text" class="form-ctrl" id="cs-bas_note_01_titre"></div>
+                <div class="form-groupe"><label class="form-label">Note 01 — texte</label><textarea class="form-ctrl" id="cs-bas_note_01_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Note 02 — titre</label><input type="text" class="form-ctrl" id="cs-bas_note_02_titre"></div>
+                <div class="form-groupe"><label class="form-label">Note 02 — texte</label><textarea class="form-ctrl" id="cs-bas_note_02_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Note 03 — titre</label><input type="text" class="form-ctrl" id="cs-bas_note_03_titre"></div>
+                <div class="form-groupe"><label class="form-label">Note 03 — texte</label><textarea class="form-ctrl" id="cs-bas_note_03_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Note 04 — titre</label><input type="text" class="form-ctrl" id="cs-bas_note_04_titre"></div>
+                <div class="form-groupe"><label class="form-label">Note 04 — texte</label><textarea class="form-ctrl" id="cs-bas_note_04_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Note 05 — titre</label><input type="text" class="form-ctrl" id="cs-bas_note_05_titre"></div>
+                <div class="form-groupe"><label class="form-label">Note 05 — texte</label><textarea class="form-ctrl" id="cs-bas_note_05_texte" rows="2"></textarea></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-panel visible">
+            <div class="form-panel-header"><div class="form-panel-titre">Bon à savoir — Conservation et utilisation</div></div>
+            <div class="form-body">
+              <div class="form-grille">
+                <div class="form-groupe"><label class="form-label">Conservation 01 — titre</label><input type="text" class="form-ctrl" id="cs-bas_conservation_01_titre"></div>
+                <div class="form-groupe"><label class="form-label">Conservation 01 — texte</label><textarea class="form-ctrl" id="cs-bas_conservation_01_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Conservation 02 — titre</label><input type="text" class="form-ctrl" id="cs-bas_conservation_02_titre"></div>
+                <div class="form-groupe"><label class="form-label">Conservation 02 — texte</label><textarea class="form-ctrl" id="cs-bas_conservation_02_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Conservation 03 — titre</label><input type="text" class="form-ctrl" id="cs-bas_conservation_03_titre"></div>
+                <div class="form-groupe"><label class="form-label">Conservation 03 — texte</label><textarea class="form-ctrl" id="cs-bas_conservation_03_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Conservation 04 — titre</label><input type="text" class="form-ctrl" id="cs-bas_conservation_04_titre"></div>
+                <div class="form-groupe"><label class="form-label">Conservation 04 — texte</label><textarea class="form-ctrl" id="cs-bas_conservation_04_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Conservation 05 — titre</label><input type="text" class="form-ctrl" id="cs-bas_conservation_05_titre"></div>
+                <div class="form-groupe"><label class="form-label">Conservation 05 — texte</label><textarea class="form-ctrl" id="cs-bas_conservation_05_texte" rows="2"></textarea></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-panel visible">
+            <div class="form-panel-header"><div class="form-panel-titre">Commandes et délais</div></div>
+            <div class="form-body">
+              <div class="form-grille">
+                <div class="form-groupe"><label class="form-label">Commande 01 — titre</label><input type="text" class="form-ctrl" id="cs-bas_commande_01_titre"></div>
+                <div class="form-groupe"><label class="form-label">Commande 01 — texte</label><textarea class="form-ctrl" id="cs-bas_commande_01_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Commande 02 — titre</label><input type="text" class="form-ctrl" id="cs-bas_commande_02_titre"></div>
+                <div class="form-groupe"><label class="form-label">Commande 02 — texte</label><textarea class="form-ctrl" id="cs-bas_commande_02_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Commande 03 — titre</label><input type="text" class="form-ctrl" id="cs-bas_commande_03_titre"></div>
+                <div class="form-groupe"><label class="form-label">Commande 03 — texte</label><textarea class="form-ctrl" id="cs-bas_commande_03_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Commande 04 — titre</label><input type="text" class="form-ctrl" id="cs-bas_commande_04_titre"></div>
+                <div class="form-groupe"><label class="form-label">Commande 04 — texte</label><textarea class="form-ctrl" id="cs-bas_commande_04_texte" rows="2"></textarea></div>
+                <div class="form-groupe"><label class="form-label">Commande 05 — titre</label><input type="text" class="form-ctrl" id="cs-bas_commande_05_titre"></div>
+                <div class="form-groupe"><label class="form-label">Commande 05 — texte</label><textarea class="form-ctrl" id="cs-bas_commande_05_texte" rows="2"></textarea></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+	
+
+      <!-- INCI -->
+      <!-- ════════════════════════════════════════
+     INCI — Ingrédients et validation
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+     ⚠️ LÉGAL — Ne jamais afficher un nom à la place d'un code INCI
+
+     JS (admin.js)
+       chargerInci()
+       inciAppliquerFiltres()
+       inciGetFiltres()
+       inciConstruireAccordeons()
+       inciRendreLigne()
+       inciToggleDetail() / inciToggleAccordeon()
+       inciValider()
+       retourRecetteDepuisInci()
+
+     CSS (style.css)
+       .filtres-bar, .filtre-btn, .filtre-label
+     ════════════════════════════════════════ -->
+      <div class="section-admin" id="section-inci">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Validation des sources</div>
+            <div class="page-entete-titre">Ingrédients <em>INCI</em></div>
+          </div>
+          <button class="bouton bouton-petit bouton-contour cache" id="btn-retour-recette" onclick="retourRecetteDepuisInci()">← Retour à la recette</button>
+        </div>
+        <div class="msg-zone" id="msg-inci"></div>
+
+        <div class="filtres-bar" id="inci-filtres">
+          <div class="filtres-ligne">
+            <button class="bouton bouton-petit bouton-contour" onclick="document.getElementById('inci-filtres-avances').classList.toggle('cache')">Filtres</button>
+          </div>
+          <div id="inci-filtres-avances" class="cache">
+          <div class="filtres-ligne">
+            <span class="filtre-label">Statut</span>
+            <button class="filtre-btn actif" data-filtre-statut="tout" onclick="inciAppliquerFiltres(this, 'statut')">Tout</button>
+            <button class="filtre-btn" data-filtre-statut="a-valider" onclick="inciAppliquerFiltres(this, 'statut')">À valider</button>
+            <button class="filtre-btn" data-filtre-statut="valide" onclick="inciAppliquerFiltres(this, 'statut')">Validé</button>
+          </div>
+          <div class="filtres-ligne">
+            <span class="filtre-label">Source</span>
+            <button class="filtre-btn actif" data-filtre-source="tout" onclick="inciAppliquerFiltres(this, 'source')">Tout</button>
+            <button class="filtre-btn" data-filtre-source="PA" onclick="inciAppliquerFiltres(this, 'source')">Purearome</button>
+            <button class="filtre-btn" data-filtre-source="MH" onclick="inciAppliquerFiltres(this, 'source')">Les Mauvaises Herbes</button>
+            <button class="filtre-btn" data-filtre-source="Arbressence" onclick="inciAppliquerFiltres(this, 'source')">Arbressence</button>
+            <button class="filtre-btn" data-filtre-source="DE" onclick="inciAppliquerFiltres(this, 'source')">Divine Essence</button>
+          </div>
+          </div>
+          <div class="filtres-ligne">
+            <span class="filtre-label">Recherche</span>
+            <div class="champ-avec-reset">
+              <input type="text" class="form-ctrl" id="inci-recherche" placeholder="Nom d'ingrédient…" oninput="inciAppliquerFiltres()">
+              <button class="btn-reset-champ" onclick="document.getElementById('inci-recherche').value='';inciAppliquerFiltres()">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chargement" id="loading-inci"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <div id="inci-accordeons"></div>
+      </div>
+
+      <!-- IMPORT RECETTES -->
+      <!-- ════════════════════════════════════════
+     IMPORT RECETTES — Importer via fichier .md
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       importLireFichier()
+       importEnLot()
+       importParserMD()
+       importEnvoyer()
+       importAnnuler()
+
+     CSS (style.css)
+       .carte-admin, .carte-admin-entete
+     ════════════════════════════════════════ -->
+      <div class="section-admin" id="section-import-recettes">
+        <div class="page-entete fade-in">
+          <div class="page-entete-gauche">
+            <p class="page-entete-eyebrow">Coller un fichier MD pour importer</p>
+            <h1 class="page-entete-titre">Import <em>recettes</em></h1>
+          </div>
+        </div>
+        <div class="msg-zone" id="msg-import-recettes"></div>
+        <div class="carte-admin">
+          <input type="hidden" id="import-recette-id" value="1">
+          <div class="form-groupe">
+            <input type="file" class="cache" id="import-md-fichier" accept=".md" onchange="importLireFichier(this)">
+            <input type="file" class="cache" id="import-md-lot" accept=".md" multiple onchange="importEnLot(this)">
+            <button class="bouton bouton-vert-pale" onclick="document.getElementById('import-md-fichier').click()">Choisir un fichier .md</button>
+            <button class="bouton" onclick="document.getElementById('import-md-lot').click()">Importer en lot</button>
+          </div>
+          <textarea class="cache" id="import-md-texte"></textarea>
+        </div>
+       <div class="carte-admin cache" id="import-apercu-zone">
+  <div class="carte-admin-entete">Aperçu — vérifier et corriger avant d'importer</div>
+  <div class="form-body">
+    <div class="form-grille">
+      <div class="form-groupe col-demi">
+        <label class="form-label">Nom</label>
+        <input type="text" class="form-ctrl" id="imp-nom">
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Collection</label>
+        <input type="text" class="form-ctrl" id="imp-collection">
+      </div>
+	  
+	  
+      <div class="form-groupe">
+        <label class="form-label">Ligne</label>
+        <input type="text" class="form-ctrl" id="imp-ligne">
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Statut</label>
+        <select class="form-ctrl" id="imp-statut">
+          <option value="test">Test</option>
+          <option value="public">Public</option>
+        </select>
+      </div>
+      <div class="form-groupe">
+                <label class="form-label">Rang</label>
+                <input type="text" inputmode="decimal" class="form-ctrl" id="imp-rang">
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Nb unités</label>
+                <input type="text" inputmode="decimal" class="form-ctrl" id="imp-unites">
+              </div>
+      <div class="form-groupe">
+        <label class="form-label">Cure (jours)</label>
+        <input type="text" inputmode="decimal" class="form-ctrl" id="imp-cure">
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Surgras</label>
+        <input type="text" class="form-ctrl" id="imp-surgras">
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Couleur HEX</label>
+        <input type="text" class="form-ctrl" id="imp-couleur-hex" oninput="importApercuCouleur(this)">
+        <div id="imp-couleur-apercu" class="couleur-apercu"></div>
+      </div>
+      <div class="form-groupe col-plein">
+        <label class="form-label">Image principale (URL)</label>
+        <input type="text" class="form-ctrl" id="imp-image-url">
+      </div>
+      <div class="form-groupe col-plein">
+        <label class="form-label">Image Noël (URL)</label>
+        <input type="text" class="form-ctrl" id="imp-image-url-noel">
+      </div>
+      <div class="form-groupe col-plein">
+        <label class="form-label">Version courte</label>
+        <textarea class="form-ctrl" id="imp-desc-courte" rows="2"></textarea>
+      </div>
+      <div class="form-groupe col-plein">
+        <label class="form-label">Version longue</label>
+        <textarea class="form-ctrl" id="imp-desc-longue" rows="4"></textarea>
+      </div>
+      <div class="form-groupe col-plein">
+        <label class="form-label">Notes</label>
+        <textarea class="form-ctrl" id="imp-notes" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="form-groupe col-plein">
+      <label class="form-label">Ingrédients</label>
+      <div id="imp-ingredients"></div>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="bouton" onclick="importEnvoyer()">Importer</button>
+    <button class="bouton bouton-contour" onclick="importAnnuler()">Annuler</button>
+  </div>
+</div>
+      </div>
+
+      <!-- DENSITÉS -->
+     <!-- ════════════════════════════════════════
+     DENSITÉS — Facteurs de conversion ml → g
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerDensites()
+       ouvrirFormDensite()
+       fermerFormDensite()
+       modifierDensite()
+       sauvegarderDensite()
+
+     CSS (style.css)
+       .tableau-admin, .tableau-wrap
+     ════════════════════════════════════════ -->
+      <div class="section-admin" id="section-densites">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Facteurs de conversion ml → g par type d'ingrédient</div>
+            <div class="page-entete-titre">Densités</div>
+          </div>
+          <button class="bouton" id="btn-nouvelle-densite" onclick="ouvrirFormDensite()">+ Nouveau type</button>
+        </div>
+        <div class="msg-zone" id="msg-densites"></div>
+       <div class="form-panel" id="form-densites">
+          <button class="btn-fermer-panneau" onclick="fermerFormDensite()" title="Fermer">✕</button>
+          <div class="form-panel-header">
+            <div class="form-panel-titre" id="form-densites-titre">Nouveau type</div>
+          </div>
+          <div class="form-body">
+            <input type="hidden" id="fd-mode">
+            <div class="form-grille">
+			
+          <div class="form-groupe">
+                <label class="form-label">Type d'ingrédient</label>
+                <input type="text" class="form-ctrl" id="fd-type" placeholder="">
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Densité (g/ml)</label>
+                <input type="text" inputmode="decimal" class="form-ctrl" id="fd-densite" placeholder="">
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Unité source</label>
+                <select class="form-ctrl" id="fd-unite">
+                  <option value="ml">ml</option>
+                  <option value="g">g</option>
+                  <option value="L">L</option>
+                  <option value="kg">kg</option>
+                </select>
+              </div>
+			  
+			  
+              <div class="form-groupe">
+                <label class="form-label">Marge de perte (%)</label>
+                <input type="text" inputmode="decimal" class="form-ctrl" id="fd-marge-perte">
+              </div>
+            </div>
+            <hr class="separateur">
+            <div class="form-actions">
+              <button class="bouton" onclick="sauvegarderDensite()">Enregistrer</button>
+              <button class="bouton bouton-vert-pale" onclick="fermerFormDensite()">Annuler</button>
+            </div>
+          </div>
+        </div>
+        <div class="chargement" id="loading-densites"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+        <table id="tableau-densites" class="cache">
+          <thead>
+            <tr><th>Type d'ingrédient</th><th>Densité (g/ml)</th><th>Unité source</th><th>Marge perte (%)</th><th></th></tr>
+          </thead>
+          <tbody id="tbody-densites"></tbody>
+        </table>
+       <div class="vide cache" id="vide-densites">
+          <div class="vide-titre">Aucune densité</div>
+        </div>
+      </div>
+
+
+   <!-- ════════════════════════════════════════
+     MÉDIATHÈQUE — Photos Cloudinary
+     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
+
+     JS (admin.js)
+       chargerMediatheque()
+       medFiltrer()
+       mediathequeOuvrirAjout()
+       mediathequeFermerAjout()
+       mediathequeSauvegarder()
+       mediathequeSyncCloudinary()
+       mediathequeSupprimer()
+       ouvrirMediatheque()
+       filtrerMediatheque()
+       peuplerFiltresCategoriesMediatheque()
+       selectionnerPhotoMediatheque()
+       fermerModalMediatheque()
+
+     CSS (style.css)
+       .carte-admin, .carte-admin-entete
+       .filtres-bar
+     ════════════════════════════════════════ -->
+    <div class="section-admin" id="section-mediatheque">
+  <div class="page-entete fade-in">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Photos disponibles dans le sélecteur</div>
+      <div class="page-entete-titre">Médiathèque</div>
+    </div>
+    <div class="form-actions">
+      <button class="bouton" onclick="mediathequeOuvrirAjout()">+ Ajouter une photo</button>
+      <button class="bouton bouton-vert-pale" onclick="mediathequeSyncCloudinary()">↺ Synchroniser Cloudinary</button>
+    </div>
+  </div>
+  <div class="msg-zone" id="msg-mediatheque"></div>
+  <div class="carte-admin fade-in cache" id="med-form-ajout">
+    <div class="carte-admin-entete">Ajouter une photo</div>
+    <div class="form-groupe">
+      <label class="form-label">URL Cloudinary</label>
+      <div class="champ-avec-reset">
+        <input type="text" class="form-ctrl" id="med-url" placeholder="Coller l'URL ici">
+        <button class="btn-reset-champ" onclick="document.getElementById('med-url').value=''">✕</button>
+      </div>
+    </div>
+    <div class="form-groupe">
+      <label class="form-label">Nom</label>
+      <input type="text" class="form-ctrl" id="med-nom" placeholder="Ex. : saponica-principale">
+    </div>
+    <div class="form-groupe">
+      <label class="form-label">Catégorie</label>
+      <select class="form-ctrl" id="med-categorie">
+        <option value="">— Choisir —</option>
+        <option>Site général</option>
+        <option>Recette</option>
+        <option>Recette Noël</option>
+        <option>Collection</option>
+        <option>Collection Noël</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="bouton" onclick="mediathequeSauvegarder()">Sauvegarder</button>
+      <button class="bouton bouton-contour" onclick="mediathequeFermerAjout()">Annuler</button>
+    </div>
+  </div>
+  <div class="filtres-bar">
+    <select class="form-ctrl filtre-select" id="med-filtre-cat" onchange="medFiltrer()">
+      <option value="">Toutes les catégories</option>
+    </select>
+    <span class="texte-secondaire" id="med-compteur"></span>
+  </div>
+  <div class="chargement cache" id="med-chargement"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+  <div id="med-grille" class="collections-grille"></div>
+  
+
+</div>
+
+
+
+
+
+
+
+
+
+ <!-- CATALOGUE BUILDER -->
+ 
+ 
+ 
+ 
+<div class="section-admin" id="section-catalogue-builder">
+
+  <div class="page-entete fade-in">
+    <div>
+      <div class="page-entete-eyebrow">Mise en page du catalogue imprimable</div>
+      <div class="page-entete-titre">Catalogue <em>PDF</em></div>
+    </div>
+    <div class="form-actions">
+      <button class="bouton bouton-contour" onclick="cbOuvrirVueLecture()">👁 Vue lecture</button>
+      <button class="bouton bouton-contour" onclick="cbImprimerPage()">🖨 Page courante</button>
+      <button class="bouton" onclick="cbImprimerCatalogue()">📄 Imprimer catalogue</button>
+    </div>
+  </div>
+
+  <div class="msg-zone" id="msg-catalogue-builder" style="display:none"></div>
+  <div class="chargement" id="cb-chargement"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement des données…</div>
+
+  <div id="cb-layout" style="display:none">
+
+    <!-- ── GAUCHE — Palette + pages ─────── -->
+    <div class="cb-palette">
+      <div class="cb-section-titre">BLOCS</div>
+      <button class="cb-palette-btn" onclick="cbAjouterBloc('titre')">T — Titre</button>
+      <button class="cb-palette-btn" onclick="cbAjouterBloc('texte')">¶ — Texte</button>
+      <button class="cb-palette-btn" onclick="cbAjouterBloc('image')">⬜ — Image</button>
+      <button class="cb-palette-btn" onclick="cbAjouterBloc('couleur')">■ — Couleur</button>
+      <div class="cb-palette-sep"></div>
+      <div class="cb-section-titre">MOSAÏQUES</div>
+      <button class="cb-palette-btn" onclick="cbAjouterBloc('mosaique-v')">▦ — Verticale</button>
+      <button class="cb-palette-btn" onclick="cbAjouterBloc('mosaique-h')">▦ — Horizontale</button>
+      <div class="cb-palette-sep"></div>
+      <div class="cb-section-titre">GABARITS</div>
+      <button class="cb-palette-btn" onclick="cbOuvrirFicheProduit()">📦 Fiche produit</button>
+      <div class="cb-palette-sep"></div>
+      <div class="cb-section-titre">PAGES</div>
+      <div id="cb-liste-pages"></div>
+      <button class="cb-palette-btn cb-palette-btn-new" onclick="cbNouvellePageCatalogue()">+ Nouvelle page</button>
+    </div>
+
+    <!-- ── CENTRE — Canvas ───────────────── -->
+    <div class="cb-canvas-zone">
+
+      <div class="cb-canvas-toolbar">
+        <input class="form-ctrl" id="cb-page-nom" style="width:150px;font-size:13px" placeholder="Nom de la page" oninput="cbRenommerPage(this.value)">
+        <select class="form-ctrl" id="cb-page-collection" style="font-size:13px;max-width:160px" onchange="cbAssignerCollection(this.value)">
+          <option value="">— Collection —</option>
+        </select>
+        <button class="bouton bouton-petit" id="cb-btn-tdm" onclick="cbGenererTDMPage()" style="display:none">📋 TDM</button>
+        <div style="flex:1"></div>
+        <button class="bouton bouton-petit bouton-contour" id="cb-btn-monter" onclick="cbMonterBloc()" style="display:none" title="Monter le bloc">↑</button>
+        <button class="bouton bouton-petit bouton-contour" id="cb-btn-descendre" onclick="cbDescendreBloc()" style="display:none" title="Descendre le bloc">↓</button>
+        <button class="bouton bouton-petit bouton-contour" id="cb-btn-copier" onclick="cbCopierBloc()" style="display:none">⧉ Copier</button>
+        <button class="bouton bouton-petit bouton-contour" id="cb-btn-coller" onclick="cbCollerBloc()" style="display:none">⧉ Coller</button>
+        <button class="bouton bouton-petit bouton-rouge" id="cb-btn-supprimer-bloc" onclick="cbSupprimerBlocSelectionne()" style="display:none">🗑 Bloc</button>
+        <button class="bouton bouton-petit bouton-rouge" onclick="cbSupprimerPage()">🗑 Page</button>
+      </div>
+
+      <div class="cb-canvas-wrap">
+        <div class="cb-canvas" id="cb-canvas"
+          onmousedown="cbCanvasClick(event)"
+          onmouseup="cbGlobalMouseUp()">
+          <div class="cb-canvas-vide" id="cb-canvas-vide">
+            ← Ajoutez des blocs depuis le panneau gauche
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── DROITE — Propriétés ───────────── -->
+    <div class="cb-props" id="cb-props">
+
+      <!-- Panneau calques -->
+      <div id="cb-calques" style="margin-bottom:14px;border-bottom:1px solid #f0f0f0;padding-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:.5px">CALQUES</div>
+        <div id="cb-calques-liste"></div>
+      </div>
+
+      <div id="cb-props-vide" style="color:#bbb;font-size:13px;text-align:center;margin-top:20px;line-height:1.8">
+        <div style="font-size:28px;margin-bottom:8px">←</div>
+        Cliquez sur un bloc<br>pour configurer<br>sa source
+      </div>
+
+      <div id="cb-props-contenu" style="display:none">
+
+        <div style="font-weight:700;font-size:13px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f0f0f0" id="cb-props-type-label">Bloc</div>
+
+       <!-- Onglet source en premier -->
+        <div class="form-groupe">
+          <label class="form-label">Onglet source</label>
+          <select class="form-ctrl" id="cb-src-sheet" onchange="cbOnChangeSheet()">
+            <option value="">— Choisir —</option>
+            <option value="Collections_v2">Collections</option>
+            <option value="Gammes_v2">Gammes</option>
+            <option value="Familles_v2">Familles</option>
+            <option value="Produits_v2">Produits</option>
+            <option value="Contenu_v2">Contenu site</option>
+            <option value="Mediatheque_v2">Médiathèque</option>
+            <option value="Images_Locales_v2">Images locales</option>
+          </select>
+        </div>
+
+        <!-- Filtres optionnels -->
+        <div class="form-groupe" id="cb-src-col-groupe" style="display:none">
+          <label class="form-label">Collection (filtre)</label>
+          <select class="form-ctrl" id="cb-src-col" onchange="cbOnChangeCollection()">
+            <option value="">— Toutes —</option>
+          </select>
+        </div>
+        <div class="form-groupe" id="cb-src-gam-groupe" style="display:none">
+          <label class="form-label">Gamme (filtre)</label>
+          <select class="form-ctrl" id="cb-src-gam" onchange="cbOnChangeGamme()">
+            <option value="">— Toutes —</option>
+          </select>
+        </div>
+        <div class="form-groupe" id="cb-src-fam-groupe" style="display:none">
+          <label class="form-label">Famille (filtre)</label>
+          <select class="form-ctrl" id="cb-src-fam" onchange="cbOnChangeFamille()">
+            <option value="">— Toutes —</option>
+          </select>
+        </div>
+
+        <!-- Item + Champ -->
+        <div class="form-groupe" id="cb-src-id-groupe" style="display:none">
+          <label class="form-label">Item</label>
+          <select class="form-ctrl" id="cb-src-id" onchange="cbOnChangeId()"></select>
+        </div>
+        <div class="form-groupe" id="cb-src-field-groupe" style="display:none">
+          <label class="form-label">Champ</label>
+          <select class="form-ctrl" id="cb-src-field" onchange="cbOnChangeField()"></select>
+        </div>
+        <div id="cb-apercu-zone" style="display:none;background:#f8f8f8;border-radius:6px;padding:10px;margin-bottom:12px;font-size:12px;color:#444;max-height:100px;overflow:auto">
+          <div style="font-size:9px;color:#aaa;font-weight:700;margin-bottom:4px;letter-spacing:.5px">APERÇU</div>
+          <div id="cb-apercu-val"></div>
+        </div>
+
+        <!-- Couleur libre (bloc couleur sans binding) -->
+        <div id="cb-couleur-libre-zone" style="display:none;border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px">
+          <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:.5px">COULEUR</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+            <div onclick="cbSetCouleurPredefinie('#5a8a3a')" title="Primary" style="width:22px;height:22px;border-radius:50%;background:#5a8a3a;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#4a6e2e')" title="Primary dark" style="width:22px;height:22px;border-radius:50%;background:#4a6e2e;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#d4a445')" title="Accent" style="width:22px;height:22px;border-radius:50%;background:#d4a445;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#ffffff')" title="Blanc" style="width:22px;height:22px;border-radius:50%;background:#ffffff;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#8b8680')" title="Gris" style="width:22px;height:22px;border-radius:50%;background:#8b8680;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#3d3b39')" title="Gris foncé" style="width:22px;height:22px;border-radius:50%;background:#3d3b39;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurPredefinie('#333333')" title="Logo" style="width:22px;height:22px;border-radius:50%;background:#333333;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="color" id="cb-couleur-libre-picker" oninput="cbUpdateCouleurLibre(this.value)" style="width:48px;height:36px;padding:2px;border:1px solid #e5e5e5;border-radius:6px;cursor:pointer">
+            <span style="font-size:12px;color:#666">Couleur libre</span>
+          </div>
+        </div>
+
+        <!-- Dimensions -->
+        <div style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px">
+          <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:.5px">DIMENSIONS</div>
+          <div class="form-grille">
+            <div class="form-groupe"><label class="form-label">Larg.</label><input type="number" class="form-ctrl" id="cb-dim-w" oninput="cbUpdateDim()"></div>
+            <div class="form-groupe"><label class="form-label">Haut.</label><input type="number" class="form-ctrl" id="cb-dim-h" oninput="cbUpdateDim()"></div>
+            <div class="form-groupe"><label class="form-label">X</label><input type="number" class="form-ctrl" id="cb-dim-x" oninput="cbUpdateDim()"></div>
+            <div class="form-groupe"><label class="form-label">Y</label><input type="number" class="form-ctrl" id="cb-dim-y" oninput="cbUpdateDim()"></div>
+          </div>
+        </div>
+
+        <!-- Typographie -->
+        <div id="cb-typo-zone" style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px;display:none">
+          <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:.5px">TYPOGRAPHIE</div>
+          <div class="form-groupe">
+            <label class="form-label">Police</label>
+            <select class="form-ctrl" id="cb-typo-police" onchange="cbUpdateTypo()">
+              <option value="DM Sans">DM Sans</option>
+              <option value="Playfair Display">Playfair Display</option>
+              <option value="Birthstone">Birthstone</option>
+            </select>
+          </div>
+          <div class="form-grille">
+            <div class="form-groupe">
+              <label class="form-label">Taille</label>
+              <input type="number" class="form-ctrl" id="cb-typo-size" oninput="cbUpdateTypo()">
+            </div>
+            <div class="form-groupe">
+              <label class="form-label">Couleur</label>
+              <input type="color" class="form-ctrl" id="cb-typo-couleur" oninput="cbUpdateTypo()" style="padding:2px;height:36px">
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+            <div onclick="cbSetCouleurTexte('#5a8a3a')" title="Primary" style="width:22px;height:22px;border-radius:50%;background:#5a8a3a;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#4a6e2e')" title="Primary dark" style="width:22px;height:22px;border-radius:50%;background:#4a6e2e;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#d4a445')" title="Accent" style="width:22px;height:22px;border-radius:50%;background:#d4a445;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#ffffff')" title="Blanc" style="width:22px;height:22px;border-radius:50%;background:#ffffff;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#8b8680')" title="Gris" style="width:22px;height:22px;border-radius:50%;background:#8b8680;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#3d3b39')" title="Gris foncé" style="width:22px;height:22px;border-radius:50%;background:#3d3b39;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+            <div onclick="cbSetCouleurTexte('#333333')" title="Logo" style="width:22px;height:22px;border-radius:50%;background:#333333;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button class="bouton bouton-petit" id="cb-typo-bold-btn" onclick="cbToggleBold()" style="font-weight:bold;flex:1">G</button>
+            <button class="bouton bouton-petit" id="cb-typo-italic-btn" onclick="cbToggleItalic()" style="font-style:italic;flex:1">I</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button class="bouton bouton-petit" id="cb-typo-left-btn" onclick="cbSetAlign('left')" style="flex:1">⬅</button>
+            <button class="bouton bouton-petit" id="cb-typo-center-btn" onclick="cbSetAlign('center')" style="flex:1">☰</button>
+            <button class="bouton bouton-petit" id="cb-typo-right-btn" onclick="cbSetAlign('right')" style="flex:1">➡</button>
+          </div>
+        </div>
+
+        <!-- Opacité couleur -->
+        <div id="cb-opacite-zone" style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px;display:none">
+          <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:.5px">TRANSPARENCE</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="range" id="cb-opacite-slider" min="0" max="100" value="100" oninput="cbUpdateOpacite(this.value)" style="flex:1">
+            <span id="cb-opacite-label" style="font-size:12px;color:#666;width:36px;text-align:right">100%</span>
+          </div>
+        </div>
+
+        <!-- Opacité image -->
+        <div id="cb-image-opacite-zone" style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px;display:none">
+          <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:8px;letter-spacing:.5px">TRANSPARENCE</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="range" id="cb-image-opacite-slider" min="0" max="100" value="100" oninput="cbUpdateImageOpacite(this.value)" style="flex:1">
+            <span id="cb-image-opacite-label" style="font-size:12px;color:#666;width:36px;text-align:right">100%</span>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:#888;margin-top:12px;margin-bottom:8px;letter-spacing:.5px">ZOOM ET POSITION</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+            <span style="font-size:11px;color:#888;width:14px">🔍</span>
+            <input type="range" id="cb-image-zoom" min="100" max="300" value="100" oninput="cbUpdateImagePos()" style="flex:1">
+            <span id="cb-image-zoom-label" style="font-size:12px;color:#666;width:36px;text-align:right">100%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+            <span style="font-size:11px;color:#888;width:14px">X</span>
+            <input type="range" id="cb-image-pos-x" min="0" max="100" value="50" oninput="cbUpdateImagePos()" style="flex:1">
+            <span id="cb-image-pos-x-label" style="font-size:12px;color:#666;width:36px;text-align:right">50%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:11px;color:#888;width:14px">Y</span>
+            <input type="range" id="cb-image-pos-y" min="0" max="100" value="50" oninput="cbUpdateImagePos()" style="flex:1">
+            <span id="cb-image-pos-y-label" style="font-size:12px;color:#666;width:36px;text-align:right">50%</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /cb-layout -->
+
+</div><!-- /section-catalogue-builder -->
+
+<!-- VUE LECTURE -->
+<div id="cb-vue-lecture" style="display:none">
+  <button id="cb-vue-lecture-fermer" onclick="cbFermerVueLecture()">✕ Fermer</button>
+  <div id="cb-vue-lecture-contenu"></div>
+</div>
+
+
+
+
+
+ 
+	  </main>
+  </div>	  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+<script src="../js/main.js"></script>
+<script src="../js/parsers.js"></script>
+  <script src="../js/admin.js"></script>
+    
+ <div id="ecran-connexion" class="ecran-connexion cache">
+    <div class="connexion-boite">
+      <img src="../Images/Logofinal.png" alt="Univers Caresse" class="connexion-logo">
+      <h2 class="connexion-titre">Administration</h2>
+  <input type="password" id="input-mdp-admin" class="form-ctrl">
+      <p id="erreur-mdp-admin" class="connexion-erreur"></p>
+      <button class="bouton" onclick="validerConnexionAdmin()">Entrer</button>
+    </div>
+  </div>
+
+
+ <div class="modal-admin-overlay" id="modal-if-nouvel-ingredient">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Nouvel ingrédient</div>
+      
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe">
+        <label class="form-label">Catégorie UC</label>
+        <select class="form-ctrl" id="modal-if-cat"></select>
+      </div>
+      <div class="form-groupe cache" id="modal-if-nouvelle-cat-groupe">
+        <label class="form-label">Nouvelle catégorie UC</label>
+        <input type="text" class="form-ctrl" id="modal-if-nouvelle-cat" placeholder="Ex: Ingrédients Secs">
+      </div>
+      <div class="form-groupe cache" id="modal-if-nouveau-nom-groupe">
+        <label class="form-label">Nouveau nom UC</label>
+        <input type="text" class="form-ctrl" id="modal-if-nouveau-nom" placeholder="Ex: Cire émulsifiante">
+      </div>
+      <div class="form-groupe">
+      <!--   <label class="form-label">Nom UC</label>-->
+        <select class="form-ctrl" id="modal-if-nomuc"></select>
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-petit bouton-contour" onclick="fermerModalIfNouvelIngredient()">Annuler</button>
+        <button class="bouton bouton-petit" onclick="modalIfConfirmer()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-admin-overlay" id="modal-ajouter-inci">
+    <div class="modal-admin">
+      <div class="modal-admin-header">
+        <div class="modal-admin-titre" id="modal-ajouter-inci-titre">Nouvel ingrédient</div>
+      </div>
+      <div class="modal-admin-body">
+        <div class="form-groupe">
+          <label class="form-label">Nom de l'ingrédient</label>
+          <input type="text" class="form-ctrl" id="modal-inci-nom" placeholder="Ex: Huile de coco" oninput="modalInciSyncNomUC()">
+        </div>
+        <div class="form-groupe" id="modal-inci-groupe-url">
+          <label class="form-label">URL de Purearome, Arbressence, Mauvaises Herbes ou Divine Essence</label>
+          <input type="text" class="form-ctrl" id="modal-inci-url" placeholder="Exemple : https://www.purearome.com/fr/produit/..." oninput="modalInciToggleChamps()">
+        </div>
+        <div class="form-groupe" id="modal-inci-groupe-fourn">
+          <label class="form-label">Ou nom d'un autre fournisseur</label>
+          <input type="text" class="form-ctrl" id="modal-inci-fourn" placeholder="Ex: Aliksir, Pranarôm…" oninput="modalInciToggleChamps()">
+        </div>
+        <div id="modal-inci-champs-manuels" class="cache">
+          <div class="form-groupe">
+            <label class="form-label">INCI</label>
+            <input type="text" class="form-ctrl" id="modal-inci-inci" placeholder="Ex: Cocos Nucifera Oil">
+          </div>
+          <div class="form-groupe">
+            <label class="form-label">Nom botanique</label>
+            <input type="text" class="form-ctrl" id="modal-inci-bot" placeholder="Ex: Cocos nucifera">
+          </div>
+          <div class="form-groupe">
+            <label class="form-label">Note olfactive</label>
+            <input type="text" class="form-ctrl" id="modal-inci-note" placeholder="Ex: Boisé, doux…">
+          </div>
+        </div>
+        <div id="modal-inci-statut" class="form-valeur cache"></div>
+      </div>
+      <div class="modal-admin-body">
+        <div class="form-actions">
+          <button class="bouton bouton-petit bouton-contour" onclick="fermerModalAjouterInci()">Annuler</button>
+          <button class="bouton bouton-petit" id="modal-inci-btn-go" onclick="modalInciGo()">Go</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="modal-admin-overlay" id="modal-facture">
+          <div class="modal-admin">
+            <div class="modal-admin-header">
+              <div>
+                <div class="modal-admin-titre" id="modal-facture-titre">Facture</div>
+                <div class="modal-admin-info" id="modal-facture-info"></div>
+              </div>
+              <button class="btn-fermer-panneau-rouge" onclick="fermerModalFacture()" title="Fermer">✕</button>
+            </div>
+            <div class="modal-admin-body">
+              <div class="chargement cache" id="loading-detail-facture"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+              <div id="contenu-detail-facture"></div>
+            </div>
+          </div>
+        </div>
+ <div class="modal-admin-overlay" id="modal-confirm">
+    <div class="modal-admin">
+      <div class="modal-admin-header">
+        <div class="modal-admin-titre" id="modal-confirm-message"></div>
+      </div>
+      <div class="modal-admin-body" style="display:flex;gap:12px;justify-content:flex-end;padding:16px">
+        <button class="bouton bouton-petit bouton-contour" onclick="fermerModalConfirm()">Annuler</button>
+        <button class="bouton bouton-petit bouton-rouge" id="modal-confirm-btn">Confirmer</button>
+      </div>
+    </div>
+  </div>
+<div class="modal-admin-overlay" id="modal-nom-uc">
+    <div class="modal-admin">
+      <div class="modal-admin-header">
+        <div class="modal-admin-titre">Nouveau nom UC</div>
+      </div>
+      <div class="modal-admin-body">
+        <div class="form-groupe">
+          <label class="form-label">Nom UC</label>
+          <input type="text" class="form-ctrl" id="modal-nom-uc-valeur" placeholder="Ex: Huile de coco">
+        </div>
+      </div>
+      <div class="modal-admin-body">
+        <div class="form-actions">
+          <button class="bouton bouton-petit bouton-contour" onclick="fermerModalNomUC()">Annuler</button>
+          <button class="bouton bouton-petit" onclick="confirmerModalNomUC()">Ajouter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="modal-admin-overlay" id="modal-mediatheque">
+  <div class="modal-admin modal-mediatheque-contenu">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Médiathèque</div>
+      <button class="btn-fermer-panneau" onclick="fermerModalMediatheque()" title="Fermer">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <div class="filtres-bar">
+        <select class="form-ctrl filtre-select" id="mediatheque-filtre-cat" onchange="filtrerMediatheque()">
+          <option value="">Toutes les catégories</option>
+        </select>
+        <input type="text" class="form-ctrl filtre-recherche" id="mediatheque-filtre-nom" oninput="filtrerMediatheque()" placeholder="Rechercher par nom">
+      </div>
+      <div id="mediatheque-grille" class="mediatheque-grille"></div>
+      <div class="chargement cache" id="mediatheque-chargement"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-petit bouton-contour" onclick="fermerModalMediatheque()">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/achats.js"></script>
+<script src="../js/entrer-facture.js"></script>
+<script src="../js/catalogue-builder.js"></script>
+
+<!-- MODALE FICHE PRODUIT -->
+<div class="modal-admin-overlay" id="modal-cb-fiche" style="display:none">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Fiche produit</div>
+      <button class="btn-fermer-panneau" onclick="cbFermerFicheProduit()">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe">
+        <label class="form-label">Collection</label>
+        <select class="form-ctrl" id="modal-fp-col" onchange="cbModalFPonChangeCol()">
+          <option value="">— Choisir —</option>
+        </select>
+      </div>
+      <div class="form-groupe" id="modal-fp-gam-groupe" style="display:none">
+        <label class="form-label">Gamme</label>
+        <select class="form-ctrl" id="modal-fp-gam" onchange="cbModalFPonChangeGam()">
+          <option value="">— Choisir —</option>
+        </select>
+      </div>
+      <div class="form-groupe" id="modal-fp-pro-groupe" style="display:none">
+        <label class="form-label">Produit</label>
+        <select class="form-ctrl" id="modal-fp-pro">
+          <option value="">— Choisir —</option>
+        </select>
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Orientation</label>
+        <div style="display:flex;gap:10px;margin-top:6px">
+          <button class="bouton bouton-petit" id="modal-fp-btn-v" onclick="cbModalFPsetOrientation('v')"
+            style="flex:1;background:#2d7a50;color:#fff">Vertical</button>
+          <button class="bouton bouton-petit" id="modal-fp-btn-h" onclick="cbModalFPsetOrientation('h')"
+            style="flex:1">Horizontal</button>
+        </div>
+        <input type="hidden" id="modal-fp-orientation" value="v">
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-petit bouton-contour" onclick="cbFermerFicheProduit()">Annuler</button>
+        <button class="bouton bouton-petit" onclick="cbGenererFicheProduit()">Générer</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="overlay-chargement" class="overlay-chargement cache">
+  <div class="chargement">
+    <div class="chargement-spinner">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+</body>
+
+
+
+
+
+
+ 
+</html>

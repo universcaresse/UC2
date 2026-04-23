@@ -100,7 +100,7 @@ if (resGam && resGam.success) {
   if (resCfg && resCfg.success) {
     listesDropdown.config = {};
     (resCfg.items || []).forEach(c => {
-      listesDropdown.config[c.type] = { densite: c.densite, unite: c.unite, margePertePct: c.marge_perte_pct };
+      listesDropdown.config[c.cat_id] = { densite: c.densite, unite: c.unite, margePertePct: c.marge_perte_pct };
     });
   }
 
@@ -3164,9 +3164,9 @@ async function chargerDensites() {
   donneesDensites.forEach(d => {
     const tr = document.createElement('tr');
     tr.style.cursor = 'pointer';
-    tr.onclick = () => modifierDensite(d.type);
-    tr.innerHTML = `
-      <td>${d.type}</td>
+  tr.onclick = () => modifierDensite(d.cat_id);
+tr.innerHTML = `
+      <td>${listesDropdown.categoriesMap?.[d.cat_id] || d.cat_id}</td>
       <td>${parseFloat(d.densite).toFixed(3)}</td>
       <td>${d.unite}</td>
       <td>${d.marge_perte_pct ? parseFloat(d.marge_perte_pct).toFixed(1) + ' %' : '—'}</td>`;
@@ -3192,12 +3192,12 @@ function fermerFormDensite() {
   document.getElementById('btn-nouvelle-densite').classList.remove('cache');
 }
 
-function modifierDensite(type) {
-  const d = donneesDensites.find(x => x.type === type);
+function modifierDensite(cat_id) {
+  const d = donneesDensites.find(x => x.cat_id === cat_id);
   if (!d) return;
   document.getElementById('form-densites-titre').textContent = 'Modifier la densité';
   document.getElementById('fd-mode').value        = 'modif';
-  document.getElementById('fd-type').value        = d.type;
+  document.getElementById('fd-type').value        = d.cat_id;
   document.getElementById('fd-densite').value     = d.densite;
   document.getElementById('fd-unite').value       = d.unite;
   document.getElementById('fd-marge-perte').value = d.marge_perte_pct || '';
@@ -3216,7 +3216,7 @@ async function sauvegarderDensite() {
   if (isNaN(densite) || densite <= 0) { afficherMsg('densites', 'Densité invalide.', 'erreur'); return; }
   const marge_perte_pct = parseFloat(document.getElementById('fd-marge-perte').value) || 0;
   // V2 : saveConfig
-  const res = await appelAPIPost('saveConfig', { type, densite, unite, marge_perte_pct });
+  const res = await appelAPIPost('saveConfig', { cat_id: type, densite, unite, marge_perte_pct });
   if (res && res.success) {
     fermerFormDensite();
     afficherMsg('densites', mode === 'modif' ? 'Densité mise à jour.' : 'Type ajouté.');
