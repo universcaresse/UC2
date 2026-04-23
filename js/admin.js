@@ -1331,7 +1331,6 @@ async function ouvrirFicheProduit(pro_id) {
 
   const resEmb = await appelAPI('getFormatsEmballages', { pro_id });
   const embItems = (resEmb && resEmb.success) ? resEmb.items : [];
-  const stock = listesDropdown.stock || [];
 
   const formatsHtml = formats.length
     ? formats.map(f => {
