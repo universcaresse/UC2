@@ -1616,9 +1616,21 @@ await chargerCollectionsPourSelecteur();
   })).sort((a, b) => b.quantite - a.quantite);
 
   // Formats
-  formatsRecette = (resFormats && resFormats.success ? resFormats.items : []).map(f => ({
-    poids: f.poids, unite: f.unite, prix: f.prix_vente, desc: ''
+   formatsRecette = (resFormats && resFormats.success ? resFormats.items : []).map(f => ({
+    poids: f.poids, unite: f.unite, prix: f.prix_vente, desc: '', nb_unites: f.nb_unites || 0
   }));
+
+  // Emballages par format
+  emballagesRecette = {};
+  const resEmb = await appelAPI('getFormatsEmballages', { pro_id });
+  if (resEmb && resEmb.success) {
+    (resEmb.items || []).forEach(e => {
+      const cle = `${e.poids}_${e.unite}`;
+      if (!emballagesRecette[cle]) emballagesRecette[cle] = [];
+      const ing = (listesDropdown.fullData || []).find(d => d.ing_id === e.ing_id);
+      emballagesRecette[cle].push({ ing_id: e.ing_id, nom: ing?.nom_UC || '', quantite: e.quantite, nb_par_unite: e.nb_par_unite || 1 });
+    });
+  }
 
  document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
   document.getElementById('grille-produits').classList.add('cache');
@@ -1669,7 +1681,7 @@ async function sauvegarderRecette() {
       quantite_g:     i.quantite
     })),
     formats: formatsRecette.map(f => ({
-      poids: f.poids, unite: f.unite, prix_vente: f.prix, emb_id: ''
+      poids: f.poids, unite: f.unite, prix_vente: f.prix, emb_id: '', nb_unites: f.nb_unites || 0
     }))
   };
 
@@ -1704,7 +1716,18 @@ async function sauvegarderRecette() {
   const res = await appelAPIPost('saveProduit', d);
   if (res && res.success) {
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
-  cacherChargement();
+  // Sauvegarder les emballages par format
+    for (const f of formatsRecette) {
+      const cle = `${f.poids}_${f.unite}`;
+      const embs = emballagesRecette[cle] || [];
+      await appelAPIPost('saveFormatsEmballages', {
+        pro_id: d.pro_id,
+        poids:  f.poids,
+        unite:  f.unite,
+        emballages: embs.filter(e => e.ing_id).map(e => ({ ing_id: e.ing_id, quantite: e.quantite || 0, nb_par_unite: e.nb_par_unite || 1 }))
+      });
+    }
+    cacherChargement();
     fermerFormProduit();
     afficherMsg('recettes', id ? 'Produit mis à jour.' : 'Produit créé.');
     await chargerProduitsData();
@@ -2071,6 +2094,7 @@ async function chargerIngredientsBaseRecette() {
 
 // ─── FORMATS PRODUIT ───
 var formatsRecette = [];
+var emballagesRecette = {}; // { "poids_unite": [{ing_id, nom, quantite}] }
 
 function ajouterFormatRecette(poids='', unite='g', prix='', desc='') {
   formatsRecette.push({ poids, unite, prix, desc });
@@ -2078,17 +2102,47 @@ function ajouterFormatRecette(poids='', unite='g', prix='', desc='') {
 }
 
 function supprimerFormatRecette(index) {
+  const f = formatsRecette[index];
+  if (f) delete emballagesRecette[`${f.poids}_${f.unite}`];
   formatsRecette.splice(index, 1);
   rafraichirListeFormatsRecette();
 }
 
+function ajouterEmballageFormat(cle) {
+  if (!emballagesRecette[cle]) emballagesRecette[cle] = [];
+  emballagesRecette[cle].push({ ing_id: '', nom: '', quantite: 0 });
+  rafraichirListeFormatsRecette();
+}
+
+function supprimerEmballageFormat(cle, idx) {
+  if (emballagesRecette[cle]) emballagesRecette[cle].splice(idx, 1);
+  rafraichirListeFormatsRecette();
+}
 function rafraichirListeFormatsRecette() {
   const liste = document.getElementById('liste-formats-recette');
   if (!liste) return;
   const labels = document.getElementById('labels-formats-recette');
   if (formatsRecette.length === 0) { liste.innerHTML = ''; if (labels) labels.classList.add('cache'); return; }
   if (labels) labels.classList.remove('cache');
-  liste.innerHTML = formatsRecette.map((f, i) => `
+
+  const catsEmb = ['CAT-1776180859522', 'CAT-1776369774938', 'CAT-014'];
+  const ingsEmb = (listesDropdown.fullData || []).filter(d => catsEmb.includes(d.cat_id));
+
+  liste.innerHTML = formatsRecette.map((f, i) => {
+    const cle = `${f.poids}_${f.unite}`;
+    const embs = emballagesRecette[cle] || [];
+    const lignesEmb = embs.map((e, j) => `
+      <div class="ingredient-rangee">
+        <select class="form-ctrl" onchange="emballagesRecette['${cle}'][${j}].ing_id=this.value; emballagesRecette['${cle}'][${j}].nom=(listesDropdown.fullData.find(d=>d.ing_id===this.value)||{}).nom_UC||'';">
+          <option value="">— Ingrédient —</option>
+          ${ingsEmb.map(d => `<option value="${d.ing_id}" ${d.ing_id===e.ing_id?'selected':''}>${d.nom_UC}</option>`).join('')}
+        </select>
+        <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${e.nb_par_unite||1}" placeholder="Nb/unité" onchange="emballagesRecette['${cle}'][${j}].nb_par_unite=parseFloat(this.value)||1">
+        <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${e.quantite||''}" placeholder="Qté" onchange="emballagesRecette['${cle}'][${j}].quantite=parseFloat(this.value)||0">
+        <button class="bouton bouton-petit bouton-rouge" onclick="supprimerEmballageFormat('${cle}',${j})">✕</button>
+      </div>`).join('');
+
+    return `
     <div class="ingredient-rangee">
       <input type="text" inputmode="decimal" class="form-ctrl" value="${f.poids||''}" placeholder="Poids" onchange="formatsRecette[${i}].poids=this.value">
       <select class="form-ctrl" onchange="formatsRecette[${i}].unite=this.value">
@@ -2096,10 +2150,16 @@ function rafraichirListeFormatsRecette() {
         <option value="ml" ${f.unite==='ml'?'selected':''}>ml</option>
       </select>
       <input type="text" inputmode="decimal" class="form-ctrl" value="${f.prix||''}" placeholder="Prix $" onchange="formatsRecette[${i}].prix=parseFloat(this.value)||0">
+      <input type="text" inputmode="decimal" class="form-ctrl" value="${f.nb_unites||''}" placeholder="Nb unités" onchange="formatsRecette[${i}].nb_unites=parseInt(this.value)||0">
       <button class="bouton bouton-petit bouton-rouge" onclick="supprimerFormatRecette(${i})">✕</button>
-    </div>`).join('');
+    </div>
+    <div style="margin-left:24px;margin-bottom:8px;">
+      <div style="font-size:0.75rem;text-transform:uppercase;color:var(--gris);margin-bottom:4px;">Contenants / Emballages</div>
+      ${lignesEmb}
+      <button type="button" class="bouton bouton-petit bouton-vert-pale" onclick="ajouterEmballageFormat('${cle}')">+ Ajouter</button>
+    </div>`;
+  }).join('');
 }
-
 // CONFIG et appelAPI/appelAPIPost définis dans main.js
 
 // ─── LISTES DROPDOWN V2 ───
