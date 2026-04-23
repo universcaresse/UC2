@@ -599,11 +599,8 @@ function efOnChangeSaisieNomUC() {
     return;
   }
 
-  champ.classList.add('cache');
+champ.classList.add('cache');
   ef._saisieIngId = sel.value || null;
-
-  // Charger les formats pour cet ingrédient
-  if (ef._saisieIngId) efPopulerFormats(ef._saisieIngId);
 }
 
 function efMajLigneTotal() {

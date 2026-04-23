@@ -459,7 +459,7 @@ async function sauvegarderFamille() {
     rang:        positionChoisie + 1,
     nom,
     description: document.getElementById('ff-desc').value,
-    couleur_hex: (document.getElementById('ff-couleur-hex') || {}).value
+    couleur_hex: '',
   };
   const res = await appelAPIPost('saveFamille', d);
   if (res && res.success) {
@@ -802,7 +802,7 @@ async function sauvegarderCollection() {
     nom:         document.getElementById('fc-collection').value.toUpperCase(),
     slogan:      document.getElementById('fc-slogan').value,
     description: document.getElementById('fc-desc-col').value,
-    couleur_hex: (document.getElementById('fc-couleur-hex') || {}).value,
+    couleur_hex: '',
     photo_url:   document.getElementById('fc-photo-url').value,
     photo_noel_url: document.getElementById('fc-photo-url-noel')?.value || '',
     rowIndex:    rowIndex || null
@@ -1013,7 +1013,7 @@ async function sauvegarderGamme2() {
     rang:        rangCalcule,
     nom,
     description: document.getElementById('fg-desc').value,
-    couleur_hex: (document.getElementById('fg-couleur-hex') || {}).value || '',
+    couleur_hex: '',
     rowIndex:    rowIndex || null
   };
   const res = await appelAPIPost('saveGamme', d);
@@ -1439,7 +1439,7 @@ async function ouvrirFicheProduit(pro_id) {
     <div class="fiche-section-titre">Mode d'emploi</div>
     <div class="fiche-texte">${pro.mode_emploi || '—'}</div>
     <div class="fiche-section-titre">Ingrédients</div>
-    a<div class="fiche-ingredient fiche-ingredient-labels">
+    <div class="fiche-ingredient fiche-ingredient-labels">
       <span class="fiche-ing-nom">Nom</span>
       <span class="fiche-ing-inci">INCI</span>
       <span class="fiche-ing-qte">Qté</span>
@@ -1546,6 +1546,7 @@ function ouvrirFormRecette() { ouvrirFormProduit(); }
 async function ouvrirFormProduit() {
   formatsRecette = [];
   ingredientsRecette = [];
+  emballagesRecette = {};
   document.getElementById('form-recettes-titre').textContent = 'Nouveau produit';
   document.getElementById('fr-id').value = '';
 ['fr-nom','fr-couleur','fr-unites','fr-cure','fr-description','fr-instructions','fr-notes','fr-surgras','fr-avertissement','fr-mode-emploi']
@@ -1571,6 +1572,7 @@ async function ouvrirFormProduit() {
   rafraichirListeIngredientsRecette();
   rafraichirListeFormatsRecette();
   window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
 
