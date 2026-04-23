@@ -1628,7 +1628,7 @@ await chargerCollectionsPourSelecteur();
       const cle = `${e.poids}_${e.unite}`;
       if (!emballagesRecette[cle]) emballagesRecette[cle] = [];
       const ing = (listesDropdown.fullData || []).find(d => d.ing_id === e.ing_id);
-      emballagesRecette[cle].push({ ing_id: e.ing_id, nom: ing?.nom_UC || '', quantite: e.quantite, nb_par_unite: e.nb_par_unite || 1 });
+      emballagesRecette[cle].push({ ing_id: e.ing_id, cat_id: ing?.cat_id || '', nom: ing?.nom_UC || '', quantite: e.quantite, nb_par_unite: e.nb_par_unite || 1 });
     });
   }
 
@@ -2110,7 +2110,7 @@ function supprimerFormatRecette(index) {
 
 function ajouterEmballageFormat(cle) {
   if (!emballagesRecette[cle]) emballagesRecette[cle] = [];
-  emballagesRecette[cle].push({ ing_id: '', nom: '', quantite: 0 });
+  emballagesRecette[cle].push({ ing_id: '', cat_id: '', nom: '', quantite: 0, nb_par_unite: 1 });
   rafraichirListeFormatsRecette();
 }
 
@@ -2131,16 +2131,24 @@ function rafraichirListeFormatsRecette() {
   liste.innerHTML = formatsRecette.map((f, i) => {
     const cle = `${f.poids}_${f.unite}`;
     const embs = emballagesRecette[cle] || [];
-    const lignesEmb = embs.map((e, j) => `
-      <div class="ingredient-rangee">
-        <select class="form-ctrl" onchange="emballagesRecette['${cle}'][${j}].ing_id=this.value; emballagesRecette['${cle}'][${j}].nom=(listesDropdown.fullData.find(d=>d.ing_id===this.value)||{}).nom_UC||'';">
-          <option value="">— Ingrédient —</option>
-          ${ingsEmb.map(d => `<option value="${d.ing_id}" ${d.ing_id===e.ing_id?'selected':''}>${d.nom_UC}</option>`).join('')}
-        </select>
-        <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${e.nb_par_unite||1}" placeholder="Nb/unité" onchange="emballagesRecette['${cle}'][${j}].nb_par_unite=parseFloat(this.value)||1">
-        <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${e.quantite||''}" placeholder="Qté" onchange="emballagesRecette['${cle}'][${j}].quantite=parseFloat(this.value)||0">
-        <button class="bouton bouton-petit bouton-rouge" onclick="supprimerEmballageFormat('${cle}',${j})">✕</button>
-      </div>`).join('');
+    const lignesEmb = embs.map((e, j) => {
+        const catEmb = catsEmb.find(c => (listesDropdown.fullData || []).find(d => d.ing_id === e.ing_id && d.cat_id === c));
+        const ingsDecat = catEmb ? (listesDropdown.fullData || []).filter(d => d.cat_id === catEmb) : [];
+        return `
+        <div class="ingredient-rangee">
+          <select class="form-ctrl" onchange="emballagesRecette['${cle}'][${j}].cat_id=this.value; rafraichirListeFormatsRecette()">
+            <option value="">— Catégorie —</option>
+            ${catsEmb.map(c => `<option value="${c}" ${catEmb===c?'selected':''}>${listesDropdown.categoriesMap?.[c]||c}</option>`).join('')}
+          </select>
+          <select class="form-ctrl" onchange="emballagesRecette['${cle}'][${j}].ing_id=this.value; emballagesRecette['${cle}'][${j}].nom=(listesDropdown.fullData.find(d=>d.ing_id===this.value)||{}).nom_UC||'';">
+            <option value="">— Nom UC —</option>
+            ${ingsDecat.map(d => `<option value="${d.ing_id}" ${d.ing_id===e.ing_id?'selected':''}>${d.nom_UC}</option>`).join('')}
+          </select>
+          <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${e.nb_par_unite||1}" placeholder="Nb/unité" onchange="emballagesRecette['${cle}'][${j}].nb_par_unite=parseFloat(this.value)||1">
+          <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${e.quantite||''}" placeholder="Qté g" onchange="emballagesRecette['${cle}'][${j}].quantite=parseFloat(this.value)||0">
+          <button class="bouton bouton-petit bouton-rouge" onclick="supprimerEmballageFormat('${cle}',${j})">✕</button>
+        </div>`;
+      }).join('');
 
     return `
     <div class="ingredient-rangee">
