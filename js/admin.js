@@ -1329,8 +1329,30 @@ async function ouvrirFicheProduit(pro_id) {
   const col = donneesCollections.find(c => c.col_id === pro.col_id);
   const gam = donneesGammes.find(g => g.gam_id === pro.gam_id);
 
+  const resEmb = await appelAPI('getFormatsEmballages', { pro_id });
+  const embItems = (resEmb && resEmb.success) ? resEmb.items : [];
+  const stock = listesDropdown.stock || [];
+
   const formatsHtml = formats.length
-    ? formats.map(f => `<div class="fiche-ingredient"><span class="fiche-ing-nom">${f.poids} ${f.unite}</span><span class="fiche-ing-qte">${f.prix_vente ? formaterPrix(f.prix_vente) : '—'}</span></div>`).join('')
+    ? formats.map(f => {
+        const nbUnites = f.nb_unites || 0;
+        const coutIngParUnite = nbUnites > 0 ? coutTotal / nbUnites : 0;
+        const embsDuFormat = embItems.filter(e => String(e.poids) === String(f.poids) && e.unite === f.unite);
+        const coutEmb = embsDuFormat.reduce((s, e) => {
+          const stockItem = stock.find(st => st.ing_id === e.ing_id);
+          const prixParG  = stockItem?.prix_par_g_reel || 0;
+          return s + ((e.nb_par_unite || 1) * prixParG);
+        }, 0);
+        const coutTotal_f = coutIngParUnite + coutEmb;
+        const marge = f.prix_vente && coutTotal_f > 0 ? ((f.prix_vente - coutTotal_f) / f.prix_vente * 100).toFixed(1) : '—';
+        return `<div class="fiche-ingredient">
+          <span class="fiche-ing-nom">${f.poids} ${f.unite}</span>
+          <span class="fiche-ing-qte">${f.prix_vente ? formaterPrix(f.prix_vente) : '—'}</span>
+          <span class="fiche-ing-qte">${nbUnites ? nbUnites + ' unités' : '—'}</span>
+          <span class="fiche-ing-qte">${coutTotal_f > 0 ? formaterPrix(coutTotal_f) + '/unité' : '—'}</span>
+          <span class="fiche-ing-qte">${marge !== '—' ? marge + '% marge' : '—'}</span>
+        </div>`;
+      }).join('')
     : '<div class="fiche-vide fiche-label-manquant">⚠ Aucun format</div>';
 
   // Charger les ingrédients
@@ -1427,6 +1449,13 @@ async function ouvrirFicheProduit(pro_id) {
     <div class="fiche-section-titre">Liste INCI pour étiquette</div>
     <div class="fiche-inci-etiquette">${inciLabelHtml}</div>
     <div class="fiche-section-titre">Formats disponibles</div>
+    <div class="fiche-ingredient fiche-ingredient-labels">
+      <span class="fiche-ing-nom">Format</span>
+      <span class="fiche-ing-qte">Prix vente</span>
+      <span class="fiche-ing-qte">Nb unités</span>
+      <span class="fiche-ing-qte">Coût/unité</span>
+      <span class="fiche-ing-qte">Marge</span>
+    </div>
     <div class="fiche-ingredients">${formatsHtml}</div>
     <div class="fiche-section-titre">Export</div>
     <button class="bouton" onclick="exporterFicheProduit()">Copier pour le graphiste</button>
@@ -2132,7 +2161,7 @@ function rafraichirListeFormatsRecette() {
     const cle = `${f.poids}_${f.unite}`;
     const embs = emballagesRecette[cle] || [];
     const lignesEmb = embs.map((e, j) => {
-        const catEmb = catsEmb.find(c => (listesDropdown.fullData || []).find(d => d.ing_id === e.ing_id && d.cat_id === c));
+        const catEmb = e.cat_id || catsEmb.find(c => (listesDropdown.fullData || []).find(d => d.ing_id === e.ing_id && d.cat_id === c)) || '';
         const ingsDecat = catEmb ? (listesDropdown.fullData || []).filter(d => d.cat_id === catEmb) : [];
         return `
         <div class="ingredient-rangee">
@@ -2145,7 +2174,6 @@ function rafraichirListeFormatsRecette() {
             ${ingsDecat.map(d => `<option value="${d.ing_id}" ${d.ing_id===e.ing_id?'selected':''}>${d.nom_UC}</option>`).join('')}
           </select>
           <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${e.nb_par_unite||1}" placeholder="Nb/unité" onchange="emballagesRecette['${cle}'][${j}].nb_par_unite=parseFloat(this.value)||1">
-          <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${e.quantite||''}" placeholder="Qté g" onchange="emballagesRecette['${cle}'][${j}].quantite=parseFloat(this.value)||0">
           <button class="bouton bouton-petit bouton-rouge" onclick="supprimerEmballageFormat('${cle}',${j})">✕</button>
         </div>`;
       }).join('');
@@ -2161,8 +2189,11 @@ function rafraichirListeFormatsRecette() {
       <input type="text" inputmode="decimal" class="form-ctrl" value="${f.nb_unites||''}" placeholder="Nb unités" onchange="formatsRecette[${i}].nb_unites=parseInt(this.value)||0">
       <button class="bouton bouton-petit bouton-rouge" onclick="supprimerFormatRecette(${i})">✕</button>
     </div>
-    <div style="margin-left:24px;margin-bottom:8px;">
-      <div style="font-size:0.75rem;text-transform:uppercase;color:var(--gris);margin-bottom:4px;">Contenants / Emballages</div>
+    <div class="ingredient-rangee" style="font-size:0.75rem;color:var(--gris);text-transform:uppercase;">
+        <span style="flex:2">Catégorie</span>
+        <span style="flex:2">Nom UC</span>
+        <span style="width:90px;flex:none">Nb/unité</span>
+      </div>
       ${lignesEmb}
       <button type="button" class="bouton bouton-petit bouton-vert-pale" onclick="ajouterEmballageFormat('${cle}')">+ Ajouter</button>
     </div>`;
