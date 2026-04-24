@@ -1313,11 +1313,14 @@ async function mettreAJourLignes() {
   const sel    = document.getElementById('fr-ligne');
   sel.innerHTML = '<option value="">— Choisir —</option>';
   const gammes = (collectionsDisponibles[col_id] || []).sort((a, b) => (a.rang || 99) - (b.rang || 99));
-  if (!gammes.length) { sel.innerHTML = '<option value="">— Aucune gamme —</option>'; return; }
+if (!gammes.length) { sel.innerHTML = '<option value="">— Aucune gamme —</option>'; sel.disabled = true; return; }
+  sel.disabled = false;
   gammes.forEach(g => {
     const o = document.createElement('option'); o.value = g.gam_id; o.textContent = g.nom; sel.appendChild(o);
   });
+  sel.disabled = false;
 }
+
 
 async function ouvrirFicheProduit(pro_id) {
   const pro = donneesProduits.find(p => p.pro_id === pro_id);
