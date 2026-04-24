@@ -677,22 +677,7 @@ function fermerFicheGamme() {
   if (btnNew) btnNew.classList.remove('cache');
 }
 
-function ouvrirFormGamme(col_id) {
-  document.getElementById('form-collections-titre').textContent = 'Nouvelle gamme';
-  document.getElementById('fc-rowIndex').value  = '';
-  document.getElementById('fc-mode').value      = 'ligne';
-  document.getElementById('fc-bloc-collection').classList.add('cache');
-  document.getElementById('fc-bloc-ligne').classList.remove('cache');
-  document.getElementById('fc-collection-ligne').value = col_id || '';
- ['fc-rang-ligne','fc-ligne','fc-desc-ligne','fc-couleur-hex-ligne','fc-photo-url-ligne'].forEach(id => {
-    const e = document.getElementById(id); if (e) e.value = '';
-  });
-  document.getElementById('contenu-collections').classList.add('cache');
-  document.getElementById('btn-nouvelle-collection').classList.add('cache');
-  document.getElementById('form-collections').classList.remove('cache');
-  document.getElementById('form-collections').classList.add('visible');
-  window.scrollTo(0, 0);
-}
+
 
 async function modifierGamme(gam_id) {
   const gam = donneesGammes.find(g => g.gam_id === gam_id);
