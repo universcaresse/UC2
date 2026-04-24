@@ -381,6 +381,16 @@ function fermerFicheFamille() {
 }
 
 function peuplerPositionFamille(col_id, rangActuel) {
+  const selGam = document.getElementById('ff-gamme');
+  if (selGam) {
+    selGam.innerHTML = '<option value="">— Aucune —</option>';
+    if (col_id) {
+      donneesGammes.filter(g => g.col_id === col_id).sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(g => {
+        const o = document.createElement('option');
+        o.value = g.gam_id; o.textContent = g.nom; selGam.appendChild(o);
+      });
+    }
+  }
   const selPos = document.getElementById('ff-position');
   if (!selPos) return;
   selPos.innerHTML = '<option value="0">En premier</option>';
@@ -443,6 +453,8 @@ function modifierFamille(fam_id) {
   });
   sel.value = fam.col_id || '';
   peuplerPositionFamille(fam.col_id, fam.rang);
+  const selGamFam = document.getElementById('ff-gamme');
+  if (selGamFam) selGamFam.value = fam.gam_id || '';
   document.getElementById('contenu-familles').classList.add('cache');
   document.getElementById('btn-nouvelle-famille').classList.add('cache');
   document.getElementById('form-familles').classList.remove('cache');
@@ -459,6 +471,7 @@ async function sauvegarderFamille() {
   const d = {
     fam_id:      id || ('FAM-' + Date.now()),
     col_id,
+    gam_id:      document.getElementById('ff-gamme')?.value || '',
     rang:        positionChoisie + 1,
     nom,
     description: document.getElementById('ff-desc').value,
