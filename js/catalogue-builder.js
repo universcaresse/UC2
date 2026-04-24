@@ -202,6 +202,8 @@ function cbNomCollection(col_id) {
 }
 
 // ─── BLOCS ───────────────────────────────────────────────────────────────────
+
+
 function cbAjouterBloc(type) {
   const page = cbPages[cbPageIndex];
   if (!page) return;
@@ -285,6 +287,8 @@ function cbGetPage() { return cbPages[cbPageIndex]||null; }
 function cbGetBloc() { return cbGetPage()?.blocs.find(b=>b.id===cbSelId)||null; }
 
 // ─── RENDU INTERFACE ─────────────────────────────────────────────────────────
+
+
 function cbRendreInterface() {
   cbRendrePagesListe();
   cbRendreCanvas();
@@ -333,6 +337,8 @@ function cbRendrePagesListe() {
 }
 
 // ─── RENDU CANVAS ────────────────────────────────────────────────────────────
+
+
 function cbRendreCanvas() {
   const canvas = document.getElementById('cb-canvas');
   if (!canvas) return;
@@ -939,35 +945,29 @@ function cbGenererFicheProduit() {
     ? formats.map(f=>`${parseFloat(f.prix_vente).toFixed(2).replace('.',',')} $\n${f.poids} ${f.unite}`).join('        ')
     : '';
 
-  if (ori==='v') {
+  
+if (ori==='v') {
     const hexX=CB_MARGE+20, hexY=CB_MARGE+20;
-    const hexW=210, hexH=470;
+    const hexW=210, hexH=290;
     const photoS=210;
 
-    // Hex
+    // Hex (fond couleur, toute la hauteur)
     page.blocs.push({...b('couleur_hex'), type:'couleur', x:hexX, y:hexY, w:hexW, h:hexH, couleur_libre:hexCouleur});
     // Photo
     page.blocs.push({...b('image_url'), type:'image', x:hexX, y:hexY, w:photoS, h:photoS});
-    // Nom collection
-    page.blocs.push({...b(''), type:'titre', x:hexX+10, y:hexY+photoS+16, w:hexW-20, h:24,
-      fs:10, bold:false, couleur_texte:'#ffffff', _texte_fixe:(col?.nom||'').toUpperCase()});
-    // Nom produit
-    page.blocs.push({...b('nom'), type:'titre', x:hexX+10, y:hexY+photoS+40, w:hexW-20, h:36,
-      fs:18, bold:true, police:'Playfair Display', couleur_texte:'#ffffff'});
-    // Gamme
-    page.blocs.push({...b(''), type:'texte', x:hexX+10, y:hexY+photoS+78, w:hexW-20, h:22,
-      fs:11, italic:false, couleur_texte:'#ffffffaa', _texte_fixe:gam?.nom||''});
-    // Desc emballage
-    page.blocs.push({...b('desc_emballage'), type:'texte', x:hexX+10, y:hexY+photoS+102, w:hexW-20, h:22,
-      fs:10, italic:true, couleur_texte:'#ffffffcc'});
-    // Ligne séparatrice
-    page.blocs.push({...b(''), type:'couleur', x:hexX+10, y:hexY+photoS+128, w:hexW-20, h:1,
-      couleur_libre:'#ffffff66', opacite:0.5});
-    // Formats + prix
-    page.blocs.push({...b(''), type:'texte', x:hexX+10, y:hexY+photoS+136, w:hexW-20, h:50,
-      fs:11, bold:false, couleur_texte:'#ffffff', align:'center',
+    // Rectangle blanc semi-transparent derrière le nom
+    page.blocs.push({...b(''), type:'couleur', x:hexX, y:hexY, w:hexW, h:35,
+      couleur_libre:'#ffffff', opacite:0.5});
+    // Nom produit (sur la photo, centré, foncé)
+    page.blocs.push({...b('nom'), type:'titre', x:hexX, y:hexY+5, w:hexW, h:25,
+      fs:18, bold:true, police:'Playfair Display', couleur_texte:'#333333', align:'center'});
+    // Formats + prix (coin inférieur gauche de la photo)
+    page.blocs.push({...b(''), type:'texte', x:hexX+10, y:hexY+photoS-40, w:hexW-20, h:35,
+      fs:11, bold:false, couleur_texte:'#333333', align:'left',
       _texte_fixe: formatsTexte});
-
+    // Desc emballage (sous la photo, zone colorée, avec espace)
+    page.blocs.push({...b('desc_emballage'), type:'texte', x:hexX+10, y:hexY+photoS+10, w:hexW-20, h:70,
+      fs:10, italic:false, couleur_texte:'#ffffff', align:'left'});
   } else {
     const hexX=CB_MARGE+20, hexY=CB_MARGE+20;
     const hexW=470, hexH=210;
