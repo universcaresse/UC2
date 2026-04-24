@@ -1347,6 +1347,7 @@ if (!gammes.length) { sel.innerHTML = '<option value="">— Aucune gamme —</op
 }
 
 async function ouvrirFicheProduit(pro_id) {
+  afficherChargement();
   const pro = donneesProduits.find(p => p.pro_id === pro_id);
   if (!pro) return;
   produitActif = pro;
@@ -1438,6 +1439,7 @@ async function ouvrirFicheProduit(pro_id) {
     ? `<div class="inci-label-texte">${inciLabel}</div>`
     : '<div class="fiche-vide">Aucun code INCI disponible</div>';
 
+  cacherChargement();
   document.getElementById('fiche-recette-titre').textContent = pro.nom || '—';
   document.getElementById('fiche-recette-contenu').innerHTML = `
     <div class="fiche-visuel">
@@ -1615,6 +1617,7 @@ function fermerFormProduit() {
 function fermerFormRecette() { fermerFormProduit(); }
 
 async function modifierProduit(pro_id) {
+  afficherChargement();
   const pro = donneesProduits.find(p => p.pro_id === pro_id);
   if (!pro) return;
 
@@ -1691,12 +1694,13 @@ await chargerCollectionsPourSelecteur();
     });
   }
 
- document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
+ cacherChargement();
+  document.querySelector('#section-produits .filtres-bar')?.classList.add('cache');
   document.getElementById('grille-produits').classList.add('cache');
   document.getElementById('form-recettes').classList.remove('cache');
   rafraichirListeIngredientsRecette();
   rafraichirListeFormatsRecette();
-  window.scrollTo(0, 0);
+  window.scrollTo(0, 0);;
 }
 
 // Compatibilité nom V1
