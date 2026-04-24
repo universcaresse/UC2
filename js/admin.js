@@ -2257,6 +2257,7 @@ async function chargerFactures() {
     o.value = f; o.textContent = f; selFourn.appendChild(o);
   });
 
+  cacherChargement();
   afficherFactures(toutesFactures);
 }
 
