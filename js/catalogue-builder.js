@@ -946,6 +946,7 @@ function cbGenererFicheProduit() {
     : '';
 
   
+
 if (ori==='v') {
     const hexX=CB_MARGE+20, hexY=CB_MARGE+20;
     const hexW=210, hexH=290;
@@ -959,16 +960,19 @@ if (ori==='v') {
     page.blocs.push({...b(''), type:'couleur', x:hexX, y:hexY, w:hexW, h:35,
       couleur_libre:'#ffffff', opacite:0.5});
     // Nom produit (sur la photo, centré, foncé)
-    page.blocs.push({...b('nom'), type:'titre', x:hexX, y:hexY+5, w:hexW, h:25,
-      fs:18, bold:true, police:'Playfair Display', couleur_texte:'#333333', align:'center'});
+    page.blocs.push({...b('nom'), type:'titre', x:hexX, y:hexY+1, w:hexW, h:25,
+      fs:18, bold:true, police:'Playfair Display', couleur_texte:'#333333', align:'center'}); // remonté
     // Formats + prix (coin inférieur gauche de la photo)
     page.blocs.push({...b(''), type:'texte', x:hexX+10, y:hexY+photoS-40, w:hexW-20, h:35,
       fs:11, bold:false, couleur_texte:'#333333', align:'left',
       _texte_fixe: formatsTexte});
     // Desc emballage (sous la photo, zone colorée, avec espace)
-    page.blocs.push({...b('desc_emballage'), type:'texte', x:hexX+10, y:hexY+photoS+10, w:hexW-20, h:70,
-      fs:10, italic:false, couleur_texte:'#ffffff', align:'left'});
+    page.blocs.push({...b('desc_emballage'), type:'texte', x:hexX+10, y:hexY+photoS+5, w:hexW-20, h:70,
+      fs:10, italic:false, couleur_texte:'#ffffff', align:'left'}); // remonté légèrement
   } else {
+	  
+	  
+	  
     const hexX=CB_MARGE+20, hexY=CB_MARGE+20;
     const hexW=470, hexH=210;
     const photoS=210;
