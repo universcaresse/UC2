@@ -706,6 +706,11 @@ async function efAjouterLigne() {
   };
 
   if (ef._editIdx !== null) {
+    const ligneAncienne = ef.lignes[ef._editIdx];
+    if (ligneAncienne.rowIndex) {
+      await appelAPIPost('deleteAchatLigne', { rowIndex: ligneAncienne.rowIndex });
+      ef.lignes.forEach(l => { if (l.rowIndex > ligneAncienne.rowIndex) l.rowIndex--; });
+    }
     ef.lignes[ef._editIdx] = nouvelleLigne;
     ef._editIdx = null;
   } else {

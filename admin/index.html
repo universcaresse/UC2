@@ -201,7 +201,7 @@
     </button>
   </div>
   <div class="accueil-grande-tuile accueil-grande-tuile-jaune">
-    <button class="accueil-tuile" onclick="afficherSection('nouvelle-facture', null)">
+    <button class="accueil-tuile" onclick="afficherSection('entrer-facture', null)">
       <span class="tuile-icone">
         <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 18 L6 38 L42 38 L42 18 L22 18 L19 14 L6 14 Z"/>
@@ -855,11 +855,7 @@
             <option value="public">Public</option>
           </select>
           <input type="text" class="form-ctrl filtre-recherche" id="filtre-recette-nom" oninput="filtrerRecettes()" placeholder="Par nom">
-          <select class="form-ctrl filtre-select" id="filtre-recette-complet" onchange="filtrerRecettes()">
-            <option value="">Affichage</option>
-			 <option value="complet">Complètes</option>
-            <option value="incomplet">Incomplètes</option>
-          </select>
+          
           <button class="bouton bouton-petit bouton-contour" onclick="reinitialiserFiltresRecettes()" title="Réinitialiser">✕</button>
         </div>
 		
@@ -1043,12 +1039,7 @@
             </div>
             <div class="form-groupe col-plein" id="zone-formats-recette">
               <label class="form-label">Formats disponibles</label>
-             <div class="ingredient-rangee ingredient-rangee-labels" id="labels-formats-recette">
-                <span class="form-label">Poids</span>
-                <span class="form-label">Unité</span>
-                <span class="form-label">Prix $</span>
-                <span></span>
-              </div>
+             
               <div class="ingredient-rangee ingredient-rangee-labels" id="labels-formats-recette">
                 <span class="form-label">Poids</span>
                 <span class="form-label">Unité</span>
@@ -1090,503 +1081,9 @@
         </div>
       </div>
 
-     <!-- ════════════════════════════════════════
-     SECTION : NOUVELLE FACTURE
-     À insérer dans admin/index.html
-     dans la zone des sections admin
-     ════════════════════════════════════════ -->
-
-      <div id="section-nouvelle-facture" class="section-admin">
-
-  <!-- EN-TÊTE DE PAGE -->
-  <div class="page-entete fade-in">
-    <div>
-      <div class="page-entete-eyebrow">Achats d'ingrédients</div>
-      <div class="page-entete-titre">Nouvelle <em>facture</em></div>
-    </div>
-  </div>
-
-  <!-- ZONE MESSAGES GLOBAUX -->
-  <div id="facture-msg" class="msg-zone"></div>
-
-  <!-- INDICATEUR D'ÉTAPES -->
-  <div class="wizard-etapes">
-    <div class="wizard-etape active" id="wizard-etape-1">
-      <div class="wizard-cercle">1</div>
-      <div class="wizard-label">Facture</div>
-    </div>
-    <div class="wizard-trait"></div>
-    <div class="wizard-etape" id="wizard-etape-2">
-      <div class="wizard-cercle">2</div>
-      <div class="wizard-label">Items</div>
-    </div>
-    <div class="wizard-trait"></div>
-    <div class="wizard-etape" id="wizard-etape-3">
-      <div class="wizard-cercle">3</div>
-      <div class="wizard-label">Finalisation</div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════
-       ÉTAPE 1 — EN-TÊTE FACTURE
-  ══════════════════════════════ -->
-  <!-- ════════════════════════════════════════
-     NOUVELLE FACTURE — Étape 1 : En-tête facture
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       initialiserNouvelleFacture()
-       wizardEtape2()
-       onChangeFournisseur()
-
-     CSS (style.css)
-       .wizard-etapes, .wizard-etape, .wizard-cercle
-       .wizard-label, .wizard-trait
-     ════════════════════════════════════════ -->
-  <div id="wizard-step-1" class="wizard-step">
-    <div class="form-panel">
-      <div class="form-panel-header">
-        <div class="fiche-bandeau">
-          <span class="form-panel-titre">Informations de la facture</span>
-        </div>
-      </div>
-    </div>
-    <div class="form-panel">
-      <div class="form-body">
-        <div class="form-grille">
-
-          <div class="form-groupe">
-            <label class="form-label">N° facture (ou ajout d'inventaire)</label>
-            <input type="text" id="facture-numero" class="form-ctrl" autocomplete="off">
-          </div>
-
-          <div class="form-groupe">
-            <label class="form-label">Date</label>
-            <input type="date" id="facture-date" class="form-ctrl">
-          </div>
-
-          <div class="form-groupe col-plein">
-            <label class="form-label">Fournisseur</label>
-            <select id="facture-fournisseur" class="form-ctrl" onchange="onChangeFournisseur()">
-              <option value=""></option>
-            </select>
-           <input type="text" id="facture-fournisseur-nouveau" class="form-ctrl cache" autocomplete="off">
-          </div>
-
-        </div>
-      </div>
-    </div>
-    <div class="form-panel form-body-actions">
-      <div class="form-actions">
-        <button class="bouton" onclick="wizardEtape2()">Suivant →</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════
-       ÉTAPE 2 — ITEMS
-  ══════════════════════════════ -->
-  <!-- ════════════════════════════════════════
-     NOUVELLE FACTURE — Étape 2 : Items
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       wizardEtape2()
-       wizardEtape3()
-       afficherBanniereFacture()
-       afficherItemsFacture()
-       onChangeType()
-       onChangeIngredient()
-       onChangeFormat()
-
-     CSS (style.css)
-       .facture-active-banner, .facture-active-titre, .facture-active-info
-     ════════════════════════════════════════ -->
-  <div id="wizard-step-2" class="wizard-step cache">
-
-    <!-- Bannière facture active -->
-    <div id="facture-banniere" class="facture-active-banner cache">
-      <div>
-        <div class="facture-active-titre">Facture <span id="banniere-numero"></span></div>
-        <div class="facture-active-info"><span id="banniere-fournisseur"></span></div>
-      </div>
-      <div class="text-right">
-        <div class="facture-sous-total-label">Sous-total</div>
-        <div class="facture-sous-total" id="banniere-sous-total">0,00 $</div>
-      </div>
-    </div>
-
-    <!-- Formulaire ajout item -->
-    <div class="form-panel">
-      <div class="form-panel-header">
-        <div class="fiche-bandeau">
-          <span class="form-panel-titre">Ajouter un item</span>
-        </div>
-      </div>
-    </div>
-    <div class="form-panel">
-      <div class="form-body">
-        <div id="item-msg" class="msg-zone"></div>
-        <div class="form-grille">
-
-          <div class="form-groupe">
-            <label class="form-label">Type</label>
-            <select id="item-type" class="form-ctrl" onchange="onChangeType()">
-              <option value=""></option>
-            </select>
-          </div>
-
-          <div class="form-groupe">
-            <label class="form-label">Ingrédient</label>
-            <select id="item-ingredient" class="form-ctrl" onchange="onChangeIngredient()">
-              <option value=""></option>
-            </select>
-          <input type="text" id="item-ingredient-nouveau" class="form-ctrl cache" autocomplete="off">
-          </div>
-			<div class="form-groupe">
-            <label class="form-label">Format</label>
-            <select id="item-format" class="form-ctrl" onchange="onChangeFormat()">
-              <option value="">— Choisir un format —</option>
-            </select>
-          </div>
-          <input type="hidden" id="item-format-qte">
-          <input type="hidden" id="item-format-unite">
-       
-          <div class="form-groupe cache" id="item-nouveau-qte-bloc">
-            <label class="form-label">Quantité du contenant</label>
-            <input type="text" inputmode="decimal" id="item-nouveau-qte" class="form-ctrl" autocomplete="off">
-          </div>
-          <div class="form-groupe cache" id="item-nouveau-unite-bloc">
-            <label class="form-label">Unité</label>
-            <select id="item-nouveau-unite" class="form-ctrl">
-              <option value="g">g</option>
-              <option value="ml">ml</option>
-              <option value="kg">kg</option>
-              <option value="L">L</option>
-              <option value="lbs">lbs</option>
-            </select>
-          </div>
-
-          <div class="form-groupe">
-            <label class="form-label">Prix unitaire ($)</label>
-            <input type="text" inputmode="decimal" id="item-prix-unitaire" class="form-ctrl" autocomplete="off">
-          </div>
-
-          <div class="form-groupe">
-            <label class="form-label">Quantité achetée</label>
-            <input type="text" inputmode="decimal" id="item-quantite" class="form-ctrl" autocomplete="off">
-          </div>
-
-          <div class="form-groupe col-plein">
-            <label class="form-label">Notes <span class="form-optionnel">(optionnel)</span></label>
-            <input type="text" id="item-notes" class="form-ctrl" autocomplete="off">
-          </div>
-
-        </div>
-      </div>
-    </div>
-    <div class="form-panel form-body-actions">
-      <div class="form-actions">
-        <button class="bouton" onclick="ajouterItem()">+ Ajouter</button>
-      </div>
-    </div>
-
-    <!-- Tableau des items -->
-    <div id="items-tableau-zone" class="mt-24"></div>
-
-    <!-- Navigation -->
-    <div class="form-actions mt-24">
-      <button class="bouton bouton-contour" onclick="wizardEtape1()">← Retour</button>
-      <button class="bouton bouton-vert-pale" onclick="terminerPlusTard()">Terminer plus tard</button>
-      <button class="bouton" onclick="wizardEtape3()">Suivant →</button>
-    </div>
-
-  </div>
-
-  <!-- ══════════════════════════════
-       ÉTAPE 3 — FINALISATION
-  ══════════════════════════════ -->
-  <!-- ════════════════════════════════════════
-     NOUVELLE FACTURE — Étape 3 : Finalisation
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       wizardEtape3()
-       calculerTotalFinal()
-       finaliserFacture()
-
-     CSS (style.css)
-       .finalisation-panel, .finalisation-titre
-     ════════════════════════════════════════ -->
-  <div id="wizard-step-3" class="wizard-step cache">
-
-    <div class="form-panel">
-      <div class="form-panel-header">
-        <div class="fiche-bandeau">
-          <span class="form-panel-titre">Finalisation de la facture</span>
-        </div>
-      </div>
-    </div>
-    <div class="form-panel">
-      <div class="form-body">
-        <div id="final-msg" class="msg-zone"></div>
-        <div class="form-grille">
-
-          <div class="form-groupe">
-            <label class="form-label">Sous-total</label>
-            <input type="text" id="final-sous-total" class="form-ctrl" readonly>
-          </div>
-
-          <div class="form-groupe">
-            <label class="form-label">Livraison ($)</label>
-            <input type="text" inputmode="decimal" id="final-livraison" class="form-ctrl"
-                   oninput="calculerTotalFinal()" autocomplete="off">
-          </div>
-
-          <div class="form-groupe">
-            <label class="form-label">TPS ($)</label>
-            <input type="text" inputmode="decimal" id="final-tps" class="form-ctrl"
-                   oninput="calculerTotalFinal()" autocomplete="off">
-          </div>
-
-          <div class="form-groupe">
-            <label class="form-label">TVQ ($)</label>
-            <input type="text" inputmode="decimal" id="final-tvq" class="form-ctrl"
-                   oninput="calculerTotalFinal()" autocomplete="off">
-          </div>
-
-        </div>
-        <div class="total-final-row">
-          <div>
-            <div class="total-final-label">Total</div>
-            <div class="total-final-montant" id="final-total-affichage">0,00 $</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="form-panel form-body-actions">
-      <div class="form-actions">
-        <button class="bouton bouton-contour" onclick="wizardEtape2()">← Retour</button>
-        <button class="bouton bouton-or" onclick="finaliserFacture()">Finaliser</button>
-      </div>
-    </div>
-
-  </div>
-
-      </div>
-
-      <!-- FACTURES -->
-      <!-- ════════════════════════════════════════
-     IMPORT FACTURE PDF
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       importerFacturePDF()
-       parserFacturePA()
-       afficherApercuItems()
-       confirmerImportFacture()
-
-     CSS (style.css)
-       .tableau-admin, .tableau-wrap
-       .form-grille-2
-     ════════════════════════════════════════ -->
-      <div class="section-admin" id="section-import-facture">
-        <div class="page-entete">
-          <div class="page-entete-titre">Entrer <em>une facture</em></div>
-        </div>
-        <div id="msg-import-facture" class="msg-zone"></div>
-		
-		
-        <div id="if-bloc-upload">
-          <div class="form-panel">
-            <div class="form-panel-header">
-              <div class="fiche-bandeau">
-                <span class="form-panel-titre">Entrer facture</span>
-              </div>
-            </div>
-          </div>
-          <div class="form-panel">
-            <div class="form-body">
-              <div class="form-groupe">
-                <label class="form-label">Fournisseur</label>
-                <select class="form-ctrl" id="if-fournisseur">
-                  <option value="">— Choisir —</option>
-                  <option value="PA">Pure Arôme</option>
-                  <option value="MH">Les Mauvaises Herbes</option>
-                  <option value="Arbressence">Arbressence</option>
-                  <option value="DE">Divine Essence</option>
-                  <option value="Amazon">Amazon</option>
-                </select>
-              </div>
-             <div class="form-groupe">
-                <label class="form-label">Fichier PDF</label>
-                <input type="file" class="cache" id="if-fichier" accept="application/pdf">
-              
-				<label for="if-fichier" class="bouton bouton-contour form-ctrl" id="if-fichier-label">Choisir un fichier</label>
-				
-				
-                <span class="texte-secondaire" id="if-fichier-nom">Aucun fichier choisi</span>
-              </div>
-            </div>
-          </div>
-          <div class="form-panel form-body-actions">
-            <div class="form-actions">
-              <button class="bouton" onclick="importerFacturePDF()">Lire le PDF</button>
-            <button class="bouton" onclick="voirTexteBrutPDF()">Texte brut</button>
-              <button class="bouton" onclick="saisirDepuisCatalogue()">Saisir depuis le catalogue</button>
-            </div>
-          </div>
-          <div id="if-texte-brut-zone" class="cache">
-            <div class="form-panel">
-              <div class="form-body">
-                <div class="form-groupe">
-                  <label class="form-label">Texte brut extrait du PDF</label>
-                  <textarea class="form-ctrl" id="if-texte-brut" rows="20" readonly></textarea>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-		
-		
-		
-        <div id="if-apercu" class="cache">
-      <div class="form-panel">
-            <div class="form-panel-header">
-              <div class="fiche-bandeau">
-                <span class="form-panel-titre">Aperçu de la facture</span>
-              </div>
-            </div>
-          </div>
-          <div class="form-panel">
-            <div class="form-body">
-			
-			
-			
-             <input type="hidden" id="if-date">
-              <div class="filtres-bar">
-                <div class="form-groupe">
-                  <label class="form-label">N° facture</label>
-                  <input type="text" class="form-ctrl" id="if-numero">
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">Jour</label>
-                  <select class="form-ctrl" id="if-date-jour" onchange="ifSyncDate()" style="width:70px"></select>
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">Mois</label>
-                  <select class="form-ctrl" id="if-date-mois" onchange="ifSyncDate()">
-                    <option value="01">Janvier</option><option value="02">Février</option>
-                    <option value="03">Mars</option><option value="04">Avril</option>
-                    <option value="05">Mai</option><option value="06">Juin</option>
-                    <option value="07">Juillet</option><option value="08">Août</option>
-                    <option value="09">Septembre</option><option value="10">Octobre</option>
-                    <option value="11">Novembre</option><option value="12">Décembre</option>
-                  </select>
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">Année</label>
-                  <select class="form-ctrl" id="if-date-annee" onchange="ifSyncDate()" style="width:90px"></select>
-                </div>
-              </div>
-			  
-			  
-			  
-              <div id="if-catalogue-zone" class="cache">
-			  
-			  
-           <div class="filtres-bar" style="margin-bottom:1rem;">
-              <div class="form-groupe">
-                <label class="form-label">Catégorie</label>
-                <select class="form-ctrl" id="if-cat-catalogue" onchange="ifOnChangeCatCatalogue()">
-                  <option value="">— Catégorie —</option>
-                </select>
-              </div>
-              <div class="form-groupe">
-                <label class="form-label">Item</label>
-                <select class="form-ctrl" id="if-item-catalogue">
-                  <option value="">— Choisir —</option>
-                </select>
-              </div>
-            </div>
-			
-			
-			
-            <div class="form-actions" style="margin-bottom:1rem;">
-              <button class="bouton bouton-petit" onclick="ifAjouterDepuisCatalogue()">+ Ajouter</button>
-            </div>
-          </div>
-          <div class="tableau-wrap" style="margin-top:1rem;">
-                <table class="tableau-admin" id="if-tableau">
-                  <thead>
-                    <tr>
-                      <th>Description facture</th>
-                      <th>Format</th>
-                      <th>Qté</th>
-                      <th>Prix unit.</th>
-                      <th>Total</th>
-                      <th>Type UC</th>
-                      <th>Nom UC</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody id="if-tbody"></tbody>
-                </table>
-             </div>
-              <div class="form-actions">
-                <button class="bouton bouton-petit bouton-contour" onclick="ifAjouterLigneManuelle()">+ Ajouter une ligne</button>
-              </div>
-              <div class="form-grille-2" style="margin-top:1rem;">
-                <div class="form-groupe">
-                  <label class="form-label">Sous-total PDF</label>
-                  <input type="text" class="form-ctrl" id="if-soustotal" readonly>
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">Sous-total calculé</label>
-                  <input type="text" class="form-ctrl" id="if-soustotal-calcule" readonly>
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">TPS</label>
-                <input type="text" class="form-ctrl" id="if-tps" onchange="ifRecalculerSousTotal()">
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">TVQ</label>
-                  <input type="text" class="form-ctrl" id="if-tvq" onchange="ifRecalculerSousTotal()">
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">Livraison</label>
-                 <input type="text" class="form-ctrl" id="if-livraison" onchange="ifRecalculerSousTotal()">
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">Total</label>
-                  <input type="text" class="form-ctrl" id="if-total" readonly>
-                </div>
-              </div>
-              
-               <div id="if-validation" class="msg-zone"></div>
-            </div>
-          </div>
-          <div class="form-panel form-body-actions">
-            <div class="form-actions">
-              <button class="bouton bouton-contour" onclick="document.getElementById('if-apercu').classList.add('cache'); document.getElementById('if-bloc-upload').classList.remove('cache')">Annuler</button>
-              <button class="bouton" id="if-btn-confirmer" onclick="confirmerImportFacture()">Confirmer l'import</button>
-            </div>
-          </div>
-		  
-		  
-		  
-        </div>
-      </div>
-	  
-	  
-	  
-	  
-	  
+    	  
 	  <!-- ════════════════════════════════════════
      ENTRER UNE FACTURE V3
-     Section autonome — IDs préfixés ef-
-     JS : entrer-facture.js
-     Ne pas modifier les sections existantes
      ════════════════════════════════════════ -->
 
       <div class="section-admin" id="section-entrer-facture">
@@ -1978,9 +1475,7 @@
           <select class="form-ctrl filtre-select" id="inv-filtre-type" onchange="filtrerInventaire()">
             <option value="">Tous les types</option>
           </select>
-          <select class="form-ctrl filtre-select" id="inv-filtre-fourn" onchange="filtrerInventaire()">
-            <option value="">Tous les fournisseurs</option>
-          </select>
+          
           <input type="text" class="form-ctrl filtre-select" id="inv-recherche" placeholder="Rechercher par nom…" oninput="filtrerInventaire()">
           <button class="btn-fermer-panneau" onclick="reinitialiserFiltresInventaire()" title="Réinitialiser">✕</button>
         </div>
@@ -2970,7 +2465,7 @@
 		  
 		  
 <script src="../js/main.js"></script>
-<script src="../js/parsers.js"></script>
+
   <script src="../js/admin.js"></script>
     
  <div id="ecran-connexion" class="ecran-connexion cache">
@@ -3130,7 +2625,7 @@
   </div>
 </div>
 
-<script src="../js/achats.js"></script>
+
 <script src="../js/entrer-facture.js"></script>
 <script src="../js/catalogue-builder.js"></script>
 
