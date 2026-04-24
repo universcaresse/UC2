@@ -1332,13 +1332,37 @@ async function ouvrirFicheProduit(pro_id) {
   const resEmb = await appelAPI('getFormatsEmballages', { pro_id });
   const embItems = (resEmb && resEmb.success) ? resEmb.items : [];
 
+  // Charger les ingrédients
+  const resIng = await appelAPI('getProduitsIngredients', { pro_id });
+  const ings   = (resIng && resIng.success) ? resIng.items : [];
+
+  // Charger le stock si pas encore en mémoire
+  if (!listesDropdown.stock) {
+    const resSto = await appelAPI('getStock');
+    listesDropdown.stock = (resSto && resSto.success) ? resSto.items : [];
+  }
+  const stock  = listesDropdown.stock  || [];
+  const config = listesDropdown.config || {};
+  let coutTotal  = 0;
+  ings.forEach(ing => {
+    const stockItem = stock.find(s => s.ing_id === ing.ing_id);
+    const prixParG  = stockItem ? (stockItem.prix_par_g_reel || 0) : 0;
+    const cat_id    = stockItem ? (stockItem.cat_id || '') : '';
+    const cfg       = config[cat_id] || {};
+    const perte     = cfg.margePertePct || 0;
+    const facteur   = 1 + (perte / 100);
+    const sousTotal = (ing.quantite_g || 0) * prixParG * facteur;
+    coutTotal += sousTotal;
+  });
+  const cout = coutTotal;
+
   const formatsHtml = formats.length
     ? formats.map(f => {
         const nbUnites = f.nb_unites || 0;
-        const coutIngParUnite = nbUnites > 0 ? coutTotal / nbUnites : 0;
+        const coutIngParUnite = nbUnites > 0 ? cout / nbUnites : 0;
         const embsDuFormat = embItems.filter(e => String(e.poids) === String(f.poids) && e.unite === f.unite);
         const coutEmb = embsDuFormat.reduce((s, e) => {
-          const stockItem = stock.find(st => st.ing_id === e.ing_id);
+          const stockItem = (listesDropdown.stock || []).find(st => st.ing_id === e.ing_id);
           const prixParG  = stockItem?.prix_par_g_reel || 0;
           return s + ((e.nb_par_unite || 1) * prixParG);
         }, 0);
@@ -1354,31 +1378,7 @@ async function ouvrirFicheProduit(pro_id) {
       }).join('')
     : '<div class="fiche-vide fiche-label-manquant">⚠ Aucun format</div>';
 
-  // Charger les ingrédients
-  const resIng = await appelAPI('getProduitsIngredients', { pro_id });
-  const ings   = (resIng && resIng.success) ? resIng.items : [];
-
-  // Charger le stock si pas encore en mémoire
-  if (!listesDropdown.stock) {
-    const resSto = await appelAPI('getStock');
-    listesDropdown.stock = (resSto && resSto.success) ? resSto.items : [];
-  }
-  const stock  = listesDropdown.stock  || [];
-  const config = listesDropdown.config || {};
-  let coutDetail = '';
-  let coutTotal  = 0;
-  ings.forEach(ing => {
-    const stockItem = stock.find(s => s.ing_id === ing.ing_id);
-    const prixParG  = stockItem ? (stockItem.prix_par_g_reel || 0) : 0;
-    const cat_id    = stockItem ? (stockItem.cat_id || '') : '';
-    const cfg       = config[cat_id] || {};
-    const perte     = cfg.margePertePct || 0;
-    const facteur   = 1 + (perte / 100);
-    const sousTotal = (ing.quantite_g || 0) * prixParG * facteur;
-    coutTotal += sousTotal;
-    
-  });
-  const cout        = coutTotal;
+  
   const nbUnites    = pro.nb_unites || 1;
   const coutParUnit = cout > 0 ? (cout / nbUnites).toFixed(2) + ' $' : '—';
   const coutHtml = `<div class="fiche-champ"><span class="fiche-label">Coût de revient estimé</span><span class="fiche-valeur">${cout > 0 ? cout.toFixed(2) + ' $' : '—'}</span></div><div class="fiche-champ"><span class="fiche-label">Coût par unité (${nbUnites} unités)</span><span class="fiche-valeur">${coutParUnit}</span></div>`;
