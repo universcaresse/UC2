@@ -3182,7 +3182,13 @@ function ouvrirFormDensite() {
   document.getElementById('fd-densite').value     = '';
   document.getElementById('fd-unite').value       = 'ml';
   document.getElementById('fd-marge-perte').value = '';
-  document.getElementById('fd-type').readOnly     = false;
+  const selType = document.getElementById('fd-type');
+selType.innerHTML = '<option value="">— Choisir —</option>';
+Object.keys(listesDropdown.categoriesMap || {}).sort((a,b) => (listesDropdown.categoriesMap[a]||'').localeCompare(listesDropdown.categoriesMap[b]||'','fr')).forEach(k => {
+  const opt = document.createElement('option');
+  opt.value = k; opt.textContent = listesDropdown.categoriesMap[k];
+  selType.appendChild(opt);
+});
   document.getElementById('form-densites').classList.add('visible');
   document.getElementById('fd-type').focus();
 }
@@ -3197,11 +3203,20 @@ function modifierDensite(cat_id) {
   if (!d) return;
   document.getElementById('form-densites-titre').textContent = 'Modifier la densité';
   document.getElementById('fd-mode').value        = 'modif';
-  document.getElementById('fd-type').value        = d.cat_id;
-  document.getElementById('fd-densite').value     = d.densite;
-  document.getElementById('fd-unite').value       = d.unite;
-  document.getElementById('fd-marge-perte').value = d.marge_perte_pct || '';
-  document.getElementById('fd-type').readOnly     = true;
+  
+  const selType2 = document.getElementById('fd-type');
+selType2.innerHTML = '<option value="">— Choisir —</option>';
+Object.keys(listesDropdown.categoriesMap || {}).sort((a,b) => (listesDropdown.categoriesMap[a]||'').localeCompare(listesDropdown.categoriesMap[b]||'','fr')).forEach(k => {
+  const opt = document.createElement('option');
+  opt.value = k; opt.textContent = listesDropdown.categoriesMap[k];
+  selType2.appendChild(opt);
+});
+selType2.value = d.cat_id;
+document.getElementById('fd-densite').value     = d.densite;
+document.getElementById('fd-unite').value       = d.unite;
+document.getElementById('fd-marge-perte').value = d.marge_perte_pct || '';
+  
+  
   document.getElementById('form-densites').classList.add('visible');
   document.getElementById('btn-nouvelle-densite').classList.add('cache');
   document.getElementById('fd-densite').focus();
