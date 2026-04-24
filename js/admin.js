@@ -1315,12 +1315,21 @@ async function mettreAJourLignes() {
   const gammes = (collectionsDisponibles[col_id] || []).sort((a, b) => (a.rang || 99) - (b.rang || 99));
 if (!gammes.length) { sel.innerHTML = '<option value="">— Aucune gamme —</option>'; sel.disabled = true; return; }
   sel.disabled = false;
+  
   gammes.forEach(g => {
     const o = document.createElement('option'); o.value = g.gam_id; o.textContent = g.nom; sel.appendChild(o);
   });
   sel.disabled = false;
+  const selFam = document.getElementById('fr-famille');
+  if (selFam) {
+    const valFam = selFam.value;
+    selFam.innerHTML = '<option value="">— Aucune —</option>';
+    donneesFamilles.filter(f => f.col_id === col_id).sort((a, b) => (a.nom || '').localeCompare(b.nom || '', 'fr')).forEach(fam => {
+      const o = document.createElement('option'); o.value = fam.fam_id; o.textContent = fam.nom; selFam.appendChild(o);
+    });
+    selFam.value = valFam;
+  }
 }
-
 
 async function ouvrirFicheProduit(pro_id) {
   const pro = donneesProduits.find(p => p.pro_id === pro_id);
