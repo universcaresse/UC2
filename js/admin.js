@@ -3152,7 +3152,14 @@ async function chargerDensites() {
   if (vide)    vide.classList.add('cache');
 
   // V2 : getConfig
-  const res = await appelAPI('getConfig');
+  if (!listesDropdown.categoriesMap || Object.keys(listesDropdown.categoriesMap).length === 0) {
+  const resCats = await appelAPI('getCategoriesUC');
+  if (resCats && resCats.success) {
+    listesDropdown.categoriesMap = {};
+    (resCats.items || []).forEach(c => { listesDropdown.categoriesMap[c.cat_id] = c.nom; });
+  }
+}
+const res = await appelAPI('getConfig');
   if (loading) loading.classList.add('cache');
   if (!res || !res.success) { afficherMsg('densites', 'Erreur.', 'erreur'); return; }
   donneesDensites = res.items || [];
