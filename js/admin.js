@@ -395,7 +395,8 @@ function peuplerPositionFamille(col_id, rangActuel) {
   if (!selPos) return;
   selPos.innerHTML = '<option value="0">En premier</option>';
   if (!col_id) return;
-  donneesFamilles.filter(f => f.col_id === col_id)
+  const gam_id = document.getElementById('ff-gamme')?.value || '';
+  donneesFamilles.filter(f => f.col_id === col_id && (!gam_id || f.gam_id === gam_id))
     .sort((a, b) => (a.rang || 99) - (b.rang || 99))
     .forEach(f => {
       const o = document.createElement('option');
