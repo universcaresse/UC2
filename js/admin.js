@@ -2380,11 +2380,14 @@ function fermerModalFacture() {
 
 function supprimerFacture(ach_id) {
   confirmerAction('Supprimer cette facture et tous ses items ?', async () => {
+    afficherChargement();
     const res = await appelAPIPost('deleteAchat', { ach_id });
     if (res && res.success) {
+      cacherChargement();
       afficherMsg('factures', 'Facture supprimée.');
       chargerFactures();
     } else {
+      cacherChargement();
       afficherMsg('factures', 'Erreur lors de la suppression.', 'erreur');
     }
   });
@@ -2719,17 +2722,20 @@ function inciToggleAccordeon(header) {
 }
 
 async function inciValider(id, nom_UC, cat_id, ing_id) {
+  afficherChargement();
   const inci          = document.getElementById(`${id}-inci`)?.value  || '';
   const nomBotanique  = document.getElementById(`${id}-bot`)?.value   || '';
   const noteOlfactive = document.getElementById(`${id}-note`)?.value  || '';
   if (!ing_id) { afficherMsg('inci', 'Ingrédient introuvable.', 'erreur'); return; }
   const res = await appelAPIPost('saveIngredientInci', { ing_id, inci, nom_botanique: nomBotanique, note_olfactive: noteOlfactive, statut: '✅ Validé' });
   if (res && res.success) {
+    cacherChargement();
     afficherMsg('inci', '✅ INCI sauvegardé.');
     listesDropdown.fullData = listesDropdown.fullData.map(d => d.ing_id === ing_id ? { ...d, inci, nom_botanique: nomBotanique, note_olfactive: noteOlfactive, statut: '✅ Validé' } : d);
     document.getElementById(`${id}-detail`)?.classList.add('cache');
     await chargerInci();
   } else {
+    cacherChargement();
     afficherMsg('inci', res?.message || 'Erreur lors de la sauvegarde.', 'erreur');
   }
 }
@@ -2828,6 +2834,7 @@ document.getElementById('fd-marge-perte').value = d.marge_perte_pct || '';
 }
 
 async function sauvegarderDensite() {
+  afficherChargement();
   const mode    = document.getElementById('fd-mode').value;
   const type    = document.getElementById('fd-type').value.trim();
   const densite = parseFloat(document.getElementById('fd-densite').value);
@@ -2837,13 +2844,16 @@ async function sauvegarderDensite() {
   const marge_perte_pct = parseFloat(document.getElementById('fd-marge-perte').value) || 0;
   // V2 : saveConfig
   const res = await appelAPIPost('saveConfig', { cat_id: type, densite, unite, marge_perte_pct });
-  if (res && res.success) {
+  
+ if (res && res.success) {
+    cacherChargement();
     fermerFormDensite();
     afficherMsg('densites', mode === 'modif' ? 'Densité mise à jour.' : 'Type ajouté.');
     listesDropdown.config[type] = { densite, unite, margePertePct: marge_perte_pct };
     donneesDensites = [];
     chargerDensites();
   } else {
+    cacherChargement();
     afficherMsg('densites', res?.message || 'Erreur.', 'erreur');
   }
 }
@@ -2876,20 +2886,25 @@ async function chargerContenuSite() {
 }
 
 async function toggleModeSaisonnier() {
+  afficherChargement();
   const res    = await appelAPI('getContenu');
   if (!res || !res.success) return;
   const actuel = res.contenu.mode_saisonnier || 'non';
   const nouveau = actuel === 'oui' ? 'non' : 'oui';
   const data   = await appelAPIPost('updateContenu', { contenu: { mode_saisonnier: nouveau } });
   if (data && data.success) {
+    cacherChargement();
     document.getElementById('btn-mode-saisonnier').textContent = nouveau === 'oui' ? '🌲 Mode saisonnier ON' : '🌲 Mode saisonnier OFF';
     document.getElementById('btn-mode-saisonnier').classList.toggle('btn-primary', nouveau === 'oui');
     document.getElementById('btn-mode-saisonnier').classList.toggle('bouton-vert-pale', nouveau !== 'oui');
     afficherMsg('contenu-site', nouveau === 'oui' ? 'Mode saisonnier activé.' : 'Mode saisonnier désactivé.');
+  } else {
+    cacherChargement();
   }
 }
 
 async function sauvegarderContenuSite() {
+  afficherChargement();
   const corps = document.getElementById('corps-contenu-site');
   if (!corps) return;
   const contenu = {};
@@ -2899,8 +2914,10 @@ async function sauvegarderContenuSite() {
   });
   const data = await appelAPIPost('updateContenu', { contenu });
   if (data && data.success) {
+    cacherChargement();
     afficherMsg('msg-contenu-site', 'Contenu sauvegardé.', 'succes');
   } else {
+    cacherChargement();
     afficherMsg('msg-contenu-site', 'Erreur lors de la sauvegarde.', 'erreur');
   }
 }
@@ -3083,6 +3100,7 @@ function calculerApercuLot() {
 }
 
 async function sauvegarderLot() {
+  afficherChargement();
   const select = document.getElementById('fab-recette');
   const opt    = select.options[select.selectedIndex];
   if (!opt || !opt.value) { afficherMsg('fabrication', '❌ Choisir un produit.'); return; }
@@ -3119,9 +3137,11 @@ async function sauvegarderLot() {
   });
 
   if (res && res.success) {
+    cacherChargement();
     fermerFormFabrication();
     chargerFabrication();
   } else {
+    cacherChargement();
     afficherMsg('fabrication', '❌ ' + (res?.message || 'Erreur.'));
   }
 }
