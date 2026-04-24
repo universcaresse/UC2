@@ -85,6 +85,7 @@ if (resGam && resGam.success) {
     const gamB = donneesGammes.find(g => g.gam_id === b.gam_id);
     return ((colA?.rang || 99) - (colB?.rang || 99)) ||
            ((gamA?.rang || 99) - (gamB?.rang || 99)) ||
+           ((donneesFamilles.find(f => f.fam_id === a.fam_id)?.rang || 99) - (donneesFamilles.find(f => f.fam_id === b.fam_id)?.rang || 99)) ||
            (a.nom || '').localeCompare(b.nom || '');
    });
     donneesProduits = donneesProduits.map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
@@ -1080,6 +1081,7 @@ donneesProduits = (resPro.items || []).sort((a, b) => {
     const gamB = donneesGammes.find(g => g.gam_id === b.gam_id);
     return ((colA?.rang || 99) - (colB?.rang || 99)) ||
            ((gamA?.rang || 99) - (gamB?.rang || 99)) ||
+           ((donneesFamilles.find(f => f.fam_id === a.fam_id)?.rang || 99) - (donneesFamilles.find(f => f.fam_id === b.fam_id)?.rang || 99)) ||
            (a.nom || '').localeCompare(b.nom || '');
   }).map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
   afficherProduits();
@@ -2418,7 +2420,8 @@ async function chargerInventaire() {
     }
   }
  const res = await appelAPI('getStock');
-  console.log('getStock result:', res);
+  
+  
   if (loading) loading.classList.add('cache');
   if (!res || !res.success) { afficherMsg('inventaire', 'Erreur.', 'erreur'); return; }
 

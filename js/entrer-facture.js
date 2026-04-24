@@ -814,14 +814,17 @@ async function efSupprimerLigne(idx) {
   const ligne = ef.lignes[idx];
   if (!ligne) return;
 
-  if (ligne.rowIndex) {
-    const res = await appelAPIPost('deleteAchatLigne', { rowIndex: ligne.rowIndex });
+  if (ligne.ing_id) {
+    const res = await appelAPIPost('deleteAchatLigne', {
+      ach_id:       ef.factureActive.ach_id,
+      ing_id:       ligne.ing_id,
+      format_qte:   ligne.formatQte,
+      format_unite: ligne.formatUnite
+    });
     if (!res || !res.success) {
       afficherMsg('ef-items', res?.message || 'Erreur suppression ligne.', 'erreur');
       return;
     }
-    // Décrémenter les rowIndex des lignes suivantes (le sheet a décalé)
-    ef.lignes.forEach(l => { if (l.rowIndex > ligne.rowIndex) l.rowIndex--; });
   }
 
   ef.lignes.splice(idx, 1);

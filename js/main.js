@@ -463,6 +463,8 @@ function construireCatalogue() {
 
   const filtresBar = document.getElementById('filtres-bar');
 
+  filtresBar.innerHTML = '<button class="filtre-btn actif" data-filtre="tout" onclick="filtrer(\'tout\')">Tout</button>';
+
   ordre.forEach(col_id => {
     if (!parCollection[col_id]) return;
     const info = infoCollections[col_id] || {};
