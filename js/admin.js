@@ -301,13 +301,15 @@ var donneesFamilles = [];
 
 
 async function chargerFamilles() {
+  afficherChargement();
   const [resCol, resFam] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getFamilles')
   ]);
-  if (!resCol || !resCol.success) { afficherMsg('familles', 'Erreur lors du chargement.', 'erreur'); return; }
+  if (!resCol || !resCol.success) { cacherChargement(); afficherMsg('familles', 'Erreur lors du chargement.', 'erreur'); return; }
   donneesCollections = resCol.items || [];
   donneesFamilles    = (resFam && resFam.success) ? resFam.items || [] : [];
+  cacherChargement();
   afficherFamilles();
 }
 
@@ -483,25 +485,30 @@ async function supprimerFamille(fam_id) {
     return;
   }
   confirmerAction('Supprimer cette famille ?', async () => {
+    afficherChargement();
     const res = await appelAPIPost('deleteFamille', { fam_id });
     if (res && res.success) {
+      cacherChargement();
       fermerFicheFamille();
       afficherMsg('familles', 'Famille supprimée.');
       await chargerFamilles();
     } else {
+      cacherChargement();
       afficherMsg('familles', 'Erreur lors de la suppression.', 'erreur');
     }
   });
 }
 
 async function chargerCollections() {
+  afficherChargement();
   const [resCol, resGam] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getGammes')
   ]);
-  if (!resCol || !resCol.success) { afficherMsg('collections', 'Erreur lors du chargement.', 'erreur'); return; }
+ if (!resCol || !resCol.success) { cacherChargement(); afficherMsg('collections', 'Erreur lors du chargement.', 'erreur'); return; }
   donneesCollections = resCol.items || [];
   donneesGammes      = (resGam && resGam.success) ? resGam.items || [] : [];
+  cacherChargement();
   afficherCollections();
 }
 
@@ -844,12 +851,15 @@ async function supprimerCollection(col_id) {
     return;
   }
   confirmerAction('Supprimer cette collection ?', async () => {
+    afficherChargement();
     const res = await appelAPIPost('deleteCollection', { col_id });
     if (res && res.success) {
+      cacherChargement();
       fermerFicheCollection();
       afficherMsg('collections', 'Collection supprimée.');
       await chargerCollections();
     } else {
+      cacherChargement();
       afficherMsg('collections', 'Erreur lors de la suppression.', 'erreur');
     }
   });
@@ -866,14 +876,17 @@ async function supprimerGamme(gam_id) {
     return;
   }
  confirmerAction('Supprimer cette gamme ?', async () => {
+    afficherChargement();
     const res = await appelAPIPost('deleteGamme', { gam_id, col_id: gam.col_id });
     if (res && res.success) {
+      cacherChargement();
       fermerFicheGamme2();
       afficherMsg('gammes', 'Gamme supprimée.');
       const resGam = await appelAPI('getGammes');
       if (resGam && resGam.success) donneesGammes = resGam.items || [];
       afficherGammes();
     } else {
+      cacherChargement();
       afficherMsg('gammes', 'Erreur.', 'erreur');
     }
   });
@@ -1062,11 +1075,12 @@ var scrollAvantProduit = 0;
 var collectionsDisponibles = {};
 
 async function chargerProduitsData() {
+  afficherChargement();
   const [resPro, resFmt] = await Promise.all([
     appelAPI('getProduits'),
     appelAPI('getProduitsFormats')
   ]);
-  if (!resPro || !resPro.success) { afficherMsg('produits', 'Erreur.', 'erreur'); return; }
+  if (!resPro || !resPro.success) { cacherChargement(); afficherMsg('produits', 'Erreur.', 'erreur'); return; }
   const formatsMap = {};
   if (resFmt && resFmt.success) {
     (resFmt.items || []).forEach(f => {
@@ -1084,6 +1098,7 @@ donneesProduits = (resPro.items || []).sort((a, b) => {
            ((donneesFamilles.find(f => f.fam_id === a.fam_id)?.rang || 99) - (donneesFamilles.find(f => f.fam_id === b.fam_id)?.rang || 99)) ||
            (a.nom || '').localeCompare(b.nom || '');
   }).map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
+  cacherChargement();
   afficherProduits();
 }
 
@@ -1798,12 +1813,15 @@ async function supprimerProduit(pro_id) {
     return;
   }
   confirmerAction('Supprimer ce produit ?', async () => {
+    afficherChargement();
     const res = await appelAPIPost('deleteProduit', { pro_id });
     if (res && res.success) {
+      cacherChargement();
       fermerFicheProduit();
       afficherMsg('recettes', 'Produit supprimé.');
       await chargerProduitsData();
     } else {
+      cacherChargement();
       afficherMsg('recettes', 'Erreur.', 'erreur');
     }
   });
@@ -2210,8 +2228,7 @@ function rafraichirListeFormatsRecette() {
         <span style="width:90px;flex:none">Nb/unité</span>
       </div>
       ${lignesEmb}
-      <button type="button" class="bouton bouton-petit bouton-vert-pale" onclick="ajouterEmballageFormat('${cle}')">+ Ajouter</button>
-    </div>`;
+      <button type="button" class="bouton bouton-petit bouton-vert-pale" onclick="ajouterEmballageFormat('${cle}')">+ Ajouter</button>`;
   }).join('');
 }
 // CONFIG et appelAPI/appelAPIPost définis dans main.js
@@ -2229,6 +2246,7 @@ function cacherChargement() {
 var toutesFactures = [];
 
 async function chargerFactures() {
+  afficherChargement();
   const loading = document.getElementById('loading-factures');
   const tableau = document.getElementById('tableau-factures');
   const vide    = document.getElementById('vide-factures');
@@ -2242,7 +2260,7 @@ async function chargerFactures() {
     appelAPI('getFournisseurs')
   ]);
   if (loading) loading.classList.add('cache');
-  if (!resAch || !resAch.success) { afficherMsg('factures', 'Erreur lors du chargement.', 'erreur'); return; }
+  if (!resAch || !resAch.success) { cacherChargement(); afficherMsg('factures', 'Erreur lors du chargement.', 'erreur'); return; }
 
   const fournisseursMap = {};
   (resFour?.items || []).forEach(f => { fournisseursMap[f.four_id] = f.nom; });
@@ -2333,6 +2351,7 @@ function afficherFactures(liste) {
 }
 
 async function voirDetailFacture(ach_id) {
+  afficherChargement();
   if (!listesDropdown.fullData || !listesDropdown.fullData.length) {
     const resInci = await appelAPI('getIngredientsInci');
     if (resInci && resInci.success) listesDropdown.fullData = resInci.items || [];
@@ -2344,6 +2363,7 @@ async function voirDetailFacture(ach_id) {
   document.getElementById('modal-facture-info').textContent  = facture ? facture.date + ' — ' + facture.fournisseur : '';
   document.getElementById('contenu-detail-facture').innerHTML = '';
   document.getElementById('loading-detail-facture').classList.remove('cache');
+  cacherChargement();;
 
   // V2 : getAchatsLignes
   const res = await appelAPI('getAchatsLignes', { ach_id });
@@ -2416,6 +2436,7 @@ function supprimerFacture(ach_id) {
 var donneesInventaire = [];
 
 async function chargerInventaire() {
+  afficherChargement();
   const loading = document.getElementById('loading-inventaire');
   const contenu = document.getElementById('contenu-inventaire');
   const vide    = document.getElementById('vide-inventaire');
@@ -2435,7 +2456,7 @@ async function chargerInventaire() {
   
   
   if (loading) loading.classList.add('cache');
-  if (!res || !res.success) { afficherMsg('inventaire', 'Erreur.', 'erreur'); return; }
+  if (!res || !res.success) { cacherChargement(); afficherMsg('inventaire', 'Erreur.', 'erreur'); return; }
 
   const items = res.items || [];
   if (!items.length) { if (vide) vide.classList.remove('cache'); return; }
@@ -2486,6 +2507,7 @@ async function chargerInventaire() {
       <div class="inv-total-montant">${formaterPrix(total)}</div>
     </div>`;
  donneesInventaire = items;
+  cacherChargement();
   if (contenu) contenu.innerHTML = html;
 
   const types = [...new Set(items.map(i => i.cat_id).filter(Boolean))].sort();
@@ -2556,6 +2578,7 @@ var inciDonnees      = [];
 var inciCategoriesUC = [];
 
 async function chargerInci() {
+  afficherChargement();
   document.getElementById('loading-inci').classList.remove('cache');
   document.getElementById('inci-accordeons').innerHTML = '';
 
@@ -2573,7 +2596,8 @@ async function chargerInci() {
   inciCategoriesUC = (resUC && resUC.success) ? resUC.items : [];
 
   document.getElementById('loading-inci').classList.add('cache');
-  inciConstruireAccordeons();
+  cacherChargement();
+  inciConstruireAccordeons();;
 }
 
 function inciAppliquerFiltres(btn, groupe) {
@@ -2756,6 +2780,7 @@ async function inciValider(id, nom_UC, cat_id, ing_id) {
 var donneesDensites = [];
 
 async function chargerDensites() {
+  afficherChargement();
   const loading = document.getElementById('loading-densites');
   const tableau = document.getElementById('tableau-densites');
   const vide    = document.getElementById('vide-densites');
@@ -2773,7 +2798,7 @@ async function chargerDensites() {
 }
 const res = await appelAPI('getConfig');
   if (loading) loading.classList.add('cache');
-  if (!res || !res.success) { afficherMsg('densites', 'Erreur.', 'erreur'); return; }
+  if (!res || !res.success) { cacherChargement(); afficherMsg('densites', 'Erreur.', 'erreur'); return; }
   donneesDensites = res.items || [];
 
   if (!donneesDensites.length) { if (vide) vide.classList.remove('cache'); return; }
@@ -2791,6 +2816,7 @@ tr.innerHTML = `
       <td>${d.marge_perte_pct ? parseFloat(d.marge_perte_pct).toFixed(1) + ' %' : '—'}</td>`;
     tbody.appendChild(tr);
   });
+  cacherChargement();
   if (tableau) tableau.classList.remove('cache');
 }
 
@@ -2923,12 +2949,14 @@ async function sauvegarderContenuSite() {
    FABRICATION V2
 ════════════════════════════════ */
 async function chargerFabrication() {
+  afficherChargement();
   document.getElementById('loading-fabrication').classList.remove('cache');
   document.getElementById('contenu-fabrication').innerHTML = '';
   // V2 : getLots
   const res = await appelAPI('getLots');
   document.getElementById('loading-fabrication').classList.add('cache');
-  if (!res || !res.success) { afficherMsg('fabrication', '❌ Erreur de chargement.'); return; }
+  if (!res || !res.success) { cacherChargement(); afficherMsg('fabrication', '❌ Erreur de chargement.'); return; }
+  cacherChargement();
   afficherTableauFabrication(res.items || []);
 }
 
