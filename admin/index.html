@@ -2138,40 +2138,12 @@
       <div class="page-entete-titre">Médiathèque</div>
     </div>
     <div class="form-actions">
-      <button class="bouton" onclick="mediathequeOuvrirAjout()">+ Ajouter une photo</button>
+      
       <button class="bouton bouton-vert-pale" onclick="mediathequeSyncCloudinary()">↺ Synchroniser Cloudinary</button>
     </div>
   </div>
   <div class="msg-zone" id="msg-mediatheque"></div>
-  <div class="carte-admin fade-in cache" id="med-form-ajout">
-    <div class="carte-admin-entete">Ajouter une photo</div>
-    <div class="form-groupe">
-      <label class="form-label">URL Cloudinary</label>
-      <div class="champ-avec-reset">
-        <input type="text" class="form-ctrl" id="med-url" placeholder="Coller l'URL ici">
-        <button class="btn-reset-champ" onclick="document.getElementById('med-url').value=''">✕</button>
-      </div>
-    </div>
-    <div class="form-groupe">
-      <label class="form-label">Nom</label>
-      <input type="text" class="form-ctrl" id="med-nom" placeholder="Ex. : saponica-principale">
-    </div>
-    <div class="form-groupe">
-      <label class="form-label">Catégorie</label>
-      <select class="form-ctrl" id="med-categorie">
-        <option value="">— Choisir —</option>
-        <option>Site général</option>
-        <option>Recette</option>
-        <option>Recette Noël</option>
-        <option>Collection</option>
-        <option>Collection Noël</option>
-      </select>
-    </div>
-    <div class="form-actions">
-      <button class="bouton" onclick="mediathequeSauvegarder()">Sauvegarder</button>
-      <button class="bouton bouton-contour" onclick="mediathequeFermerAjout()">Annuler</button>
-    </div>
-  </div>
+  
   <div class="filtres-bar">
     <select class="form-ctrl filtre-select" id="med-filtre-cat" onchange="medFiltrer()">
       <option value="">Toutes les catégories</option>

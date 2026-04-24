@@ -1908,44 +1908,13 @@ async function mediathequeSyncCloudinary() {
   chargerMediatheque();
 }
 
-function mediathequeOuvrirAjout() {
-  document.getElementById('med-form-ajout').classList.remove('cache');
-  document.getElementById('med-url').value      = '';
-  document.getElementById('med-nom').value      = '';
-  document.getElementById('med-categorie').value = '';
-  document.getElementById('med-url').focus();
-}
 
-function mediathequeFermerAjout() {
-  document.getElementById('med-form-ajout').classList.add('cache');
-}
 
-async function mediathequeSauvegarder() {
-  const url = document.getElementById('med-url').value.trim();
-  const nom = document.getElementById('med-nom').value.trim();
-  const cat = document.getElementById('med-categorie').value;
-  if (!url || !nom || !cat) { afficherMsg('mediatheque', 'URL, nom et catégorie requis.', 'erreur'); return; }
-  const res = await appelAPIPost('saveMediatheque', { url, nom, categorie: cat });
-  if (!res || !res.success) { afficherMsg('mediatheque', 'Erreur de sauvegarde.', 'erreur'); return; }
-  _mediathequeDonnees = null;
-  mediathequeFermerAjout();
-  afficherMsg('mediatheque', `✅ "${nom}" ajoutée.`);
-  chargerMediatheque();
-}
 
-async function mediathequeSupprimer(rowIndex, nom) {
-  if (!confirm(`Supprimer "${nom}" de la médiathèque?`)) return;
-  const resActuel = await appelAPI('getMediatheque');
-  if (resActuel && resActuel.success) {
-    const item = (resActuel.items || []).find(i => i.nom === nom);
-    if (item) rowIndex = item.rowIndex;
-  }
-  const res = await appelAPIPost('supprimerMediatheque', { rowIndex });
-  if (!res || !res.success) { afficherMsg('mediatheque', 'Erreur de suppression.', 'erreur'); return; }
-  _mediathequeDonnees = null;
-  afficherMsg('mediatheque', `✅ "${nom}" supprimée.`);
-  chargerMediatheque();
-}
+
+
+
+
 
 // ─── MÉDIATHÈQUE — SÉLECTEUR ───
 var _mediathequeChampId   = null;
