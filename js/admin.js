@@ -2196,7 +2196,7 @@ function rafraichirListeFormatsRecette() {
       <button class="bouton bouton-petit bouton-rouge" onclick="supprimerFormatRecette(${i})">✕</button>
     </div>
     <div class="ingredient-rangee" style="font-size:0.75rem;color:var(--gris);text-transform:uppercase;">
-        <span style="flex:2">Catégorie</span>
+        <span style="flex:2">Contenant et emballage</span>
         <span style="flex:2">Nom UC</span>
         <span style="width:90px;flex:none">Nb/unité</span>
       </div>
