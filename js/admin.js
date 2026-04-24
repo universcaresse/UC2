@@ -2311,7 +2311,7 @@ function afficherFactures(liste) {
     tr.onclick = () => voirDetailFacture(f.ach_id);
     tr.innerHTML = `
       <td>${f.fournisseur}</td>
-      <td class="td-numero">${f.numero_facture || f.ach_id}</td>
+      <td class="td-numero">${f.numero_facture || '—'}</td>
       <td class="td-date">${f.dateAff}</td>
       <td class="td-prix">${f.total ? formaterPrix(f.total) : '—'}</td>
       <td>${badge}</td>`;
