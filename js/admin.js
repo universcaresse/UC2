@@ -1900,10 +1900,12 @@ function medFiltrer() {
 }
 
 async function mediathequeSyncCloudinary() {
+  afficherChargement();
   afficherMsg('mediatheque', 'Synchronisation en cours…');
   const res = await appelAPI('syncCloudinary');
-  if (!res || !res.success) { afficherMsg('mediatheque', 'Erreur de synchronisation.', 'erreur'); return; }
+  if (!res || !res.success) { cacherChargement(); afficherMsg('mediatheque', 'Erreur de synchronisation.', 'erreur'); return; }
   _mediathequeDonnees = null;
+  cacherChargement();
   afficherMsg('mediatheque', `✅ ${res.ajouts} photo(s) ajoutée(s).`);
   chargerMediatheque();
 }
