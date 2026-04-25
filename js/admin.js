@@ -160,6 +160,7 @@ if (id === 'familles')       afficherFamilles();
   if (id === 'contenu-site')   chargerContenuSite();
   if (id === 'mediatheque')    chargerMediatheque();
   if (id === 'inventaire-production') { afficherSection('inventaire', null); return; }
+  if (id === 'ventes')        { chargerVentes(); }
   if (id === 'fabrication') {
     if (!donneesProduits || donneesProduits.length === 0) {
       Promise.all([appelAPI('getProduits'), appelAPI('getProduitsFormats')]).then(([resPro, resFmt]) => {
@@ -3463,3 +3464,203 @@ function importLireFichier()   {}
 async function importEnLot()   {}
 function importAnnuler()       { document.getElementById('import-apercu-zone')?.classList.add('cache'); }
 function importDevinerType()   { return ''; }
+
+/* ════════════════════════════════
+   VENTES V2
+════════════════════════════════ */
+var venPanier = [];
+var venIdEnCours = null;
+
+async function chargerVentes() {
+  const loading = document.getElementById('loading-ventes');
+  const tableau = document.getElementById('tableau-ventes');
+  const vide    = document.getElementById('vide-ventes');
+  if (loading) loading.classList.remove('cache');
+  const res = await appelAPI('getVentesEntete');
+  if (loading) loading.classList.add('cache');
+  if (!res || !res.success || !res.items.length) {
+    if (vide) vide.classList.remove('cache');
+    return;
+  }
+  let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>Date</th><th>Client</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody>';
+  res.items.forEach(v => {
+    html += `<tr class="cliquable" onclick="voirDetailVente('${v.ven_id}')">
+      <td>${v.date}</td>
+      <td>${v.client || '—'}</td>
+      <td>${v.mode_paiement || '—'}</td>
+      <td>${formaterPrix(v.total)}</td>
+      <td>${v.statut}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  if (tableau) tableau.innerHTML = html;
+}
+
+function ouvrirFormVente() {
+  venPanier = [];
+  venIdEnCours = 'VEN-' + Date.now();
+  const selCol = document.getElementById('ven-collection');
+  selCol.innerHTML = '<option value="">— Choisir —</option>';
+  donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.col_id; o.textContent = c.nom; selCol.appendChild(o);
+  });
+  document.getElementById('ven-gamme').innerHTML = '<option value="">— Toutes —</option>';
+  document.getElementById('ven-produit').innerHTML = '<option value="">— Choisir —</option>';
+  document.getElementById('ven-format').innerHTML = '<option value="">— Choisir —</option>';
+  document.getElementById('ven-quantite').value = '1';
+  document.getElementById('ven-prix').value = '';
+  document.getElementById('ven-total-ligne').value = '';
+  document.getElementById('ven-client').value = '';
+  document.getElementById('ven-courriel').value = '';
+  document.getElementById('ven-telephone').value = '';
+  document.getElementById('ven-paiement').value = 'argent';
+  document.getElementById('ven-livraison').value = '0';
+  document.getElementById('ven-sous-total').value = '';
+  document.getElementById('ven-total').value = '';
+  venRafraichirPanier();
+  document.getElementById('contenu-ventes').classList.add('cache');
+  document.getElementById('form-vente').classList.remove('cache');
+  window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
+}
+
+function fermerFormVente() {
+  document.getElementById('form-vente').classList.add('cache');
+  document.getElementById('contenu-ventes').classList.remove('cache');
+  venPanier = [];
+  venIdEnCours = null;
+}
+
+function venFiltrerGammes() {
+  const col_id = document.getElementById('ven-collection').value;
+  const sel = document.getElementById('ven-gamme');
+  sel.innerHTML = '<option value="">— Toutes —</option>';
+  donneesGammes.filter(g => !col_id || g.col_id === col_id).sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(g => {
+    const o = document.createElement('option');
+    o.value = g.gam_id; o.textContent = g.nom; sel.appendChild(o);
+  });
+  venFiltrerProduits();
+}
+
+function venFiltrerProduits() {
+  const col_id = document.getElementById('ven-collection').value;
+  const gam_id = document.getElementById('ven-gamme').value;
+  const sel = document.getElementById('ven-produit');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  donneesProduits.filter(p => p.statut !== 'archive' && (!col_id || p.col_id === col_id) && (!gam_id || p.gam_id === gam_id))
+    .sort((a, b) => (a.nom || '').localeCompare(b.nom || '')).forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.pro_id; o.textContent = p.nom; sel.appendChild(o);
+    });
+  document.getElementById('ven-format').innerHTML = '<option value="">— Choisir —</option>';
+  document.getElementById('ven-prix').value = '';
+  document.getElementById('ven-total-ligne').value = '';
+}
+
+async function venFiltrerFormats() {
+  const pro_id = document.getElementById('ven-produit').value;
+  const sel = document.getElementById('ven-format');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  if (!pro_id) return;
+  const res = await appelAPI('getLotsDisponibles', { pro_id });
+  if (!res || !res.success) return;
+  const formatsVus = new Set();
+  (res.items || []).forEach(l => {
+    const cle = `${l.format_poids}_${l.format_unite}`;
+    if (formatsVus.has(cle)) return;
+    formatsVus.add(cle);
+    const o = document.createElement('option');
+    o.value = JSON.stringify({ lot_id: l.lot_id, poids: l.format_poids, unite: l.format_unite, nb_disponible: l.nb_disponible });
+    o.textContent = `${l.format_poids} ${l.format_unite} — ${l.nb_disponible} dispo`;
+    sel.appendChild(o);
+  });
+  venMettreAJourPrix();
+}
+
+function venMettreAJourPrix() {
+  const pro_id = document.getElementById('ven-produit').value;
+  const formatVal = document.getElementById('ven-format').value;
+  if (!pro_id || !formatVal) { document.getElementById('ven-prix').value = ''; document.getElementById('ven-total-ligne').value = ''; return; }
+  const format = JSON.parse(formatVal);
+  const pro = donneesProduits.find(p => p.pro_id === pro_id);
+  const formatProduit = (pro?.formats || []).find(f => String(f.poids) === String(format.poids) && f.unite === format.unite);
+  const prix = formatProduit?.prix_vente || 0;
+  const qte  = parseInt(document.getElementById('ven-quantite').value) || 1;
+  document.getElementById('ven-prix').value = prix ? formaterPrix(prix) : '—';
+  document.getElementById('ven-total-ligne').value = prix ? formaterPrix(prix * qte) : '—';
+}
+
+function venAjouterLigne() {
+  const pro_id    = document.getElementById('ven-produit').value;
+  const formatVal = document.getElementById('ven-format').value;
+  const qte       = parseInt(document.getElementById('ven-quantite').value) || 1;
+  if (!pro_id || !formatVal) { afficherMsg('ventes', 'Choisir un produit et un format.', 'erreur'); return; }
+  const format = JSON.parse(formatVal);
+  const pro    = donneesProduits.find(p => p.pro_id === pro_id);
+  const formatProduit = (pro?.formats || []).find(f => String(f.poids) === String(format.poids) && f.unite === format.unite);
+  const prix = formatProduit?.prix_vente || 0;
+  venPanier.push({ pro_id, lot_id: format.lot_id, nom: pro?.nom || '', poids: format.poids, unite: format.unite, quantite: qte, prix_unitaire: prix });
+  venRafraichirPanier();
+  document.getElementById('ven-produit').value = '';
+  document.getElementById('ven-format').innerHTML = '<option value="">— Choisir —</option>';
+  document.getElementById('ven-quantite').value = '1';
+  document.getElementById('ven-prix').value = '';
+  document.getElementById('ven-total-ligne').value = '';
+}
+
+function venRafraichirPanier() {
+  const liste = document.getElementById('ven-panier-liste');
+  if (!venPanier.length) { liste.innerHTML = '<div class="texte-secondaire">Aucun article</div>'; venCalculerTotal(); return; }
+  liste.innerHTML = venPanier.map((l, i) => `
+    <div class="ingredient-rangee">
+      <span style="flex:2">${l.nom} — ${l.poids} ${l.unite}</span>
+      <span style="flex:1">Qté : ${l.quantite}</span>
+      <span style="flex:1">${formaterPrix(l.prix_unitaire * l.quantite)}</span>
+      <button class="bouton bouton-petit bouton-rouge" onclick="venSupprimerLigne(${i})">✕</button>
+    </div>`).join('');
+  venCalculerTotal();
+}
+
+function venSupprimerLigne(i) {
+  venPanier.splice(i, 1);
+  venRafraichirPanier();
+}
+
+function venCalculerTotal() {
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const total     = sousTotal + livraison;
+  document.getElementById('ven-sous-total').value = formaterPrix(sousTotal);
+  document.getElementById('ven-total').value      = formaterPrix(total);
+}
+
+async function finaliserVente() {
+  if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
+  afficherChargement();
+  const client      = document.getElementById('ven-client').value;
+  const courriel    = document.getElementById('ven-courriel').value;
+  const telephone   = document.getElementById('ven-telephone').value;
+  const paiement    = document.getElementById('ven-paiement').value;
+  const livraison   = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const ven_id      = venIdEnCours;
+
+  const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement });
+  if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la création.', 'erreur'); return; }
+
+  for (const l of venPanier) {
+    await appelAPIPost('addVenteLigne', { ven_id, pro_id: l.pro_id, lot_id: l.lot_id, quantite: l.quantite, prix_unitaire: l.prix_unitaire, format_poids: l.poids, format_unite: l.unite });
+  }
+
+  const resFin = await appelAPIPost('finaliserVente', { ven_id, livraison });
+  if (!resFin || !resFin.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur'); return; }
+
+  cacherChargement();
+  fermerFormVente();
+  afficherMsg('ventes', '✅ Vente enregistrée.');
+  chargerVentes();
+}
+
+async function voirDetailVente(ven_id) {
+  afficherMsg('ventes', 'Fonctionnalité à venir.');
+}

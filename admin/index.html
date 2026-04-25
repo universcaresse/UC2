@@ -51,7 +51,7 @@
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Production <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
 		<button class="nav-dropdown-item" onclick="afficherSection('fabrication', this)">Fabrication</button>
-		<button class="nav-dropdown-item bientot">Ventes</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('ventes', null)">Ventes</button>
         </div>
       </li>
 	  
@@ -123,6 +123,7 @@
         <button class="sidebar-lien" onclick="afficherSection('fabrication', this)">Fabrication</button>
         <button class="sidebar-lien" onclick="afficherSection('inventaire-production', this)">Stock</button>
 		<button class="sidebar-lien bientot">Corrections Stock</button>
+        <button class="sidebar-lien" onclick="afficherSection('ventes', this)">Ventes</button>
       </div>
       <div class="sidebar-sep"></div>
      <div class="sidebar-groupe">
@@ -1639,7 +1640,147 @@
 
       </div>
 
-    <!-- INVENTAIRE PRODUCTION -->
+    <!-- VENTES -->
+      <div class="section-admin" id="section-ventes">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Ventes au marché</div>
+            <div class="page-entete-titre">Ventes</div>
+          </div>
+          <button class="bouton" onclick="ouvrirFormVente()">+ Nouvelle vente</button>
+        </div>
+        <div class="msg-zone" id="msg-ventes"></div>
+
+        <!-- FORMULAIRE VENTE -->
+        <div id="form-vente" class="cache">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <span class="form-panel-titre">Nouvelle vente</span>
+              <button class="btn-fermer-panneau" onclick="fermerFormVente()">✕</button>
+            </div>
+          </div>
+
+          <!-- SÉLECTION PRODUIT -->
+          <div class="form-panel">
+            <div class="form-body">
+              <div class="form-grille">
+                <div class="form-groupe">
+                  <label class="form-label">Collection</label>
+                  <select class="form-ctrl" id="ven-collection" onchange="venFiltrerGammes()">
+                    <option value="">— Choisir —</option>
+                  </select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Gamme</label>
+                  <select class="form-ctrl" id="ven-gamme" onchange="venFiltrerProduits()">
+                    <option value="">— Toutes —</option>
+                  </select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Produit</label>
+                  <select class="form-ctrl" id="ven-produit" onchange="venFiltrerFormats()">
+                    <option value="">— Choisir —</option>
+                  </select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Format</label>
+                  <select class="form-ctrl" id="ven-format" onchange="venMettreAJourPrix()">
+                    <option value="">— Choisir —</option>
+                  </select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Quantité</label>
+                  <input type="number" class="form-ctrl" id="ven-quantite" min="1" value="1" oninput="venMettreAJourPrix()">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Prix unitaire</label>
+                  <input type="text" class="form-ctrl" id="ven-prix" readonly>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Total</label>
+                  <input type="text" class="form-ctrl" id="ven-total-ligne" readonly>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button class="bouton" onclick="venAjouterLigne()">+ Ajouter</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANIER -->
+          <div class="form-panel" id="ven-panier-panel">
+            <div class="form-panel-header">
+              <span class="form-panel-titre">Panier</span>
+            </div>
+            <div class="form-body">
+              <div id="ven-panier-liste"></div>
+              <div class="form-grille" style="margin-top:16px">
+                <div class="form-groupe">
+                  <label class="form-label">Sous-total</label>
+                  <input type="text" class="form-ctrl" id="ven-sous-total" readonly>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Livraison ($)</label>
+                  <input type="text" inputmode="decimal" class="form-ctrl" id="ven-livraison" value="0" oninput="venCalculerTotal()">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Total</label>
+                  <input type="text" class="form-ctrl" id="ven-total" readonly>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CLIENT -->
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <span class="form-panel-titre">Client (optionnel)</span>
+            </div>
+            <div class="form-body">
+              <div class="form-grille">
+                <div class="form-groupe">
+                  <label class="form-label">Nom</label>
+                  <input type="text" class="form-ctrl" id="ven-client">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Courriel</label>
+                  <input type="text" inputmode="email" class="form-ctrl" id="ven-courriel">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Téléphone</label>
+                  <input type="text" inputmode="tel" class="form-ctrl" id="ven-telephone">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Paiement</label>
+                  <select class="form-ctrl" id="ven-paiement">
+                    <option value="argent">Argent comptant</option>
+                    <option value="carte">Carte</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+              <button class="bouton bouton-contour" onclick="fermerFormVente()">Annuler</button>
+              <button class="bouton" onclick="finaliserVente()">Finaliser la vente</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTE DES VENTES -->
+        <div id="contenu-ventes">
+          <div class="chargement" id="loading-ventes"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+          <div id="tableau-ventes"></div>
+          <div class="vide cache" id="vide-ventes">
+            <div class="vide-titre">Aucune vente</div>
+            <div class="vide-desc">Créez votre première vente</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVENTAIRE PRODUCTION -->
       <!-- ════════════════════════════════════════
      INVENTAIRE PRODUCTION — Lots fabriqués
      ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
