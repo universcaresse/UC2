@@ -855,19 +855,27 @@ function cbZoomCanvas(val) {
   const label = document.getElementById('cb-zoom-canvas-label');
   if (label) label.textContent = val + '%';
   const scale = parseFloat(val) / 100;
+
+  // Créer ou réutiliser un conteneur intermédiaire
+  let inner = document.getElementById('cb-canvas-inner');
   const wrap = document.getElementById('cb-canvas-wrap');
-  if (wrap) {
-    wrap.style.setProperty('--cb-scale', scale);
+  if (!inner && wrap) {
+    inner = document.createElement('div');
+    inner.id = 'cb-canvas-inner';
+    inner.style.cssText = 'display:flex;flex-direction:row;transform-origin:top center;';
+    // Déplacer les canvas dans le conteneur
+    const canvas = document.getElementById('cb-canvas');
+    const voisin = document.getElementById('cb-canvas-voisin');
+    if (canvas) inner.appendChild(canvas);
+    if (voisin) inner.appendChild(voisin);
+    wrap.appendChild(inner);
   }
-  // Appliquer aux 2 canvas
-  ['cb-canvas','cb-canvas-voisin'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.style.transform = `scale(${scale})`;
-    el.style.transformOrigin = 'top center';
-    el.style.marginRight = `-${CB_W * (1 - scale)}px`;
-    el.style.marginBottom = `-${CB_H * (1 - scale)}px`;
-  });
+
+  if (inner) {
+    inner.style.transform = `scale(${scale})`;
+    inner.style.marginBottom = `-${CB_H * (1 - scale)}px`;
+    inner.style.marginRight  = `-${CB_W * 2 * (1 - scale)}px`;
+  }
 }
 
 // ─── FICHE PRODUIT ───────────────────────────────────────────────────────────
