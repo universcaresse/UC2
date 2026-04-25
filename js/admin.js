@@ -3162,6 +3162,7 @@ function fermerFormFabrication() {
   document.getElementById('fab-collection').value = '';
   document.getElementById('fab-gamme').innerHTML = '<option value="">— Toutes les gammes —</option>';
   document.getElementById('fab-recette').innerHTML = '<option value="">— Choisir un produit —</option>';
+  document.getElementById('fab-format').innerHTML = '<option value="">— Choisir un format —</option>'; // ← ajouté
   document.getElementById('fab-multiplicateur').value = '1';
   document.getElementById('fab-nb-unites').value = '';
   document.getElementById('fab-date-jour').value = '';
@@ -3273,7 +3274,7 @@ async function sauvegarderLot() {
     : (parseInt(opt.dataset.nbUnites) || 1) * multi;
   const cure    = parseInt(opt.dataset.cure) || 0;
   const dateFab = document.getElementById('fab-date').value;
-  if (!dateFab) { afficherMsg('fabrication', '❌ Date de fabrication requise.'); return; }
+  if (!dateFab) { cacherChargement(); afficherMsg('fabrication', '❌ Date de fabrication requise.'); return; }
 
   const d = new Date(dateFab);
   d.setDate(d.getDate() + cure);
