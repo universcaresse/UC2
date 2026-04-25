@@ -82,6 +82,7 @@ async function cbOnAfficher() {
 
   document.getElementById('cb-chargement').style.display = 'none';
   document.getElementById('cb-layout').style.display     = 'flex';
+  setTimeout(() => cbZoomCanvas(70), 100);
 
   await cbChargerPages();
   if (!cbPages.length) cbNouvellePageCatalogue();
@@ -849,6 +850,24 @@ function cbSetCouleurTexte(val) {
 }
 
 function cbDeselectionner() { cbSelId=null; cbRendreCanvas(); cbRendreProps(); cbRendreCalques(); }
+
+function cbZoomCanvas(val) {
+  const canvas = document.getElementById('cb-canvas');
+  const voisin = document.getElementById('cb-canvas-voisin');
+  const label  = document.getElementById('cb-zoom-canvas-label');
+  if (label) label.textContent = val + '%';
+  const scale = parseFloat(val) / 100;
+  if (canvas) {
+    canvas.style.transform = `scale(${scale})`;
+    canvas.style.transformOrigin = 'top left';
+    canvas.style.marginBottom = `-${CB_H * (1 - scale)}px`;
+  }
+  if (voisin) {
+    voisin.style.transform = `scale(${scale})`;
+    voisin.style.transformOrigin = 'top left';
+    voisin.style.marginBottom = `-${CB_H * (1 - scale)}px`;
+  }
+}
 
 // ─── FICHE PRODUIT ───────────────────────────────────────────────────────────
 function cbOuvrirFicheProduit() {

@@ -2230,6 +2230,11 @@
         <button class="bouton bouton-petit bouton-contour" id="cb-btn-coller" onclick="cbCollerBloc()" style="display:none">⧉ Coller</button>
         <button class="bouton bouton-petit bouton-rouge" id="cb-btn-supprimer-bloc" onclick="cbSupprimerBlocSelectionne()" style="display:none">🗑 Bloc</button>
         <button class="bouton bouton-petit bouton-rouge" onclick="cbSupprimerPage()">🗑 Page</button>
+        <div style="display:flex;align-items:center;gap:6px;margin-left:auto">
+          <span style="font-size:11px;color:#888">Zoom</span>
+          <input type="range" id="cb-zoom-canvas" min="30" max="120" value="70" oninput="cbZoomCanvas(this.value)" style="width:80px">
+          <span id="cb-zoom-canvas-label" style="font-size:11px;color:#666;width:32px">70%</span>
+        </div>
       </div>
 
       <div class="cb-canvas-wrap">
