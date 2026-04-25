@@ -1651,7 +1651,7 @@
         <div class="page-entete fade-in">
           <div>
             <div class="page-entete-eyebrow">Textes affichés sur le site public</div>
-            <div class="page-entete-titre">Contenu du site</div>
+            <div class="page-entete-titre">Contenu <em>du site</em></div>
           </div>
           <div class="form-actions">
             <button class="bouton" onclick="sauvegarderContenuSite()">Enregistrer</button>
@@ -1675,7 +1675,10 @@
               </div>
               <div class="form-groupe">
                 <label class="form-label">Mode saisonnier</label>
-                <button class="bouton bouton-vert-pale" id="btn-mode-saisonnier" onclick="toggleModeSaisonnier()">🌲 Mode saisonnier est OFF</button>
+                <select class="form-ctrl" id="cs-mode_saisonnier">
+                  <option value="non">Non — mode standard</option>
+                  <option value="oui">Oui — mode saisonnier actif</option>
+                </select>
               </div>
             </div>
           </div>
