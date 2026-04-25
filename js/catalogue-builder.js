@@ -855,27 +855,12 @@ function cbZoomCanvas(val) {
   const label = document.getElementById('cb-zoom-canvas-label');
   if (label) label.textContent = val + '%';
   const scale = parseFloat(val) / 100;
-
-  // Créer ou réutiliser un conteneur intermédiaire
-  let inner = document.getElementById('cb-canvas-inner');
   const wrap = document.getElementById('cb-canvas-wrap');
-  if (!inner && wrap) {
-    inner = document.createElement('div');
-    inner.id = 'cb-canvas-inner';
-    inner.style.cssText = 'display:flex;flex-direction:row;transform-origin:top center;';
-    // Déplacer les canvas dans le conteneur
-    const canvas = document.getElementById('cb-canvas');
-    const voisin = document.getElementById('cb-canvas-voisin');
-    if (canvas) inner.appendChild(canvas);
-    if (voisin) inner.appendChild(voisin);
-    wrap.appendChild(inner);
-  }
+  if (!wrap) return;
 
-  if (inner) {
-    inner.style.transform = `scale(${scale})`;
-    inner.style.marginBottom = `-${CB_H * (1 - scale)}px`;
-    inner.style.marginRight  = `-${CB_W * 2 * (1 - scale)}px`;
-  }
+  wrap.style.transform = `scale(${scale})`;
+  wrap.style.transformOrigin = 'top center';
+  wrap.style.height = `${CB_H * scale + 48}px`;
 }
 
 // ─── FICHE PRODUIT ───────────────────────────────────────────────────────────
