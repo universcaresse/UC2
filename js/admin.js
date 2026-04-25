@@ -3192,23 +3192,21 @@ async function modifierLot(lot_id) {
   const d = new Date(lot.date_fabrication);
   d.setDate(d.getDate() + cure);
   const dateDispo = d.toISOString().split('T')[0];
-  confirmerAction('Sauvegarder les modifications ?', async () => {
-    afficherChargement();
-    const nbUnites = parseInt(document.getElementById(`fab-edit-unites-${lot_id}`).value) || 0;
-    const dateFab  = document.getElementById(`fab-edit-date-${lot_id}`).value;
-    const d2 = new Date(dateFab);
-    d2.setDate(d2.getDate() + cure);
-    const dateDispo2 = d2.toISOString().split('T')[0];
-    const res = await appelAPIPost('updateLot', { lot_id, nb_unites: nbUnites, date_fabrication: dateFab, date_disponibilite: dateDispo2 });
-    if (res && res.success) {
-      cacherChargement();
-      afficherMsg('fabrication', 'Lot mis à jour.');
-      chargerFabrication();
-    } else {
-      cacherChargement();
-      afficherMsg('fabrication', 'Erreur.', 'erreur');
-    }
-  });
+  afficherChargement();
+  const nbUnites = parseInt(document.getElementById(`fab-edit-unites-${lot_id}`).value) || 0;
+  const dateFab  = document.getElementById(`fab-edit-date-${lot_id}`).value;
+  const d2 = new Date(dateFab);
+  d2.setDate(d2.getDate() + cure);
+  const dateDispo2 = d2.toISOString().split('T')[0];
+  const res = await appelAPIPost('updateLot', { lot_id, nb_unites: nbUnites, date_fabrication: dateFab, date_disponibilite: dateDispo2 });
+  if (res && res.success) {
+    cacherChargement();
+    afficherMsg('fabrication', 'Lot mis à jour.');
+    chargerFabrication();
+  } else {
+    cacherChargement();
+    afficherMsg('fabrication', 'Erreur.', 'erreur');
+  }
 }
 
 async function supprimerLot(lot_id) {
