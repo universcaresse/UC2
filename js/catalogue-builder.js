@@ -852,21 +852,22 @@ function cbSetCouleurTexte(val) {
 function cbDeselectionner() { cbSelId=null; cbRendreCanvas(); cbRendreProps(); cbRendreCalques(); }
 
 function cbZoomCanvas(val) {
-  const canvas = document.getElementById('cb-canvas');
-  const voisin = document.getElementById('cb-canvas-voisin');
-  const label  = document.getElementById('cb-zoom-canvas-label');
+  const label = document.getElementById('cb-zoom-canvas-label');
   if (label) label.textContent = val + '%';
   const scale = parseFloat(val) / 100;
-  if (canvas) {
-    canvas.style.transform = `scale(${scale})`;
-    canvas.style.transformOrigin = 'top left';
-    canvas.style.marginBottom = `-${CB_H * (1 - scale)}px`;
+  const wrap = document.getElementById('cb-canvas-wrap');
+  if (wrap) {
+    wrap.style.setProperty('--cb-scale', scale);
   }
-  if (voisin) {
-    voisin.style.transform = `scale(${scale})`;
-    voisin.style.transformOrigin = 'top left';
-    voisin.style.marginBottom = `-${CB_H * (1 - scale)}px`;
-  }
+  // Appliquer aux 2 canvas
+  ['cb-canvas','cb-canvas-voisin'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.transform = `scale(${scale})`;
+    el.style.transformOrigin = 'top center';
+    el.style.marginRight = `-${CB_W * (1 - scale)}px`;
+    el.style.marginBottom = `-${CB_H * (1 - scale)}px`;
+  });
 }
 
 // ─── FICHE PRODUIT ───────────────────────────────────────────────────────────
