@@ -3177,7 +3177,7 @@ function fabFiltrerFormats() {
     if (!res || !res.success) return;
     (res.items || []).forEach(f => {
       const opt = document.createElement('option');
-      opt.value = JSON.stringify({ poids: f.poids, unite: f.unite, prix: f.prix_vente });
+      opt.value = JSON.stringify({ poids: f.poids, unite: f.unite, prix: f.prix_vente, nb_unites: f.nb_unites || 0 });
       opt.textContent = f.poids + ' ' + f.unite + (f.prix_vente ? ' — ' + parseFloat(f.prix_vente).toFixed(2) + ' $' : '');
       select.appendChild(opt);
     });
@@ -3207,9 +3207,16 @@ async function calculerApercuLot() {
   if (!opt || !opt.value) { document.getElementById('fab-apercu').classList.add('cache'); return; }
   const mode     = document.getElementById('form-fabrication').dataset.mode;
   const multi    = parseInt(document.getElementById('fab-multiplicateur').value) || 1;
+
+  // Récupérer nb_unites du format choisi
+  const selFormat = document.getElementById('fab-format');
+  const formatVal = selFormat?.value ? JSON.parse(selFormat.value) : {};
+  const nbUnitesFormat = formatVal.nb_unites || 0;
+
   const nbUnites = mode === 'existant'
     ? parseInt(document.getElementById('fab-nb-unites').value) || 0
-    : (parseInt(opt.dataset.nbUnites) || 1) * multi;
+    : nbUnitesFormat * multi;
+
   const cure    = parseInt(opt.dataset.cure) || 0;
   const dateFab = document.getElementById('fab-date').value;
   let dateDispo = '—';
