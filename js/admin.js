@@ -3310,6 +3310,15 @@ async function sauvegarderLot() {
 
   const selFormat = document.getElementById('fab-format');
   const formatVal = selFormat?.value ? JSON.parse(selFormat.value) : {};
+  const nbUnitesFormat = formatVal.nb_unites || 0;
+  if (!listesDropdown.stock || !listesDropdown.stock.length) {
+    const resSto = await appelAPI('getStock');
+    listesDropdown.stock = (resSto && resSto.success) ? resSto.items : [];
+  }
+  const resIng2 = await appelAPI('getProduitsIngredients', { pro_id: opt.value });
+  const ings2   = (resIng2 && resIng2.success) ? resIng2.items : [];
+  const cout    = calculerCoutRevient(ings2);
+  const coutParUnite = nbUnitesFormat > 0 ? cout / nbUnitesFormat : 0;
   const lot_id = 'LOT-' + Date.now();
   const res = await appelAPIPost('saveLot', {
     lot_id,
@@ -3320,10 +3329,10 @@ async function sauvegarderLot() {
     date_disponibilite: dateDispo,
     format_poids:       formatVal.poids || '',
     format_unite:       formatVal.unite || '',
-    cout_ingredients:   0,
+    cout_ingredients:   cout,
     cout_emballages:    0,
-    cout_revient_total: 0,
-    cout_par_unite:     0
+    cout_revient_total: cout,
+    cout_par_unite:     coutParUnite
   });
 
   if (res && res.success) {
