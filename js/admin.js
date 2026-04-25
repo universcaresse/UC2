@@ -2978,15 +2978,33 @@ function afficherTableauFabrication(lots) {
       </tr>
       <tr class="fab-lot-detail cache" id="fab-detail-${l.lot_id}">
         <td colspan="5">
-          <div class="form-grille" style="padding:12px 0">
+          <div class="form-grille">
             <div class="form-groupe">
               <label class="form-label">Nb unités</label>
               <input type="number" class="form-ctrl" id="fab-edit-unites-${l.lot_id}" value="${l.nb_unites}" min="0">
             </div>
             <div class="form-groupe">
-              <label class="form-label">Date de fabrication</label>
-              <input type="date" class="form-ctrl" id="fab-edit-date-${l.lot_id}" value="${l.date_fabrication}">
+              <label class="form-label">Jour</label>
+              <select class="form-ctrl" id="fab-edit-jour-${l.lot_id}" onchange="fabEditSyncDate('${l.lot_id}')">
+                <option value="">— Jour —</option>
+                ${Array.from({length:31},(_,i)=>{const v=String(i+1).padStart(2,'0');return `<option value="${v}" ${l.date_fabrication.split('-')[2]===v?'selected':''}>${i+1}</option>`;}).join('')}
+              </select>
             </div>
+            <div class="form-groupe">
+              <label class="form-label">Mois</label>
+              <select class="form-ctrl" id="fab-edit-mois-${l.lot_id}" onchange="fabEditSyncDate('${l.lot_id}')">
+                <option value="">— Mois —</option>
+                ${[['01','Janvier'],['02','Février'],['03','Mars'],['04','Avril'],['05','Mai'],['06','Juin'],['07','Juillet'],['08','Août'],['09','Septembre'],['10','Octobre'],['11','Novembre'],['12','Décembre']].map(([v,n])=>`<option value="${v}" ${l.date_fabrication.split('-')[1]===v?'selected':''}>${n}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-groupe">
+              <label class="form-label">Année</label>
+              <select class="form-ctrl" id="fab-edit-annee-${l.lot_id}" onchange="fabEditSyncDate('${l.lot_id}')">
+                <option value="">— Année —</option>
+                ${Array.from({length:6},(_,i)=>{const a=new Date().getFullYear()-i;return `<option value="${a}" ${l.date_fabrication.split('-')[0]===String(a)?'selected':''}>${a}</option>`;}).join('')}
+              </select>
+            </div>
+            <input type="hidden" id="fab-edit-date-${l.lot_id}" value="${l.date_fabrication}">
           </div>
           <div class="form-actions">
             <button class="bouton bouton-petit" onclick="modifierLot('${l.lot_id}')">Sauvegarder</button>
@@ -3023,6 +3041,10 @@ function afficherTableauFabrication(lots) {
     return h;
   }
 
+  if (!lots.length) {
+    document.getElementById('contenu-fabrication').innerHTML = '<div class="vide"><div class="vide-titre">Aucun lot enregistré</div><div class="vide-desc">Créez votre premier lot de fabrication</div></div>';
+    return;
+  }
   let html = '';
   html += rendreBlocStatut('EN CURE', totalEnCure, enCure);
   html += rendreBlocStatut('DISPONIBLE', totalDisponibles, disponibles);
@@ -3030,11 +3052,36 @@ function afficherTableauFabrication(lots) {
   document.getElementById('contenu-fabrication').innerHTML = html;
 }
 
+function fabEditSyncDate(lot_id) {
+  const j = document.getElementById(`fab-edit-jour-${lot_id}`).value;
+  const m = document.getElementById(`fab-edit-mois-${lot_id}`).value;
+  const a = document.getElementById(`fab-edit-annee-${lot_id}`).value;
+  if (j && m && a) {
+    const date = new Date(`${a}-${m}-${j}`);
+    if (!isNaN(date.getTime())) {
+      document.getElementById(`fab-edit-date-${lot_id}`).value = `${a}-${m}-${j}`;
+    } else {
+      document.getElementById(`fab-edit-date-${lot_id}`).value = '';
+    }
+  } else {
+    document.getElementById(`fab-edit-date-${lot_id}`).value = '';
+  }
+}
+
 function fabSyncDate() {
   const j = document.getElementById('fab-date-jour').value;
   const m = document.getElementById('fab-date-mois').value;
   const a = document.getElementById('fab-date-annee').value;
-  document.getElementById('fab-date').value = (j && m && a) ? `${a}-${m}-${j}` : '';
+  if (j && m && a) {
+    const date = new Date(`${a}-${m}-${j}`);
+    if (!isNaN(date.getTime())) {
+      document.getElementById('fab-date').value = `${a}-${m}-${j}`;
+    } else {
+      document.getElementById('fab-date').value = '';
+    }
+  } else {
+    document.getElementById('fab-date').value = '';
+  }
   calculerApercuLot();
 }
 
@@ -3192,9 +3239,11 @@ async function modifierLot(lot_id) {
   const d = new Date(lot.date_fabrication);
   d.setDate(d.getDate() + cure);
   const dateDispo = d.toISOString().split('T')[0];
-  afficherChargement();
   const nbUnites = parseInt(document.getElementById(`fab-edit-unites-${lot_id}`).value) || 0;
   const dateFab  = document.getElementById(`fab-edit-date-${lot_id}`).value;
+  if (!dateFab) { afficherMsg('fabrication', 'Date de fabrication requise.', 'erreur'); return; }
+  if (nbUnites < 0) { afficherMsg('fabrication', 'Nombre d\'unités invalide.', 'erreur'); return; }
+  afficherChargement();
   const d2 = new Date(dateFab);
   d2.setDate(d2.getDate() + cure);
   const dateDispo2 = d2.toISOString().split('T')[0];
@@ -3264,7 +3313,7 @@ async function sauvegarderLot() {
   if (res && res.success) {
     cacherChargement();
     fermerFormFabrication();
-    chargerFabrication();
+    await chargerFabrication();
   } else {
     cacherChargement();
     afficherMsg('fabrication', '❌ ' + (res?.message || 'Erreur.'));
