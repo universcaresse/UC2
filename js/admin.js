@@ -3016,7 +3016,7 @@ function afficherTableauFabrication(lots) {
 
   function rendreBlocStatut(titre, total, liste) {
     let h = `<div class="carte-admin">
-      <div class="carte-admin-entete">${titre} <span class="texte-secondaire">${total} savon${total !== 1 ? 's' : ''}</span></div>`;
+      <div class="carte-admin-entete">${titre} <span class="texte-secondaire">${total} produit${total !== 1 ? 's' : ''}</span></div>`;
     if (liste.length === 0) {
       h += `<div class="texte-secondaire" style="padding:12px 0">Aucun lot</div>`;
     } else {
