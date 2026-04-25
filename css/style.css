@@ -1340,6 +1340,7 @@ tr.cliquable { cursor: pointer; }
 .form-groupe { margin-top: 1rem; }
 .accordeon-detail .form-actions { justify-content: space-between; }
 .carte-admin { border: 1px solid var(--beige); border-radius: 6px; padding: 16px; margin-bottom: 12px; }
+.fab-apercu { margin-top: 16px; }
 .carte-admin-entete { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
 .carte-admin-entete .form-ctrl { flex: 1; }
 .ligne-cliquable { cursor: pointer; }

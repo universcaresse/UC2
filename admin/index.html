@@ -1580,13 +1580,36 @@
                 </div>
 
                 <div class="form-groupe">
-                  <label class="form-label">Date de fabrication</label>
-                  <input type="date" id="fab-date" class="form-ctrl" onchange="calculerApercuLot()">
+                  <label class="form-label">Jour</label>
+                  <select id="fab-date-jour" class="form-ctrl" onchange="fabSyncDate()"></select>
                 </div>
+                <div class="form-groupe">
+                  <label class="form-label">Mois</label>
+                  <select id="fab-date-mois" class="form-ctrl" onchange="fabSyncDate()">
+                    <option value="">— Mois —</option>
+                    <option value="01">Janvier</option>
+                    <option value="02">Février</option>
+                    <option value="03">Mars</option>
+                    <option value="04">Avril</option>
+                    <option value="05">Mai</option>
+                    <option value="06">Juin</option>
+                    <option value="07">Juillet</option>
+                    <option value="08">Août</option>
+                    <option value="09">Septembre</option>
+                    <option value="10">Octobre</option>
+                    <option value="11">Novembre</option>
+                    <option value="12">Décembre</option>
+                  </select>
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Année</label>
+                  <select id="fab-date-annee" class="form-ctrl" onchange="fabSyncDate()"></select>
+                </div>
+                <input type="hidden" id="fab-date">
 
               </div>
 
-              <div id="fab-apercu" class="carte-admin cache">
+             <div id="fab-apercu" class="carte-admin cache fab-apercu">
                 <div class="carte-admin-entete">Aperçu</div>
                 <div class="form-grille">
                   <div class="form-groupe">

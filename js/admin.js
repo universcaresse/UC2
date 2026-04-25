@@ -1366,7 +1366,7 @@ async function ouvrirFicheProduit(pro_id) {
   const ings   = (resIng && resIng.success) ? resIng.items : [];
 
   // Charger le stock si pas encore en mémoire
-  if (!listesDropdown.stock) {
+ if (!listesDropdown.stock || !listesDropdown.stock.length) {
     const resSto = await appelAPI('getStock');
     listesDropdown.stock = (resSto && resSto.success) ? resSto.items : [];
   }
@@ -3030,6 +3030,14 @@ function afficherTableauFabrication(lots) {
   document.getElementById('contenu-fabrication').innerHTML = html;
 }
 
+function fabSyncDate() {
+  const j = document.getElementById('fab-date-jour').value;
+  const m = document.getElementById('fab-date-mois').value;
+  const a = document.getElementById('fab-date-annee').value;
+  document.getElementById('fab-date').value = (j && m && a) ? `${a}-${m}-${j}` : '';
+  calculerApercuLot();
+}
+
 function ouvrirFormFabrication(existant) {
   const selectCol = document.getElementById('fab-collection');
   selectCol.innerHTML = '<option value="">— Choisir une collection —</option>';
@@ -3040,8 +3048,39 @@ function ouvrirFormFabrication(existant) {
   });
   document.getElementById('fab-gamme').innerHTML = '<option value="">— Toutes les gammes —</option>';
   document.getElementById('fab-recette').innerHTML = '<option value="">— Choisir un produit —</option>';
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('fab-date').value = existant ? '' : today;
+
+  // Peupler jours
+  const selJour = document.getElementById('fab-date-jour');
+  selJour.innerHTML = '<option value="">— Jour —</option>';
+  for (let i = 1; i <= 31; i++) {
+    const o = document.createElement('option');
+    o.value = String(i).padStart(2, '0');
+    o.textContent = i;
+    selJour.appendChild(o);
+  }
+
+  // Peupler années
+  const selAnnee = document.getElementById('fab-date-annee');
+  selAnnee.innerHTML = '<option value="">— Année —</option>';
+  const anneeActuelle = new Date().getFullYear();
+  for (let a = anneeActuelle; a >= anneeActuelle - 5; a--) {
+    const o = document.createElement('option');
+    o.value = a; o.textContent = a;
+    selAnnee.appendChild(o);
+  }
+
+  // Pré-remplir avec aujourd'hui si nouveau lot
+  if (!existant) {
+    const today = new Date();
+    selJour.value = String(today.getDate()).padStart(2, '0');
+    document.getElementById('fab-date-mois').value = String(today.getMonth() + 1).padStart(2, '0');
+    selAnnee.value = today.getFullYear();
+    fabSyncDate();
+  } else {
+    document.getElementById('fab-date-mois').value = '';
+    document.getElementById('fab-date').value = '';
+  }
+
   document.querySelector('#form-fabrication .form-panel-titre').textContent = existant ? 'Entrer un lot existant' : 'Nouveau lot';
   document.getElementById('fab-groupe-multiplicateur').classList.toggle('cache', !!existant);
   document.getElementById('fab-groupe-nb-unites').classList.toggle('cache', !existant);
@@ -3107,11 +3146,15 @@ function fermerFormFabrication() {
   document.getElementById('fab-recette').innerHTML = '<option value="">— Choisir un produit —</option>';
   document.getElementById('fab-multiplicateur').value = '1';
   document.getElementById('fab-nb-unites').value = '';
+  document.getElementById('fab-date-jour').value = '';
+  document.getElementById('fab-date-mois').value = '';
+  document.getElementById('fab-date-annee').value = '';
+  document.getElementById('fab-date').value = '';
   document.getElementById('fab-apercu').classList.add('cache');
   afficherMsg('fabrication', '');
 }
 
-function calculerApercuLot() {
+async function calculerApercuLot() {
   const select = document.getElementById('fab-recette');
   const opt    = select.options[select.selectedIndex];
   if (!opt || !opt.value) { document.getElementById('fab-apercu').classList.add('cache'); return; }
@@ -3126,8 +3169,19 @@ function calculerApercuLot() {
   if (dateFab) { const d = new Date(dateFab); d.setDate(d.getDate() + cure); dateDispo = d.toISOString().split('T')[0]; }
   document.getElementById('fab-apercu-unites').textContent = nbUnites + ' unité(s)';
   document.getElementById('fab-apercu-dispo').textContent  = dateDispo;
-  document.getElementById('fab-apercu-cout').textContent   = '—';
   document.getElementById('fab-apercu').classList.remove('cache');
+
+  // Charger le stock si nécessaire
+  if (!listesDropdown.stock || !listesDropdown.stock.length) {
+    const resSto = await appelAPI('getStock');
+    listesDropdown.stock = (resSto && resSto.success) ? resSto.items : [];
+  }
+  const pro_id = opt.value;
+  const resIng = await appelAPI('getProduitsIngredients', { pro_id });
+  const ings   = (resIng && resIng.success) ? resIng.items : [];
+  const cout   = calculerCoutRevient(ings);
+  const coutParUnite = nbUnites > 0 && cout > 0 ? (cout / nbUnites).toFixed(2) + ' $' : '—';
+  document.getElementById('fab-apercu-cout').textContent = cout > 0 ? cout.toFixed(2) + ' $ (' + coutParUnite + '/unité)' : '—';
 }
 
 async function modifierLot(lot_id) {
