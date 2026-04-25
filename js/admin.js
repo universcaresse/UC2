@@ -3110,7 +3110,7 @@ function ouvrirFormFabrication(existant) {
   const selAnnee = document.getElementById('fab-date-annee');
   selAnnee.innerHTML = '<option value="">— Année —</option>';
   const anneeActuelle = new Date().getFullYear();
-  for (let a = anneeActuelle; a >= anneeActuelle - 5; a--) {
+  for (let a = anneeActuelle; a >= anneeActuelle - 1; a--) {
     const o = document.createElement('option');
     o.value = a; o.textContent = a;
     selAnnee.appendChild(o);
@@ -3238,9 +3238,13 @@ async function calculerApercuLot() {
     document.getElementById('fab-apercu-cout').textContent = 'Choisir un format';
     return;
   }
-  const coutTotal    = cout * multi;
-  const coutParUnite = nbUnitesFormat > 0 && cout > 0 ? (cout / nbUnitesFormat).toFixed(2) + ' $' : '—';
-  document.getElementById('fab-apercu-cout').textContent = coutTotal > 0 ? coutTotal.toFixed(2) + ' $ total — ' + coutParUnite + '/unité' : '—';
+  const coutParUnite = nbUnitesFormat > 0 && cout > 0 ? cout / nbUnitesFormat : 0;
+  const coutTotal    = mode === 'existant' 
+    ? coutParUnite * nbUnites 
+    : cout * multi;
+  document.getElementById('fab-apercu-cout').textContent = coutParUnite > 0 
+    ? coutTotal.toFixed(2) + ' $ total — ' + coutParUnite.toFixed(2) + ' $/unité' 
+    : '—';
 }
 
 async function modifierLot(lot_id) {
