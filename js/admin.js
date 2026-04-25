@@ -3233,9 +3233,14 @@ async function calculerApercuLot() {
   const pro_id = opt.value;
   const resIng = await appelAPI('getProduitsIngredients', { pro_id });
   const ings   = (resIng && resIng.success) ? resIng.items : [];
-  const cout   = calculerCoutRevient(ings);
-  const coutParUnite = nbUnites > 0 && cout > 0 ? (cout / nbUnites).toFixed(2) + ' $' : '—';
-  document.getElementById('fab-apercu-cout').textContent = cout > 0 ? cout.toFixed(2) + ' $ (' + coutParUnite + '/unité)' : '—';
+  const cout = calculerCoutRevient(ings);
+  if (!nbUnitesFormat) {
+    document.getElementById('fab-apercu-cout').textContent = 'Choisir un format';
+    return;
+  }
+  const coutTotal    = cout * multi;
+  const coutParUnite = nbUnitesFormat > 0 && cout > 0 ? (cout / nbUnitesFormat).toFixed(2) + ' $' : '—';
+  document.getElementById('fab-apercu-cout').textContent = coutTotal > 0 ? coutTotal.toFixed(2) + ' $ total — ' + coutParUnite + '/unité' : '—';
 }
 
 async function modifierLot(lot_id) {
