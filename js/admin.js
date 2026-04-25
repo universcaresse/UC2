@@ -3103,6 +3103,7 @@ function fermerFormFabrication() {
   document.getElementById('form-fabrication').classList.add('cache');
   document.getElementById('contenu-fabrication').classList.remove('cache');
   document.getElementById('fab-collection').value = '';
+  document.getElementById('fab-gamme').innerHTML = '<option value="">— Toutes les gammes —</option>';
   document.getElementById('fab-recette').innerHTML = '<option value="">— Choisir un produit —</option>';
   document.getElementById('fab-multiplicateur').value = '1';
   document.getElementById('fab-nb-unites').value = '';
