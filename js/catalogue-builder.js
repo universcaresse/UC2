@@ -855,12 +855,11 @@ function cbZoomCanvas(val) {
   const label = document.getElementById('cb-zoom-canvas-label');
   if (label) label.textContent = val + '%';
   const scale = parseFloat(val) / 100;
-  const wrap = document.getElementById('cb-canvas-wrap');
-  if (!wrap) return;
-
-  wrap.style.transform = `scale(${scale})`;
-  wrap.style.transformOrigin = 'top center';
-  wrap.style.height = `${CB_H * scale + 48}px`;
+  const inner = document.getElementById('cb-canvas-inner');
+  if (!inner) return;
+  inner.style.transform = `scale(${scale})`;
+  inner.style.transformOrigin = 'top left';
+  inner.style.marginBottom = `-${Math.round(CB_H * (1-scale))}px`;
 }
 
 // ─── FICHE PRODUIT ───────────────────────────────────────────────────────────
