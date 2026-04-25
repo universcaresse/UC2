@@ -3269,6 +3269,9 @@ async function sauvegarderLot() {
 
   const mode     = document.getElementById('form-fabrication').dataset.mode;
   const multi    = parseInt(document.getElementById('fab-multiplicateur').value) || 1;
+  const selFormat = document.getElementById('fab-format');
+  const formatVal = selFormat?.value ? JSON.parse(selFormat.value) : {};
+  const nbUnitesFormat = formatVal.nb_unites || 0;
   const nbUnites = mode === 'existant'
     ? parseInt(document.getElementById('fab-nb-unites').value) || 0
     : nbUnitesFormat * multi;
@@ -3279,10 +3282,6 @@ async function sauvegarderLot() {
   const d = new Date(dateFab);
   d.setDate(d.getDate() + cure);
   const dateDispo = d.toISOString().split('T')[0];
-
-  const selFormat = document.getElementById('fab-format');
-  const formatVal = selFormat?.value ? JSON.parse(selFormat.value) : {};
-  const nbUnitesFormat = formatVal.nb_unites || 0;
   if (!listesDropdown.stock || !listesDropdown.stock.length) {
     const resSto = await appelAPI('getStock');
     listesDropdown.stock = (resSto && resSto.success) ? resSto.items : [];
