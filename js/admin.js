@@ -3149,7 +3149,7 @@ function fabFiltrerFormats() {
     (res.items || []).forEach(f => {
       const opt = document.createElement('option');
       opt.value = JSON.stringify({ poids: f.poids, unite: f.unite, prix: f.prix_vente, nb_unites: f.nb_unites || 0 });
-      opt.textContent = f.poids + ' ' + f.unite + (f.prix_vente ? ' — ' + parseFloat(f.prix_vente).toFixed(2) + ' $' : '');
+      opt.textContent = f.poids + ' ' + f.unite + (f.nb_unites ? ' — ' + f.nb_unites + ' unités' : '');
       select.appendChild(opt);
     });
   });
