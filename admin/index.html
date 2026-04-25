@@ -2238,11 +2238,13 @@
       </div>
 
       <div class="cb-canvas-wrap">
-        <div class="cb-canvas" id="cb-canvas"
-          onmousedown="cbCanvasClick(event)"
-          onmouseup="cbGlobalMouseUp()">
-          <div class="cb-canvas-vide" id="cb-canvas-vide">
-            ← Ajoutez des blocs depuis le panneau gauche
+        <div id="cb-canvas-inner" style="display:flex;flex-direction:row;transform-origin:top left;">
+          <div class="cb-canvas" id="cb-canvas"
+            onmousedown="cbCanvasClick(event)"
+            onmouseup="cbGlobalMouseUp()">
+            <div class="cb-canvas-vide" id="cb-canvas-vide">
+              ← Ajoutez des blocs depuis le panneau gauche
+            </div>
           </div>
         </div>
       </div>
