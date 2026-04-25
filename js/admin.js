@@ -2,11 +2,8 @@
    UNIVERS CARESSE — admin.js
    V2 — Passe 1 — 6 avril 2026
    ═══════════════════════════════════════ */
-
 // ─── INITIALISATION ───
-
 var adminScrollObserver = null;
-
 function initScrollAnimationsAdmin() {
   adminScrollObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -18,7 +15,6 @@ function initScrollAnimationsAdmin() {
   }, { threshold: 0.15 });
   document.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => adminScrollObserver.observe(el));
 }
-
 function reobserverFadeIn(conteneur) {
   if (!adminScrollObserver || !conteneur) return;
   conteneur.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => el.classList.remove('visible'));
@@ -26,7 +22,6 @@ function reobserverFadeIn(conteneur) {
     conteneur.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => adminScrollObserver.observe(el));
   }));
 } 
-
 window.addEventListener('popstate', (e) => {
   if (e.state && e.state.section) {
     afficherSection(e.state.section, null);
@@ -34,7 +29,6 @@ window.addEventListener('popstate', (e) => {
     history.pushState({ section: 'accueil' }, '', '#accueil');
   }
 });
-
 document.addEventListener('DOMContentLoaded', async () => {
   const session = sessionStorage.getItem('uc_admin');
   if (session !== 'true') {
@@ -47,8 +41,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initScrollAnimationsAdmin();
   await chargerDonneesInitiales();
 });
-
-// V2 : getCollections + getGammes + getProduits + getIngredientsInci + getConfig
 async function chargerDonneesInitiales() {
 const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt] = await Promise.all([
     appelAPI('getCollections'),
@@ -60,7 +52,6 @@ const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt] = await
     appelAPI('getCategoriesUC'),
     appelAPI('getProduitsFormats')
   ]);
-
   if (resCol && resCol.success) {
     donneesCollections = resCol.items || [];
   }
@@ -111,7 +102,6 @@ if (resGam && resGam.success) {
 	if (statCol)  statCol.textContent  = donneesCollections.length;
 	if (statProd && nbPublics > 0) statProd.textContent = nbPublics + '+';
 }
-
 // ─── NAVIGATION SIDEBAR ───
 function toggleDropdownAdmin(el) {
   const item = el.closest('.nav-admin-item');
@@ -119,13 +109,11 @@ function toggleDropdownAdmin(el) {
   document.querySelectorAll('.nav-admin-item.ouvert').forEach(i => i.classList.remove('ouvert'));
   if (!estOuvert) item.classList.add('ouvert');
 }
-
 document.addEventListener('click', function(e) {
   if (!e.target.closest('.nav-admin-item')) {
     document.querySelectorAll('.nav-admin-item.ouvert').forEach(i => i.classList.remove('ouvert'));
   }
 });
-
 function appliquerCouleursHex() {
   document.querySelectorAll('input.form-ctrl').forEach(input => {
     const val = (input.value || '').trim();
@@ -140,7 +128,6 @@ function appliquerCouleursHex() {
     }
   });
 }
-
 function afficherSection(id, bouton) {
   setTimeout(appliquerCouleursHex, 300);
   history.pushState({ section: id }, '', '#' + id);
@@ -196,7 +183,6 @@ if (id === 'familles')       afficherFamilles();
   
   if (id === 'entrer-facture') efInit();
 }
-
 // ─── STATS ACCUEIL ───
 async function validerConnexionAdmin() {
   const mdp = document.getElementById('input-mdp-admin')?.value;
@@ -209,7 +195,6 @@ async function validerConnexionAdmin() {
     if (err) err.textContent = 'Mot de passe incorrect.';
   }
 }
-
 function afficherStatsAccueil() {
   const nbPublics = donneesProduits.filter(p => p.statut === 'public').length;
   const statCol   = document.getElementById('admin-stat-collections');
@@ -217,7 +202,6 @@ function afficherStatsAccueil() {
   if (statCol)  statCol.textContent  = donneesCollections.length;
   if (statProd && nbPublics > 0) statProd.textContent = nbPublics + '+';
 }
-
 // ─── BURGER MOBILE ───
 function initBurgerAdmin() {
   const overlay = document.getElementById('sidebar-overlay');
@@ -236,19 +220,16 @@ function initBurgerAdmin() {
     dernierScroll = scrollActuel;
   });
 }
-
 function toggleSidebarAdmin() {
   document.getElementById('sidebar-admin').classList.toggle('ouvert');
   document.getElementById('sidebar-overlay').classList.toggle('visible');
 }
-
 function fermerSidebarMobile() {
   const sidebar = document.getElementById('sidebar-admin');
   const overlay = document.getElementById('sidebar-overlay');
   if (sidebar) sidebar.classList.remove('ouvert');
   if (overlay) overlay.classList.remove('visible');
 }
-
 // ─── MESSAGES ───
 function afficherMsg(zone, texte, type = 'succes') {
   const el = document.getElementById('msg-' + zone);
@@ -269,7 +250,6 @@ function afficherMsg(zone, texte, type = 'succes') {
   setTimeout(() => toast.classList.add('visible'), 10);
   setTimeout(() => toast.classList.remove('visible'), 3000);
 }
-
 // ─── COULEUR PAR NOM ───
 function couleurTexteContraste(hex) {
   if (!hex || !hex.startsWith('#')) return 'carte-infos-clair';
@@ -279,27 +259,22 @@ function couleurTexteContraste(hex) {
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance > 0.5 ? 'carte-infos-fonce' : 'carte-infos-clair';
 }
-
 function stringToColor(str) {
   const palette = ['#5a8a3a','#4a7c9e','#9b6b9b','#c4773a','#3a8a7a','#8a5a3a','#6b7a3a','#9b3a5a','#3a5a8a'];
   let h = 0;
   for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h);
   return palette[Math.abs(h) % palette.length];
 }
-
 /* ════════════════════════════════
    COLLECTIONS V2
 ════════════════════════════════ */
 var donneesCollections = []; // [{col_id, rang, nom, slogan, description, couleur_hex, photo_url, photo_noel_url}]
 var donneesGammes      = []; // [{gam_id, col_id, rang, nom, description, couleur_hex, photo_url, photo_noel_url}]
 var filtreGammesColId  = '';
-
 /* ════════════════════════════════
    FAMILLES V2
 ════════════════════════════════ */
 var donneesFamilles = [];
-
-
 async function chargerFamilles() {
   afficherChargement();
   const [resCol, resFam] = await Promise.all([
@@ -312,7 +287,6 @@ async function chargerFamilles() {
   cacherChargement();
   afficherFamilles();
 }
-
 function afficherFamilles() {
   const loading = document.getElementById('loading-familles');
   const contenu = document.getElementById('contenu-familles');
@@ -343,7 +317,6 @@ function afficherFamilles() {
   html += '</div>';
   contenu.innerHTML = html;
 }
-
 function ouvrirFicheFamille(fam_id) {
   const fam = donneesFamilles.find(f => f.fam_id === fam_id);
   if (!fam) return;
@@ -372,14 +345,12 @@ function ouvrirFicheFamille(fam_id) {
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
-
 function fermerFicheFamille() {
   document.getElementById('fiche-famille').classList.add('cache');
   document.getElementById('contenu-familles').classList.remove('cache');
   const btnNew = document.getElementById('btn-nouvelle-famille');
   if (btnNew) btnNew.classList.remove('cache');
 }
-
 function peuplerPositionFamille(col_id, rangActuel) {
   const selGam = document.getElementById('ff-gamme');
   if (selGam) {
@@ -406,7 +377,6 @@ function peuplerPositionFamille(col_id, rangActuel) {
       selPos.appendChild(o);
     });
 }
-
 function ouvrirFormFamille() {
   fermerFicheFamille();
   document.getElementById('form-familles-titre').textContent = 'Nouvelle famille';
@@ -2209,6 +2179,7 @@ function rafraichirListeFormatsRecette() {
 
 // ─── LISTES DROPDOWN V2 ───
 var listesDropdown = { types: [], fullData: [], config: {}, fournisseurs: [], formats: [] };
+const CATS_SANS_INCI = ['CAT-1776369774938', 'CAT-1776641557249', 'CAT-014'];
 
 function afficherChargement() {
   document.getElementById('overlay-chargement')?.classList.remove('cache');
@@ -2618,7 +2589,7 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
 
   inciDonnees.forEach(l => {
     if (recherche && !(l.nom_UC || '').toLowerCase().includes(recherche)) return;
-    const catsSansInci = ['CAT-1776369774938', 'CAT-1776641557249', 'CAT-014'];
+    const catsSansInci = CATS_SANS_INCI;
     const exempteSansInci = catsSansInci.includes(l.cat_id);
     if (filtreStatut === 'a-valider' && (l.inci || exempteSansInci)) return;
     if (filtreStatut === 'valide'    && !l.inci && !exempteSansInci) return;
@@ -2668,7 +2639,7 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
 }
 
 function inciRendreLigne(l, cat, uid) {
-  const catsSansInci2 = ['CAT-1776369774938', 'CAT-1776641557249', 'CAT-014'];
+  const catsSansInci2 = CATS_SANS_INCI;
   const aInci      = !!l.inci || catsSansInci2.includes(l.cat_id);
   const statutLabel = aInci ? '✅' : '🔴';
   const id         = `inci-${uid}`;
@@ -3329,9 +3300,10 @@ async function sauvegarderLot() {
     date_disponibilite: dateDispo,
     format_poids:       formatVal.poids || '',
     format_unite:       formatVal.unite || '',
-    cout_ingredients:   cout,
+    nb_unites_format:   nbUnitesFormat,
+    cout_ingredients:   coutParUnite * nbUnites,
     cout_emballages:    0,
-    cout_revient_total: cout,
+    cout_revient_total: coutParUnite * nbUnites,
     cout_par_unite:     coutParUnite
   });
 
