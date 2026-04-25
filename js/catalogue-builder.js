@@ -857,12 +857,6 @@ function cbDeselectionner() { cbSelId=null; cbRendreCanvas(); cbRendreProps(); c
 function cbZoomCanvas(val) {
   const label = document.getElementById('cb-zoom-canvas-label');
   if (label) label.textContent = val + '%';
-  const scale = parseFloat(val) / 100;
-  const inner = document.getElementById('cb-canvas-inner');
-  if (!inner) return;
-  inner.style.transform = `scale(${scale})`;
-  inner.style.transformOrigin = 'top left';
-  inner.style.marginBottom = `-${Math.round(CB_H * (1-scale))}px`;
 }
 
 // ─── FICHE PRODUIT ───────────────────────────────────────────────────────────
