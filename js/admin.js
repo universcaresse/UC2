@@ -2890,33 +2890,10 @@ async function chargerContenuSite() {
     const el = document.getElementById('cs-' + cle);
     if (el) el.value = c[cle];
   });
-  const btnSaisonnier = document.getElementById('btn-mode-saisonnier');
-  if (btnSaisonnier) {
-    const actif = c.mode_saisonnier === 'oui';
-    btnSaisonnier.textContent = actif ? '🌲 Mode saisonnier ON' : '🌲 Mode saisonnier OFF';
-    btnSaisonnier.classList.toggle('bouton', actif);
-    btnSaisonnier.classList.toggle('bouton-vert-pale', !actif);
-  }
+  
   if (corps) corps.classList.remove('cache');
 }
 
-async function toggleModeSaisonnier() {
-  afficherChargement();
-  const res    = await appelAPI('getContenu');
-  if (!res || !res.success) return;
-  const actuel = res.contenu.mode_saisonnier || 'non';
-  const nouveau = actuel === 'oui' ? 'non' : 'oui';
-  const data   = await appelAPIPost('updateContenu', { contenu: { mode_saisonnier: nouveau } });
-  if (data && data.success) {
-    cacherChargement();
-    document.getElementById('btn-mode-saisonnier').textContent = nouveau === 'oui' ? '🌲 Mode saisonnier ON' : '🌲 Mode saisonnier OFF';
-    document.getElementById('btn-mode-saisonnier').classList.toggle('btn-primary', nouveau === 'oui');
-    document.getElementById('btn-mode-saisonnier').classList.toggle('bouton-vert-pale', nouveau !== 'oui');
-    afficherMsg('contenu-site', nouveau === 'oui' ? 'Mode saisonnier activé.' : 'Mode saisonnier désactivé.');
-  } else {
-    cacherChargement();
-  }
-}
 
 async function sauvegarderContenuSite() {
   afficherChargement();
@@ -2940,21 +2917,31 @@ async function sauvegarderContenuSite() {
 /* ════════════════════════════════
    FABRICATION V2
 ════════════════════════════════ */
+var _lotsData = [];
+
 async function chargerFabrication() {
   afficherChargement();
   document.getElementById('loading-fabrication').classList.remove('cache');
   document.getElementById('contenu-fabrication').innerHTML = '';
-  // V2 : getLots
   const res = await appelAPI('getLots');
   document.getElementById('loading-fabrication').classList.add('cache');
   if (!res || !res.success) { cacherChargement(); afficherMsg('fabrication', '❌ Erreur de chargement.'); return; }
+  _lotsData = res.items || [];
   cacherChargement();
-  afficherTableauFabrication(res.items || []);
+  afficherTableauFabrication(_lotsData);
 }
 
 function fabToggleAccordeon(el) {
   const body = el.nextElementSibling;
   body.classList.toggle('cache');
+}
+
+function fabToggleLot(lot_id) {
+  const detail = document.getElementById(`fab-detail-${lot_id}`);
+  if (!detail) return;
+  const estOuvert = !detail.classList.contains('cache');
+  document.querySelectorAll('.fab-lot-detail').forEach(d => d.classList.add('cache'));
+  if (!estOuvert) detail.classList.remove('cache');
 }
 
 function afficherTableauFabrication(lots) {
@@ -2979,7 +2966,37 @@ function afficherTableauFabrication(lots) {
     return Object.values(groupes).sort((a, b) => a.collection.localeCompare(b.collection) || a.gamme.localeCompare(b.gamme));
   }
 
-  function rendreBlocStatut(titre, total, liste, colonnes, rendreLigne) {
+  function rendreLot(l) {
+    const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
+    return `
+      <tr class="ligne-cliquable" onclick="fabToggleLot('${l.lot_id}')">
+        <td>${pro?.nom || l.pro_id}</td>
+        <td>${l.date_fabrication}</td>
+        <td>${l.date_disponibilite}</td>
+        <td>${l.nb_unites}</td>
+        <td>${l.cout_par_unite ? parseFloat(l.cout_par_unite).toFixed(2) + ' $' : '—'}</td>
+      </tr>
+      <tr class="fab-lot-detail cache" id="fab-detail-${l.lot_id}">
+        <td colspan="5">
+          <div class="form-grille" style="padding:12px 0">
+            <div class="form-groupe">
+              <label class="form-label">Nb unités</label>
+              <input type="number" class="form-ctrl" id="fab-edit-unites-${l.lot_id}" value="${l.nb_unites}" min="0">
+            </div>
+            <div class="form-groupe">
+              <label class="form-label">Date de fabrication</label>
+              <input type="date" class="form-ctrl" id="fab-edit-date-${l.lot_id}" value="${l.date_fabrication}">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="bouton bouton-petit" onclick="modifierLot('${l.lot_id}')">Sauvegarder</button>
+            <button class="bouton bouton-petit bouton-rouge" onclick="supprimerLot('${l.lot_id}')">Supprimer</button>
+          </div>
+        </td>
+      </tr>`;
+  }
+
+  function rendreBlocStatut(titre, total, liste) {
     let h = `<div class="carte-admin">
       <div class="carte-admin-entete">${titre} <span class="texte-secondaire">${total} savon${total !== 1 ? 's' : ''}</span></div>`;
     if (liste.length === 0) {
@@ -2994,8 +3011,10 @@ function afficherTableauFabrication(lots) {
             <span class="texte-secondaire">${totalGroupe} savon${totalGroupe !== 1 ? 's' : ''}</span>
           </div>
           <div class="form-body">
-            <table class="table-admin"><thead><tr>${colonnes.map(c => `<th>${c}</th>`).join('')}</tr></thead>
-            <tbody>${g.lots.map(rendreLigne).join('')}</tbody></table>
+            <table class="tableau-admin">
+              <thead><tr><th>Produit</th><th>Fabriqué le</th><th>Disponible le</th><th>Unités</th><th>Coût/unité</th></tr></thead>
+              <tbody>${g.lots.map(rendreLot).join('')}</tbody>
+            </table>
           </div>
         </div>`;
       });
@@ -3005,27 +3024,9 @@ function afficherTableauFabrication(lots) {
   }
 
   let html = '';
-  html += rendreBlocStatut('EN CURE', totalEnCure, enCure,
-    ['Produit', 'Fabriqué le', 'Disponible le', 'Unités'],
-    l => {
-      const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
-      return `<tr><td>${pro?.nom || l.pro_id}</td><td>${l.date_fabrication}</td><td>${l.date_disponibilite}</td><td>${l.nb_unites}</td></tr>`;
-    }
-  );
-  html += rendreBlocStatut('DISPONIBLE', totalDisponibles, disponibles,
-    ['Produit', 'Disponible le', 'Unités', 'Coût/unité'],
-    l => {
-      const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
-      return `<tr><td>${pro?.nom || l.pro_id}</td><td>${l.date_disponibilite}</td><td>${l.nb_unites}</td><td>${l.cout_par_unite ? parseFloat(l.cout_par_unite).toFixed(2) + ' $' : '—'}</td></tr>`;
-    }
-  );
-  html += rendreBlocStatut('ÉPUISÉ', totalEpuises, epuises,
-    ['Produit', 'Fabriqué le', 'Unités', 'Coût/unité'],
-    l => {
-      const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
-      return `<tr><td>${pro?.nom || l.pro_id}</td><td>${l.date_fabrication}</td><td>${l.nb_unites}</td><td>${l.cout_par_unite ? parseFloat(l.cout_par_unite).toFixed(2) + ' $' : '—'}</td></tr>`;
-    }
-  );
+  html += rendreBlocStatut('EN CURE', totalEnCure, enCure);
+  html += rendreBlocStatut('DISPONIBLE', totalDisponibles, disponibles);
+  html += rendreBlocStatut('ÉPUISÉ', totalEpuises, epuises);
   document.getElementById('contenu-fabrication').innerHTML = html;
 }
 
@@ -3037,6 +3038,7 @@ function ouvrirFormFabrication(existant) {
     opt.value = c.col_id; opt.textContent = c.nom;
     selectCol.appendChild(opt);
   });
+  document.getElementById('fab-gamme').innerHTML = '<option value="">— Toutes les gammes —</option>';
   document.getElementById('fab-recette').innerHTML = '<option value="">— Choisir un produit —</option>';
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('fab-date').value = existant ? '' : today;
@@ -3049,12 +3051,25 @@ function ouvrirFormFabrication(existant) {
   document.getElementById('form-fabrication').classList.remove('cache');
 }
 
+function fabFiltrerGammes() {
+  const col_id = document.getElementById('fab-collection').value;
+  const select = document.getElementById('fab-gamme');
+  select.innerHTML = '<option value="">— Toutes les gammes —</option>';
+  const gammes = donneesGammes.filter(g => !col_id || g.col_id === col_id).sort((a, b) => (a.rang || 99) - (b.rang || 99));
+  gammes.forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g.gam_id; opt.textContent = g.nom; select.appendChild(opt);
+  });
+  fabFiltrerRecettes();
+}
+
 function fabFiltrerRecettes() {
   const col_id = document.getElementById('fab-collection').value;
+  const gam_id = document.getElementById('fab-gamme').value;
   const select = document.getElementById('fab-recette');
   select.innerHTML = '<option value="">— Choisir un produit —</option>';
   const produits = donneesProduits
-    .filter(p => p.statut !== 'archive' && (!col_id || p.col_id === col_id))
+    .filter(p => p.statut !== 'archive' && (!col_id || p.col_id === col_id) && (!gam_id || p.gam_id === gam_id))
     .sort((a, b) => (a.nom || '').localeCompare(b.nom || ''));
   produits.forEach(p => {
     const opt = document.createElement('option');
@@ -3112,6 +3127,48 @@ function calculerApercuLot() {
   document.getElementById('fab-apercu-dispo').textContent  = dateDispo;
   document.getElementById('fab-apercu-cout').textContent   = '—';
   document.getElementById('fab-apercu').classList.remove('cache');
+}
+
+async function modifierLot(lot_id) {
+  const lot = _lotsData.find(l => l.lot_id === lot_id);
+  if (!lot) return;
+  const pro = donneesProduits.find(p => p.pro_id === lot.pro_id);
+  const cure = pro ? (pro.cure || 0) : 0;
+  const d = new Date(lot.date_fabrication);
+  d.setDate(d.getDate() + cure);
+  const dateDispo = d.toISOString().split('T')[0];
+  confirmerAction('Sauvegarder les modifications ?', async () => {
+    afficherChargement();
+    const nbUnites = parseInt(document.getElementById(`fab-edit-unites-${lot_id}`).value) || 0;
+    const dateFab  = document.getElementById(`fab-edit-date-${lot_id}`).value;
+    const d2 = new Date(dateFab);
+    d2.setDate(d2.getDate() + cure);
+    const dateDispo2 = d2.toISOString().split('T')[0];
+    const res = await appelAPIPost('updateLot', { lot_id, nb_unites: nbUnites, date_fabrication: dateFab, date_disponibilite: dateDispo2 });
+    if (res && res.success) {
+      cacherChargement();
+      afficherMsg('fabrication', 'Lot mis à jour.');
+      chargerFabrication();
+    } else {
+      cacherChargement();
+      afficherMsg('fabrication', 'Erreur.', 'erreur');
+    }
+  });
+}
+
+async function supprimerLot(lot_id) {
+  confirmerAction('Supprimer ce lot ?', async () => {
+    afficherChargement();
+    const res = await appelAPIPost('deleteLot', { lot_id });
+    if (res && res.success) {
+      cacherChargement();
+      afficherMsg('fabrication', 'Lot supprimé.');
+      chargerFabrication();
+    } else {
+      cacherChargement();
+      afficherMsg('fabrication', 'Erreur.', 'erreur');
+    }
+  });
 }
 
 async function sauvegarderLot() {

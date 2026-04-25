@@ -1540,15 +1540,22 @@
 
                 <div class="form-groupe col-plein">
                   <label class="form-label">Collection</label>
-                  <select id="fab-collection" class="form-ctrl" onchange="fabFiltrerRecettes()">
+                  <select id="fab-collection" class="form-ctrl" onchange="fabFiltrerGammes()">
                     <option value="">— Choisir une collection —</option>
                   </select>
                 </div>
 
                 <div class="form-groupe">
-                  <label class="form-label">Recette</label>
+                  <label class="form-label">Gamme</label>
+                  <select id="fab-gamme" class="form-ctrl" onchange="fabFiltrerRecettes()">
+                    <option value="">— Toutes les gammes —</option>
+                  </select>
+                </div>
+
+                <div class="form-groupe">
+                  <label class="form-label">Produit</label>
                   <select id="fab-recette" class="form-ctrl" onchange="fabFiltrerFormats()">
-                    <option value="">— Choisir une recette —</option>
+                    <option value="">— Choisir un produit —</option>
                   </select>
                 </div>
 
