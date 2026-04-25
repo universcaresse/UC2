@@ -472,9 +472,12 @@ function cbRendreVoisin() {
     pageVoisine.blocs.forEach(b=>voisin.appendChild(cbCreerBlocEl(b,false)));
   }
 
+  const inner = document.getElementById('cb-canvas-inner');
   const canvasActif = document.getElementById('cb-canvas');
-  if (estPaire) canvasActif.after(voisin);
-  else canvasActif.before(voisin);
+  if (inner) {
+    if (estPaire) inner.appendChild(voisin);
+    else inner.insertBefore(voisin, canvasActif);
+  }
 }
 
 // ─── PROPRIÉTÉS ──────────────────────────────────────────────────────────────
