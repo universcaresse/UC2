@@ -3271,7 +3271,7 @@ async function sauvegarderLot() {
   const multi    = parseInt(document.getElementById('fab-multiplicateur').value) || 1;
   const nbUnites = mode === 'existant'
     ? parseInt(document.getElementById('fab-nb-unites').value) || 0
-    : (parseInt(opt.dataset.nbUnites) || 1) * multi;
+    : nbUnitesFormat * multi;
   const cure    = parseInt(opt.dataset.cure) || 0;
   const dateFab = document.getElementById('fab-date').value;
   if (!dateFab) { cacherChargement(); afficherMsg('fabrication', '❌ Date de fabrication requise.'); return; }
