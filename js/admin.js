@@ -3754,6 +3754,7 @@ function modifierPromotion(promo_id) {
   });
   selFam.value = p.fam_id || '';
   fpMettreAJourChamps();
+  document.getElementById('fp-btn-supprimer').classList.remove('cache');
   document.getElementById('form-promotion').classList.remove('cache');
   document.getElementById('contenu-promotions').classList.add('cache');
   window.scrollTo(0, 0);
