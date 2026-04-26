@@ -374,7 +374,7 @@ async function afficherRegroupementsPublic() {
   res.items.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(fra => {
     const couleurs = couleurCollection(fra.nom, fra.couleur_hex);
     strip.innerHTML += `
-      <a href="#regroupement" onclick="ouvrirRegroupement('${fra.ing_id}', '${(fra.nom || '').replace(/'/g, '')}', '${(fra.description || '').replace(/'/g, '')}')" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
+      <a href="javascript:void(0)" onclick="ouvrirRegroupement('${fra.ing_id}', '${(fra.nom || '').replace(/'/g, '')}', '${(fra.description || '').replace(/'/g, '')}')" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
         <div class="collection-tile-bg"></div>
         <div class="collection-tile-overlay"></div>
         <div class="collection-tile-content">
