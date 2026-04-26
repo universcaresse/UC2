@@ -3616,7 +3616,9 @@ function venAjouterLigne() {
   const prix = formatProduit?.prix_vente || 0;
   venPanier.push({ pro_id, lot_id: format.lot_id, nom: pro?.nom || '', poids: format.poids, unite: format.unite, quantite: qte, prix_unitaire: prix });
   venRafraichirPanier();
-  document.getElementById('ven-produit').value = '';
+  document.getElementById('ven-collection').value = '';
+  document.getElementById('ven-gamme').innerHTML = '<option value="">— Toutes —</option>';
+  document.getElementById('ven-produit').innerHTML = '<option value="">— Choisir —</option>';
   document.getElementById('ven-format').innerHTML = '<option value="">— Choisir —</option>';
   document.getElementById('ven-quantite').value = '1';
   document.getElementById('ven-prix').value = '';
