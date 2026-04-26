@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await chargerDonneesInitiales();
 });
 async function chargerDonneesInitiales() {
-const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt] = await Promise.all([
+const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resPromo] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getGammes'),
     appelAPI('getFamilles'),
@@ -50,7 +50,8 @@ const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt] = await
     appelAPI('getIngredientsInci'),
     appelAPI('getConfig'),
     appelAPI('getCategoriesUC'),
-    appelAPI('getProduitsFormats')
+    appelAPI('getProduitsFormats'),
+    appelAPI('getPromotions')
   ]);
   if (resCol && resCol.success) {
     donneesCollections = resCol.items || [];
@@ -94,6 +95,10 @@ if (resGam && resGam.success) {
     (resCfg.items || []).forEach(c => {
       listesDropdown.config[c.cat_id] = { densite: c.densite, unite: c.unite, margePertePct: c.marge_perte_pct };
     });
+  }
+
+  if (resPromo && resPromo.success) {
+    donneesPromotions = resPromo.items || [];
   }
 
   const nbPublics = donneesProduits.filter(p => p.statut === 'public').length;
@@ -3628,7 +3633,7 @@ function venRafraichirPanier() {
       <span style="flex:1">${formaterPrix(l.prix_unitaire * l.quantite)}</span>
       <button class="bouton bouton-petit bouton-rouge" onclick="venSupprimerLigne(${i})">✕</button>
     </div>`).join('');
-  venCalculerTotal();
+  venMettreAJourPromos();
 }
 
 function venSupprimerLigne(i) {
@@ -3639,9 +3644,111 @@ function venSupprimerLigne(i) {
 function venCalculerTotal() {
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
-  const total     = sousTotal + livraison;
+  const rabais    = venCalculerRabais();
+  const total     = sousTotal + livraison - rabais;
   document.getElementById('ven-sous-total').value = formaterPrix(sousTotal);
-  document.getElementById('ven-total').value      = formaterPrix(total);
+  document.getElementById('ven-total').value      = formaterPrix(Math.max(0, total));
+}
+
+function venCalculerRabais() {
+  const sel = document.getElementById('ven-promotion');
+  if (!sel || !sel.value) return 0;
+  const data = JSON.parse(sel.value);
+  if (!data || data.statut !== 'applicable') return 0;
+  const p = donneesPromotions.find(x => x.promo_id === data.promo_id);
+  if (!p) return 0;
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  if (p.type === 'qte_produit') {
+    let rabais = 0;
+    venPanier.forEach(l => {
+      const qteTotale = venPanier.filter(x => x.pro_id === l.pro_id).reduce((s, x) => s + x.quantite, 0);
+      if (qteTotale >= p.quantite_min) rabais += p.valeur * l.quantite;
+    });
+    return rabais;
+  }
+  if (p.type === 'qte_panier' || p.type === 'lot_complet' || p.type === 'ensemble_famille') {
+    return sousTotal * (p.valeur / 100);
+  }
+  return 0;
+}
+
+function venMettreAJourPromos() {
+  const sel = document.getElementById('ven-promotion');
+  if (!sel) return;
+  const valActuelle = sel.value ? JSON.parse(sel.value)?.promo_id : '';
+  sel.innerHTML = '<option value="">— Aucune —</option>';
+
+  const totalPanier = venPanier.reduce((s, l) => s + l.quantite, 0);
+
+  donneesPromotions.forEach(p => {
+    let statut = '';
+    let manque = 0;
+
+    if (p.type === 'qte_produit') {
+      const maxQteMemeProduit = Math.max(...Object.values(
+        venPanier.reduce((acc, l) => { acc[l.pro_id] = (acc[l.pro_id] || 0) + l.quantite; return acc; }, {})
+      ).concat([0]));
+      if (maxQteMemeProduit >= p.quantite_min) statut = 'applicable';
+      else { manque = p.quantite_min - maxQteMemeProduit; if (manque <= p.quantite_seuil) statut = 'presque'; }
+    }
+    else if (p.type === 'qte_panier') {
+      if (totalPanier >= p.quantite_min) statut = 'applicable';
+      else { manque = p.quantite_min - totalPanier; if (manque <= p.quantite_seuil) statut = 'presque'; }
+    }
+    else if (p.type === 'lot_complet') {
+      const applicable = venPanier.some(l => {
+        const pro = donneesProduits.find(x => x.pro_id === l.pro_id);
+        const fmt = (pro?.formats || []).find(f => String(f.poids) === String(l.poids) && f.unite === l.unite);
+        return fmt && l.quantite >= (fmt.nb_unites || 0) && fmt.nb_unites > 0;
+      });
+      if (applicable) statut = 'applicable';
+    }
+    else if (p.type === 'ensemble_famille') {
+      if (!p.fam_id) return;
+      const produitsFamille = donneesProduits.filter(x => x.fam_id === p.fam_id);
+      const proIdsVendus = new Set(venPanier.map(l => l.pro_id));
+      const manquants = produitsFamille.filter(x => !proIdsVendus.has(x.pro_id));
+      if (!manquants.length) statut = 'applicable';
+      else { manque = manquants.length; if (manque <= p.quantite_seuil) statut = 'presque'; }
+    }
+
+    if (!statut) return;
+
+    const o = document.createElement('option');
+    o.value = JSON.stringify({ promo_id: p.promo_id, statut });
+    const prefix = statut === 'applicable' ? '✅ ' : `🔜 (manque ${manque}) `;
+    o.textContent = prefix + p.nom;
+    if (statut === 'presque') o.style.color = 'var(--accent)';
+    sel.appendChild(o);
+    if (p.promo_id === valActuelle) o.selected = true;
+  });
+
+  venAppliquerPromotion();
+}
+
+function venAppliquerPromotion() {
+  const sel = document.getElementById('ven-promotion');
+  const info = document.getElementById('ven-promo-info');
+  if (!sel.value) { info.style.display = 'none'; venCalculerTotal(); return; }
+  const data = JSON.parse(sel.value);
+  const p = donneesPromotions.find(x => x.promo_id === data.promo_id);
+  if (!p) { info.style.display = 'none'; venCalculerTotal(); return; }
+
+  if (data.statut === 'presque') {
+    info.style.display = 'block';
+    info.style.borderLeftColor = 'var(--accent)';
+    info.style.background = 'var(--accent-08)';
+    info.textContent = '🔜 Pas encore applicable — encouragez le client à compléter sa commande !';
+    venCalculerTotal();
+    return;
+  }
+
+  const rabais = venCalculerRabais();
+  info.style.display = 'block';
+  info.style.borderLeftColor = 'var(--primary)';
+  info.style.background = 'var(--primary-06)';
+  info.textContent = `✅ Rabais appliqué : -${formaterPrix(rabais)}`;
+  venCalculerTotal();
 }
 
 async function finaliserVente() {

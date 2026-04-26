@@ -1755,6 +1755,22 @@
             </div>
           </div>
 
+          <!-- PROMOTION -->
+          <div class="form-panel visible">
+            <div class="form-panel-header">
+              <span class="form-panel-titre">Promotion</span>
+            </div>
+            <div class="form-body">
+              <div class="form-groupe">
+                <label class="form-label">Choisir une promotion</label>
+                <select class="form-ctrl" id="ven-promotion" onchange="venAppliquerPromotion()">
+                  <option value="">— Aucune —</option>
+                </select>
+              </div>
+              <div id="ven-promo-info" style="display:none;margin-top:12px;padding:12px;background:var(--primary-06);border-left:3px solid var(--primary);font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--gris-fonce)"></div>
+            </div>
+          </div>
+
           <div class="form-panel form-body-actions">
             <div class="form-actions">
               <button class="bouton bouton-contour" onclick="fermerFormVente()">Annuler</button>
