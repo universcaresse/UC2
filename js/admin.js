@@ -3872,7 +3872,18 @@ async function finaliserVente() {
     await appelAPIPost('addVenteLigne', { ven_id, pro_id: l.pro_id, lot_id: l.lot_id, quantite: l.quantite, prix_unitaire: l.prix_unitaire, format_poids: l.poids, format_unite: l.unite });
   }
 
-  const resFin = await appelAPIPost('finaliserVente', { ven_id, livraison });
+  const promoSel  = document.getElementById('ven-promotion').value;
+  const promoData = promoSel ? JSON.parse(promoSel) : null;
+  const rabais    = venCalculerRabais();
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const total_net = Math.max(0, sousTotal + livraison - rabais);
+  const resFin = await appelAPIPost('finaliserVente', {
+    ven_id,
+    livraison,
+    promo_id: promoData?.promo_id || '',
+    rabais,
+    total_net
+  });
   if (!resFin || !resFin.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur'); return; }
 
   cacherChargement();
