@@ -731,6 +731,20 @@ function filtrerRegroupement(col_id) {
 }
 
 function filtrerGamme(gam_id, col_id) {
+  if (!col_id) return;
+  const conteneur = document.querySelector(`.collection-filtres-gammes[data-collection-filtres="${col_id}"]`);
+  if (conteneur) {
+    conteneur.querySelectorAll('[data-filtre-gamme]').forEach(b => b.classList.remove('actif'));
+    const btn = conteneur.querySelector(`[data-filtre-gamme="${gam_id}"]`);
+    if (btn) btn.classList.add('actif');
+  }
+  const section = document.querySelector(`.collection-section[data-collection="${col_id}"]`);
+  if (section) {
+    section.querySelectorAll('.ligne-groupe').forEach(g => {
+      g.classList.toggle('masquee', gam_id !== 'tout' && g.dataset.gamme !== gam_id);
+    });
+  }
+}
 
 // ─── MODAL PRODUIT ───
 // V2 : produit.nom_collection, produit.nom_gamme, produit.formats, produit.ingredients
