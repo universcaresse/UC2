@@ -3974,7 +3974,6 @@ function fermerFicheRegroupement() {
 }
 
 function ouvrirFormRegroupement() {
-  fermerFicheRegroupement();
   document.getElementById('form-regroupements-titre').textContent = 'Nouveau regroupement';
   document.getElementById('freg-id').value          = '';
   const selCat = document.getElementById('freg-cat');
@@ -3993,6 +3992,7 @@ function ouvrirFormRegroupement() {
   peuplerPositionRegroupement(null);
   document.getElementById('contenu-regroupements').classList.add('cache');
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
+  document.getElementById('fiche-regroupement').classList.add('cache');
   document.getElementById('form-regroupements').classList.remove('cache');
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
