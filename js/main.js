@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     donneesCatalogue = resCat;
     afficherCollectionsPublic();
     afficherNbProduits();
+    afficherRegroupementsPublic();
     document.querySelectorAll('.hero-stat-num').forEach(el => setTimeout(() => el.classList.add('visible'), 50));
   }
 });
@@ -359,6 +360,29 @@ function afficherNbProduits() {
   const nb = (donneesCatalogue.produits || []).length;
   const statProd = document.getElementById('hero-stat-produits');
   if (nb > 0 && statProd) statProd.textContent = nb + '+';
+}
+
+async function afficherRegroupementsPublic() {
+  const strip = document.getElementById('regroupements-strip');
+  if (!strip) return;
+  const res = await appelAPI('getRegroupements');
+  if (!res || !res.success || !res.items || !res.items.length) {
+    strip.closest('.section-collections')?.classList.add('cache');
+    return;
+  }
+  strip.innerHTML = '';
+  res.items.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(fra => {
+    const couleurs = couleurCollection(fra.nom, fra.couleur_hex);
+    strip.innerHTML += `
+      <a href="#catalogue" onclick="naviguer('catalogue')" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
+        <div class="collection-tile-bg"></div>
+        <div class="collection-tile-overlay"></div>
+        <div class="collection-tile-content">
+          <span class="collection-tile-name">${(fra.nom || '').toUpperCase()}</span>
+          <span class="collection-tile-slogan">${fra.description || ''}</span>
+        </div>
+      </a>`;
+  });
 }
 
 function afficherCollectionsFallback() {
