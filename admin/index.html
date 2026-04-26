@@ -1494,24 +1494,8 @@
         </div>
       </div>
 
-<!-- FABRICATION -->
-      <!-- ════════════════════════════════════════
-     FABRICATION — Lots de production
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       chargerFabrication()
-       afficherTableauFabrication()
-       ouvrirFormFabrication()
-       fermerFormFabrication()
-       fabFiltrerRecettes()
-       fabFiltrerFormats()
-       calculerApercuLot()
-
-     CSS (style.css)
-       .carte-admin, .carte-admin-entete
-     ════════════════════════════════════════ -->
-      <div class="section-admin" id="section-fabrication">
+	<!-- FABRICATION -->
+       <div class="section-admin" id="section-fabrication">
         <div class="page-entete fade-in">
           <div class="page-entete-gauche">
             <div class="page-entete-eyebrow">Production</div>
@@ -1640,7 +1624,7 @@
 
       </div>
 
-    <!-- VENTES -->
+	<!-- VENTES -->
       <div class="section-admin" id="section-ventes">
         <div class="page-entete fade-in">
           <div>
@@ -1779,20 +1763,8 @@
           </div>
         </div>
       </div>
-
-      <!-- INVENTAIRE PRODUCTION -->
-      <!-- ════════════════════════════════════════
-     INVENTAIRE PRODUCTION — Lots fabriqués
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       ⚠️ Cette section redirige vers section-inventaire
-       afficherSection('inventaire')
-
-     CSS (style.css)
-       .inv-section, .inv-header, .inv-titre, .inv-line
-     ════════════════════════════════════════ -->
-      <div class="section-admin" id="section-inventaire-production">
+	<!-- INVENTAIRE PRODUCTION -->
+        <div class="section-admin" id="section-inventaire-production">
         <div class="page-entete fade-in">
           <div class="page-entete-gauche">
             <div class="page-entete-eyebrow">Production</div>
@@ -1803,22 +1775,8 @@
         <div class="chargement" id="loading-inventaire-production"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div id="contenu-inventaire-production"></div>
       </div>
-
     <!-- CONTENU DU SITE -->
-      <!-- ════════════════════════════════════════
-     CONTENU DU SITE — Textes du site public
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       chargerContenuSite()
-       sauvegarderContenuSite()
-       toggleModeSaisonnier()
-
-     CSS (style.css)
-       .form-panel, .form-panel-header, .form-panel-titre
-       .form-grille, .form-groupe, .form-ctrl
-     ════════════════════════════════════════ -->
-      <div class="section-admin" id="section-contenu-site">
+        <div class="section-admin" id="section-contenu-site">
         <div class="page-entete fade-in">
           <div>
             <div class="page-entete-eyebrow">Textes affichés sur le site public</div>
@@ -2036,28 +1994,8 @@
 
         </div>
       </div>
-	
-
-      <!-- INCI -->
-      <!-- ════════════════════════════════════════
-     INCI — Ingrédients et validation
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-     ⚠️ LÉGAL — Ne jamais afficher un nom à la place d'un code INCI
-
-     JS (admin.js)
-       chargerInci()
-       inciAppliquerFiltres()
-       inciGetFiltres()
-       inciConstruireAccordeons()
-       inciRendreLigne()
-       inciToggleDetail() / inciToggleAccordeon()
-       inciValider()
-       retourRecetteDepuisInci()
-
-     CSS (style.css)
-       .filtres-bar, .filtre-btn, .filtre-label
-     ════════════════════════════════════════ -->
-      <div class="section-admin" id="section-inci">
+	<!-- INCI -->
+		<div class="section-admin" id="section-inci">
         <div class="page-entete fade-in">
           <div>
             <div class="page-entete-eyebrow">Validation des sources</div>
@@ -2066,7 +2004,6 @@
           <button class="bouton bouton-petit bouton-contour cache" id="btn-retour-recette" onclick="retourRecetteDepuisInci()">← Retour à la recette</button>
         </div>
         <div class="msg-zone" id="msg-inci"></div>
-
         <div class="filtres-bar" id="inci-filtres">
           <div class="filtres-ligne">
             <button class="bouton bouton-petit bouton-contour" onclick="document.getElementById('inci-filtres-avances').classList.toggle('cache')">Filtres</button>
@@ -2095,27 +2032,11 @@
             </div>
           </div>
         </div>
-
         <div class="chargement" id="loading-inci"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div id="inci-accordeons"></div>
       </div>
-
-      <!-- IMPORT RECETTES -->
-      <!-- ════════════════════════════════════════
-     IMPORT RECETTES — Importer via fichier .md
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       importLireFichier()
-       importEnLot()
-       importParserMD()
-       importEnvoyer()
-       importAnnuler()
-
-     CSS (style.css)
-       .carte-admin, .carte-admin-entete
-     ════════════════════════════════════════ -->
-      <div class="section-admin" id="section-import-recettes">
+    <!-- IMPORT RECETTES -->
+            <div class="section-admin" id="section-import-recettes">
         <div class="page-entete fade-in">
           <div class="page-entete-gauche">
             <p class="page-entete-eyebrow">Coller un fichier MD pour importer</p>
@@ -2212,21 +2133,7 @@
 </div>
       </div>
 
-      <!-- DENSITÉS -->
-     <!-- ════════════════════════════════════════
-     DENSITÉS — Facteurs de conversion ml → g
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       chargerDensites()
-       ouvrirFormDensite()
-       fermerFormDensite()
-       modifierDensite()
-       sauvegarderDensite()
-
-     CSS (style.css)
-       .tableau-admin, .tableau-wrap
-     ════════════════════════════════════════ -->
+    <!-- DENSITÉS -->
       <div class="section-admin" id="section-densites">
         <div class="page-entete fade-in">
           <div>
@@ -2244,8 +2151,7 @@
           <div class="form-body">
             <input type="hidden" id="fd-mode">
             <div class="form-grille">
-			
-          <div class="form-groupe">
+			          <div class="form-groupe">
                 <label class="form-label">Type d'ingrédient</label>
                 <select class="form-ctrl" id="fd-type"></select>
               </div>
@@ -2262,9 +2168,7 @@
                   <option value="kg">kg</option>
                 </select>
               </div>
-			  
-			  
-              <div class="form-groupe">
+			   <div class="form-groupe">
                 <label class="form-label">Marge de perte (%)</label>
                 <input type="text" inputmode="decimal" class="form-ctrl" id="fd-marge-perte">
               </div>
@@ -2289,42 +2193,19 @@
       </div>
 
 
-   <!-- ════════════════════════════════════════
-     MÉDIATHÈQUE — Photos Cloudinary
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       chargerMediatheque()
-       medFiltrer()
-       mediathequeOuvrirAjout()
-       mediathequeFermerAjout()
-       mediathequeSauvegarder()
-       mediathequeSyncCloudinary()
-       mediathequeSupprimer()
-       ouvrirMediatheque()
-       filtrerMediatheque()
-       peuplerFiltresCategoriesMediatheque()
-       selectionnerPhotoMediatheque()
-       fermerModalMediatheque()
-
-     CSS (style.css)
-       .carte-admin, .carte-admin-entete
-       .filtres-bar
-     ════════════════════════════════════════ -->
+   <!-- MÉDIATHÈQUE — Photos Cloudinary-->
     <div class="section-admin" id="section-mediatheque">
-  <div class="page-entete fade-in">
-    <div class="page-entete-gauche">
-      <div class="page-entete-eyebrow">Photos disponibles dans le sélecteur</div>
-      <div class="page-entete-titre">Médiathèque</div>
-    </div>
-    <div class="form-actions">
-      
-      <button class="bouton bouton-vert-pale" onclick="mediathequeSyncCloudinary()">↺ Synchroniser Cloudinary</button>
-    </div>
-  </div>
+		<div class="page-entete fade-in">
+			<div class="page-entete-gauche">
+				<div class="page-entete-eyebrow">Photos disponibles dans le sélecteur</div>
+					<div class="page-entete-titre">Médiathèque</div>
+			</div>
+			<div class="form-actions">
+			<button class="bouton bouton-vert-pale" onclick="mediathequeSyncCloudinary()">↺ Synchroniser Cloudinary</button>
+			</div>
+		</div>
   <div class="msg-zone" id="msg-mediatheque"></div>
-  
-  <div class="filtres-bar">
+    <div class="filtres-bar">
     <select class="form-ctrl filtre-select" id="med-filtre-cat" onchange="medFiltrer()">
       <option value="">Toutes les catégories</option>
     </select>
@@ -2332,25 +2213,9 @@
   </div>
   <div class="chargement cache" id="med-chargement"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
   <div id="med-grille" class="collections-grille"></div>
-  
-
 </div>
-
-
-
-
-
-
-
-
-
- <!-- CATALOGUE BUILDER -->
- 
- 
- 
- 
-<div class="section-admin" id="section-catalogue-builder">
-
+	<!-- CATALOGUE BUILDER -->
+	<div class="section-admin" id="section-catalogue-builder">
   <div class="page-entete fade-in">
     <div>
       <div class="page-entete-eyebrow">Mise en page du catalogue imprimable</div>
