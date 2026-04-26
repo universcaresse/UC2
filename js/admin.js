@@ -3520,7 +3520,8 @@ function ouvrirFormVente() {
   document.getElementById('ven-client').value = '';
   document.getElementById('ven-courriel').value = '';
   document.getElementById('ven-telephone').value = '';
-  document.getElementById('ven-paiement').value = 'argent';
+  document.getElementById('ven-paiement').value = '';
+  
   document.getElementById('ven-livraison').value = '0';
   document.getElementById('ven-sous-total').value = '';
   document.getElementById('ven-total').value = '';
@@ -3753,7 +3754,94 @@ function venAppliquerPromotion() {
   venCalculerTotal();
 }
 
-async function finaliserVente() {
+function ouvrirApercuFacture() {
+  if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
+  const paiement  = document.getElementById('ven-paiement').value;
+  if (!paiement) { afficherMsg('ventes', 'Choisir un mode de paiement.', 'erreur'); return; }
+
+  const client    = document.getElementById('ven-client').value;
+  const courriel  = document.getElementById('ven-courriel').value;
+  const telephone = document.getElementById('ven-telephone').value;
+  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais    = venCalculerRabais();
+  const total     = Math.max(0, sousTotal + livraison - rabais);
+  const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const promoSel  = document.getElementById('ven-promotion').value;
+  const promoData = promoSel ? JSON.parse(promoSel) : null;
+  const promo     = promoData ? donneesPromotions.find(p => p.promo_id === promoData.promo_id) : null;
+
+  let html = `
+    <div style="font-family:'DM Sans',sans-serif;color:var(--gris-fonce)">
+      <div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--beige)">
+        <div style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--primary)">Univers Caresse</div>
+        <div style="font-size:0.75rem;color:var(--gris);letter-spacing:0.1em;margin-top:4px">${date}</div>
+      </div>`;
+
+  if (client || courriel || telephone) {
+    html += `<div style="margin-bottom:16px;font-size:0.85rem;color:var(--gris)">`;
+    if (client)    html += `<div>${client}</div>`;
+    if (courriel)  html += `<div>${courriel}</div>`;
+    if (telephone) html += `<div>${telephone}</div>`;
+    html += `</div>`;
+  }
+
+  html += `<table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:0.85rem">
+    <thead>
+      <tr style="border-bottom:2px solid var(--beige)">
+        <th style="text-align:left;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Produit</th>
+        <th style="text-align:center;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Qté</th>
+        <th style="text-align:right;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Prix</th>
+        <th style="text-align:right;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Total</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  venPanier.forEach(l => {
+    html += `<tr style="border-bottom:1px solid var(--beige)">
+      <td style="padding:10px 0">${l.nom} — ${l.poids} ${l.unite}</td>
+      <td style="padding:10px 0;text-align:center">${l.quantite}</td>
+      <td style="padding:10px 0;text-align:right">${formaterPrix(l.prix_unitaire)}</td>
+      <td style="padding:10px 0;text-align:right">${formaterPrix(l.prix_unitaire * l.quantite)}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;font-size:0.85rem">
+      <div style="display:flex;justify-content:space-between;width:220px"><span style="color:var(--gris)">Sous-total</span><span>${formaterPrix(sousTotal)}</span></div>`;
+
+  if (rabais > 0 && promo) {
+    html += `<div style="display:flex;justify-content:space-between;width:220px;color:var(--primary)"><span>Rabais — ${promo.nom}</span><span>-${formaterPrix(rabais)}</span></div>`;
+  }
+  if (livraison > 0) {
+    html += `<div style="display:flex;justify-content:space-between;width:220px"><span style="color:var(--gris)">Livraison</span><span>${formaterPrix(livraison)}</span></div>`;
+  }
+
+  html += `<div style="display:flex;justify-content:space-between;width:220px;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--primary);border-top:1px solid var(--beige);padding-top:8px;margin-top:4px"><span>Total</span><span>${formaterPrix(total)}</span></div>
+      <div style="font-size:0.75rem;color:var(--gris);margin-top:4px">${paiement === 'argent' ? 'Comptant' : 'Carte'}</div>
+    </div>
+    <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--beige);font-family:'Playfair Display',serif;font-style:italic;color:var(--gris);font-size:0.9rem">Merci pour votre achat !</div>
+  </div>`;
+
+  document.getElementById('modal-fv-contenu').innerHTML = html;
+  document.getElementById('modal-fv-numero').textContent = venIdEnCours;
+  document.getElementById('modal-facture-vente').classList.add('ouvert');
+}
+
+function fermerApercuFacture() {
+  document.getElementById('modal-facture-vente').classList.remove('ouvert');
+}
+
+function envoyerFactureCourriel() {
+  const courriel = document.getElementById('ven-courriel').value;
+  if (!courriel) { afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur'); return; }
+  afficherMsg('ventes', 'Fonctionnalité courriel à venir.', 'erreur');
+}
+
+function envoyerFactureTexto() {
+  const telephone = document.getElementById('ven-telephone').value;
+  if (!telephone) { afficherMs
   if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
   afficherChargement();
   const client      = document.getElementById('ven-client').value;

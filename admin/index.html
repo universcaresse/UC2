@@ -1774,7 +1774,7 @@
           <div class="form-panel form-body-actions">
             <div class="form-actions">
               <button class="bouton bouton-contour" onclick="fermerFormVente()">Annuler</button>
-              <button class="bouton" onclick="finaliserVente()">Finaliser la vente</button>
+              <button class="bouton" onclick="ouvrirApercuFacture()">Voir la facture</button>
             </div>
           </div>
         </div>
@@ -2690,7 +2690,28 @@
             </div>
           </div>
         </div>
- <div class="modal-admin-overlay" id="modal-confirm">
+ <div class="modal-admin-overlay" id="modal-facture-vente">
+  <div class="modal-admin" style="max-width:600px">
+    <div class="modal-admin-header">
+      <div>
+        <div class="modal-admin-titre">Facture</div>
+        <div class="modal-admin-info" id="modal-fv-numero"></div>
+      </div>
+      <button class="btn-fermer-panneau" onclick="fermerApercuFacture()">✕</button>
+    </div>
+    <div class="modal-admin-body" id="modal-fv-contenu"></div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-contour" onclick="fermerApercuFacture()">Annuler</button>
+        <button class="bouton bouton-vert-pale" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
+        <button class="bouton bouton-vert-pale" onclick="envoyerFactureTexto()">Envoyer par texto</button>
+        <button class="bouton" onclick="finaliserVente()">Finaliser</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-admin-overlay" id="modal-confirm">
     <div class="modal-admin">
       <div class="modal-admin-header">
         <div class="modal-admin-titre" id="modal-confirm-message"></div>
