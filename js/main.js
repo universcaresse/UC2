@@ -44,6 +44,7 @@ let adminConnecte = false;
 let scrollObserver = null;
 let donneesCatalogue = null;
 let collectionEnAttente = null;
+let ingredientEnAttente = null;
 let accueilAnime = false;
 
 // ─── INITIALISATION ───
@@ -374,7 +375,7 @@ async function afficherRegroupementsPublic() {
   res.items.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(fra => {
     const couleurs = couleurCollection(fra.nom, fra.couleur_hex);
     strip.innerHTML += `
-      <a href="#catalogue" onclick="naviguer('catalogue')" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
+      <a href="#catalogue" onclick="naviguer('catalogue'); ingredientEnAttente='${fra.ing_id}';" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
         <div class="collection-tile-bg"></div>
         <div class="collection-tile-overlay"></div>
         <div class="collection-tile-content">
@@ -571,6 +572,10 @@ function construireCatalogue() {
     filtrer(collectionEnAttente);
     collectionEnAttente = null;
   }
+  if (ingredientEnAttente) {
+    filtrerParIngredient(ingredientEnAttente);
+    ingredientEnAttente = null;
+  }
 }
 
 // ─── CARTE PRODUIT ───
@@ -650,6 +655,28 @@ function filtrer(col_id, gam_id) {
     const offset   = cible.getBoundingClientRect().top + window.scrollY - navH - filtresH - enteteH - 16;
     window.scrollTo({ top: offset, behavior: 'smooth' });
   }
+}
+
+function filtrerParIngredient(ing_id) {
+  document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('actif'));
+  const btnTout = document.querySelector('[data-filtre="tout"]');
+  if (btnTout) btnTout.classList.add('actif');
+  document.querySelectorAll('.collection-section').forEach(s => s.classList.remove('masquee'));
+  document.querySelectorAll('.carte-produit').forEach(carte => {
+    const data = JSON.parse(decodeURIComponent(escape(atob(carte.dataset.produit))));
+    const ingredients = data.ingredients || [];
+    const aIngredient = ingredients.some(i => i.ing_id === ing_id);
+    carte.closest('.ligne-groupe') && (carte.closest('.ligne-groupe').classList.remove('masquee'));
+    carte.classList.toggle('masquee', !aIngredient);
+  });
+  document.querySelectorAll('.ligne-groupe').forEach(g => {
+    const aDesCartesVisibles = [...g.querySelectorAll('.carte-produit')].some(c => !c.classList.contains('masquee'));
+    g.classList.toggle('masquee', !aDesCartesVisibles);
+  });
+  document.querySelectorAll('.collection-section').forEach(s => {
+    const aDesLignesVisibles = [...s.querySelectorAll('.ligne-groupe')].some(l => !l.classList.contains('masquee'));
+    s.classList.toggle('masquee', !aDesLignesVisibles);
+  });
 }
 
 function filtrerGamme(gam_id, col_id) {
