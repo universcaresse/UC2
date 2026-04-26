@@ -3521,6 +3521,7 @@ function ouvrirFormVente() {
   venRafraichirPanier();
   document.getElementById('contenu-ventes').classList.add('cache');
   document.getElementById('form-vente').classList.remove('cache');
+  document.getElementById('form-vente').style.display = 'block';
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
