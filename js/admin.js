@@ -3710,7 +3710,8 @@ function ouvrirFormPromotion() {
   document.getElementById('fp-type').value = '';
   document.getElementById('fp-nom').value = '';
   document.getElementById('fp-valeur').value = '';
-  document.getElementById('fp-quantite-min').value = '';
+  document.getElementById('fp-quantite-min').value   = '';
+  document.getElementById('fp-quantite-seuil').value = '';
   const selFam = document.getElementById('fp-famille');
   selFam.innerHTML = '<option value="">— Aucune —</option>';
   donneesFamilles.sort((a, b) => (a.nom || '').localeCompare(b.nom || '', 'fr')).forEach(f => {
@@ -3745,7 +3746,8 @@ function modifierPromotion(promo_id) {
   document.getElementById('fp-type').value = p.type;
   document.getElementById('fp-nom').value = p.nom;
   document.getElementById('fp-valeur').value = p.valeur;
-  document.getElementById('fp-quantite-min').value = p.quantite_min || '';
+  document.getElementById('fp-quantite-min').value   = p.quantite_min   || '';
+  document.getElementById('fp-quantite-seuil').value = p.quantite_seuil || '';
   const selFam = document.getElementById('fp-famille');
   selFam.innerHTML = '<option value="">— Aucune —</option>';
   donneesFamilles.sort((a, b) => (a.nom || '').localeCompare(b.nom || '', 'fr')).forEach(f => {
@@ -3772,7 +3774,8 @@ async function sauvegarderPromotion() {
     type,
     nom,
     valeur:       parseFloat(document.getElementById('fp-valeur').value) || 0,
-    quantite_min: parseInt(document.getElementById('fp-quantite-min').value) || 0
+    quantite_min:   parseInt(document.getElementById('fp-quantite-min').value)   || 0,
+    quantite_seuil: parseInt(document.getElementById('fp-quantite-seuil').value) || 1
   };
   const res = await appelAPIPost('savePromotion', d);
   if (res && res.success) {
