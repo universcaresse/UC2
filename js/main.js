@@ -149,6 +149,7 @@ function afficherSection(id) {
     }
     chargerCatalogue();
   }
+  if (id === 'regroupements') afficherPageRegroupements();
   if (id === 'educatif')  afficherEduSection(1);
 }
 
@@ -370,11 +371,12 @@ async function afficherRegroupementsPublic() {
     strip.closest('.section-collections')?.classList.add('cache');
     return;
   }
+  window._regroupementsData = res.items;
   strip.innerHTML = '';
   res.items.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(fra => {
     const couleurs = couleurCollection(fra.nom, fra.couleur_hex);
     strip.innerHTML += `
-      <a href="javascript:void(0)" onclick="ouvrirRegroupement('${fra.ing_id}')" data-nom="${(fra.nom || '').replace(/"/g, '')}" data-desc="${(fra.description || '').replace(/"/g, '')}" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
+      <a href="#regroupements" onclick="naviguer('regroupements')" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
         <div class="collection-tile-bg"></div>
         <div class="collection-tile-overlay"></div>
         <div class="collection-tile-content">
@@ -650,6 +652,60 @@ function filtrer(col_id, gam_id) {
     const offset   = cible.getBoundingClientRect().top + window.scrollY - navH - filtresH - enteteH - 16;
     window.scrollTo({ top: offset, behavior: 'smooth' });
   }
+}
+
+function afficherPageRegroupements() {
+  const body = document.getElementById('regroupements-body');
+  const filtresBar = document.getElementById('regroupements-filtres');
+  if (!body || !filtresBar) return;
+  body.innerHTML = '';
+  filtresBar.innerHTML = '<button class="filtre-btn actif" onclick="filtrerRegroupements(\'tout\')">Tous</button>';
+
+  const res = window._regroupementsData;
+  if (!res || !res.length) { body.innerHTML = '<div class="vide"><p>Aucun regroupement.</p></div>'; return; }
+
+  res.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(fra => {
+    const couleurs = couleurCollection(fra.nom, fra.couleur_hex);
+    const btn = document.createElement('button');
+    btn.className = 'filtre-btn';
+    btn.textContent = fra.nom;
+    btn.dataset.filtre = fra.fra_id;
+    btn.onclick = () => filtrerRegroupements(fra.fra_id);
+    filtresBar.appendChild(btn);
+
+    const section = document.createElement('div');
+    section.className = 'collection-section';
+    section.dataset.regroupement = fra.fra_id;
+    section.innerHTML = `
+      <div class="collection-entete fade-in">
+        <div>
+          <h2 class="collection-entete-nom">${(fra.nom || '').toUpperCase()}</h2>
+          <p class="collection-entete-slogan">${fra.description || ''}</p>
+        </div>
+        <div class="collection-entete-visuel">
+          <div class="collection-entete-bg" style="--col-hex: ${couleurs[0]};">
+            ${fra.photo_url ? `<img src="${fra.photo_url}" alt="${fra.nom}" onerror="this.style.display='none'">` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="produits-grille">
+        ${(donneesCatalogue?.produits || [])
+          .filter(p => (p.ingredients || []).some(i => i.ing_id === fra.ing_id))
+          .map(p => carteProduit(p)).join('')}
+      </div>`;
+    body.appendChild(section);
+  });
+}
+
+function filtrerRegroupements(fra_id) {
+  document.querySelectorAll('#regroupements-filtres .filtre-btn').forEach(b => b.classList.remove('actif'));
+  const btn = fra_id === 'tout'
+    ? document.querySelector('#regroupements-filtres .filtre-btn')
+    : document.querySelector(`#regroupements-filtres [data-filtre="${fra_id}"]`);
+  if (btn) btn.classList.add('actif');
+  document.querySelectorAll('#regroupements-body .collection-section').forEach(s => {
+    s.classList.toggle('masquee', fra_id !== 'tout' && s.dataset.regroupement !== fra_id);
+  });
 }
 
 function ouvrirRegroupement(ing_id) {
