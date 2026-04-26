@@ -3611,6 +3611,7 @@ function venAjouterLigne() {
   const qte       = parseInt(document.getElementById('ven-quantite').value) || 1;
   if (!pro_id || !formatVal) { afficherMsg('ventes', 'Choisir un produit et un format.', 'erreur'); return; }
   const format = JSON.parse(formatVal);
+  if (qte > format.nb_disponible) { afficherMsg('ventes', `Stock insuffisant — ${format.nb_disponible} disponible(s).`, 'erreur'); return; }
   const pro    = donneesProduits.find(p => p.pro_id === pro_id);
   const formatProduit = (pro?.formats || []).find(f => String(f.poids) === String(format.poids) && f.unite === format.unite);
   const prix = formatProduit?.prix_vente || 0;
