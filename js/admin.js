@@ -3989,12 +3989,14 @@ function ouvrirFormRegroupement() {
   document.getElementById('contenu-regroupements').classList.add('cache');
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
   document.getElementById('form-regroupements').classList.remove('cache');
+  document.getElementById('form-regroupements').classList.add('visible');
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
 
 function fermerFormRegroupement() {
   document.getElementById('form-regroupements').classList.add('cache');
+  document.getElementById('form-regroupements').classList.remove('visible');
   document.getElementById('contenu-regroupements').classList.remove('cache');
   document.getElementById('btn-nouveau-regroupement').classList.remove('cache');
 }
