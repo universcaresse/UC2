@@ -4035,7 +4035,7 @@ function modifierRegroupement(fra_id) {
 function peuplerIngredientsRegroupement(cat_id, ing_id_actuel) {
 	
 	
-if (id === 'regroupements')  { const r = document.getElementById('regroupements-recherche'); if (r) r.value = ''; afficherRegroupements(); }
+if (id === 'regroupements')  { appelAPI('getRegroupements').then(res => { if (res && res.success) donneesRegroupements = res.items || []; afficherRegroupements(); }); }
   const sel = document.getElementById('freg-ing');
   sel.innerHTML = '<option value="">— Choisir —</option>';
   if (!cat_id) { sel.disabled = true; return; }
