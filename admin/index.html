@@ -70,6 +70,7 @@
         <div class="nav-dropdown">
 		<button class="nav-dropdown-item" onclick="afficherSection('inci', null)">INCI</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('densites', null)">Densité</button>
+		<button class="nav-dropdown-item" onclick="afficherSection('promotions', null)">Promotions</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('contenu-site', null)">Contenu du site</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('catalogue-builder', null)">Catalogue PDF</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('mediatheque', null)">Médiathèque</button>
@@ -130,6 +131,7 @@
         <div class="sidebar-titre">Système</div>
         <button class="sidebar-lien" onclick="afficherSection('inci', this)">INCI</button>
         <button class="sidebar-lien" onclick="afficherSection('densites', this)">Densité</button>
+        <button class="sidebar-lien" onclick="afficherSection('promotions', this)">Promotions</button>
         <button class="sidebar-lien" onclick="afficherSection('contenu-site', this)">Contenu du site</button>
         <button class="sidebar-lien" onclick="afficherSection('catalogue-builder', this)">Catalogue PDF</button>
         <button class="sidebar-lien" onclick="afficherSection('mediatheque', this)">Médiathèque</button>
@@ -2141,7 +2143,76 @@
 </div>
       </div>
 
-    <!-- DENSITÉS -->
+    <!-- <!-- PROMOTIONS -->
+      <div class="section-admin" id="section-promotions">
+        <div class="page-entete fade-in">
+          <div>
+            <div class="page-entete-eyebrow">Gestion des rabais</div>
+            <div class="page-entete-titre">Promotions</div>
+          </div>
+          <button class="bouton" onclick="ouvrirFormPromotion()">+ Nouvelle promotion</button>
+        </div>
+        <div class="msg-zone" id="msg-promotions"></div>
+
+        <div id="form-promotion" class="cache">
+          <div class="form-panel visible">
+            <div class="form-panel-header">
+              <span class="form-panel-titre" id="form-promotion-titre">Nouvelle promotion</span>
+              <button class="btn-fermer-panneau" onclick="fermerFormPromotion()">✕</button>
+            </div>
+            <div class="form-body">
+              <input type="hidden" id="fp-id">
+              <div class="form-grille">
+                <div class="form-groupe">
+                  <label class="form-label">Type</label>
+                  <select class="form-ctrl" id="fp-type" onchange="fpMettreAJourChamps()">
+                    <option value="">— Choisir —</option>
+                    <option value="qte_produit">Quantité même produit</option>
+                    <option value="qte_panier">Quantité panier total</option>
+                    <option value="lot_complet">Lot complet</option>
+                    <option value="ensemble_famille">Ensemble famille</option>
+                  </select>
+                </div>
+                <div class="form-groupe" id="fp-groupe-famille">
+                  <label class="form-label">Famille</label>
+                  <select class="form-ctrl" id="fp-famille">
+                    <option value="">— Aucune —</option>
+                  </select>
+                </div>
+                <div class="form-groupe col-plein">
+                  <label class="form-label">Nom</label>
+                  <input type="text" class="form-ctrl" id="fp-nom" placeholder="Ex: 5 savons = 0,25$ de rabais chacun">
+                </div>
+                <div class="form-groupe">
+                  <label class="form-label">Valeur</label>
+                  <input type="text" inputmode="decimal" class="form-ctrl" id="fp-valeur" placeholder="$ ou %">
+                </div>
+                <div class="form-groupe" id="fp-groupe-qte">
+                  <label class="form-label">Quantité minimum</label>
+                  <input type="number" class="form-ctrl" id="fp-quantite-min" min="1">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-panel visible form-body-actions">
+            <div class="form-actions">
+              <button class="bouton bouton-contour" onclick="fermerFormPromotion()">Annuler</button>
+              <button class="bouton" onclick="sauvegarderPromotion()">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="contenu-promotions">
+          <div class="chargement" id="loading-promotions"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+          <div id="tableau-promotions"></div>
+          <div class="vide cache" id="vide-promotions">
+            <div class="vide-titre">Aucune promotion</div>
+            <div class="vide-desc">Créez votre première promotion</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DENSITÉS --> -->
       <div class="section-admin" id="section-densites">
         <div class="page-entete fade-in">
           <div>
