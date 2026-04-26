@@ -654,12 +654,12 @@ function filtrer(col_id, gam_id) {
   }
 }
 
-function afficherPageRegroupements() {
+function afficherPageRegroupements(fraIdActif) {
   const body = document.getElementById('regroupements-body');
   const filtresBar = document.getElementById('regroupements-filtres');
   if (!body || !filtresBar) return;
   body.innerHTML = '';
-  filtresBar.innerHTML = '<button class="filtre-btn actif" onclick="filtrerRegroupements(\'tout\')">Tous</button>';
+  filtresBar.innerHTML = '<button class="filtre-btn" data-filtre="tout" onclick="filtrerRegroupements(\'tout\')">Tous</button>';
 
   const res = window._regroupementsData;
   if (!res || !res.length) { body.innerHTML = '<div class="vide"><p>Aucun regroupement.</p></div>'; return; }
