@@ -3482,6 +3482,7 @@ function importDevinerType()   { return ''; }
 var venPanier = [];
 var venIdEnCours = null;
 var venNumeroAffiche = '';
+var venLotsDisponibles = [];
 
 async function chargerVentes() {
   const loading = document.getElementById('loading-ventes');
@@ -3511,6 +3512,8 @@ async function chargerVentes() {
 function ouvrirFormVente() {
   venPanier = [];
   venIdEnCours = 'VEN-' + Date.now();
+  const resLots = await appelAPI('getLotsDisponibles');
+  venLotsDisponibles = (resLots && resLots.success) ? resLots.items : [];
   const derniereVente = [...(toutesFactures || [])].sort((a, b) => (b.ven_id || '').localeCompare(a.ven_id || '')).find(v => v.ven_id);
   const dernierNum = derniereVente ? parseInt(derniereVente.numero_affiche || '0') || 0 : 0;
   venNumeroAffiche = String(dernierNum + 1).padStart(4, '0');
