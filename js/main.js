@@ -652,7 +652,7 @@ function filtrer(col_id, gam_id) {
   }
 }
 
-function ouvrirRegroupement(ing_id, nom, description) {
+function ouvrirRegroupement(ing_id) {
   document.getElementById('regroupement-titre').textContent = nom.toUpperCase();
   document.getElementById('regroupement-eyebrow').textContent = description || 'Produits par ingrédient vedette';
   const body = document.getElementById('regroupement-body');
