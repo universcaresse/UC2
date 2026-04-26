@@ -44,7 +44,6 @@ let adminConnecte = false;
 let scrollObserver = null;
 let donneesCatalogue = null;
 let collectionEnAttente = null;
-let ingredientEnAttente = null;
 let accueilAnime = false;
 
 // ─── INITIALISATION ───
@@ -375,7 +374,7 @@ async function afficherRegroupementsPublic() {
   res.items.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(fra => {
     const couleurs = couleurCollection(fra.nom, fra.couleur_hex);
     strip.innerHTML += `
-      <a href="#catalogue" onclick="naviguer('catalogue'); ingredientEnAttente='${fra.ing_id}';" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
+      <a href="#regroupement" onclick="ouvrirRegroupement('${fra.ing_id}', '${(fra.nom || '').replace(/'/g, '')}', '${(fra.description || '').replace(/'/g, '')}')" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
         <div class="collection-tile-bg"></div>
         <div class="collection-tile-overlay"></div>
         <div class="collection-tile-content">
@@ -572,10 +571,6 @@ function construireCatalogue() {
     filtrer(collectionEnAttente);
     collectionEnAttente = null;
   }
-  if (ingredientEnAttente) {
-    filtrerParIngredient(ingredientEnAttente);
-    ingredientEnAttente = null;
-  }
 }
 
 // ─── CARTE PRODUIT ───
@@ -657,29 +652,74 @@ function filtrer(col_id, gam_id) {
   }
 }
 
-function filtrerParIngredient(ing_id) {
-  document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('actif'));
-  const btnTout = document.querySelector('[data-filtre="tout"]');
-  if (btnTout) btnTout.classList.add('actif');
-  document.querySelectorAll('.collection-section').forEach(s => s.classList.remove('masquee'));
-  document.querySelectorAll('.carte-produit').forEach(carte => {
-    const data = JSON.parse(decodeURIComponent(escape(atob(carte.dataset.produit))));
-    const ingredients = data.ingredients || [];
-    const aIngredient = ingredients.some(i => i.ing_id === ing_id);
-    carte.closest('.ligne-groupe') && (carte.closest('.ligne-groupe').classList.remove('masquee'));
-    carte.classList.toggle('masquee', !aIngredient);
+function ouvrirRegroupement(ing_id, nom, description) {
+  document.getElementById('regroupement-titre').textContent = nom.toUpperCase();
+  document.getElementById('regroupement-eyebrow').textContent = description || 'Produits par ingrédient vedette';
+  const body = document.getElementById('regroupement-body');
+  body.innerHTML = '';
+
+  if (!donneesCatalogue || !donneesCatalogue.produits) {
+    body.innerHTML = '<p>Chargement en cours…</p>';
+    naviguer('regroupement');
+    return;
+  }
+
+  const produits = (donneesCatalogue.produits || []).filter(p =>
+    (p.ingredients || []).some(i => i.ing_id === ing_id)
+  );
+
+  if (!produits.length) {
+    body.innerHTML = '<div class="vide"><p>Aucun produit trouvé pour ce regroupement.</p></div>';
+    naviguer('regroupement');
+    return;
+  }
+
+  const infoCollections = donneesCatalogue.infoCollections || {};
+
+  // Filtres par collection
+  const colsPresentes = [...new Set(produits.map(p => p.col_id))];
+  const filtresBar = document.getElementById('regroupement-filtres');
+  filtresBar.innerHTML = '<button class="filtre-btn actif" onclick="filtrerRegroupement(\'tout\')">Toutes</button>';
+  colsPresentes.forEach(col_id => {
+    const info = infoCollections[col_id] || {};
+    const btn = document.createElement('button');
+    btn.className = 'filtre-btn';
+    btn.textContent = info.nom || col_id;
+    btn.onclick = () => filtrerRegroupement(col_id);
+    filtresBar.appendChild(btn);
   });
-  document.querySelectorAll('.ligne-groupe').forEach(g => {
-    const aDesCartesVisibles = [...g.querySelectorAll('.carte-produit')].some(c => !c.classList.contains('masquee'));
-    g.classList.toggle('masquee', !aDesCartesVisibles);
+
+  // Regrouper par collection
+  const parCollection = {};
+  produits.forEach(p => {
+    if (!parCollection[p.col_id]) parCollection[p.col_id] = [];
+    parCollection[p.col_id].push(p);
   });
-  document.querySelectorAll('.collection-section').forEach(s => {
-    const aDesLignesVisibles = [...s.querySelectorAll('.ligne-groupe')].some(l => !l.classList.contains('masquee'));
-    s.classList.toggle('masquee', !aDesLignesVisibles);
+
+  Object.keys(parCollection).forEach(col_id => {
+    const info = infoCollections[col_id] || {};
+    const couleurs = couleurCollection(info.nom || '', info.couleur_hex);
+    const section = document.createElement('div');
+    section.className = 'collection-section';
+    section.dataset.collection = col_id;
+    section.innerHTML = `
+      <div class="collection-entete fade-in">
+        <div>
+          <h2 class="collection-entete-nom">${(info.nom || '').toUpperCase()}</h2>
+          <p class="collection-entete-slogan">${info.slogan || ''}</p>
+        </div>
+      </div>
+      <div class="produits-grille">${parCollection[col_id].map(p => carteProduit(p)).join('')}</div>`;
+    body.appendChild(section);
   });
+
+  naviguer('regroupement');
 }
 
-function filtrerGamme(gam_id, col_id) {
+function filtrerRegroupement(col_id) {
+  document.querySelectorAll('#regroupement-filtres .filtre-btn').forEach(b => b.classList.remove('actif'));
+  const btn = document.querySelector(`#regroupement-filtres [data-filtre="${col_id}"]`) || 
+              [...document.querySelectorAll('#regroupement-filtres .filtre-btn')].find(b => b.text
   if (!col_id) return;
   const conteneur = document.querySelector(`.collection-filtres-gammes[data-collection-filtres="${col_id}"]`);
   if (conteneur) {
