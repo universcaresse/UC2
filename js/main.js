@@ -694,6 +694,10 @@ function afficherPageRegroupements() {
           .map(p => carteProduit(p)).join('')}
       </div>`;
     body.appendChild(section);
+    if (scrollObserver) {
+      section.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
+    }
+    section.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
   });
 }
 
