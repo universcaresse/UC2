@@ -3574,21 +3574,16 @@ function venFiltrerProduits() {
   document.getElementById('ven-total-ligne').value = '';
 }
 
-async function venFiltrerFormats() {
+function venFiltrerFormats() {
   const pro_id = document.getElementById('ven-produit').value;
   const sel = document.getElementById('ven-format');
   sel.innerHTML = '<option value="">— Choisir —</option>';
   if (!pro_id) return;
-  const res = await appelAPI('getLotsDisponibles', { pro_id });
-  if (!res || !res.success) return;
-  const formatsVus = new Set();
-  (res.items || []).forEach(l => {
-    const cle = `${l.format_poids}_${l.format_unite}`;
-    if (formatsVus.has(cle)) return;
-    formatsVus.add(cle);
+  const pro = donneesProduits.find(p => p.pro_id === pro_id);
+  (pro?.formats || []).sort((a, b) => parseFloat(a.poids) - parseFloat(b.poids)).forEach(f => {
     const o = document.createElement('option');
-    o.value = JSON.stringify({ lot_id: l.lot_id, poids: l.format_poids, unite: l.format_unite, nb_disponible: l.nb_disponible });
-    o.textContent = `${l.format_poids} ${l.format_unite} — ${l.nb_disponible} dispo`;
+    o.value = JSON.stringify({ lot_id: '', poids: f.poids, unite: f.unite, nb_disponible: 99 });
+    o.textContent = `${f.poids} ${f.unite}`;
     sel.appendChild(o);
   });
   venMettreAJourPrix();
