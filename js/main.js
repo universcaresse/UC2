@@ -374,7 +374,7 @@ async function afficherRegroupementsPublic() {
   res.items.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(fra => {
     const couleurs = couleurCollection(fra.nom, fra.couleur_hex);
     strip.innerHTML += `
-      <a href="javascript:void(0)" onclick="ouvrirRegroupement('${fra.ing_id}', '${(fra.nom || '').replace(/'/g, '')}', '${(fra.description || '').replace(/'/g, '')}')" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
+      <a href="javascript:void(0)" onclick="ouvrirRegroupement('${fra.ing_id}')" data-nom="${(fra.nom || '').replace(/"/g, '')}" data-desc="${(fra.description || '').replace(/"/g, '')}" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
         <div class="collection-tile-bg"></div>
         <div class="collection-tile-overlay"></div>
         <div class="collection-tile-content">
@@ -653,6 +653,9 @@ function filtrer(col_id, gam_id) {
 }
 
 function ouvrirRegroupement(ing_id) {
+  const el = document.querySelector(`[onclick*="${ing_id}"]`);
+  const nom = el ? (el.dataset.nom || '') : '';
+  const description = el ? (el.dataset.desc || '') : '';
   document.getElementById('regroupement-titre').textContent = nom.toUpperCase();
   document.getElementById('regroupement-eyebrow').textContent = description || 'Produits par ingrédient vedette';
   const body = document.getElementById('regroupement-body');
@@ -718,22 +721,16 @@ function ouvrirRegroupement(ing_id) {
 
 function filtrerRegroupement(col_id) {
   document.querySelectorAll('#regroupement-filtres .filtre-btn').forEach(b => b.classList.remove('actif'));
-  const btn = document.querySelector(`#regroupement-filtres [data-filtre="${col_id}"]`) || 
-              [...document.querySelectorAll('#regroupement-filtres .filtre-btn')].find(b => b.text
-  if (!col_id) return;
-  const conteneur = document.querySelector(`.collection-filtres-gammes[data-collection-filtres="${col_id}"]`);
-  if (conteneur) {
-    conteneur.querySelectorAll('[data-filtre-gamme]').forEach(b => b.classList.remove('actif'));
-    const btn = conteneur.querySelector(`[data-filtre-gamme="${gam_id}"]`);
-    if (btn) btn.classList.add('actif');
-  }
-  const section = document.querySelector(`.collection-section[data-collection="${col_id}"]`);
-  if (section) {
-    section.querySelectorAll('.ligne-groupe').forEach(g => {
-      g.classList.toggle('masquee', gam_id !== 'tout' && g.dataset.gamme !== gam_id);
-    });
-  }
+  document.querySelectorAll('#regroupement-filtres .filtre-btn').forEach(b => {
+    if (col_id === 'tout' && b.textContent === 'Toutes') b.classList.add('actif');
+    if (b.dataset && b.dataset.filtre === col_id) b.classList.add('actif');
+  });
+  document.querySelectorAll('#regroupement-body .collection-section').forEach(s => {
+    s.classList.toggle('masquee', col_id !== 'tout' && s.dataset.collection !== col_id);
+  });
 }
+
+function filtrerGamme(gam_id, col_id) {
 
 // ─── MODAL PRODUIT ───
 // V2 : produit.nom_collection, produit.nom_gamme, produit.formats, produit.ingredients
