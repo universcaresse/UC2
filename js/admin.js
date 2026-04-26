@@ -3521,7 +3521,6 @@ function ouvrirFormVente() {
   document.getElementById('ven-courriel').value = '';
   document.getElementById('ven-telephone').value = '';
   document.getElementById('ven-paiement').value = '';
-  
   document.getElementById('ven-livraison').value = '0';
   document.getElementById('ven-sous-total').value = '';
   document.getElementById('ven-total').value = '';
@@ -3841,7 +3840,22 @@ function envoyerFactureCourriel() {
 
 function envoyerFactureTexto() {
   const telephone = document.getElementById('ven-telephone').value;
-  if (!telephone) { afficherMs
+  if (!telephone) { afficherMsg('ventes', 'Aucun téléphone indiqué pour ce client.', 'erreur'); return; }
+  const client    = document.getElementById('ven-client').value;
+  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais    = venCalculerRabais();
+  const total     = Math.max(0, sousTotal + livraison - rabais);
+  let texte = `Univers Caresse\n\n`;
+  venPanier.forEach(l => { texte += `${l.nom} ${l.poids}${l.unite} x${l.quantite} = ${formaterPrix(l.prix_unitaire * l.quantite)}\n`; });
+  texte += `\nSous-total: ${formaterPrix(sousTotal)}`;
+  if (rabais > 0) texte += `\nRabais: -${formaterPrix(rabais)}`;
+  if (livraison > 0) texte += `\nLivraison: ${formaterPrix(livraison)}`;
+  texte += `\nTOTAL: ${formaterPrix(total)}\n\nMerci!`;
+  window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
+}
+
+async function finaliserVente() {
   if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
   afficherChargement();
   const client      = document.getElementById('ven-client').value;
@@ -3866,15 +3880,11 @@ function envoyerFactureTexto() {
   afficherMsg('ventes', '✅ Vente enregistrée.');
   chargerVentes();
 }
-}
+
 async function voirDetailVente(ven_id) {
   afficherMsg('ventes', 'Fonctionnalité à venir.');
 }
-
-
-/* ════════════════════════════════
-   PROMOTIONS V2
-════════════════════════════════ */
+/* PROMOTIONS V2 */
 var donneesPromotions = [];
 
 async function chargerPromotions() {
