@@ -3481,6 +3481,7 @@ function importDevinerType()   { return ''; }
 ════════════════════════════════ */
 var venPanier = [];
 var venIdEnCours = null;
+var venNumeroAffiche = '';
 
 async function chargerVentes() {
   const loading = document.getElementById('loading-ventes');
@@ -3510,6 +3511,9 @@ async function chargerVentes() {
 function ouvrirFormVente() {
   venPanier = [];
   venIdEnCours = 'VEN-' + Date.now();
+  const derniereVente = [...(toutesFactures || [])].sort((a, b) => (b.ven_id || '').localeCompare(a.ven_id || '')).find(v => v.ven_id);
+  const dernierNum = derniereVente ? parseInt(derniereVente.numero_affiche || '0') || 0 : 0;
+  venNumeroAffiche = String(dernierNum + 1).padStart(4, '0');
   const selCol = document.getElementById('ven-collection');
   selCol.innerHTML = '<option value="">— Choisir —</option>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(c => {
@@ -3830,7 +3834,7 @@ function ouvrirApercuFacture() {
   </div>`;
 
   document.getElementById('modal-fv-contenu').innerHTML = html;
-  document.getElementById('modal-fv-numero').textContent = venIdEnCours;
+  document.getElementById('modal-fv-numero').textContent = venNumeroAffiche;
   document.getElementById('modal-facture-vente').classList.add('ouvert');
 }
 
