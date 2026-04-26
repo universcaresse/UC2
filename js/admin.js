@@ -3897,6 +3897,7 @@ async function finaliserVente() {
   if (!resFin || !resFin.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur'); return; }
 
   cacherChargement();
+  fermerApercuFacture();
   fermerFormVente();
   afficherMsg('ventes', '✅ Vente enregistrée.');
   chargerVentes();
