@@ -3697,7 +3697,7 @@ async function chargerPromotions() {
       <td>${typesLabels[p.type] || p.type}</td>
       <td>${p.valeur}</td>
       <td>${p.quantite_min || '—'}</td>
-      <td onclick="event.stopPropagation()"><button class="btn-suppr" onclick="supprimerPromotion('${p.promo_id}')">Supprimer</button></td>
+      <td></td>
     </tr>`;
   });
   html += '</tbody></table></div>';
@@ -3718,6 +3718,8 @@ function ouvrirFormPromotion() {
     o.value = f.fam_id; o.textContent = f.nom; selFam.appendChild(o);
   });
   fpMettreAJourChamps();
+  document.getElementById('fp-btn-supprimer').classList.add('cache');
+  document.getElementById('fp-btn-supprimer').classList.remove('cache');
   document.getElementById('form-promotion').classList.remove('cache');
   document.getElementById('contenu-promotions').classList.add('cache');
   window.scrollTo(0, 0);
@@ -3781,6 +3783,12 @@ async function sauvegarderPromotion() {
     cacherChargement();
     afficherMsg('promotions', 'Erreur.', 'erreur');
   }
+}
+
+function supprimerPromotionActive() {
+  const id = document.getElementById('fp-id').value;
+  if (!id) return;
+  supprimerPromotion(id);
 }
 
 async function supprimerPromotion(promo_id) {
