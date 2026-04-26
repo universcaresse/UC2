@@ -3584,9 +3584,11 @@ function venFiltrerFormats() {
   if (!pro_id) return;
   const pro = donneesProduits.find(p => p.pro_id === pro_id);
   (pro?.formats || []).sort((a, b) => parseFloat(a.poids) - parseFloat(b.poids)).forEach(f => {
+    const lot = venLotsDisponibles.find(l => l.pro_id === pro_id && String(l.format_poids) === String(f.poids) && l.format_unite === f.unite);
+    const nbDispo = lot ? lot.nb_disponible : 0;
     const o = document.createElement('option');
-    o.value = JSON.stringify({ lot_id: '', poids: f.poids, unite: f.unite, nb_disponible: 99 });
-    o.textContent = `${f.poids} ${f.unite}`;
+    o.value = JSON.stringify({ lot_id: lot?.lot_id || '', poids: f.poids, unite: f.unite, nb_disponible: nbDispo });
+    o.textContent = `${f.poids} ${f.unite} — ${nbDispo} dispo`;
     sel.appendChild(o);
   });
   venMettreAJourPrix();
