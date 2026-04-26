@@ -1674,7 +1674,11 @@
                 </div>
                 <div class="form-groupe">
                   <label class="form-label">Quantité</label>
-                  <input type="number" class="form-ctrl" id="ven-quantite" min="1" value="1" oninput="venMettreAJourPrix()">
+                  <div style="display:flex;gap:8px;align-items:center">
+                    <button class="bouton bouton-petit" onclick="venChangerQte(-1)">−</button>
+                    <input type="number" class="form-ctrl" id="ven-quantite" min="1" value="1" oninput="venMettreAJourPrix()" style="text-align:center;width:70px">
+                    <button class="bouton bouton-petit" onclick="venChangerQte(1)">+</button>
+                  </div>
                 </div>
                 <div class="form-groupe">
                   <label class="form-label">Prix unitaire</label>
@@ -1704,8 +1708,11 @@
                   <input type="text" class="form-ctrl" id="ven-sous-total" readonly>
                 </div>
                 <div class="form-groupe">
-                  <label class="form-label">Livraison ($)</label>
-                  <input type="text" inputmode="decimal" class="form-ctrl" id="ven-livraison" value="0" oninput="venCalculerTotal()">
+                  <label class="form-label">Livraison</label>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <input type="text" inputmode="decimal" class="form-ctrl" id="ven-livraison" value="0" oninput="venCalculerTotal()">
+                    <span style="color:var(--gris);font-family:'DM Sans',sans-serif">$</span>
+                  </div>
                 </div>
                 <div class="form-groupe">
                   <label class="form-label">Total</label>
@@ -1737,6 +1744,7 @@
                 <div class="form-groupe">
                   <label class="form-label">Paiement</label>
                   <select class="form-ctrl" id="ven-paiement">
+                    <option value="">— Choisir —</option>
                     <option value="argent">Argent comptant</option>
                     <option value="carte">Carte</option>
                   </select>

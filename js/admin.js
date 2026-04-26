@@ -3592,6 +3592,13 @@ function venMettreAJourPrix() {
   document.getElementById('ven-total-ligne').value = prix ? formaterPrix(prix * qte) : '—';
 }
 
+function venChangerQte(delta) {
+  const input = document.getElementById('ven-quantite');
+  const val = parseInt(input.value) || 1;
+  input.value = Math.max(1, val + delta);
+  venMettreAJourPrix();
+}
+
 function venAjouterLigne() {
   const pro_id    = document.getElementById('ven-produit').value;
   const formatVal = document.getElementById('ven-format').value;
