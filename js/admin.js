@@ -3692,12 +3692,12 @@ async function chargerPromotions() {
   const typesLabels = { qte_produit: 'Qté même produit', qte_panier: 'Qté panier', lot_complet: 'Lot complet', ensemble_famille: 'Ensemble famille' };
   let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>Nom</th><th>Type</th><th>Valeur</th><th>Qté min</th><th></th></tr></thead><tbody>';
   donneesPromotions.forEach(p => {
-    html += `<tr>
+    html += `<tr class="ligne-cliquable" onclick="modifierPromotion('${p.promo_id}')">
       <td>${p.nom}</td>
       <td>${typesLabels[p.type] || p.type}</td>
       <td>${p.valeur}</td>
       <td>${p.quantite_min || '—'}</td>
-      <td><button class="btn-edit" onclick="modifierPromotion('${p.promo_id}')">Modifier</button> <button class="btn-suppr" onclick="supprimerPromotion('${p.promo_id}')">Supprimer</button></td>
+      <td onclick="event.stopPropagation()"><button class="btn-suppr" onclick="supprimerPromotion('${p.promo_id}')">Supprimer</button></td>
     </tr>`;
   });
   html += '</tbody></table></div>';
