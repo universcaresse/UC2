@@ -118,7 +118,14 @@ async function cbSauvegarderPage(idx) {
       est_toc:    page.est_toc ? '1':'0',
       blocs_json: JSON.stringify(page.blocs),
     });
-  } catch(e) { console.error('cbSauvegarderPage:', e); }
+    // ← Indicateur visuel
+    const ind = document.getElementById('cb-save-indicator');
+    if (ind) { ind.textContent = '✓ Sauvegardé'; ind.style.color = '#2d7a50'; setTimeout(()=>ind.textContent='', 2000); }
+  } catch(e) {
+    console.error('cbSauvegarderPage:', e);
+    const ind = document.getElementById('cb-save-indicator');
+    if (ind) { ind.textContent = '⚠ Erreur sauvegarde'; ind.style.color = 'red'; }
+  }
 }
 
 async function cbSupprimerPageAPI(page_id) {
@@ -164,6 +171,7 @@ function cbSupprimerPage() {
 }
 
 function cbAllerPage(idx) {
+  cbSauvegarderPage(); // ← la ligne magique
   if (idx < 0 || idx >= cbPages.length) return;
   cbPageIndex = idx;
   cbSelId = null;
