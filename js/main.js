@@ -680,7 +680,8 @@ function afficherPageRegroupements(fraIdActif) {
       <div class="collection-entete fade-in">
         <div>
           <h2 class="collection-entete-nom">${(fra.nom || '').toUpperCase()}</h2>
-          <p class="collection-entete-slogan">${fra.description || ''}</p>
+          <p class="collection-entete-slogan">${fra.slogan || ''}</p>
+          <p class="collection-entete-desc">${fra.description || ''}</p>
         </div>
         <div class="collection-entete-visuel">
           <div class="collection-entete-bg" style="--col-hex: ${couleurs[0]};">
