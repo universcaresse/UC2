@@ -2643,6 +2643,26 @@
 </div><!-- /section-catalogue-builder -->
 
 <!-- VUE LECTURE -->
+<div class="modal-admin-overlay" id="modal-cb-nouvelle-page" style="display:none">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Nouvelle page</div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe">
+        <label class="form-label" id="modal-np-texte"></label>
+        <input type="number" id="modal-np-input" class="form-ctrl" min="0">
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-contour" onclick="document.getElementById('modal-cb-nouvelle-page').style.display='none'">Annuler</button>
+        <button class="bouton" onclick="cbConfirmerNouvellePage()">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="cb-vue-lecture" style="display:none">
   <button id="cb-vue-lecture-fermer" onclick="cbFermerVueLecture()">✕ Fermer</button>
   <div id="cb-vue-lecture-contenu"></div>
