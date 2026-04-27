@@ -135,3 +135,6 @@ function reinitialiserFiltresInventaire() {
   if (el) el.value = '';
   filtrerInventaire();
 }
+
+
+

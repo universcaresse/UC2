@@ -407,3 +407,4 @@ async function finaliserVente() {
 async function voirDetailVente(ven_id) {
   afficherMsg('ventes', 'Fonctionnalité à venir.');
 }
+

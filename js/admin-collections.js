@@ -1,3 +1,8 @@
+
+var donneesCollections = []; // [{col_id, rang, nom, slogan, description, couleur_hex, photo_url, photo_noel_url}]
+var donneesGammes      = []; // [{gam_id, col_id, rang, nom, description, couleur_hex, photo_url, photo_noel_url}]
+var filtreGammesColId  = '';
+
 async function chargerCollections() {
   afficherChargement();
   const [resCol, resGam] = await Promise.all([
