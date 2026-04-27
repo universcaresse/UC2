@@ -3960,7 +3960,7 @@ function ouvrirFicheRegroupement(fra_id) {
   if (fra.photo_noel_url) wrapHtml += `<img src="${fra.photo_noel_url}" class="fiche-visuel-photo">`;
   const ficheExtras = document.getElementById('fiche-regroupement-extras');
   if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class="fiche-visuel">${wrapHtml}</div>` : '';
-  document.getElementById('fiche-regroupement-modifier').onclick = () => { fermerFicheRegroupement(); modifierRegroupement(fra_id); };
+  document.getElementById('fiche-regroupement-modifier').onclick = () => { console.log('modifier cliqué', fra_id); fermerFicheRegroupement(); modifierRegroupement(fra_id); };
   document.getElementById('btn-supprimer-regroupement').onclick  = () => supprimerRegroupement(fra_id);
   document.getElementById('contenu-regroupements').classList.add('cache');
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
