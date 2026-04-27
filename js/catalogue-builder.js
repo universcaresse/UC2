@@ -40,10 +40,40 @@ let cbIdCnt     = 0;
 const cbGenId   = () => 'cb' + Date.now() + '_' + (++cbIdCnt);
 
 // ─── POINT D'ENTRÉE ──────────────────────────────────────────────────────────
+async function cbRechargerDonnees() {
+  try {
+    const [rCat, rGam, rFam, rCont, rMed, rImg, rFmt] = await Promise.all([
+      appelAPI('getCatalogue'),
+      appelAPI('getGammes'),
+      appelAPI('getFamilles'),
+      appelAPI('getContenu'),
+      appelAPI('getMediatheque'),
+      appelAPI('getImagesLocales'),
+      appelAPI('getProduitsFormats'),
+    ]);
+    const cols = rCat && rCat.success
+      ? Object.entries(rCat.infoCollections||{}).map(([id,v])=>({col_id:id,...v}))
+      : [];
+    const contenu = rCont && rCont.success
+      ? Object.entries(rCont.contenu||{}).map(([cle,valeur])=>({cle,valeur}))
+      : [];
+    cbData = {
+      Collections_v2:    cols,
+      Gammes_v2:         rGam && rGam.success  ? rGam.items    : [],
+      Familles_v2:       rFam && rFam.success  ? rFam.items    : [],
+      Produits_v2:       rCat && rCat.success  ? rCat.produits : [],
+      Contenu_v2:        contenu,
+      Mediatheque_v2:    rMed && rMed.success  ? rMed.items    : [],
+      Images_Locales_v2: rImg && rImg.success  ? rImg.items    : [],
+      Produits_Formats_v2: rFmt && rFmt.success ? rFmt.items   : [],
+    };
+  } catch(e) { console.error('CB reload:', e); }
+}
+
 async function cbOnAfficher() {
-  if (cbInited) { cbRendreInterface(); return; }
+  if (cbInited) { await cbRechargerDonnees(); cbRendreInterface(); return; }
   cbInited = true;
-  cbInjectStyles();
+  cbInjectStyles();;
 
   try {
     const [rCat, rGam, rFam, rCont, rMed, rImg, rFmt] = await Promise.all([
