@@ -823,7 +823,7 @@ footer > * { position: relative; z-index: 1; }
 .ligne-rouge { background-color: var(--color-background-danger, #fff0f0); }
 .ligne-rouge td { color: var(--color-text-danger, #a32d2d); }
 
-#form-collections .form-panel, #form-gammes .form-panel, #form-familles .form-panel, #fiche-famille .form-panel, #fiche-recette .form-panel, #form-recettes .form-panel, #wizard-step-1 .form-panel, #wizard-step-2 .form-panel, #wizard-step-3 .form-panel, #fiche-ligne .form-panel, #fiche-gamme .form-panel, #if-bloc-upload .form-panel, #if-apercu .form-panel, #form-fabrication .form-panel, #form-vente .form-panel { display: block; }
+#form-collections .form-panel, #form-gammes .form-panel, #form-familles .form-panel, #fiche-famille .form-panel, #fiche-recette .form-panel, #form-recettes .form-panel, #wizard-step-1 .form-panel, #wizard-step-2 .form-panel, #wizard-step-3 .form-panel, #fiche-ligne .form-panel, #fiche-gamme .form-panel, #if-bloc-upload .form-panel, #if-apercu .form-panel, #form-fabrication .form-panel, #form-vente .form-panel, #form-regroupements .form-panel { display: block; }
  
 
 /* ═══════════════════════════════════════
