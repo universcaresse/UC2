@@ -8,6 +8,18 @@ var venNumeroAffiche = '';
 var venLotsDisponibles = [];
 
 async function chargerVentes() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('square') === 'success') {
+    const pending = sessionStorage.getItem('square-pending');
+    if (pending) {
+      const { ven_id, numeroAffiche } = JSON.parse(pending);
+      sessionStorage.removeItem('square-pending');
+      venIdEnCours      = ven_id;
+      venNumeroAffiche  = numeroAffiche;
+      ouvrirApercuFacture();
+    }
+    window.history.replaceState({}, '', window.location.pathname);
+  }
   const loading = document.getElementById('loading-ventes');
   const tableau = document.getElementById('tableau-ventes');
   const vide    = document.getElementById('vide-ventes');
@@ -341,11 +353,57 @@ function ouvrirApercuFacture() {
   </div>`;
   document.getElementById('modal-fv-contenu').innerHTML = html;
   document.getElementById('modal-fv-numero').textContent = venNumeroAffiche;
+  const btnSquare = document.getElementById('btn-payer-square');
+  if (btnSquare) btnSquare.style.display = paiement === 'carte' ? '' : 'none';
   document.getElementById('modal-facture-vente').classList.add('ouvert');
 }
 
 function fermerApercuFacture() {
   document.getElementById('modal-facture-vente').classList.remove('ouvert');
+}
+
+async function payerParSquare() {
+  const res = await appelAPI('getSquareAppId');
+  if (!res || !res.app_id) { afficherMsg('ventes', 'App ID Square introuvable.', 'erreur'); return; }
+
+  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais    = venCalculerRabais();
+  const total     = Math.max(0, sousTotal + livraison - rabais);
+  const montantCents = Math.round(total * 100);
+
+  const callbackURL = 'https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec?square=success';
+
+  const data = encodeURIComponent(JSON.stringify({
+    amount_money: { amount: montantCents, currency_code: 'CAD' },
+    callback_url: callbackURL,
+    client_id:    res.app_id,
+    version:      '1.3',
+    notes:        `Facture ${venNumeroAffiche}`
+  }));
+
+  sessionStorage.setItem('square-pending', JSON.stringify({
+    ven_id:        venIdEnCours,
+    numeroAffiche: venNumeroAffiche
+  }));
+
+  window.location.href = `square-commerce-v1://payment/create?data=${data}`;
+}
+
+function payerAvecSquare() {
+  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais    = venCalculerRabais();
+  const total     = Math.max(0, sousTotal + livraison - rabais);
+  const montantCents = Math.round(total * 100);
+  const data = encodeURIComponent(JSON.stringify({
+    amount_money: { amount: montantCents, currency_code: 'CAD' },
+    callback_url: window.location.href,
+    client_id: 'VOTRE_APP_ID_SQUARE',
+    version: '1.3',
+    notes: 'Univers Caresse'
+  }));
+  window.location.href = `square-commerce-v1://payment/create?data=${data}`;
 }
 
 function envoyerFactureCourriel() {
