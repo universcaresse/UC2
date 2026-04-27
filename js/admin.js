@@ -3980,6 +3980,7 @@ function ouvrirFormRegroupement() {
   document.getElementById('form-regroupements-titre').textContent      = 'Nouveau regroupement';
   document.getElementById('freg-id').value                             = '';
   document.getElementById('freg-nom').value                            = '';
+  document.getElementById('freg-slogan').value                         = '';
   document.getElementById('freg-desc').value                           = '';
   document.getElementById('freg-photo-url').value                      = '';
   document.getElementById('freg-photo-noel-url').value                 = '';
@@ -4045,6 +4046,7 @@ function modifierRegroupement(fra_id) {
   document.getElementById('form-regroupements-titre').textContent      = 'Modifier le regroupement';
   document.getElementById('freg-id').value                             = fra.fra_id;
   document.getElementById('freg-nom').value                            = fra.nom || '';
+  document.getElementById('freg-slogan').value                         = fra.slogan || '';
   document.getElementById('freg-desc').value                           = fra.description || '';
   document.getElementById('freg-photo-url').value                      = fra.photo_url || '';
   document.getElementById('freg-photo-noel-url').value                 = fra.photo_noel_url || '';
@@ -4076,6 +4078,7 @@ async function sauvegarderRegroupement() {
     fra_id:         id || ('FRA-' + Date.now()),
     rang:           positionChoisie + 1,
     nom,
+    slogan:         document.getElementById('freg-slogan').value,
     description:    document.getElementById('freg-desc').value,
     cat_id:         document.getElementById('freg-cat').value,
     ing_id,
