@@ -150,6 +150,7 @@ function modifierRegroupement(fra_id) {
   document.getElementById('form-regroupements').classList.add('visible');
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
+  document.getElementById('form-regroupements').scrollIntoView({ behavior: 'smooth' });
 }
 
 async function sauvegarderRegroupement() {
