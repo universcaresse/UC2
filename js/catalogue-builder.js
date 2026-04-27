@@ -1462,6 +1462,14 @@ function cbRendrePageHTML(page,idx) {
   return html;
 }
 
+function cbImprimerMaison() {
+  const htmlPages = cbPages.map((p,idx) => cbRendrePageHTML(p,idx));
+  const win = window.open('','_blank');
+  win.document.write(cbHTMLImpression(htmlPages, false));
+  win.document.close();
+  setTimeout(() => win.print(), 600);
+}
+
 function cbHTMLImpression(contenu,imposition) {
   return `<!DOCTYPE html><html><head><meta charset="UTF-8">
 <link href="https://fonts.googleapis.com/css2?family=Birthstone&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
