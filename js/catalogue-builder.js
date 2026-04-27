@@ -865,7 +865,7 @@ function cbAppliquerZoom(val) {
   const inner = document.getElementById('cb-canvas-inner');
   const label = document.getElementById('cb-zoom-label');
   if (inner) inner.style.transform = 'scale(' + val/100 + ')';
-  if (inner) inner.style.transformOrigin = 'top left';
+  if (inner) inner.style.transformOrigin = 'top center';
   if (label) label.textContent = val + '%';
 }
 
