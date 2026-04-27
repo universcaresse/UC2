@@ -2426,7 +2426,7 @@
       <div class="cb-palette-sep"></div>
       <div class="cb-section-titre">PAGES</div>
       <div id="cb-liste-pages"></div>
-      <button class="cb-palette-btn cb-palette-btn-new" onclick="cbNouvellePageCatalogue()">+ Nouvelle page</button>
+      <button class="cb-palette-btn cb-palette-btn-new" onclick="cbDemanderNouvellePage()">+ Nouvelle page</button>
     </div>
 
     <!-- ── CENTRE — Canvas ───────────────── -->
@@ -2439,6 +2439,8 @@
         </select>
         <button class="bouton bouton-petit" id="cb-btn-tdm" onclick="cbGenererTDMPage()" style="display:none">📋 TDM</button>
         <div style="flex:1"></div>
+        <input type="range" id="cb-zoom-slider" min="30" max="120" value="70" oninput="cbAppliquerZoom(this.value)" style="width:100px">
+        <span id="cb-zoom-label" style="font-size:12px;width:36px">70%</span>
         <button class="bouton bouton-petit bouton-contour" id="cb-btn-monter" onclick="cbMonterBloc()" style="display:none" title="Monter le bloc">↑</button>
         <button class="bouton bouton-petit bouton-contour" id="cb-btn-descendre" onclick="cbDescendreBloc()" style="display:none" title="Descendre le bloc">↓</button>
         <button class="bouton bouton-petit bouton-contour" id="cb-btn-copier" onclick="cbCopierBloc()" style="display:none">⧉ Copier</button>

@@ -320,10 +320,7 @@ function cbRendrePagesListe() {
 
     // Bouton insérer après
     const ins = document.createElement('button');
-    ins.className = 'cb-palette-btn-insert';
-    ins.textContent = '+ insérer';
-    ins.onclick = (e) => { e.stopPropagation(); cbNouvellePageCatalogue(i); };
-    cont.appendChild(ins);
+    
   });
 
   const inp = document.getElementById('cb-page-nom');
@@ -862,8 +859,13 @@ function cbSetCouleurTexte(val) {
 
 function cbDeselectionner() { cbSelId=null; cbRendreCanvas(); cbRendreProps(); cbRendreCalques(); }
 
-function cbZoomCanvas(val) {
-  const label = document.getElementById('cb-zoom-canvas-label');
+function cbZoomCanvas(val) {}
+
+function cbAppliquerZoom(val) {
+  const inner = document.getElementById('cb-canvas-inner');
+  const label = document.getElementById('cb-zoom-label');
+  if (inner) inner.style.transform = 'scale(' + val/100 + ')';
+  if (inner) inner.style.transformOrigin = 'top left';
   if (label) label.textContent = val + '%';
 }
 
@@ -1211,6 +1213,17 @@ function cbGlobalKeyDown(e) {
   // Sauvegarder après un délai pour ne pas spammer
   clearTimeout(cbGlobalKeyDown._timer);
   cbGlobalKeyDown._timer = setTimeout(()=>cbSauvegarderPage(), 800);
+}
+
+function cbDemanderNouvellePage() {
+  const total = cbPages.length;
+  const pos = prompt('Après quelle page voulez-vous insérer ?\n(1 à ' + total + ', ou 0 pour mettre en premier)');
+  if (pos === null) return;
+  const idx = parseInt(pos);
+  if (isNaN(idx) || idx < 0 || idx > total) {
+    alert('Numéro invalide.'); return;
+  }
+  cbNouvellePageCatalogue(idx === 0 ? undefined : idx - 1);
 }
 
 // ─── RÉSOUDRE BINDING ────────────────────────────────────────────────────────
