@@ -723,14 +723,57 @@
   </div>
 
   <!-- FORMULAIRE -->
-  <div id="form-regroupements" class="cache">
-    <div class="form-panel visible">
+ <!-- REGROUPEMENTS -->
+<div class="section-admin" id="section-regroupements">
+  <div class="page-entete fade-in">
+    <div>
+      <div class="page-entete-eyebrow">Regrouper les produits par ingrédient vedette</div>
+      <div class="page-entete-titre">Regroupements</div>
+    </div>
+    <button class="bouton" id="btn-nouveau-regroupement" onclick="ouvrirFormRegroupement()">+ Nouveau regroupement</button>
+  </div>
+  <div class="msg-zone" id="msg-regroupements"></div>
+
+  <!-- FICHE D'UN REGROUPEMENT -->
+  <div id="fiche-regroupement" class="cache">
+    <div class="form-panel">
       <div class="form-panel-header">
-        <span class="form-panel-titre" id="form-regroupements-titre">Nouveau regroupement</span>
+        <div class="fiche-bandeau" id="fiche-regroupement-bandeau">
+          <span class="form-panel-titre" id="fiche-regroupement-titre"></span>
+          <span class="fiche-slogan" id="fiche-regroupement-slogan"></span>
+        </div>
+        <button class="btn-fermer-panneau" onclick="fermerFicheRegroupement()" title="Fermer">✕</button>
+      </div>
+    </div>
+    <div class="form-panel">
+      <div class="form-body">
+        <div id="fiche-regroupement-extras"></div>
+        <p class="fiche-desc" id="fiche-regroupement-desc"></p>
+        <div class="section-label">Ingrédient</div>
+        <div class="form-valeur" id="fiche-regroupement-ingredient"></div>
+        <div class="section-label">Produits associés</div>
+        <p class="texte-secondaire" id="fiche-regroupement-produits"></p>
+      </div>
+    </div>
+    <div class="form-panel form-body-actions">
+      <div class="form-actions">
+        <button class="bouton" id="fiche-regroupement-modifier">Modifier ce regroupement</button>
+        <button class="bouton bouton-rouge" id="btn-supprimer-regroupement">Supprimer ce regroupement</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMULAIRE NOUVEAU / MODIFIER REGROUPEMENT -->
+  <div id="form-regroupements" class="cache">
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <div class="fiche-bandeau" id="form-regroupements-bandeau">
+          <span class="form-panel-titre" id="form-regroupements-titre">Nouveau regroupement</span>
+        </div>
         <button class="btn-fermer-panneau" onclick="fermerFormRegroupement()" title="Fermer">✕</button>
       </div>
     </div>
-    <div class="form-panel visible">
+    <div class="form-panel">
       <div class="form-body">
         <input type="hidden" id="freg-id">
         <div class="form-grille">
@@ -762,28 +805,30 @@
           </div>
           <div class="form-groupe col-plein">
             <label class="form-label">Description</label>
-            <textarea class="form-ctrl" id="freg-desc" rows="3"></textarea>
+            <textarea class="form-ctrl textarea-auto" id="freg-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
           </div>
           <div class="form-groupe col-plein">
-            <label class="form-label">Photo</label>
+            <label class="form-label">Photo principale</label>
             <div class="cloudinary-zone">
               <input type="text" class="form-ctrl" id="freg-photo-url">
-              <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('freg-photo-url', 'freg-photo-preview', '')">Médiathèque</button>
+              <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediaLibrary('freg-photo-url', 'freg-photo-preview')">Choisir une photo</button>
+              <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('freg-photo-url', 'freg-photo-preview', 'Regroupement')">Médiathèque</button>
             </div>
             <div id="freg-photo-preview"></div>
           </div>
           <div class="form-groupe col-plein">
-            <label class="form-label">Photo saisonnière</label>
+            <label class="form-label">Photo principale — saisonnière</label>
             <div class="cloudinary-zone">
               <input type="text" class="form-ctrl" id="freg-photo-noel-url">
-              <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('freg-photo-noel-url', 'freg-photo-noel-preview', '')">Médiathèque</button>
+              <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediaLibrary('freg-photo-noel-url', 'freg-photo-noel-preview')">Choisir une photo</button>
+              <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('freg-photo-noel-url', 'freg-photo-noel-preview', 'Regroupement Noël')">Médiathèque</button>
             </div>
             <div id="freg-photo-noel-preview"></div>
           </div>
         </div>
       </div>
     </div>
-    <div class="form-panel form-body-actions visible">
+    <div class="form-panel form-body-actions">
       <div class="form-actions">
         <button class="bouton" onclick="sauvegarderRegroupement()">Enregistrer</button>
         <button class="bouton bouton-contour" onclick="fermerFormRegroupement()">Annuler</button>
@@ -791,7 +836,7 @@
     </div>
   </div>
 
-  <!-- LISTE -->
+  <!-- LISTE DES REGROUPEMENTS -->
   <div class="chargement cache" id="loading-regroupements">
     <span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...
   </div>
