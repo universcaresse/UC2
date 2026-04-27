@@ -1006,13 +1006,13 @@ if (ori==='v') {
       fs:18, bold:true, police:'Playfair Display', couleur_texte:'#ffffff'});
     // Gamme
      page.blocs.push({...b(''), type:'texte', x:hexX+photoS+16, y:hexY+82, w:hexW-photoS-26, h:22,
-      fs:11, couleur_texte:'#ffffffaa', _texte_fixe:gam?.nom||''});
+      fs:11, couleur_texte:'#ffffff', _texte_fixe:gam?.nom||''});
     // Desc emballage
     page.blocs.push({...b('desc_emballage'), type:'texte', x:hexX+photoS+16, y:hexY+106, w:hexW-photoS-26, h:20,
-      fs:10, italic:true, couleur_texte:'#ffffffcc'});
+      fs:10, italic:true, couleur_texte:'#ffffff'});
     // Ligne séparatrice
     page.blocs.push({...b(''), type:'couleur', x:hexX+photoS+16, y:hexY+130, w:hexW-photoS-26, h:1,
-      couleur_libre:'#ffffff66', opacite:0.5});
+      couleur_libre:'#ffffff', opacite:0.5});
     // Formats + prix
     page.blocs.push({...b(''), type:'texte', x:hexX+photoS+16, y:hexY+138, w:hexW-photoS-26, h:50,
       fs:11, bold:false, couleur_texte:'#ffffff', align:'center',
