@@ -277,6 +277,373 @@ function stringToColor(str) {
   for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h);
   return palette[Math.abs(h) % palette.length];
 }
+/* ════════════════════════════════
+   COLLECTIONS V2
+════════════════════════════════ */
+var donneesCollections = []; // [{col_id, rang, nom, slogan, description, couleur_hex, photo_url, photo_noel_url}]
+var donneesGammes      = []; // [{gam_id, col_id, rang, nom, description, couleur_hex, photo_url, photo_noel_url}]
+var filtreGammesColId  = '';
+/* ════════════════════════════════
+   FAMILLES V2
+════════════════════════════════ */
+var donneesFamilles = [];
+async function chargerFamilles() {
+  afficherChargement();
+  const [resCol, resFam] = await Promise.all([
+    appelAPI('getCollections'),
+    appelAPI('getFamilles')
+  ]);
+  if (!resCol || !resCol.success) { cacherChargement(); afficherMsg('familles', 'Erreur lors du chargement.', 'erreur'); return; }
+  donneesCollections = resCol.items || [];
+  donneesFamilles    = (resFam && resFam.success) ? resFam.items || [] : [];
+  cacherChargement();
+  afficherFamilles();
+}
+function afficherFamilles() {
+  const loading = document.getElementById('loading-familles');
+  const contenu = document.getElementById('contenu-familles');
+  const vide    = document.getElementById('vide-familles');
+  const btnNew  = document.getElementById('btn-nouvelle-famille');
+  if (loading) loading.classList.add('cache');
+  if (btnNew)  btnNew.classList.remove('cache');
+  if (!contenu) return;
+  contenu.innerHTML = '';
+  if (vide) vide.classList.add('cache');
+  if (!donneesFamilles.length) { if (vide) vide.classList.remove('cache'); return; }
+
+  let html = '<div class="collections-grille">';
+  donneesFamilles.forEach(fam => {
+    const col     = donneesCollections.find(c => c.col_id === fam.col_id);
+    const couleurs = couleurCollection(fam.nom, fam.couleur_hex);
+    html += `
+      <div class="collection-carte" onclick="ouvrirFicheFamille('${fam.fam_id}')">
+        <div class="collection-carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
+        <div class="collection-carte-overlay"></div>
+        <div class="collection-carte-lignes-haut"><span class="collection-carte-ligne-tag">${(col?.nom || '—').toUpperCase()}</span></div>
+        <div class="collection-carte-contenu">
+          <span class="collection-carte-nom">${(fam.nom || '').toUpperCase()}</span>
+          <span class="collection-carte-slogan">${fam.description || ''}</span>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  contenu.innerHTML = html;
+}
+function ouvrirFicheFamille(fam_id) {
+  const fam = donneesFamilles.find(f => f.fam_id === fam_id);
+  if (!fam) return;
+  const col = donneesCollections.find(c => c.col_id === fam.col_id);
+  document.getElementById('fiche-famille-titre').textContent      = (fam.nom || '').toUpperCase();
+  document.getElementById('fiche-famille-slogan').textContent     = fam.slogan || '';
+  document.getElementById('fiche-famille-collection').textContent = col?.nom || '—';
+  document.getElementById('fiche-famille-desc').textContent       = fam.description || '—';
+
+  let wrapHtml = '';
+  if (fam.photo_url)      wrapHtml += `<img src="${fam.photo_url}" class="fiche-visuel-photo">`;
+  if (fam.photo_noel_url) wrapHtml += `<img src="${fam.photo_noel_url}" class="fiche-visuel-photo">`;
+  if (fam.couleur_hex)    wrapHtml += `<div class="fiche-visuel-hex" style="background:${fam.couleur_hex}"></div>`;
+  const ficheExtras = document.getElementById('fiche-famille-extras');
+  if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class="fiche-visuel">${wrapHtml}</div>` : '';
+
+  document.getElementById('fiche-famille-modifier').onclick = () => {
+    fermerFicheFamille();
+    modifierFamille(fam_id);
+  };
+  document.getElementById('btn-supprimer-famille').onclick = () => supprimerFamille(fam_id);
+  document.getElementById('contenu-familles').classList.add('cache');
+  document.getElementById('btn-nouvelle-famille').classList.add('cache');
+  document.getElementById('fiche-famille').classList.remove('cache');
+  setTimeout(appliquerCouleursHex, 300);
+  window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
+}
+function fermerFicheFamille() {
+  document.getElementById('fiche-famille').classList.add('cache');
+  document.getElementById('contenu-familles').classList.remove('cache');
+  const btnNew = document.getElementById('btn-nouvelle-famille');
+  if (btnNew) btnNew.classList.remove('cache');
+}
+function peuplerPositionFamille(col_id, rangActuel) {
+  const selGam = document.getElementById('ff-gamme');
+  if (selGam) {
+    selGam.innerHTML = '<option value="">— Aucune —</option>';
+    if (col_id) {
+      donneesGammes.filter(g => g.col_id === col_id).sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(g => {
+        const o = document.createElement('option');
+        o.value = g.gam_id; o.textContent = g.nom; selGam.appendChild(o);
+      });
+    }
+  }
+  const selPos = document.getElementById('ff-position');
+  if (!selPos) return;
+  selPos.innerHTML = '<option value="0">En premier</option>';
+  if (!col_id) return;
+  const gam_id = document.getElementById('ff-gamme')?.value || '';
+  donneesFamilles.filter(f => f.col_id === col_id && (!gam_id || f.gam_id === gam_id))
+    .sort((a, b) => (a.rang || 99) - (b.rang || 99))
+    .forEach(f => {
+      const o = document.createElement('option');
+      o.value = f.rang;
+      o.textContent = 'Après ' + f.nom;
+      if (rangActuel && f.rang === rangActuel - 1) o.selected = true;
+      selPos.appendChild(o);
+    });
+}
+function ouvrirFormFamille() {
+  fermerFicheFamille();
+  document.getElementById('form-familles-titre').textContent = 'Nouvelle famille';
+  document.getElementById('ff-id').value          = '';
+  document.getElementById('ff-rang').value        = '';
+  document.getElementById('ff-nom').value         = '';
+  document.getElementById('ff-desc').value        = '';
+  (document.getElementById('ff-couleur-hex') || {}).value = '';
+  const sel = document.getElementById('ff-collection');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
+    const o = document.createElement('option');
+    o.value = col.col_id; o.textContent = col.nom; sel.appendChild(o);
+  });
+  sel.value = '';
+  peuplerPositionFamille('', null);
+  document.getElementById('contenu-familles').classList.add('cache');
+  document.getElementById('btn-nouvelle-famille').classList.add('cache');
+  document.getElementById('form-familles').classList.remove('cache');
+  window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
+}
+
+function fermerFormFamille() {
+  document.getElementById('form-familles').classList.add('cache');
+  document.getElementById('contenu-familles').classList.remove('cache');
+  const btnNew = document.getElementById('btn-nouvelle-famille');
+  if (btnNew) btnNew.classList.remove('cache');
+}
+
+function modifierFamille(fam_id) {
+  const fam = donneesFamilles.find(f => f.fam_id === fam_id);
+  if (!fam) return;
+  document.getElementById('form-familles-titre').textContent = 'Modifier la famille';
+  document.getElementById('ff-nom').value         = fam.nom || '';
+  document.getElementById('ff-id').value          = fam.fam_id;
+  document.getElementById('ff-rang').value        = fam.rang || '';
+    document.getElementById('ff-desc').value        = fam.description || '';
+  if (document.getElementById('ff-couleur-hex')) (document.getElementById('ff-couleur-hex') || {}).value = fam.couleur_hex || '';
+  const sel = document.getElementById('ff-collection');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
+    const o = document.createElement('option');
+    o.value = col.col_id; o.textContent = col.nom; sel.appendChild(o);
+  });
+  sel.value = fam.col_id || '';
+  peuplerPositionFamille(fam.col_id, fam.rang);
+  const selGamFam = document.getElementById('ff-gamme');
+  if (selGamFam) selGamFam.value = fam.gam_id || '';
+  document.getElementById('contenu-familles').classList.add('cache');
+  document.getElementById('btn-nouvelle-famille').classList.add('cache');
+  document.getElementById('form-familles').classList.remove('cache');
+  window.scrollTo(0, 0);
+}
+
+async function sauvegarderFamille() {
+  afficherChargement();
+  const id     = document.getElementById('ff-id').value;
+  const col_id = document.getElementById('ff-collection').value;
+  const nom    = document.getElementById('ff-nom').value.trim().toUpperCase();
+  if (!nom || !col_id) { afficherMsg('familles', 'Nom et collection requis.', 'erreur'); return; }
+  const positionChoisie = parseInt(document.getElementById('ff-position')?.value) || 0;
+  const d = {
+    fam_id:      id || ('FAM-' + Date.now()),
+    col_id,
+    gam_id:      document.getElementById('ff-gamme')?.value || '',
+    rang:        positionChoisie + 1,
+    nom,
+    description: document.getElementById('ff-desc').value,
+    couleur_hex: '',
+  };
+  const res = await appelAPIPost('saveFamille', d);
+  if (res && res.success) {
+    cacherChargement();
+    fermerFormFamille();
+    afficherMsg('familles', id ? 'Famille mise à jour.' : 'Famille ajoutée.');
+    await chargerFamilles();
+  } else {
+    cacherChargement();
+    afficherMsg('familles', 'Erreur lors de la sauvegarde.', 'erreur');
+  }
+}
+
+async function supprimerFamille(fam_id) {
+  const resPro = await appelAPI('getProduits');
+  const tousLesProduits = (resPro && resPro.success) ? resPro.items : donneesProduits;
+  const produitsLies = tousLesProduits.filter(p => p.fam_id === fam_id);
+  if (produitsLies.length > 0) {
+    afficherMsg('familles', `Impossible — ${produitsLies.length} produit(s) sont liés à cette famille.`, 'erreur');
+    return;
+  }
+  confirmerAction('Supprimer cette famille ?', async () => {
+    afficherChargement();
+    const res = await appelAPIPost('deleteFamille', { fam_id });
+    if (res && res.success) {
+      cacherChargement();
+      fermerFicheFamille();
+      afficherMsg('familles', 'Famille supprimée.');
+      await chargerFamilles();
+    } else {
+      cacherChargement();
+      afficherMsg('familles', 'Erreur lors de la suppression.', 'erreur');
+    }
+  });
+}
+
+async function chargerCollections() {
+  afficherChargement();
+  const [resCol, resGam] = await Promise.all([
+    appelAPI('getCollections'),
+    appelAPI('getGammes')
+  ]);
+ if (!resCol || !resCol.success) { cacherChargement(); afficherMsg('collections', 'Erreur lors du chargement.', 'erreur'); return; }
+  donneesCollections = resCol.items || [];
+  donneesGammes      = (resGam && resGam.success) ? resGam.items || [] : [];
+  cacherChargement();
+  afficherCollections();
+}
+
+function afficherCollections() {
+  const loading = document.getElementById('loading-collections');
+  const contenu = document.getElementById('contenu-collections');
+  const vide    = document.getElementById('vide-collections');
+  const btnNew  = document.getElementById('btn-nouvelle-collection');
+  if (!contenu) return;
+  contenu.innerHTML = '';
+  if (vide) vide.classList.add('cache');
+  if (!donneesCollections.length) {
+    if (loading) loading.classList.add('cache');
+    if (btnNew)  btnNew.classList.remove('cache');
+    if (vide) vide.classList.remove('cache');
+    return;
+  }
+  if (loading) loading.classList.add('cache');
+  if (btnNew)  btnNew.classList.remove('cache');
+
+  let html = '<div class="collections-grille">';
+  donneesCollections.forEach(col => {
+    const couleurs = couleurCollection(col.nom, col.couleur_hex);
+    // Gammes de cette collection
+    html += `
+      <div class="collection-carte" onclick="ouvrirFicheCollection('${col.col_id}')">
+        <div class="collection-carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
+        <div class="collection-carte-overlay"></div>
+        <div class="collection-carte-lignes-haut"></div>
+        <div class="collection-carte-contenu">
+          <span class="collection-carte-nom">${(col.nom || '').toUpperCase()}</span>
+          <span class="collection-carte-slogan">${col.slogan || ''}</span>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  contenu.innerHTML = html;
+}
+
+function ouvrirFicheCollection(col_id) {
+  const col = donneesCollections.find(c => c.col_id === col_id);
+  if (!col) return;
+
+  const couleurs   = couleurCollection(col.nom, col.couleur_hex);
+  const gammes     = donneesGammes.filter(g => g.col_id === col_id);
+const gammesHtml = gammes.map(gam => `
+    <div class="fiche-ligne-item" onclick="fermerFicheCollection(); afficherSection('gammes', null); ouvrirFicheGamme2('${gam.gam_id}')">
+      <div class="fiche-ligne-info">
+        <span class="fiche-ligne-nom">${(gam.nom || '').toUpperCase()}</span>
+        ${gam.description ? `<p class="fiche-ligne-desc">${gam.description}</p>` : ''}
+      </div>
+    </div>`).join('');
+
+  const fiche = document.getElementById('fiche-collection');
+  document.getElementById('fiche-collection-titre').textContent  = (col.nom || '').toUpperCase();
+  document.getElementById('fiche-collection-bandeau').style.background = '';
+  document.getElementById('fiche-collection-slogan').textContent = col.slogan || '';
+  document.getElementById('fiche-collection-desc').textContent   = col.description || '';
+
+  let wrapHtml = '';
+  if (col.photo_url)       wrapHtml += `<img src="${col.photo_url}" class="fiche-visuel-photo">`;
+  if (col.photo_noel_url)  wrapHtml += `<img src="${col.photo_noel_url}" class="fiche-visuel-photo">`;
+  if (col.couleur_hex)     wrapHtml += `<div class="fiche-visuel-hex" style="background:${col.couleur_hex}"></div>`;
+  const ficheExtras = document.getElementById('fiche-collection-extras');
+  if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class="fiche-visuel">${wrapHtml}</div>` : '';
+
+  document.getElementById('fiche-collection-lignes').innerHTML = gammesHtml || '<p class="vide-desc">Aucune gamme</p>';
+
+  document.getElementById('fiche-collection-modifier').onclick = () => {
+    document.getElementById('fiche-collection').classList.remove('visible');
+    modifierCollection(col_id);
+  };
+ 
+  document.getElementById('btn-supprimer-collection').onclick = () => supprimerCollection(col_id);
+
+  document.getElementById('contenu-collections').classList.add('cache');
+  document.getElementById('btn-nouvelle-collection').classList.add('cache');
+  fiche.classList.add('visible');
+  window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
+}
+
+function fermerFicheCollection() {
+  const fiche   = document.getElementById('fiche-collection');
+  const contenu = document.getElementById('contenu-collections');
+  const btnNew  = document.getElementById('btn-nouvelle-collection');
+  if (fiche)   fiche.classList.remove('visible');
+  if (contenu) contenu.classList.remove('cache');
+  if (btnNew)  btnNew.classList.remove('cache');
+}
+
+function ouvrirFormCollection() {
+  fermerFicheCollection();
+  document.getElementById('form-collections-titre').textContent = 'Nouvelle collection';
+  document.getElementById('fc-rowIndex').value = '';
+  document.getElementById('fc-mode').value     = 'collection';
+  document.getElementById('fc-bloc-collection').classList.remove('cache');
+  document.getElementById('fc-bloc-ligne').classList.add('cache');
+  const selPos = document.getElementById('fc-position');
+  if (selPos) {
+    selPos.innerHTML = '<option value="0">En premier</option>';
+    donneesCollections.slice().sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
+      const o = document.createElement('option');
+      o.value = col.rang;
+      o.textContent = 'Après ' + col.nom;
+      selPos.appendChild(o);
+    });
+  }
+  ['fc-rang','fc-collection','fc-slogan','fc-desc-col','fc-couleur-hex','fc-photo-url']
+    .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+  ['fc-photo-preview','fc-photo-preview-noel'].forEach(id => {
+    const e = document.getElementById(id); if (e) e.innerHTML = '';
+  });
+  ['fc-couleur-apercu'].forEach(id => {
+    const e = document.getElementById(id); if (e) e.style.background = '';
+  });
+  document.getElementById('contenu-collections').classList.add('cache');
+  document.getElementById('btn-nouvelle-collection').classList.add('cache');
+  document.getElementById('form-collections').classList.remove('cache');
+  document.getElementById('form-collections').classList.add('visible');
+  window.scrollTo(0, 0);
+}
+
+function confirmerAction(message, callback) {
+  document.getElementById('modal-confirm-message').textContent = message;
+  document.getElementById('modal-confirm-btn').onclick = () => { fermerModalConfirm(); callback(); };
+  document.getElementById('modal-confirm').classList.add('ouvert');
+}
+
+function fermerModalConfirm() {
+  document.getElementById('modal-confirm').classList.remove('ouvert');
+}
+
+function fermerFormCollection() {
+  document.getElementById('contenu-collections').classList.remove('cache');
+  document.getElementById('btn-nouvelle-collection').classList.remove('cache');
+  document.getElementById('form-collections').classList.remove('visible');
+  document.getElementById('form-collections').classList.add('cache');
+}
 
 // ─── GAMMES (ex-Lignes) ───
 async function ouvrirFicheGamme(gam_id) {
@@ -3109,7 +3476,437 @@ async function importEnLot()   {}
 function importAnnuler()       { document.getElementById('import-apercu-zone')?.classList.add('cache'); }
 function importDevinerType()   { return ''; }
 
+/* ════════════════════════════════
+   VENTES V2
+════════════════════════════════ */
+var venPanier = [];
+var venIdEnCours = null;
+var venNumeroAffiche = '';
+var venLotsDisponibles = [];
 
+async function chargerVentes() {
+  const loading = document.getElementById('loading-ventes');
+  const tableau = document.getElementById('tableau-ventes');
+  const vide    = document.getElementById('vide-ventes');
+  if (loading) loading.classList.remove('cache');
+  const res = await appelAPI('getVentesEntete');
+  if (loading) loading.classList.add('cache');
+  if (!res || !res.success || !res.items.length) {
+    if (vide) vide.classList.remove('cache');
+    return;
+  }
+  let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>Date</th><th>Client</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody>';
+  res.items.forEach(v => {
+    html += `<tr class="cliquable" onclick="voirDetailVente('${v.ven_id}')">
+      <td>${v.date}</td>
+      <td>${v.client || '—'}</td>
+      <td>${v.mode_paiement || '—'}</td>
+      <td>${formaterPrix(v.total)}</td>
+      <td>${v.statut}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  if (tableau) tableau.innerHTML = html;
+}
+
+function ouvrirFormVente() {
+  venPanier = [];
+  venIdEnCours = 'VEN-' + Date.now();
+  appelAPI('getLotsDisponibles').then(resLots => {
+    venLotsDisponibles = (resLots && resLots.success) ? resLots.items : [];
+  });
+  const derniereVente = [...(toutesFactures || [])].sort((a, b) => (b.ven_id || '').localeCompare(a.ven_id || '')).find(v => v.ven_id);
+  const dernierNum = derniereVente ? parseInt(derniereVente.numero_affiche || '0') || 0 : 0;
+  venNumeroAffiche = String(dernierNum + 1).padStart(4, '0');
+  const selCol = document.getElementById('ven-collection');
+  selCol.innerHTML = '<option value="">— Choisir —</option>';
+  donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.col_id; o.textContent = c.nom; selCol.appendChild(o);
+  });
+  document.getElementById('ven-gamme').innerHTML = '<option value="">— Toutes —</option>';
+  document.getElementById('ven-produit').innerHTML = '<option value="">— Choisir —</option>';
+  document.getElementById('ven-format').innerHTML = '<option value="">— Choisir —</option>';
+  document.getElementById('ven-quantite').value = '1';
+  document.getElementById('ven-prix').value = '';
+  document.getElementById('ven-total-ligne').value = '';
+  document.getElementById('ven-client').value = '';
+  document.getElementById('ven-courriel').value = '';
+  document.getElementById('ven-telephone').value = '';
+  document.getElementById('ven-paiement').value = '';
+  document.getElementById('ven-livraison').value = '0';
+  document.getElementById('ven-sous-total').value = '';
+  document.getElementById('ven-total').value = '';
+  venRafraichirPanier();
+  document.getElementById('contenu-ventes').classList.add('cache');
+  document.getElementById('form-vente').classList.remove('cache');
+  document.getElementById('form-vente').style.display = 'block';
+  window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
+}
+
+function fermerFormVente() {
+  document.getElementById('form-vente').classList.add('cache');
+  document.getElementById('contenu-ventes').classList.remove('cache');
+  venPanier = [];
+  venIdEnCours = null;
+}
+
+function venFiltrerGammes() {
+  const col_id = document.getElementById('ven-collection').value;
+  const sel = document.getElementById('ven-gamme');
+  sel.innerHTML = '<option value="">— Toutes —</option>';
+  donneesGammes.filter(g => !col_id || g.col_id === col_id).sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(g => {
+    const o = document.createElement('option');
+    o.value = g.gam_id; o.textContent = g.nom; sel.appendChild(o);
+  });
+  venFiltrerProduits();
+}
+
+function venFiltrerProduits() {
+  const col_id = document.getElementById('ven-collection').value;
+  const gam_id = document.getElementById('ven-gamme').value;
+  const sel = document.getElementById('ven-produit');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  donneesProduits.filter(p => p.statut !== 'archive' && (!col_id || p.col_id === col_id) && (!gam_id || p.gam_id === gam_id))
+    .sort((a, b) => (a.nom || '').localeCompare(b.nom || '')).forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.pro_id; o.textContent = p.nom; sel.appendChild(o);
+    });
+  document.getElementById('ven-format').innerHTML = '<option value="">— Choisir —</option>';
+  document.getElementById('ven-prix').value = '';
+  document.getElementById('ven-total-ligne').value = '';
+}
+
+function venFiltrerFormats() {
+  const pro_id = document.getElementById('ven-produit').value;
+  const sel = document.getElementById('ven-format');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  if (!pro_id) return;
+  const pro = donneesProduits.find(p => p.pro_id === pro_id);
+  (pro?.formats || []).sort((a, b) => parseFloat(a.poids) - parseFloat(b.poids)).forEach(f => {
+    const lot = venLotsDisponibles.find(l => l.pro_id === pro_id && String(l.format_poids) === String(f.poids) && l.format_unite === f.unite);
+    const nbDispo = lot ? lot.nb_disponible : 0;
+    const o = document.createElement('option');
+    o.value = JSON.stringify({ lot_id: lot?.lot_id || '', poids: f.poids, unite: f.unite, nb_disponible: nbDispo });
+    o.textContent = `${f.poids} ${f.unite} — ${nbDispo} dispo`;
+    sel.appendChild(o);
+  });
+  venMettreAJourPrix();
+}
+
+function venMettreAJourPrix() {
+  const pro_id = document.getElementById('ven-produit').value;
+  const formatVal = document.getElementById('ven-format').value;
+  if (!pro_id || !formatVal) { document.getElementById('ven-prix').value = ''; document.getElementById('ven-total-ligne').value = ''; return; }
+  const format = JSON.parse(formatVal);
+  const pro = donneesProduits.find(p => p.pro_id === pro_id);
+  const formatProduit = (pro?.formats || []).find(f => String(f.poids) === String(format.poids) && f.unite === format.unite);
+  const prix = formatProduit?.prix_vente || 0;
+  const qte  = parseInt(document.getElementById('ven-quantite').value) || 1;
+  document.getElementById('ven-prix').value = prix ? formaterPrix(prix) : '—';
+  document.getElementById('ven-total-ligne').value = prix ? formaterPrix(prix * qte) : '—';
+}
+
+function venChangerQte(delta) {
+  const input = document.getElementById('ven-quantite');
+  const val = parseInt(input.value) || 1;
+  input.value = Math.max(1, val + delta);
+  venMettreAJourPrix();
+}
+
+function venAjouterLigne() {
+  const pro_id    = document.getElementById('ven-produit').value;
+  const formatVal = document.getElementById('ven-format').value;
+  const qte       = parseInt(document.getElementById('ven-quantite').value) || 1;
+  if (!pro_id || !formatVal) { afficherMsg('ventes', 'Choisir un produit et un format.', 'erreur'); return; }
+  const format = JSON.parse(formatVal);
+  if (qte > format.nb_disponible) { afficherMsg('ventes', `Stock insuffisant — ${format.nb_disponible} disponible(s).`, 'erreur'); return; }
+  const pro    = donneesProduits.find(p => p.pro_id === pro_id);
+  const formatProduit = (pro?.formats || []).find(f => String(f.poids) === String(format.poids) && f.unite === format.unite);
+  const prix = formatProduit?.prix_vente || 0;
+  venPanier.push({ pro_id, lot_id: format.lot_id, nom: pro?.nom || '', poids: format.poids, unite: format.unite, quantite: qte, prix_unitaire: prix });
+  venRafraichirPanier();
+  document.getElementById('ven-collection').value = '';
+  document.getElementById('ven-gamme').innerHTML = '<option value="">— Toutes —</option>';
+  document.getElementById('ven-produit').innerHTML = '<option value="">— Choisir —</option>';
+  document.getElementById('ven-format').innerHTML = '<option value="">— Choisir —</option>';
+  document.getElementById('ven-quantite').value = '1';
+  document.getElementById('ven-prix').value = '';
+  document.getElementById('ven-total-ligne').value = '';
+}
+
+function venRafraichirPanier() {
+  const liste = document.getElementById('ven-panier-liste');
+  if (!venPanier.length) { liste.innerHTML = '<div class="texte-secondaire">Aucun article</div>'; venCalculerTotal(); return; }
+  liste.innerHTML = venPanier.map((l, i) => `
+    <div class="ingredient-rangee">
+      <span style="flex:2">${l.nom} — ${l.poids} ${l.unite}</span>
+      <span style="flex:1">Qté : ${l.quantite}</span>
+      <span style="flex:1">${formaterPrix(l.prix_unitaire * l.quantite)}</span>
+      <button class="bouton bouton-petit bouton-rouge" onclick="venSupprimerLigne(${i})">✕</button>
+    </div>`).join('');
+  venMettreAJourPromos();
+}
+
+function venSupprimerLigne(i) {
+  venPanier.splice(i, 1);
+  venRafraichirPanier();
+}
+
+function venCalculerTotal() {
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const rabais    = venCalculerRabais();
+  const total     = sousTotal + livraison - rabais;
+  document.getElementById('ven-sous-total').value = formaterPrix(sousTotal);
+  document.getElementById('ven-total').value      = formaterPrix(Math.max(0, total));
+}
+
+function venCalculerRabais() {
+  const sel = document.getElementById('ven-promotion');
+  if (!sel || !sel.value) return 0;
+  const data = JSON.parse(sel.value);
+  if (!data || data.statut !== 'applicable') return 0;
+  const p = donneesPromotions.find(x => x.promo_id === data.promo_id);
+  if (!p) return 0;
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  if (p.type === 'qte_produit') {
+    let rabais = 0;
+    venPanier.forEach(l => {
+      const qteTotale = venPanier.filter(x => x.pro_id === l.pro_id).reduce((s, x) => s + x.quantite, 0);
+      if (qteTotale >= p.quantite_min) rabais += p.valeur * l.quantite;
+    });
+    return rabais;
+  }
+  if (p.type === 'qte_panier' || p.type === 'lot_complet' || p.type === 'ensemble_famille') {
+    return sousTotal * (p.valeur / 100);
+  }
+  return 0;
+}
+
+function venMettreAJourPromos() {
+  const sel = document.getElementById('ven-promotion');
+  if (!sel) return;
+  const valActuelle = sel.value ? JSON.parse(sel.value)?.promo_id : '';
+  sel.innerHTML = '<option value="">— Aucune —</option>';
+
+  const totalPanier = venPanier.reduce((s, l) => s + l.quantite, 0);
+
+  donneesPromotions.forEach(p => {
+    let statut = '';
+    let manque = 0;
+
+    if (p.type === 'qte_produit') {
+      const maxQteMemeProduit = Math.max(...Object.values(
+        venPanier.reduce((acc, l) => { acc[l.pro_id] = (acc[l.pro_id] || 0) + l.quantite; return acc; }, {})
+      ).concat([0]));
+      if (maxQteMemeProduit >= p.quantite_min) statut = 'applicable';
+      else { manque = p.quantite_min - maxQteMemeProduit; if (manque <= p.quantite_seuil) statut = 'presque'; }
+    }
+    else if (p.type === 'qte_panier') {
+      if (totalPanier >= p.quantite_min) statut = 'applicable';
+      else { manque = p.quantite_min - totalPanier; if (manque <= p.quantite_seuil) statut = 'presque'; }
+    }
+    else if (p.type === 'lot_complet') {
+      const applicable = venPanier.some(l => {
+        const pro = donneesProduits.find(x => x.pro_id === l.pro_id);
+        const fmt = (pro?.formats || []).find(f => String(f.poids) === String(l.poids) && f.unite === l.unite);
+        return fmt && l.quantite >= (fmt.nb_unites || 0) && fmt.nb_unites > 0;
+      });
+      if (applicable) statut = 'applicable';
+    }
+    else if (p.type === 'ensemble_famille') {
+      if (!p.fam_id) return;
+      const produitsFamille = donneesProduits.filter(x => x.fam_id === p.fam_id);
+      const proIdsVendus = new Set(venPanier.map(l => l.pro_id));
+      const manquants = produitsFamille.filter(x => !proIdsVendus.has(x.pro_id));
+      if (!manquants.length) statut = 'applicable';
+      else { manque = manquants.length; if (manque <= p.quantite_seuil) statut = 'presque'; }
+    }
+
+    if (!statut) return;
+
+    const o = document.createElement('option');
+    o.value = JSON.stringify({ promo_id: p.promo_id, statut });
+    const prefix = statut === 'applicable' ? '✅ ' : `🔜 (manque ${manque}) `;
+    o.textContent = prefix + p.nom;
+    if (statut === 'presque') o.style.color = 'var(--accent)';
+    sel.appendChild(o);
+    if (p.promo_id === valActuelle) o.selected = true;
+  });
+
+  venAppliquerPromotion();
+}
+
+function venAppliquerPromotion() {
+  const sel = document.getElementById('ven-promotion');
+  const info = document.getElementById('ven-promo-info');
+  if (!sel.value) { info.style.display = 'none'; venCalculerTotal(); return; }
+  const data = JSON.parse(sel.value);
+  const p = donneesPromotions.find(x => x.promo_id === data.promo_id);
+  if (!p) { info.style.display = 'none'; venCalculerTotal(); return; }
+
+  if (data.statut === 'presque') {
+    info.style.display = 'block';
+    info.style.borderLeftColor = 'var(--accent)';
+    info.style.background = 'var(--accent-08)';
+    info.textContent = '🔜 Pas encore applicable — encouragez le client à compléter sa commande !';
+    venCalculerTotal();
+    return;
+  }
+
+  const rabais = venCalculerRabais();
+  info.style.display = 'block';
+  info.style.borderLeftColor = 'var(--primary)';
+  info.style.background = 'var(--primary-06)';
+  info.textContent = `✅ Rabais appliqué : -${formaterPrix(rabais)}`;
+  venCalculerTotal();
+}
+
+function ouvrirApercuFacture() {
+  if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
+  const paiement  = document.getElementById('ven-paiement').value;
+  if (!paiement) { afficherMsg('ventes', 'Choisir un mode de paiement.', 'erreur'); return; }
+
+  const client    = document.getElementById('ven-client').value;
+  const courriel  = document.getElementById('ven-courriel').value;
+  const telephone = document.getElementById('ven-telephone').value;
+  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais    = venCalculerRabais();
+  const total     = Math.max(0, sousTotal + livraison - rabais);
+  const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const promoSel  = document.getElementById('ven-promotion').value;
+  const promoData = promoSel ? JSON.parse(promoSel) : null;
+  const promo     = promoData ? donneesPromotions.find(p => p.promo_id === promoData.promo_id) : null;
+
+  let html = `
+    <div style="font-family:'DM Sans',sans-serif;color:var(--gris-fonce)">
+      <div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--beige)">
+        <div style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--primary)">Univers Caresse</div>
+        <div style="font-size:0.75rem;color:var(--gris);letter-spacing:0.1em;margin-top:4px">${date}</div>
+      </div>`;
+
+  if (client || courriel || telephone) {
+    html += `<div style="margin-bottom:16px;font-size:0.85rem;color:var(--gris)">`;
+    if (client)    html += `<div>${client}</div>`;
+    if (courriel)  html += `<div>${courriel}</div>`;
+    if (telephone) html += `<div>${telephone}</div>`;
+    html += `</div>`;
+  }
+
+  html += `<table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:0.85rem">
+    <thead>
+      <tr style="border-bottom:2px solid var(--beige)">
+        <th style="text-align:left;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Produit</th>
+        <th style="text-align:center;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Qté</th>
+        <th style="text-align:right;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Prix</th>
+        <th style="text-align:right;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Total</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  venPanier.forEach(l => {
+    html += `<tr style="border-bottom:1px solid var(--beige)">
+      <td style="padding:10px 0">${l.nom} — ${l.poids} ${l.unite}</td>
+      <td style="padding:10px 0;text-align:center">${l.quantite}</td>
+      <td style="padding:10px 0;text-align:right">${formaterPrix(l.prix_unitaire)}</td>
+      <td style="padding:10px 0;text-align:right">${formaterPrix(l.prix_unitaire * l.quantite)}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;font-size:0.85rem">
+      <div style="display:flex;justify-content:space-between;width:220px"><span style="color:var(--gris)">Sous-total</span><span>${formaterPrix(sousTotal)}</span></div>`;
+
+  if (rabais > 0 && promo) {
+    html += `<div style="display:flex;justify-content:space-between;width:220px;color:var(--primary)"><span>Rabais — ${promo.nom}</span><span>-${formaterPrix(rabais)}</span></div>`;
+  }
+  if (livraison > 0) {
+    html += `<div style="display:flex;justify-content:space-between;width:220px"><span style="color:var(--gris)">Livraison</span><span>${formaterPrix(livraison)}</span></div>`;
+  }
+
+  html += `<div style="display:flex;justify-content:space-between;width:220px;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--primary);border-top:1px solid var(--beige);padding-top:8px;margin-top:4px"><span>Total</span><span>${formaterPrix(total)}</span></div>
+      <div style="font-size:0.75rem;color:var(--gris);margin-top:4px">${paiement === 'argent' ? 'Comptant' : 'Carte'}</div>
+    </div>
+    <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--beige);font-family:'Playfair Display',serif;font-style:italic;color:var(--gris);font-size:0.9rem">Merci pour votre achat !</div>
+  </div>`;
+
+  document.getElementById('modal-fv-contenu').innerHTML = html;
+  document.getElementById('modal-fv-numero').textContent = venNumeroAffiche;
+  document.getElementById('modal-facture-vente').classList.add('ouvert');
+}
+
+function fermerApercuFacture() {
+  document.getElementById('modal-facture-vente').classList.remove('ouvert');
+}
+
+function envoyerFactureCourriel() {
+  const courriel = document.getElementById('ven-courriel').value;
+  if (!courriel) { afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur'); return; }
+  afficherMsg('ventes', 'Fonctionnalité courriel à venir.', 'erreur');
+}
+
+function envoyerFactureTexto() {
+  const telephone = document.getElementById('ven-telephone').value;
+  if (!telephone) { afficherMsg('ventes', 'Aucun téléphone indiqué pour ce client.', 'erreur'); return; }
+  const client    = document.getElementById('ven-client').value;
+  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais    = venCalculerRabais();
+  const total     = Math.max(0, sousTotal + livraison - rabais);
+  let texte = `Univers Caresse\n\n`;
+  venPanier.forEach(l => { texte += `${l.nom} ${l.poids}${l.unite} x${l.quantite} = ${formaterPrix(l.prix_unitaire * l.quantite)}\n`; });
+  texte += `\nSous-total: ${formaterPrix(sousTotal)}`;
+  if (rabais > 0) texte += `\nRabais: -${formaterPrix(rabais)}`;
+  if (livraison > 0) texte += `\nLivraison: ${formaterPrix(livraison)}`;
+  texte += `\nTOTAL: ${formaterPrix(total)}\n\nMerci!`;
+  window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
+}
+
+async function finaliserVente() {
+  if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
+  afficherChargement();
+  const client      = document.getElementById('ven-client').value;
+  const courriel    = document.getElementById('ven-courriel').value;
+  const telephone   = document.getElementById('ven-telephone').value;
+  const paiement    = document.getElementById('ven-paiement').value;
+  const livraison   = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const ven_id      = venIdEnCours;
+
+  const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement });
+  if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la création.', 'erreur'); return; }
+
+  for (const l of venPanier) {
+    await appelAPIPost('addVenteLigne', { ven_id, pro_id: l.pro_id, lot_id: l.lot_id, quantite: l.quantite, prix_unitaire: l.prix_unitaire, format_poids: l.poids, format_unite: l.unite });
+  }
+
+  const promoSel  = document.getElementById('ven-promotion').value;
+  const promoData = promoSel ? JSON.parse(promoSel) : null;
+  const rabais    = venCalculerRabais();
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const total_net = Math.max(0, sousTotal + livraison - rabais);
+  const resFin = await appelAPIPost('finaliserVente', {
+    ven_id,
+    livraison,
+    promo_id: promoData?.promo_id || '',
+    rabais,
+    total_net
+  });
+  if (!resFin || !resFin.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur'); return; }
+
+  cacherChargement();
+  fermerApercuFacture();
+  fermerFormVente();
+  afficherMsg('ventes', '✅ Vente enregistrée.');
+  chargerVentes();
+}
+
+async function voirDetailVente(ven_id) {
+  afficherMsg('ventes', 'Fonctionnalité à venir.');
+}
 /* ════════════════════════════════
    REGROUPEMENTS V2
 ════════════════════════════════ */
