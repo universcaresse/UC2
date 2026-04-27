@@ -151,6 +151,7 @@ function modifierRegroupement(fra_id) {
   document.getElementById('form-regroupements').classList.remove('cache');
   document.getElementById('form-regroupements').classList.add('visible');
   console.log('classes form:', document.getElementById('form-regroupements').className);
+  console.log('classes fiche:', document.getElementById('fiche-regroupement').className);
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
   document.getElementById('form-regroupements').scrollIntoView({ behavior: 'smooth' });
