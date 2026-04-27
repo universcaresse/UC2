@@ -708,6 +708,7 @@ function cbOnChangeCollection() {
   cbRendreSelField('','');
   document.getElementById('cb-apercu-zone').style.display='none';
   cbRendreCanvas();
+  cbSauvegarderPage(); // ← AJOUTÉ
 }
 
 function cbOnChangeGamme() {
@@ -718,6 +719,7 @@ function cbOnChangeGamme() {
   cbRendreSelField('','');
   document.getElementById('cb-apercu-zone').style.display='none';
   cbRendreCanvas();
+  cbSauvegarderPage(); // ← AJOUTÉ
 }
 
 function cbOnChangeFamille() {
@@ -728,14 +730,15 @@ function cbOnChangeFamille() {
   cbRendreSelField('','');
   document.getElementById('cb-apercu-zone').style.display='none';
   cbRendreCanvas();
+  cbSauvegarderPage(); // ← AJOUTÉ
 }
+
 
 function cbOnChangeSheet() {
   const sheet = document.getElementById('cb-src-sheet').value;
   const bloc  = cbGetBloc();
   if (bloc) bloc.binding = {...bloc.binding, sheet, id:'', field:''};
 
-  // Filtres optionnels selon l'onglet
   const colGrp = document.getElementById('cb-src-col-groupe');
   const gamGrp = document.getElementById('cb-src-gam-groupe');
   const famGrp = document.getElementById('cb-src-fam-groupe');
@@ -745,10 +748,7 @@ function cbOnChangeSheet() {
   if (colGrp) colGrp.style.display = montrerCol ? '' : 'none';
   if (gamGrp) gamGrp.style.display = montrerGam ? '' : 'none';
   if (famGrp) famGrp.style.display = montrerFam ? '' : 'none';
-
   if (montrerCol) cbRendreSelCollection(bloc?.binding?.col_id||'');
-
- // Contenu_v2 — liste des clés directement
   if (sheet === 'Contenu_v2') {
     document.getElementById('cb-src-id-groupe').style.display = '';
     cbRendreSelId(bloc?.binding||{sheet});
@@ -757,10 +757,12 @@ function cbOnChangeSheet() {
     cbRendreSelId(bloc?.binding||{sheet});
     cbRendreSelField('', '');
   }
-
   document.getElementById('cb-apercu-zone').style.display = 'none';
   cbRendreCanvas();
+  cbSauvegarderPage(); // ← AJOUTÉ
 }
+
+
 
 function cbOnChangeId() {
   const id=document.getElementById('cb-src-id').value;
@@ -770,6 +772,7 @@ function cbOnChangeId() {
   cbRendreSelField(sheet,'');
   document.getElementById('cb-apercu-zone').style.display='none';
   cbRendreCanvas();
+  cbSauvegarderPage(); // ← AJOUTÉ
 }
 
 function cbOnChangeField() {
