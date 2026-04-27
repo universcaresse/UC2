@@ -1217,12 +1217,16 @@ function cbGlobalKeyDown(e) {
 
 function cbDemanderNouvellePage() {
   const total = cbPages.length;
-  const pos = prompt('Après quelle page voulez-vous insérer ?\n(1 à ' + total + ', ou 0 pour mettre en premier)');
-  if (pos === null) return;
-  const idx = parseInt(pos);
-  if (isNaN(idx) || idx < 0 || idx > total) {
-    alert('Numéro invalide.'); return;
-  }
+  document.getElementById('modal-np-texte').textContent = 'Après quelle page ? (1 à ' + total + ', ou 0 pour mettre en premier)';
+  document.getElementById('modal-np-input').value = total;
+  document.getElementById('modal-cb-nouvelle-page').style.display = 'flex';
+}
+
+function cbConfirmerNouvellePage() {
+  const total = cbPages.length;
+  const idx = parseInt(document.getElementById('modal-np-input').value);
+  document.getElementById('modal-cb-nouvelle-page').style.display = 'none';
+  if (isNaN(idx) || idx < 0 || idx > total) { alert('Numéro invalide.'); return; }
   cbNouvellePageCatalogue(idx === 0 ? undefined : idx - 1);
 }
 
