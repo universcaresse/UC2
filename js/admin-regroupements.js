@@ -127,6 +127,7 @@ function peuplerPositionRegroupement(rangActuel) {
 
 function modifierRegroupement(fra_id) {
   const fra = donneesRegroupements.find(f => f.fra_id === fra_id);
+  console.log('fra trouvé:', fra);
   if (!fra) return;
   document.getElementById('form-regroupements-titre').textContent      = 'Modifier le regroupement';
   document.getElementById('freg-id').value                             = fra.fra_id;
