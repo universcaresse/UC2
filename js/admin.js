@@ -3943,7 +3943,7 @@ function afficherRegroupements() {
 
 function ouvrirFicheRegroupement(fra_id) {
   const fra = donneesRegroupements.find(f => f.fra_id === fra_id);
-  if (!fra) return;
+  if (!fra) { console.log('Regroupement introuvable:', fra_id, donneesRegroupements); return; }
   document.getElementById('fiche-regroupement-titre').textContent      = (fra.nom || '').toUpperCase();
   document.getElementById('fiche-regroupement-desc').textContent       = fra.description || '—';
   const ing = (listesDropdown.fullData || []).find(d => d.ing_id === fra.ing_id);
