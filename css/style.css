@@ -1180,7 +1180,7 @@ tr.cliquable { cursor: pointer; }
   .form-body .form-actions { padding-top: 12px; padding-bottom: 12px; }
   .form-groupe { margin-top: 2px !important; margin-bottom: 1px !important; }
   .form-ctrl { padding: 6px 10px; }
-  .hero-logo-img { padding-top: 32px; }
+  .hero-logo-img { max-width: 200px; padding-top: 16px; }
 }
  
 
