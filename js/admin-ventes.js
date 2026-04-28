@@ -54,7 +54,7 @@ function ouvrirFormVente() {
   const dernierNum = derniereVente ? parseInt(derniereVente.numero_affiche || '0') || 0 : 0;
   venNumeroAffiche = String(dernierNum + 1).padStart(4, '0');
   const selCol = document.getElementById('ven-collection');
-  selCol.innerHTML = '<option value="">— Choisir —</option>';
+  selCol.innerHTML = '<option value="">— Collection —</option>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(c => {
     const o = document.createElement('option');
     o.value = c.col_id; o.textContent = c.nom; selCol.appendChild(o);
