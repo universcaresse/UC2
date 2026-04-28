@@ -59,9 +59,9 @@ function ouvrirFormVente() {
     const o = document.createElement('option');
     o.value = c.col_id; o.textContent = c.nom; selCol.appendChild(o);
   });
-  document.getElementById('ven-gamme').innerHTML = '<option value="">— Toutes —</option>';
-  document.getElementById('ven-produit').innerHTML = '<option value="">— Choisir —</option>';
-  document.getElementById('ven-format').innerHTML = '<option value="">— Choisir —</option>';
+  document.getElementById('ven-gamme').innerHTML = '<option value="">— Gamme —</option>';
+  document.getElementById('ven-produit').innerHTML = '<option value="">— Produit —</option>';
+  document.getElementById('ven-format').innerHTML = '<option value="">— Format —</option>';
   document.getElementById('ven-quantite').value = '1';
   document.getElementById('ven-prix').value = '';
   document.getElementById('ven-total-ligne').value = '';
