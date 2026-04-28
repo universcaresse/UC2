@@ -1183,7 +1183,7 @@ tr.cliquable { cursor: pointer; }
   .hero-logo-img { max-width: 200px; padding-top: 16px; }
 } .accueil-admin { height: auto; overflow: visible; }
   .accueil-droite { overflow: visible; height: auto; }
- 
+  .accueil-grande-tuile { height: auto; aspect-ratio: 2/1; }
 
 /* ═══════════════════════════════════════
    ADMIN — FICHE COLLECTION
