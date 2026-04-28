@@ -175,11 +175,13 @@ function venRafraichirPanier() {
   const liste = document.getElementById('ven-panier-liste');
   if (!venPanier.length) { liste.innerHTML = '<div class="texte-secondaire">Aucun article</div>'; venCalculerTotal(); return; }
   liste.innerHTML = venPanier.map((l, i) => `
-    <div class="ingredient-rangee">
-      <span style="flex:2">${l.nom} — ${l.poids} ${l.unite}</span>
-      <span style="flex:1">Qté : ${l.quantite}</span>
-      <span style="flex:1">${formaterPrix(l.prix_unitaire * l.quantite)}</span>
-      <button class="bouton bouton-petit bouton-rouge" onclick="venSupprimerLigne(${i})">✕</button>
+    <div class="ingredient-rangee ven-panier-item">
+      <div class="ven-panier-nom">${l.nom} — ${l.poids} ${l.unite}</div>
+      <div class="ven-panier-details">
+        <span>Qté : ${l.quantite}</span>
+        <span>${formaterPrix(l.prix_unitaire * l.quantite)}</span>
+        <button class="bouton bouton-petit bouton-rouge" onclick="venSupprimerLigne(${i})">✕</button>
+      </div>
     </div>`).join('');
   venMettreAJourPromos();
 }
@@ -293,8 +295,7 @@ function venAppliquerPromotion() {
 
 function ouvrirApercuFacture() {
   if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
-  const paiement  = document.getElementById('ven-paiement').value;
-  if (!paiement) { afficherMsg('ventes', 'Choisir un mode de paiement.', 'erreur'); return; }
+  const paiement  = document.getElementById('modal-fv-paiement')?.value || '';
   const client    = document.getElementById('ven-client').value;
   const courriel  = document.getElementById('ven-courriel').value;
   const telephone = document.getElementById('ven-telephone').value;
@@ -331,10 +332,14 @@ function ouvrirApercuFacture() {
     <tbody>`;
   venPanier.forEach(l => {
     html += `<tr style="border-bottom:1px solid var(--beige)">
-      <td style="padding:10px 0">${l.nom} — ${l.poids} ${l.unite}</td>
-      <td style="padding:10px 0;text-align:center">${l.quantite}</td>
-      <td style="padding:10px 0;text-align:right">${formaterPrix(l.prix_unitaire)}</td>
-      <td style="padding:10px 0;text-align:right">${formaterPrix(l.prix_unitaire * l.quantite)}</td>
+      <td style="padding:10px 0" colspan="4">
+        <div>${l.nom} — ${l.poids} ${l.unite}</div>
+        <div style="display:flex;gap:16px;margin-top:4px;color:var(--gris);font-size:0.8rem">
+          <span>Qté : ${l.quantite}</span>
+          <span>${formaterPrix(l.prix_unitaire)} / unité</span>
+          <span style="margin-left:auto">${formaterPrix(l.prix_unitaire * l.quantite)}</span>
+        </div>
+      </td>
     </tr>`;
   });
   html += `</tbody></table>

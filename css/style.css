@@ -1394,3 +1394,42 @@ tr.cliquable { cursor: pointer; }
   z-index: 3;
   display: inline-flex;
 }
+
+
+/* ── Module vente — iPhone ── */
+.ven-qte-ligne {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ven-qte-ligne input {
+  text-align: center;
+  flex: 1;
+}
+.bouton-plein-largeur {
+  width: 100%;
+}
+.form-actions-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ven-panier-item {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.ven-panier-nom {
+  font-weight: 500;
+}
+.ven-panier-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--gris);
+  width: 100%;
+}
+.ven-panier-details .bouton {
+  margin-left: auto;
+}

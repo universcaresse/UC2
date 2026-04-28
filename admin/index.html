@@ -1702,7 +1702,8 @@
       </div>
 
 	<!-- VENTES -->
-      <div class="section-admin" id="section-ventes">
+	
+	<div class="section-admin" id="section-ventes">
         <div class="page-entete fade-in">
           <div>
             <div class="page-entete-eyebrow">Ventes et promotions</div>
@@ -1725,49 +1726,42 @@
           <div class="form-panel">
             <div class="form-body">
               <div class="form-grille">
-                <div class="form-groupe">
-                  <label class="form-label">Collection</label>
+                <div class="form-groupe col-plein">
                   <select class="form-ctrl" id="ven-collection" onchange="venFiltrerGammes()">
-                    <option value="">— Choisir —</option>
+                    <option value="">— Collection —</option>
                   </select>
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Gamme</label>
+                <div class="form-groupe col-plein">
                   <select class="form-ctrl" id="ven-gamme" onchange="venFiltrerProduits()">
-                    <option value="">— Toutes —</option>
+                    <option value="">— Gamme (toutes) —</option>
                   </select>
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Produit</label>
+                <div class="form-groupe col-plein">
                   <select class="form-ctrl" id="ven-produit" onchange="venFiltrerFormats()">
-                    <option value="">— Choisir —</option>
+                    <option value="">— Produit —</option>
                   </select>
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Format</label>
+                <div class="form-groupe col-plein">
                   <select class="form-ctrl" id="ven-format" onchange="venMettreAJourPrix()">
-                    <option value="">— Choisir —</option>
+                    <option value="">— Format —</option>
                   </select>
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Quantité</label>
-                  <div style="display:flex;gap:8px;align-items:center">
+                <div class="form-groupe col-plein">
+                  <div class="ven-qte-ligne">
                     <button class="bouton bouton-petit" onclick="venChangerQte(-1)">−</button>
-                    <input type="number" class="form-ctrl" id="ven-quantite" min="1" value="1" oninput="venMettreAJourPrix()" style="text-align:center;width:70px">
+                    <input type="number" class="form-ctrl" id="ven-quantite" min="1" value="1" inputmode="numeric" oninput="venMettreAJourPrix()">
                     <button class="bouton bouton-petit" onclick="venChangerQte(1)">+</button>
                   </div>
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Prix unitaire</label>
-                  <input type="text" class="form-ctrl" id="ven-prix" readonly>
+                <div class="form-groupe col-demi">
+                  <input type="text" class="form-ctrl" id="ven-prix" placeholder="Prix unitaire" readonly>
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Total</label>
-                  <input type="text" class="form-ctrl" id="ven-total-ligne" readonly>
+                <div class="form-groupe col-demi">
+                  <input type="text" class="form-ctrl" id="ven-total-ligne" placeholder="Total" readonly>
                 </div>
-              </div>
-              <div class="form-actions">
-                <button class="bouton" onclick="venAjouterLigne()">+ Ajouter</button>
+                <div class="form-groupe col-plein">
+                  <button class="bouton bouton-plein-largeur" onclick="venAjouterLigne()">+ Ajouter</button>
+                </div>
               </div>
             </div>
           </div>
@@ -1780,51 +1774,14 @@
             <div class="form-body">
               <div id="ven-panier-liste"></div>
               <div class="form-grille" style="margin-top:16px">
-                <div class="form-groupe">
-                  <label class="form-label">Sous-total</label>
-                  <input type="text" class="form-ctrl" id="ven-sous-total" readonly>
+                <div class="form-groupe col-plein">
+                  <input type="text" class="form-ctrl" id="ven-sous-total" placeholder="Sous-total" readonly>
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Livraison</label>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <input type="text" inputmode="decimal" class="form-ctrl" id="ven-livraison" value="0" oninput="venCalculerTotal()">
-                    <span style="color:var(--gris);font-family:'DM Sans',sans-serif">$</span>
-                  </div>
+                <div class="form-groupe col-plein">
+                  <input type="text" inputmode="decimal" class="form-ctrl" id="ven-livraison" placeholder="Livraison $" value="0" oninput="venCalculerTotal()">
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Total</label>
-                  <input type="text" class="form-ctrl" id="ven-total" readonly>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- CLIENT -->
-          <div class="form-panel">
-            <div class="form-panel-header">
-              <span class="form-panel-titre">Client (optionnel)</span>
-            </div>
-            <div class="form-body">
-              <div class="form-grille">
-                <div class="form-groupe">
-                  <label class="form-label">Nom</label>
-                  <input type="text" class="form-ctrl" id="ven-client">
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">Courriel</label>
-                  <input type="text" inputmode="email" class="form-ctrl" id="ven-courriel">
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">Téléphone</label>
-                  <input type="text" inputmode="tel" class="form-ctrl" id="ven-telephone">
-                </div>
-                <div class="form-groupe">
-                  <label class="form-label">Paiement</label>
-                  <select class="form-ctrl" id="ven-paiement">
-                    <option value="">— Choisir —</option>
-                    <option value="argent">Comptant</option>
-                    <option value="carte">Carte</option>
-                  </select>
+                <div class="form-groupe col-plein">
+                  <input type="text" class="form-ctrl" id="ven-total" placeholder="Total" readonly>
                 </div>
               </div>
             </div>
@@ -1837,12 +1794,31 @@
             </div>
             <div class="form-body">
               <div class="form-groupe">
-                <label class="form-label">Choisir une promotion</label>
                 <select class="form-ctrl" id="ven-promotion" onchange="venAppliquerPromotion()">
-                  <option value="">— Aucune —</option>
+                  <option value="">— Aucune promotion —</option>
                 </select>
               </div>
               <div id="ven-promo-info" style="display:none;margin-top:12px;padding:12px;background:var(--primary-06);border-left:3px solid var(--primary);font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--gris-fonce)"></div>
+            </div>
+          </div>
+
+          <!-- CLIENT -->
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <span class="form-panel-titre">Client (optionnel)</span>
+            </div>
+            <div class="form-body">
+              <div class="form-grille">
+                <div class="form-groupe col-plein">
+                  <input type="text" class="form-ctrl" id="ven-client" placeholder="Nom">
+                </div>
+                <div class="form-groupe col-plein">
+                  <input type="text" inputmode="email" class="form-ctrl" id="ven-courriel" placeholder="Courriel">
+                </div>
+                <div class="form-groupe col-plein">
+                  <input type="text" inputmode="tel" class="form-ctrl" id="ven-telephone" placeholder="Téléphone">
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1865,6 +1841,10 @@
         </div>
       </div>
 	<!-- INVENTAIRE PRODUCTION -->
+	
+	
+	
+	
         <div class="section-admin" id="section-inventaire-production">
         <div class="page-entete fade-in">
           <div class="page-entete-gauche">
@@ -2789,6 +2769,11 @@
             </div>
           </div>
         </div>
+		
+		
+		
+		
+		
  <div class="modal-admin-overlay" id="modal-facture-vente">
   <div class="modal-admin" style="max-width:600px">
     <div class="modal-admin-header">
@@ -2800,12 +2785,18 @@
     </div>
     <div class="modal-admin-body" id="modal-fv-contenu"></div>
     <div class="modal-admin-body">
-      <div class="form-actions">
-        <button class="bouton bouton-contour" onclick="fermerApercuFacture()">Annuler</button>
-        <button class="bouton bouton-vert-pale" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
-        <button class="bouton bouton-vert-pale" onclick="envoyerFactureTexto()">Envoyer par texto</button>
-        <button class="bouton bouton-vert-pale" onclick="payerParSquare()">Payer par Square</button>
-        <button class="bouton" onclick="finaliserVente()">Finaliser</button>
+      <div class="form-groupe col-plein" style="margin-bottom:8px">
+        <select class="form-ctrl" id="modal-fv-paiement">
+          <option value="">— Mode de paiement —</option>
+          <option value="argent">Comptant</option>
+          <option value="carte">Carte</option>
+        </select>
+      </div>
+      <div class="form-actions-vertical">
+        <button class="bouton bouton-plein-largeur" onclick="finaliserVente()">Finaliser</button>
+        <button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="payerParSquare()">Payer par Square</button>
+        <button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
+        <button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="envoyerFactureTexto()">Envoyer par texto</button>
       </div>
     </div>
   </div>
