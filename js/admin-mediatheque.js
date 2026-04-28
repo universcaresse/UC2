@@ -36,7 +36,7 @@ function medFiltrer() {
  grille.innerHTML = items.map(i => `
     <div class="collection-carte" onclick="medOuvrirPhoto('${i.url}', '${i.nom}')">
       <div class="collection-carte-bg" style="background:#888"></div>
-      <div class="collection-carte-overlay"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);"></div>
       <img src="${i.url}" alt="${i.nom}" onerror="this.style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
       <div class="collection-carte-contenu">
         <span class="collection-carte-nom">${i.categorie}</span>
