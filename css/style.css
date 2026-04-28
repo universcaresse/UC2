@@ -1433,10 +1433,19 @@ tr.cliquable { cursor: pointer; }
 .ven-panier-details .bouton {
   margin-left: auto;
 }
-
 @media (max-width: 430px) {
   .form-panel {
-    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .form-panel-header {
+    padding: 8px 12px;
+  }
+  .form-body {
+    padding: 12px;
+  }
+  .form-body .form-actions {
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
   .form-groupe {
     margin-bottom: 6px;
@@ -1444,11 +1453,5 @@ tr.cliquable { cursor: pointer; }
   .form-ctrl {
     padding: 6px 10px;
     font-size: 0.85rem;
-  }
-  .form-body {
-    padding: 8px 0;
-  }
-  .form-panel-header {
-    padding: 8px 10px;
   }
 }
