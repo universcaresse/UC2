@@ -123,8 +123,8 @@ function fermerModalMediatheque() {
 
 function medOuvrirPhoto(url, nom) {
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
-  overlay.innerHTML = `<img src="${url}" alt="${nom}" style="max-width:90%;max-height:90%;object-fit:contain;border-radius:8px;">`;
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+  overlay.innerHTML = `<img src="${url}" alt="${nom}" style="max-width:90%;max-height:90%;object-fit:contain;">`;
   overlay.onclick = () => overlay.remove();
   document.body.appendChild(overlay);
 }
