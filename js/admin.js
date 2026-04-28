@@ -299,3 +299,14 @@ function afficherChargement() {
 function cacherChargement() {
   document.getElementById('overlay-chargement')?.classList.add('cache');
 }
+
+async function exporterTextes() {
+  afficherChargement();
+  const res = await appelAPI('exporterTextesSite');
+  cacherChargement();
+  if (res && res.success) {
+    window.open(res.url, '_blank');
+  } else {
+    alert('Erreur : ' + (res?.message || 'inconnue'));
+  }
+}
