@@ -1178,9 +1178,9 @@ tr.cliquable { cursor: pointer; }
   .form-panel-header { padding: 8px 12px; }
   .form-body { padding: 12px; }
   .form-body .form-actions { padding-top: 12px; padding-bottom: 12px; }
-  .form-groupe { margin-top: 2px; margin-bottom: 1px; }
+   .form-groupe { margin-top: 4px !important; margin-bottom: 4px !important; }
   .form-ctrl { padding: 6px 10px; }
-  .hero-logo-img { padding-top: 16px; }
+  .hero-logo-img { padding-top: 32px; }
 }
  
 
