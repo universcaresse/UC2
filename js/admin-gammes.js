@@ -138,7 +138,7 @@ async function sauvegarderGamme2() {
   const res = await appelAPIPost('saveGamme', d);
   if (res && res.success) {
 console.log('ingrédients:', ingredientsBase, 'gam_id:', res.gam_id || d.gam_id);
-    await appelAPIPost('saveGammeIngredients', {
+    await appelAPIPost('saveGammeIngredients_v2', {
       gam_id: res.gam_id || d.gam_id,
       ingredients: ingredientsBase.map(i => ({
         ing_id:         i.ing_id || '',
@@ -222,7 +222,7 @@ async function supprimerGamme(gam_id) {
   }
  confirmerAction('Supprimer cette gamme ?', async () => {
     afficherChargement();
-    await appelAPIPost('saveGammeIngredients', { gam_id, ingredients: [] });
+    await appelAPIPost('saveGammeIngredients_v2', { gam_id, ingredients: [] });
     const res = await appelAPIPost('deleteGamme', { gam_id, col_id: gam.col_id });
     if (res && res.success) {
       cacherChargement();
