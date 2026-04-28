@@ -1447,11 +1447,11 @@ tr.cliquable { cursor: pointer; }
     padding-top: 12px;
     padding-bottom: 12px;
   }
-  .form-groupe {
-    margin-bottom: 6px;
+ .form-groupe {
+    margin-top: 4px;
+    margin-bottom: 4px;
   }
   .form-ctrl {
     padding: 6px 10px;
-    font-size: 0.85rem;
-  }
+    }
 }
