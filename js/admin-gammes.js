@@ -135,16 +135,16 @@ async function sauvegarderGamme2() {
     couleur_hex: '',
     rowIndex:    rowIndex || null
   };
-  await appelAPIPost('saveGammeIngredients', {
-    gam_id: d.gam_id,
-    ingredients: ingredientsBase.map(i => ({
-      ing_id:         i.ing_id || '',
-      nom_ingredient: i.nom,
-      quantite_g:     i.quantite
-    }))
-  });
   const res = await appelAPIPost('saveGamme', d);
   if (res && res.success) {
+    await appelAPIPost('saveGammeIngredients', {
+      gam_id: res.gam_id || d.gam_id,
+      ingredients: ingredientsBase.map(i => ({
+        ing_id:         i.ing_id || '',
+        nom_ingredient: i.nom,
+        quantite_g:     i.quantite
+      }))
+    });
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
     cacherChargement();
     fermerFormGamme2();
