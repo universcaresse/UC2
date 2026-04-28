@@ -133,6 +133,14 @@ async function sauvegarderGamme2() {
     couleur_hex: '',
     rowIndex:    rowIndex || null
   };
+  await appelAPIPost('saveGammeIngredients', {
+    gam_id: d.gam_id,
+    ingredients: ingredientsBase.map(i => ({
+      ing_id:         i.ing_id || '',
+      nom_ingredient: i.nom,
+      quantite_g:     i.quantite
+    }))
+  });
   const res = await appelAPIPost('saveGamme', d);
   if (res && res.success) {
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
@@ -229,12 +237,22 @@ async function supprimerGamme(gam_id) {
 async function modifierGamme(gam_id) {
   const gam = donneesGammes.find(g => g.gam_id === gam_id);
   if (!gam) return;
+  const resIng = await appelAPI('getGammesIngredients', { gam_id });
+  ingredientsBase = (resIng && resIng.success ? resIng.items : []).map(i => ({
+    ing_id:   i.ing_id,
+    type:     (listesDropdown.fullData.find(d => d.ing_id === i.ing_id) || {}).cat_id || '',
+    nom:      i.nom_ingredient,
+    quantite: i.quantite_g
+  }));
+  rafraichirListeIngredientsBase();
   document.getElementById('form-gammes-titre').textContent = 'Modifier la gamme';
    document.getElementById('fg-nom').value         = gam.nom || '';
    document.getElementById('fg-id').value          = gam.gam_id;
  
-  document.getElementById('fg-desc').value        = gam.description || '';
-  if (document.getElementById('fg-couleur-hex')) (document.getElementById('fg-couleur-hex') || {}).value = gam.couleur_hex || '';
+document.getElementById('fg-desc').value        = '';
+  if (document.getElementById('fg-couleur-hex')) (document.getElementById('fg-couleur-hex') || {}).value = '';
+  ingredientsBase = [];
+  rafraichirListeIngredientsBase();
   const sel = document.getElementById('fg-collection');
   sel.innerHTML = '<option value="">— Choisir —</option>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
