@@ -34,7 +34,7 @@ function afficherFamilles() {
         <div class="collection-carte-lignes-haut"><span class="collection-carte-ligne-tag">${(col?.nom || '—').toUpperCase()}</span></div>
         <div class="collection-carte-contenu">
           <span class="collection-carte-nom">${(fam.nom || '').toUpperCase()}</span>
-          <span class="collection-carte-slogan">${fam.description || ''}</span>
+        
         </div>
       </div>`;
   });
