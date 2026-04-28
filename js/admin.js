@@ -304,9 +304,10 @@ async function exporterTextes() {
   afficherChargement();
   const res = await appelAPI('exporterTextesSite');
   cacherChargement();
-  if (res && res.success) {
-    window.open(res.url, '_blank');
-  } else {
-    alert('Erreur : ' + (res?.message || 'inconnue'));
-  }
+if (res && res.success) {
+  window.open(res.url, '_blank');
+  afficherMsg('gammes', '✅ Fichier exporté — vérifiez votre Google Drive : ' + res.nom);
+} else {
+  afficherMsg('gammes', '❌ Erreur : ' + (res?.message || 'inconnue'), 'erreur');
+}
 }
