@@ -68,7 +68,8 @@ function ouvrirFormVente() {
   document.getElementById('ven-client').value = '';
   document.getElementById('ven-courriel').value = '';
   document.getElementById('ven-telephone').value = '';
-  document.getElementById('ven-paiement').value = '';
+  const elPaiement = document.getElementById('modal-fv-paiement');
+  if (elPaiement) elPaiement.value = '';
   document.getElementById('ven-livraison').value = '0';
   document.getElementById('ven-sous-total').value = '';
   document.getElementById('ven-total').value = '';
