@@ -952,3 +952,8 @@ function rafraichirListeFormatsRecette() {
   }).join('');
 }
 
+function apercuCouleurRecette(input) {
+  const apercu = document.getElementById('fr-couleur-apercu');
+  if (apercu) apercu.style.background = /^#[0-9a-fA-F]{6}$/.test(input.value.trim()) ? input.value.trim() : 'var(--beige)';
+  document.getElementById('fr-couleur').value = input.value;
+}
