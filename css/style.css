@@ -1180,7 +1180,7 @@ tr.cliquable { cursor: pointer; }
   .form-body .form-actions { padding-top: 12px; padding-bottom: 12px; }
   .form-groupe { margin-top: 2px !important; margin-bottom: 1px !important; }
   .form-ctrl { padding: 6px 10px; }
-  .hero-logo-img { max-width: 240px; padding-top: 1px; }
+  .hero-logo-img { max-width: 280px; padding-top: -10px; }
 } .accueil-admin { height: auto; overflow: visible; }
   .accueil-droite { overflow: visible; height: auto; }
   .accueil-grande-tuile { height: auto; }
