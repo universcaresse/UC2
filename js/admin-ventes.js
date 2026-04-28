@@ -434,13 +434,13 @@ function envoyerFactureTexto() {
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
 }
 
-async function finaliserVente() {
+async function finaliserVente(modePaiement) {
   if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
+  const paiement = modePaiement || document.getElementById('modal-fv-paiement')?.value || '';
   afficherChargement();
   const client      = document.getElementById('ven-client').value;
   const courriel    = document.getElementById('ven-courriel').value;
   const telephone   = document.getElementById('ven-telephone').value;
-  const paiement    = document.getElementById('ven-paiement').value;
   const livraison   = parseFloat(document.getElementById('ven-livraison').value) || 0;
   const ven_id      = venIdEnCours;
   const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement });

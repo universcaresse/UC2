@@ -289,25 +289,7 @@
 	  
 	  
 	  
-     <!-- ════════════════════════════════════════
-     COLLECTIONS — Liste, fiche et formulaire
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       afficherCollections()
-       ouvrirFormCollection() / fermerFormCollection()
-       fermerFicheCollection()
-       sauvegarderCollection()
-       supprimerCollection()
-       ouvrirCloudinaryCollection() / ouvrirCloudinaryCollectionNoel()
-
-     CSS (style.css)
-     .collection-section
-       .fiche-bandeau, .fiche-slogan
-       .fiche-desc, .fiche-extras-wrap
-       .fiche-couleur, .fiche-photo
-       .fiche-ligne-item, .fiche-ligne-info, .fiche-ligne-nom
-     ════════════════════════════════════════ -->
+     <!-- COLLECTIONS — Liste, fiche et formulaire -->
      <div class="section-admin visible" id="section-collections">
         <div class="page-entete fade-in">
           <div>
@@ -319,21 +301,7 @@
         <div class="msg-zone" id="msg-collections"></div>
 		
 		
-		
-		
-      <!-- ════════════════════════════════════════
-     COLLECTIONS — Fiche d'une collection
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       ouvrirFicheCollection()
-       fermerFicheCollection()
-
-     CSS (style.css)
-       .fiche-bandeau, .fiche-slogan
-       .fiche-desc, .fiche-extras-wrap
-       .fiche-couleur, .fiche-photo
-     ════════════════════════════════════════ -->
+      <!-- COLLECTIONS — Fiche d'une collection -->
        <div id="fiche-collection">
           <div class="form-panel">
             <div class="form-panel-header">
@@ -365,18 +333,7 @@
 	   
         <!-- ════════════════════════════════════════
      COLLECTIONS — Fiche d'une gamme
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       ouvrirFicheGamme()
-       fermerFicheGamme() / fermerFicheLigne()
-
-     CSS (style.css)
-       .fiche-collection-bandeau, .fiche-collection-slogan
-       .fiche-ligne-actions
-       .fiche-ligne-item, .fiche-ligne-info
-       .fiche-ligne-nom, .fiche-ligne-format, .fiche-ligne-desc
-     ════════════════════════════════════════ -->
+      ════════════════════════════════════════ -->
       <div id="fiche-ligne" class="cache">
           <div class="form-panel">
             <div class="form-panel-header">
@@ -416,20 +373,7 @@
 		
 		<!-- ════════════════════════════════════════
      COLLECTIONS — Formulaire nouvelle/modifier collection
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       ouvrirFormCollection()
-       fermerFormCollection()
-       sauvegarderCollection()
-       apercuCouleurCollection()
-       ouvrirCloudinaryCollection() / ouvrirCloudinaryCollectionNoel()
-       ouvrirMediatheque()
-
-     CSS (style.css)
-       .cloudinary-zone
-       .couleur-apercu
-     ════════════════════════════════════════ -->
+   -->
 		<div id="form-collections" class="cache">
           <div class="form-panel">
             <div class="form-panel-header">
@@ -506,17 +450,7 @@
 		
       <!-- ════════════════════════════════════════
      COLLECTIONS — Liste des collections
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       afficherCollections()
-
-     CSS (style.css)
-       .collection-section
-       .collection-carte, .collection-carte-bg, .collection-carte-overlay
-       .collection-carte-contenu, .collection-carte-nom, .collection-carte-slogan
-       .collection-carte-actions, .collection-carte-lignes
-     ════════════════════════════════════════ -->
+    -->
         <div class="chargement" id="loading-collections">
 		
 		
@@ -550,17 +484,7 @@
 		
         <!-- ════════════════════════════════════════
      FAMILLES — Fiche d'une famille
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       ouvrirFicheFamille()
-       fermerFicheFamille()
-       modifierFamille()
-       supprimerFamille()
-
-     CSS (style.css)
-       .famille-groupe, .famille-groupe-titre, .famille-groupe-desc
-     ════════════════════════════════════════ -->
+  -->
         <div id="fiche-famille" class="cache">
           <div class="form-panel">
             <div class="form-panel-header">
@@ -911,21 +835,7 @@
 	   
     <!-- ════════════════════════════════════════
      PRODUITS — Liste des produits + filtres
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       afficherProduits()
-       filtrerRecettes()
-       peuplerFiltresRecettes()
-       reinitialiserFiltresRecettes()
-       onFiltreCollection()
-
-     CSS (style.css)
-       .filtres-bar, .filtre-select, .filtre-recherche
-       .recette-cartes-grille, .recette-section-collection
-       .recette-collection-titre, .recette-section-ligne
-       .recette-ligne-titre, .recette-carte-actions
-     ════════════════════════════════════════ -->
+-->
         <div class="filtres-bar">
           <select class="form-ctrl filtre-select" id="filtre-recette-collection" onchange="onFiltreCollection()">
             <option value="">Collections</option>
@@ -949,17 +859,7 @@
 		
 <!-- ════════════════════════════════════════
      PRODUITS — Fiche d'un produit
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       ouvrirFicheProduit()
-       fermerFicheProduit() / fermerFicheRecette()
-       basculerModeEditionRecette()
-       supprimerRecetteActive()
-
-     CSS (style.css)
-       .recette-statut-badge, .recette-statut-public, .recette-statut-test
-     ════════════════════════════════════════ -->
+    -->
         <div id="fiche-recette" class="cache">
           <div class="form-panel">
             <div class="form-panel-header">
@@ -982,26 +882,7 @@
        
          <!-- ════════════════════════════════════════
      PRODUITS — Formulaire nouveau/modifier produit
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       ouvrirFormProduit() / ouvrirFormRecette()
-       fermerFormProduit() / fermerFormRecette()
-       sauvegarderRecette()
-       modifierProduit()
-       apercuCouleurRecette()
-       ajouterIngredientRecette() / supprimerIngredientRecette()
-       rafraichirListeIngredientsRecette()
-       ajouterFormatRecette() / supprimerFormatRecette()
-       rafraichirListeFormatsRecette()
-       chargerIngredientsBaseRecette()
-       mettreAJourLignes()
-       ouvrirMediatheque()
-
-     CSS (style.css)
-       .couleur-apercu, .cloudinary-zone
-       .filtres-bar
-     ════════════════════════════════════════ -->
+   -->
          <div id="form-recettes" class="cache">
           <div class="form-panel">
             <div class="form-panel-header">
@@ -1145,18 +1026,7 @@
         </div>
       <!-- ════════════════════════════════════════
      PRODUITS — Grille des produits
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       afficherProduits()
-
-     CSS (style.css)
-       .recette-cartes-grille
-       .recette-section-collection, .recette-collection-titre
-       .recette-section-ligne, .recette-ligne-titre
-       .recette-carte-actions
-       .recette-statut-badge, .recette-statut-public, .recette-statut-test
-     ════════════════════════════════════════ -->
+  ═ -->
       <div class="chargement" id="loading-produits"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div class="recettes-grille cache" id="grille-produits"></div>
       <div class="vide cache" id="vide-produits">
@@ -1465,23 +1335,7 @@
 
       <!-- ════════════════════════════════════════
      LES FACTURES — Liste et détail
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       chargerFactures()
-       filtrerFactures()
-       reinitialiserFiltres()
-       afficherFactures()
-       voirDetailFacture()
-       fermerModalFacture()
-       supprimerFacture()
-
-     CSS (style.css)
-       .filtres-bar, .factures-compte
-       .tableau-admin, .tableau-wrap
-       .facture-sous-total, .facture-sous-total-label
-       .inv-total, .inv-total-label, .inv-total-montant
-     ════════════════════════════════════════ -->
+ -->
       <div class="section-admin" id="section-factures">
         <div class="page-entete fade-in">
           <div>
@@ -1532,20 +1386,7 @@
       </div>
 
       <!-- INVENTAIRE -->
-      <!-- ════════════════════════════════════════
-     INVENTAIRE — Stocks ingrédients
-     ⚠️ AVANT DE MODIFIER — vérifier impacts JS et CSS
-
-     JS (admin.js)
-       chargerInventaire()
-       filtrerInventaire()
-       reinitialiserFiltresInventaire()
-
-     CSS (style.css)
-       .filtres-bar
-       .inv-section, .inv-header, .inv-titre, .inv-line
-       .inv-total, .inv-total-label, .inv-total-montant
-     ════════════════════════════════════════ -->
+   -->
       <div class="section-admin" id="section-inventaire">
         <div class="page-entete fade-in">
           <div>
@@ -2785,18 +2626,12 @@
     </div>
     <div class="modal-admin-body" id="modal-fv-contenu"></div>
     <div class="modal-admin-body">
-      <div class="form-groupe col-plein" style="margin-bottom:8px">
-        <select class="form-ctrl" id="modal-fv-paiement">
-          <option value="">— Mode de paiement —</option>
-          <option value="argent">Comptant</option>
-          <option value="carte">Carte</option>
-        </select>
-      </div>
       <div class="form-actions-vertical">
-        <button class="bouton bouton-plein-largeur" onclick="finaliserVente()">Finaliser</button>
+        <button class="bouton bouton-plein-largeur" onclick="finaliserVente('argent')">Comptant</button>
         <button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="payerParSquare()">Payer par Square</button>
-        <button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
+        <button class="bouton bouton-plein-largeur" onclick="finaliserVente()">Finaliser</button>
         <button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="envoyerFactureTexto()">Envoyer par texto</button>
+        <button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
       </div>
     </div>
   </div>
