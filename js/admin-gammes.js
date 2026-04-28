@@ -137,6 +137,7 @@ async function sauvegarderGamme2() {
   };
   const res = await appelAPIPost('saveGamme', d);
   if (res && res.success) {
+console.log('ingrédients:', ingredientsBase, 'gam_id:', res.gam_id || d.gam_id);
     await appelAPIPost('saveGammeIngredients', {
       gam_id: res.gam_id || d.gam_id,
       ingredients: ingredientsBase.map(i => ({
