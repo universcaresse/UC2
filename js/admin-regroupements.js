@@ -17,8 +17,7 @@ function afficherRegroupements() {
       <div class="collection-carte-lignes-haut"></div>
       <div class="collection-carte-contenu">
         <span class="collection-carte-nom">${(fra.nom || '').toUpperCase()}</span>
-        <span class="collection-carte-slogan">${fra.description || ''}</span>
-      </div>
+        </div>
     </div>`;
   });
   html += '</div>';
