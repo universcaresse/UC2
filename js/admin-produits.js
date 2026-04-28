@@ -856,59 +856,22 @@ function rafraichirListeIngredientsRecette() {
   }).join('');
 }
 
-// ─── INGRÉDIENTS DE BASE GAMME ───
-var ingredientsBase = [];
-
-function ajouterIngredientBase(type='', nom='', quantite=0) {
-  ingredientsBase.push({ type, nom, quantite });
-  rafraichirListeIngredientsBase();
-}
-
-function supprimerIngredientBase(index) {
-  ingredientsBase.splice(index, 1);
-  rafraichirListeIngredientsBase();
-}
-
-function rafraichirListeIngredientsBase() {
-  const liste = document.getElementById('liste-ingredients-base');
-  if (!liste) return;
-  if (ingredientsBase.length === 0) { liste.innerHTML = ''; return; }
-  const cats = [...new Set(listesDropdown.fullData.map(d => d.cat_id))].filter(Boolean).sort();
-  liste.innerHTML = ingredientsBase.map((ing, i) => {
-    const ingsDeType = listesDropdown.fullData.filter(d => d.cat_id === ing.type);
-    const inciVal    = (listesDropdown.fullData.find(d => d.nom_UC === ing.nom) || {}).inci || '';
-    return `
-    <div class="ingredient-rangee">
-      <select class="form-ctrl ing-type" onchange="ingredientsBase[${i}].type=this.value; ingredientsBase[${i}].nom=''; rafraichirListeIngredientsBase()">
-        <option value="">— Type —</option>
-        ${cats.map(t => `<option value="${t}" ${ing.type===t?'selected':''}>${listesDropdown.categoriesMap?.[t]||t}</option>`).join('')}
-      </select>
-      <select class="form-ctrl ing-nom" onchange="ingredientsBase[${i}].nom=this.value; ingredientsBase[${i}].ing_id=(listesDropdown.fullData.find(d=>d.nom_UC===this.value)||{}).ing_id||''; rafraichirListeIngredientsBase()">
-        <option value="">— Ingrédient —</option>
-        ${ingsDeType.map(d => `<option value="${d.nom_UC}" ${ing.nom===d.nom_UC?'selected':''}>${d.nom_UC}</option>`).join('')}
-      </select>
-      <input type="text" class="form-ctrl ing-inci" readonly placeholder="INCI" value="${inciVal}">
-      <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${ing.quantite||''}" placeholder="g" onchange="ingredientsBase[${i}].quantite=parseFloat(this.value)||0">
-      <button class="bouton bouton-petit bouton-rouge" onclick="supprimerIngredientBase(${i})">✕</button>
-    </div>`;
-  }).join('');
-}
 
 async function chargerIngredientsBaseRecette() {
   const gam_id = document.getElementById('fr-ligne').value;
-  if (!gam_id) { ingredientsBase = []; rafraichirListeIngredientsBase(); return; }
+  if (!gam_id) { gammesIngs = []; rafraichirListeGammesIngs(); return; }
   const res = await appelAPI('getGammesIngredients', { gam_id });
-  ingredientsBase = (res && res.success ? res.items : []).map(i => ({
+  gammesIngs = (res && res.success ? res.items : []).map(i => ({
     ing_id:   i.ing_id,
     type:     (listesDropdown.fullData.find(d => d.ing_id === i.ing_id) || {}).cat_id || '',
     nom:      i.nom_ingredient,
     quantite: i.quantite_g
   }));
   if (!document.getElementById('fr-id').value) {
-    ingredientsRecette = [...ingredientsBase];
+    ingredientsRecette = [...gammesIngs];
     rafraichirListeIngredientsRecette();
   }
-  rafraichirListeIngredientsBase();
+  rafraichirListeGammesIngs();
 }
 
 // ─── FORMATS PRODUIT ───

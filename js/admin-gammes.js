@@ -1,3 +1,6 @@
+var gammesIngs = [];
+
+
 function afficherGammes() {
   const loading = document.getElementById('loading-gammes');
   const contenu = document.getElementById('contenu-gammes');
@@ -103,8 +106,8 @@ function ouvrirFormGamme(col_id) {
     o.value = col.col_id; o.textContent = col.nom; sel.appendChild(o);
   });
   if (col_id) sel.value = col_id;
-  ingredientsBase = [];
-  rafraichirListeIngredientsBase();
+  gammesIngs = [];
+  rafraichirListeGammesIngs();
   peuplerPositionGamme(col_id, null);
   document.getElementById('contenu-gammes').classList.add('cache');
   document.getElementById('btn-nouvelle-gamme').classList.add('cache');
@@ -138,10 +141,10 @@ async function sauvegarderGamme2() {
   const res = await appelAPIPost('saveGamme', d);
   await new Promise(r => setTimeout(r, 800));
   if (res && res.success) {
-console.log('ingrédients:', ingredientsBase, 'gam_id:', res.gam_id || d.gam_id);
+console.log('ingrédients:', gammesIngs, 'gam_id:', res.gam_id || d.gam_id);
     await appelAPIPost('saveGammeIngredients', {
       gam_id: res.gam_id || d.gam_id,
-      ingredients: ingredientsBase.map(i => ({
+      ingredients: gammesIngs.map(i => ({
         ing_id:         i.ing_id || '',
         nom_ingredient: i.nom,
         quantite_g:     i.quantite
@@ -243,13 +246,13 @@ async function modifierGamme(gam_id) {
   const gam = donneesGammes.find(g => g.gam_id === gam_id);
   if (!gam) return;
   const resIng = await appelAPI('getGammesIngredients', { gam_id });
-  ingredientsBase = (resIng && resIng.success ? resIng.items : []).map(i => ({
+  gammesIngs = (resIng && resIng.success ? resIng.items : []).map(i => ({
     ing_id:   i.ing_id,
     type:     (listesDropdown.fullData.find(d => d.ing_id === i.ing_id) || {}).cat_id || '',
     nom:      i.nom_ingredient,
     quantite: i.quantite_g
   }));
-  rafraichirListeIngredientsBase();
+  rafraichirListeGammesIngs();
   document.getElementById('form-gammes-titre').textContent = 'Modifier la gamme';
   
    document.getElementById('fg-nom').value         = gam.nom || '';
@@ -272,4 +275,36 @@ document.getElementById('fg-desc').value        = gam.description || '';
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
 
+function rafraichirListeGammesIngs() {
+  const liste = document.getElementById('liste-ingredients-base');
+  if (!liste) return;
+  if (gammesIngs.length === 0) { liste.innerHTML = ''; return; }
+  const cats = [...new Set(listesDropdown.fullData.map(d => d.cat_id))].filter(Boolean).sort();
+  liste.innerHTML = gammesIngs.map((ing, i) => {
+    const ingsDeType = listesDropdown.fullData.filter(d => d.cat_id === ing.type);
+    const inciVal    = (listesDropdown.fullData.find(d => d.nom_UC === ing.nom) || {}).inci || '';
+    return `
+    <div class="ingredient-rangee">
+      <select class="form-ctrl ing-type" onchange="gammesIngs[${i}].type=this.value; gammesIngs[${i}].nom=''; rafraichirListeGammesIngs()">
+        <option value="">— Type —</option>
+        ${cats.map(t => `<option value="${t}" ${ing.type===t?'selected':''}>${listesDropdown.categoriesMap?.[t]||t}</option>`).join('')}
+      </select>
+      <select class="form-ctrl ing-nom" onchange="gammesIngs[${i}].nom=this.value; gammesIngs[${i}].ing_id=(listesDropdown.fullData.find(d=>d.nom_UC===this.value)||{}).ing_id||''; rafraichirListeGammesIngs()">
+        <option value="">— Ingrédient —</option>
+        ${ingsDeType.map(d => `<option value="${d.nom_UC}" ${ing.nom===d.nom_UC?'selected':''}>${d.nom_UC}</option>`).join('')}
+      </select>
+      <input type="text" class="form-ctrl ing-inci" readonly placeholder="INCI" value="${inciVal}">
+      <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${ing.quantite||''}" placeholder="g" onchange="gammesIngs[${i}].quantite=parseFloat(this.value)||0">
+      <button class="bouton bouton-petit bouton-rouge" onclick="supprimerGammeIng(${i})">✕</button>
+    </div>`;
+  }).join('');
+}
+function ajouterGammeIng() {
+  gammesIngs.push({ type: '', nom: '', quantite: 0 });
+  rafraichirListeGammesIngs();
+}
 
+function supprimerGammeIng(index) {
+  gammesIngs.splice(index, 1);
+  rafraichirListeGammesIngs();
+}
