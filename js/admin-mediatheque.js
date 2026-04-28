@@ -33,11 +33,15 @@ function medFiltrer() {
   const grille = document.getElementById('med-grille');
   document.getElementById('med-compteur').textContent = items.length + ' photo(s)';
   if (!items.length) { grille.innerHTML = '<p class="vide-desc">Aucune photo.</p>'; return; }
-  grille.innerHTML = items.map(i => `
+ grille.innerHTML = items.map(i => `
     <div class="collection-carte" onclick="medOuvrirPhoto('${i.url}', '${i.nom}')">
-      <div class="carte-visuel"><img src="${i.url}" alt="${i.nom}" onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:cover;"></div>
-      <div class="fiche-label">${i.nom}</div>
-      <div class="texte-secondaire">${i.categorie}</div>
+      <div class="collection-carte-bg" style="background:#888"></div>
+      <div class="collection-carte-overlay"></div>
+      <img src="${i.url}" alt="${i.nom}" onerror="this.style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+      <div class="collection-carte-contenu">
+        <span class="collection-carte-nom">${i.categorie}</span>
+        <span class="collection-carte-slogan">${i.nom}</span>
+      </div>
     </div>`).join('');
 }
 
