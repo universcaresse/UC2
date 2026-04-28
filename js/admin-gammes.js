@@ -245,6 +245,8 @@ async function supprimerGamme(gam_id) {
 async function modifierGamme(gam_id) {
   const gam = donneesGammes.find(g => g.gam_id === gam_id);
   if (!gam) return;
+  document.getElementById('contenu-gammes').classList.add('cache');
+document.getElementById('btn-nouvelle-gamme').classList.add('cache');
   const resIng = await appelAPI('getGammesIngredients', { gam_id });
   gammesIngs = (resIng && resIng.success ? resIng.items : []).map(i => ({
     ing_id:   i.ing_id,
