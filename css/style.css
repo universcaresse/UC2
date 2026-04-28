@@ -1448,8 +1448,8 @@ tr.cliquable { cursor: pointer; }
     padding-bottom: 12px;
   }
  .form-groupe {
-    margin-top: 4px;
-    margin-bottom: 4px;
+    margin-top: 2px;
+    margin-bottom: 1px;
   }
   .form-ctrl {
     padding: 6px 10px;
