@@ -418,7 +418,7 @@ function payerAvecSquare() {
     version: '1.3',
     notes: 'Univers Caresse'
   }));
-  alert('Montant en cents : ' + montantCents);
+  document.getElementById('fv-spinner').innerHTML += '<div>' + montantCents + '</div>';
 window.location.href = `square-commerce-v1://payment/create?data=${data}`;
 }
 
