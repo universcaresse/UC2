@@ -376,52 +376,6 @@ function fermerApercuFacture() {
 }
 
 function payerParSquare() {
-  const squareData = encodeURIComponent(JSON.stringify({
-    amount_money: { amount: 100, currency_code: "CAD" },
-    callback_url: "https://github.io",
-    client_id: squareAppId,
-    version: "1.3"
-  }));
-
-  window.location.href = "square-commerce-v1://payment/create?data=" + squareData;
-}
-function payerParSquare() {
-  if (!squareAppId) { alert('Erreur : identifiant d'application manquant'); return; }
-
-  // 1. Calcul du montant (vérifie bien tes IDs HTML : ven-livraison ou ven-delivery)
-  const livraison = parseFloat(document.getElementById('ven-livraison')?.value) || 0;
-  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-  const rabais    = (typeof venCalculerRabais === 'function') ? venCalculerRabais() : 0;
-  const total     = Math.max(0, sousTotal + livraison - rabais);
-  const amountCents = Math.round(total * 100);
-
-  // 2. Vérification avant envoi
-  if (amountCents <= 0) { 
-    alert("Le montant est de 0 $ ; la transaction n'est pas possible."); 
-    return; 
-  }
-
-  // 3. Préparation des données pour Square
-  const squareData = encodeURIComponent(JSON.stringify({
-    amount_money: {
-      amount: amountCents,
-      currency_code: "CAD"
-    },
-    callback_url: "https://universcaresse.github.io/UC2/admin/",
-    client_id: squareAppId,
-    version: "1.3",
-    notes: "Facture " + (venNumeroAffiche || "Client"),
-    options: {
-      supported_tender_types: ["CREDIT_CARD", "DEBIT_CARD", "CASH"]
-    }
-  }));
-
-  // 4. Lancement de Square
-  window.location.href = "square-commerce-v1://payment/create?data=" + squareData;
-}
-
-
-function payerPar() {
   if (!squareAppId) { afficherMsg('ventes', 'App ID Square introuvable.', 'erreur'); return; }
 
   const boutons = document.getElementById('fv-boutons');
@@ -435,18 +389,28 @@ function payerPar() {
   const total        = Math.max(0, sousTotal + livraison - rabais);
   const montantCents = Math.round(total * 100);
 
+  if (montantCents <= 0) {
+    afficherMsg('ventes', 'Le montant est de 0 $, transaction impossible.', 'erreur');
+    spinner.classList.add('cache');
+    boutons.querySelectorAll('button').forEach(b => b.disabled = false);
+    return;
+  }
+
   sessionStorage.setItem('square-pending', JSON.stringify({
     ven_id:        venIdEnCours,
     numeroAffiche: venNumeroAffiche
   }));
 
-  const squareData = encodeURIComponent(JSON.stringify({
+  const payload = {
     amount_money: { amount: montantCents, currency_code: 'CAD' },
     callback_url: 'https://universcaresse.github.io/UC2/admin/',
     client_id:    squareAppId,
     version:      '1.3',
-    notes:        'Facture ' + venNumeroAffiche
-  }));
+    notes:        'Facture ' + venNumeroAffiche,
+    options:      { supported_tender_types: ['CREDIT_CARD', 'DEBIT_CARD', 'CASH'] }
+  };
+
+  const squareData = encodeURIComponent(JSON.stringify(payload));
 
   setTimeout(() => {
     spinner.classList.add('cache');
@@ -455,7 +419,6 @@ function payerPar() {
 
   window.location.href = 'square-commerce-v1://payment/create?data=' + squareData;
 }
-
 function envoyerFactureCourriel() {
   const courriel = document.getElementById('ven-courriel').value;
   if (!courriel) { afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur'); return; }
