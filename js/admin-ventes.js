@@ -375,7 +375,6 @@ function fermerApercuFacture() {
   document.getElementById('modal-facture-vente').classList.remove('ouvert');
 }
 
-
 function payerParSquare() {
   if (!squareAppId) { alert('Erreur: App ID manquant'); return; }
 
@@ -385,28 +384,24 @@ function payerParSquare() {
   const total     = Math.max(0, sousTotal + livraison - rabais);
   const montantCents = Math.round(total * 100);
 
-  // Verification visuelle sur ton iPhone
-  alert("Envoi à Square : " + (montantCents / 100).toFixed(2) + "$ (" + montantCents + " cents)");
-
   if (montantCents <= 0) { alert("Le montant est à 0$, transaction impossible."); return; }
 
-   const squareData = encodeURIComponent(JSON.stringify({
-    amount_money: {
-      amount: montantCents,
-      currency_code: 'CAD'
+  const squareData = encodeURIComponent(JSON.stringify({
+    amount_money: { 
+      amount: montantCents, 
+      currency_code: "CAD" 
     },
-    callback_url: 'https://universcaresse.github.io/UC2/admin/',
+    callback_url: "https://universcaresse.github.io/UC2/admin/",
     client_id: squareAppId,
-    version: '1.2', // Changé de 1.3 à 1.2
-    notes: 'Facture ' + (venNumeroAffiche || 'Client'),
-    options: {
-      supported_tender_types: ["CREDIT_CARD", "DEBIT_CARD", "CASH"]
+    version: "1.3",
+    notes: "Facture " + (venNumeroAffiche || "Client"),
+    options: { 
+      supported_tender_types: ["CREDIT_CARD", "DEBIT_CARD", "CASH"] 
     }
   }));
 
-  window.location.href = 'square-commerce-v1://payment/create?data=' + squareData;
+  window.location.href = "square-commerce-v1://payment/create?data=" + squareData;
 }
-
 
 
 
