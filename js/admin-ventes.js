@@ -378,7 +378,7 @@ async function payerParSquare() {
   const total     = Math.max(0, sousTotal + livraison - rabais);
   const montantCents = Math.round(total * 100);
 
-  const callbackURL = 'https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec?square=success';
+  const callbackURL = 'https://universcaresse.github.io/UC2/admin/?square=success';
 
   const data = encodeURIComponent(JSON.stringify({
     amount_money: { amount: montantCents, currency_code: 'CAD' },
