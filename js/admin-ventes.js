@@ -376,33 +376,15 @@ function fermerApercuFacture() {
 }
 
 function payerParSquare() {
-  if (!squareAppId) { alert('Erreur: App ID manquant'); return; }
-
-  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
-  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-  const rabais    = (typeof venCalculerRabais === 'function') ? venCalculerRabais() : 0;
-  const total     = Math.max(0, sousTotal + livraison - rabais);
-  const montantCents = Math.round(total * 100);
-
-  if (montantCents <= 0) { alert("Le montant est à 0$, transaction impossible."); return; }
-
   const squareData = encodeURIComponent(JSON.stringify({
-    amount_money: { 
-      amount: montantCents, 
-      currency_code: "CAD" 
-    },
-    callback_url: "https://universcaresse.github.io/UC2/admin/",
+    amount_money: { amount: 100, currency_code: "CAD" },
+    callback_url: "https://github.io",
     client_id: squareAppId,
-    version: "1.3",
-    notes: "Facture " + (venNumeroAffiche || "Client"),
-    options: { 
-      supported_tender_types: ["CREDIT_CARD", "DEBIT_CARD", "CASH"] 
-    }
+    version: "1.3"
   }));
 
   window.location.href = "square-commerce-v1://payment/create?data=" + squareData;
 }
-
 
 
 function payerPar() {
