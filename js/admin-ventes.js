@@ -6,7 +6,7 @@ var venPanier = [];
 var venIdEnCours = null;
 var venNumeroAffiche = '';
 var venLotsDisponibles = [];
-var squareAppId = '';
+
 
 async function chargerVentes() {
   const params = new URLSearchParams(window.location.search);

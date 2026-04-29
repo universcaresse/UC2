@@ -290,6 +290,9 @@ function fermerModalConfirm() {
 // CONFIG et appelAPI/appelAPIPost définis dans main.js
 
 // ─── LISTES DROPDOWN V2 ───
+
+var squareAppId = '';
+
 var listesDropdown = { types: [], fullData: [], config: {}, fournisseurs: [], formats: [] };
 const CATS_SANS_INCI = ['CAT-1776369774938', 'CAT-1776641557249', 'CAT-014'];
 
