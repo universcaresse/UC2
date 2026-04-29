@@ -390,14 +390,17 @@ function payerParSquare() {
 
   if (montantCents <= 0) { alert("Le montant est à 0$, transaction impossible."); return; }
 
-  const squareData = encodeURIComponent(JSON.stringify({
-    amount_money: { amount: montantCents, currency_code: 'CAD' },
+   const squareData = encodeURIComponent(JSON.stringify({
+    amount_money: {
+      amount: montantCents,
+      currency_code: 'CAD'
+    },
     callback_url: 'https://universcaresse.github.io/UC2/admin/',
-    client_id:    squareAppId,
-    version:      '1.3',
-    notes:        'Facture ' + (venNumeroAffiche || 'Client'),
-    options: { 
-      supported_tender_types: ["CREDIT_CARD", "DEBIT_CARD", "CASH"] 
+    client_id: squareAppId,
+    version: '1.2', // Changé de 1.3 à 1.2
+    notes: 'Facture ' + (venNumeroAffiche || 'Client'),
+    options: {
+      supported_tender_types: ["CREDIT_CARD", "DEBIT_CARD", "CASH"]
     }
   }));
 
