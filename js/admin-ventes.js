@@ -376,42 +376,6 @@ function fermerApercuFacture() {
 }
 
 function payerParSquare() {
-  if (!squareAppId) { alert('Erreur : identifiant d'application manquant'); return; }
-
-  // 1. Calcul du montant (vérifie bien tes IDs HTML : ven-livraison ou ven-delivery)
-  const livraison = parseFloat(document.getElementById('ven-livraison')?.value) || 0;
-  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-  const rabais    = (typeof venCalculerRabais === 'function') ? venCalculerRabais() : 0;
-  const total     = Math.max(0, sousTotal + livraison - rabais);
-  const amountCents = Math.round(total * 100);
-
-  // 2. Vérification avant envoi
-  if (amountCents <= 0) { 
-    alert("Le montant est de 0 $ ; la transaction n'est pas possible."); 
-    return; 
-  }
-
-  // 3. Préparation des données pour Square
-  const squareData = encodeURIComponent(JSON.stringify({
-    amount_money: {
-      amount: amountCents,
-      currency_code: "CAD"
-    },
-    callback_url: "https://universcaresse.github.io/UC2/admin/",
-    client_id: squareAppId,
-    version: "1.3",
-    notes: "Facture " + (venNumeroAffiche || "Client"),
-    options: {
-      supported_tender_types: ["CREDIT_CARD", "DEBIT_CARD", "CASH"]
-    }
-  }));
-
-  // 4. Lancement de Square
-  window.location.href = "square-commerce-v1://payment/create?data=" + squareData;
-}
-
-
-function payerPar() {
   if (!squareAppId) { afficherMsg('ventes', 'App ID Square introuvable.', 'erreur'); return; }
 
   const boutons = document.getElementById('fv-boutons');

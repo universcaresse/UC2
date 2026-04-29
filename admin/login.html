@@ -91,7 +91,7 @@
 
   <script>
     if (sessionStorage.getItem('uc_admin') === 'true') {
-      window.location.href = '/UC2/admin/';
+      window.location.href = '/admin/';
     }
     async function valider() {
       const mdp = document.getElementById('input-mdp').value;
@@ -104,7 +104,7 @@
       const data = await res.json();
       if (data && data.success) {
         sessionStorage.setItem('uc_admin', 'true');
-        window.location.href = '/UC2/admin/';
+        window.location.href = '/admin/';
       } else {
         document.getElementById('erreur-mdp').textContent = 'Mot de passe incorrect.';
         document.getElementById('input-mdp').value = '';
