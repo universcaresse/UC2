@@ -373,63 +373,42 @@ async function payerParSquare() {
   const spinner = document.getElementById('fv-spinner');
   boutons.querySelectorAll('button').forEach(b => b.disabled = true);
   spinner.classList.remove('cache');
+
   const res = await appelAPI('getSquareAppId');
-  console.log('App ID:', res?.app_id);
-  if (!res || !res.app_id) { afficherMsg('ventes', 'App ID Square introuvable.', 'erreur'); return; }
+  if (!res || !res.app_id) {
+    afficherMsg('ventes', 'App ID Square introuvable.', 'erreur');
+    spinner.classList.add('cache');
+    boutons.querySelectorAll('button').forEach(b => b.disabled = false);
+    return;
+  }
 
   const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
-  const totalPropre = parseFloat(String(total).replace(',', '.')) || 0;
-  const montantCents = Math.round(totalPropre * 100);
-  console.log('Panier:', JSON.stringify(venPanier));
-  console.log('sousTotal:', sousTotal, '| livraison:', livraison, '| rabais:', rabais, '| total:', total, '| totalPropre:', totalPropre, '| cents:', montantCents);
-const payload = JSON.stringify({
-    amount_money: { amount: montantCents, currency_code: 'CAD' },
-    callback_url: callbackURL,
-    client_id: res.app_id,
-    version: '1.3',
-    notes: `Facture ${venNumeroAffiche}`
-  });
-  document.getElementById('fv-spinner').innerHTML += '<div style="font-size:11px;word-break:break-all">' + payload + '</div>';
-  const callbackURL = 'https://universcaresse.github.io/UC2/admin/';
-
-  const data = encodeURIComponent(JSON.stringify({
-    amount_money: { amount: montantCents, currency_code: 'CAD' },
-    callback_url: callbackURL,
-    client_id:    res.app_id,
-    version:      '1.3',
-    notes:        `Facture ${venNumeroAffiche}`
-  }));
+  const montantCents = Math.round(total * 100);
 
   sessionStorage.setItem('square-pending', JSON.stringify({
     ven_id:        venIdEnCours,
     numeroAffiche: venNumeroAffiche
   }));
 
-  window.location.href = `square-commerce-v1://payment/create?data=${data}`;
+  const callbackURL = 'https://universcaresse.github.io/UC2/admin/';
+
+  const squareData = encodeURIComponent(JSON.stringify({
+    amount_money:  { amount: montantCents, currency_code: 'CAD' },
+    callback_url:  callbackURL,
+    client_id:     res.app_id,
+    version:       '1.3',
+    notes:         'Facture ' + venNumeroAffiche
+  }));
+
   setTimeout(() => {
     spinner.classList.add('cache');
     boutons.querySelectorAll('button').forEach(b => b.disabled = false);
   }, 3000);
-}
 
-function payerAvecSquare() {
-  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
-  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-  const rabais    = venCalculerRabais();
-  const total     = Math.max(0, sousTotal + livraison - rabais);
-  const montantCents = Math.round(total * 100);
-  const data = encodeURIComponent(JSON.stringify({
-    amount_money: { amount: montantCents, currency_code: 'CAD' },
-    callback_url: window.location.href,
-    client_id: 'VOTRE_APP_ID_SQUARE',
-    version: '1.3',
-    notes: 'Univers Caresse'
-  }));
-  document.getElementById('fv-spinner').innerHTML += '<div>' + montantCents + '</div>';
-window.location.href = `square-commerce-v1://payment/create?data=${data}`;
+  window.location.href = 'square-commerce-v1://payment/create?data=' + squareData;
 }
 
 function envoyerFactureCourriel() {
