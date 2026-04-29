@@ -408,7 +408,9 @@ async function payerParSquare() {
     boutons.querySelectorAll('button').forEach(b => b.disabled = false);
   }, 3000);
 
-  window.location.href = 'square-commerce-v1://payment/create?data=' + squareData;
+  const lien = document.createElement('a');
+lien.href = 'square-commerce-v1://payment/create?data=' + squareData;
+lien.click();
 }
 
 function envoyerFactureCourriel() {
