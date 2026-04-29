@@ -369,6 +369,10 @@ function fermerApercuFacture() {
 }
 
 async function payerParSquare() {
+  const boutons = document.getElementById('fv-boutons');
+  const spinner = document.getElementById('fv-spinner');
+  boutons.querySelectorAll('button').forEach(b => b.disabled = true);
+  spinner.classList.remove('cache');
   const res = await appelAPI('getSquareAppId');
   if (!res || !res.app_id) { afficherMsg('ventes', 'App ID Square introuvable.', 'erreur'); return; }
 
@@ -394,6 +398,10 @@ async function payerParSquare() {
   }));
 
   window.location.href = `square-commerce-v1://payment/create?data=${data}`;
+  setTimeout(() => {
+    spinner.classList.add('cache');
+    boutons.querySelectorAll('button').forEach(b => b.disabled = false);
+  }, 3000);
 }
 
 function payerAvecSquare() {
