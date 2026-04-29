@@ -6,6 +6,7 @@ var venPanier = [];
 var venIdEnCours = null;
 var venNumeroAffiche = '';
 var venLotsDisponibles = [];
+var squareAppId = '';
 
 async function chargerVentes() {
   const params = new URLSearchParams(window.location.search);
@@ -14,12 +15,19 @@ async function chargerVentes() {
     if (pending) {
       const { ven_id, numeroAffiche } = JSON.parse(pending);
       sessionStorage.removeItem('square-pending');
-      venIdEnCours      = ven_id;
-      venNumeroAffiche  = numeroAffiche;
+      venIdEnCours     = ven_id;
+      venNumeroAffiche = numeroAffiche;
       ouvrirApercuFacture();
     }
     window.history.replaceState({}, '', window.location.pathname);
   }
+
+  // Charger l'App ID Square une fois pour toutes
+  if (!squareAppId) {
+    const resSquare = await appelAPI('getSquareAppId');
+    if (resSquare && resSquare.app_id) squareAppId = resSquare.app_id;
+  }
+
   const loading = document.getElementById('loading-ventes');
   const tableau = document.getElementById('tableau-ventes');
   const vide    = document.getElementById('vide-ventes');
@@ -134,11 +142,15 @@ function venFiltrerFormats() {
 function venMettreAJourPrix() {
   const pro_id = document.getElementById('ven-produit').value;
   const formatVal = document.getElementById('ven-format').value;
-  if (!pro_id || !formatVal) { document.getElementById('ven-prix').value = ''; document.getElementById('ven-total-ligne').value = ''; return; }
+  if (!pro_id || !formatVal) {
+    document.getElementById('ven-prix').value = '';
+    document.getElementById('ven-total-ligne').value = '';
+    return;
+  }
   const format = JSON.parse(formatVal);
   const pro = donneesProduits.find(p => p.pro_id === pro_id);
   const formatProduit = (pro?.formats || []).find(f => String(f.poids) === String(format.poids) && f.unite === format.unite);
-  const prix = formatProduit?.prix_vente || 0;
+  const prix = parseFloat(String(formatProduit?.prix_vente || 0).replace(',', '.')) || 0;
   const qte  = parseInt(document.getElementById('ven-quantite').value) || 1;
   document.getElementById('ven-prix').value = prix ? formaterPrix(prix) : '—';
   document.getElementById('ven-total-ligne').value = prix ? formaterPrix(prix * qte) : '—';
@@ -158,9 +170,9 @@ function venAjouterLigne() {
   if (!pro_id || !formatVal) { afficherMsg('ventes', 'Choisir un produit et un format.', 'erreur'); return; }
   const format = JSON.parse(formatVal);
   if (qte > format.nb_disponible) { afficherMsg('ventes', `Stock insuffisant — ${format.nb_disponible} disponible(s).`, 'erreur'); return; }
-  const pro    = donneesProduits.find(p => p.pro_id === pro_id);
+  const pro = donneesProduits.find(p => p.pro_id === pro_id);
   const formatProduit = (pro?.formats || []).find(f => String(f.poids) === String(format.poids) && f.unite === format.unite);
-  const prix = formatProduit?.prix_vente || 0;
+  const prix = parseFloat(String(formatProduit?.prix_vente || 0).replace(',', '.')) || 0;
   venPanier.push({ pro_id, lot_id: format.lot_id, nom: pro?.nom || '', poids: format.poids, unite: format.unite, quantite: qte, prix_unitaire: prix });
   venRafraichirPanier();
   document.getElementById('ven-collection').value = '';
@@ -325,22 +337,20 @@ function ouvrirApercuFacture() {
     <thead>
       <tr style="border-bottom:2px solid var(--beige)">
         <th style="text-align:left;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Produit</th>
-        <th style="text-align:center;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Qté</th>
-        <th style="text-align:right;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Prix</th>
         <th style="text-align:right;padding:8px 0;color:var(--gris);font-weight:500;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase">Total</th>
       </tr>
     </thead>
     <tbody>`;
   venPanier.forEach(l => {
     html += `<tr style="border-bottom:1px solid var(--beige)">
-      <td style="padding:10px 0" colspan="4">
+      <td style="padding:10px 0">
         <div>${l.nom} — ${l.poids} ${l.unite}</div>
         <div style="display:flex;gap:16px;margin-top:4px;color:var(--gris);font-size:0.8rem">
           <span>Qté : ${l.quantite}</span>
           <span>${formaterPrix(l.prix_unitaire)} / unité</span>
-          <span style="margin-left:auto">${formaterPrix(l.prix_unitaire * l.quantite)}</span>
         </div>
       </td>
+      <td style="padding:10px 0;text-align:right">${formaterPrix(l.prix_unitaire * l.quantite)}</td>
     </tr>`;
   });
   html += `</tbody></table>
@@ -353,14 +363,11 @@ function ouvrirApercuFacture() {
     html += `<div style="display:flex;justify-content:space-between;width:220px"><span style="color:var(--gris)">Livraison</span><span>${formaterPrix(livraison)}</span></div>`;
   }
   html += `<div style="display:flex;justify-content:space-between;width:220px;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--primary);border-top:1px solid var(--beige);padding-top:8px;margin-top:4px"><span>Total</span><span>${formaterPrix(total)}</span></div>
-      <div style="font-size:0.75rem;color:var(--gris);margin-top:4px">${paiement === 'argent' ? 'Comptant' : 'Carte'}</div>
     </div>
     <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--beige);font-family:'Playfair Display',serif;font-style:italic;color:var(--gris);font-size:0.9rem">Merci pour votre achat !</div>
   </div>`;
   document.getElementById('modal-fv-contenu').innerHTML = html;
   document.getElementById('modal-fv-numero').textContent = venNumeroAffiche;
-  const btnSquare = document.getElementById('btn-payer-square');
-  if (btnSquare) btnSquare.style.display = paiement === 'carte' ? '' : 'none';
   document.getElementById('modal-facture-vente').classList.add('ouvert');
 }
 
@@ -368,24 +375,18 @@ function fermerApercuFacture() {
   document.getElementById('modal-facture-vente').classList.remove('ouvert');
 }
 
-async function payerParSquare() {
+function payerParSquare() {
+  if (!squareAppId) { afficherMsg('ventes', 'App ID Square introuvable.', 'erreur'); return; }
+
   const boutons = document.getElementById('fv-boutons');
   const spinner = document.getElementById('fv-spinner');
   boutons.querySelectorAll('button').forEach(b => b.disabled = true);
   spinner.classList.remove('cache');
 
-  const res = await appelAPI('getSquareAppId');
-  if (!res || !res.app_id) {
-    afficherMsg('ventes', 'App ID Square introuvable.', 'erreur');
-    spinner.classList.add('cache');
-    boutons.querySelectorAll('button').forEach(b => b.disabled = false);
-    return;
-  }
-
-  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
-  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-  const rabais    = venCalculerRabais();
-  const total     = Math.max(0, sousTotal + livraison - rabais);
+  const livraison    = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const sousTotal    = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais       = venCalculerRabais();
+  const total        = Math.max(0, sousTotal + livraison - rabais);
   const montantCents = Math.round(total * 100);
 
   sessionStorage.setItem('square-pending', JSON.stringify({
@@ -393,14 +394,12 @@ async function payerParSquare() {
     numeroAffiche: venNumeroAffiche
   }));
 
-  const callbackURL = 'https://universcaresse.github.io/UC2/admin/';
-
   const squareData = encodeURIComponent(JSON.stringify({
-    amount_money:  { amount: montantCents, currency_code: 'CAD' },
-    callback_url:  callbackURL,
-    client_id:     res.app_id,
-    version:       '1.3',
-    notes:         'Facture ' + venNumeroAffiche
+    amount_money: { amount: montantCents, currency_code: 'CAD' },
+    callback_url: 'https://universcaresse.github.io/UC2/admin/',
+    client_id:    squareAppId,
+    version:      '1.3',
+    notes:        'Facture ' + venNumeroAffiche
   }));
 
   setTimeout(() => {
@@ -408,9 +407,7 @@ async function payerParSquare() {
     boutons.querySelectorAll('button').forEach(b => b.disabled = false);
   }, 3000);
 
-  const lien = document.createElement('a');
-lien.href = 'square-commerce-v1://payment/create?data=' + squareData;
-lien.click();
+  window.location.href = 'square-commerce-v1://payment/create?data=' + squareData;
 }
 
 function envoyerFactureCourriel() {
@@ -439,11 +436,11 @@ async function finaliserVente(modePaiement) {
   if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
   const paiement = modePaiement || document.getElementById('modal-fv-paiement')?.value || '';
   afficherChargement();
-  const client      = document.getElementById('ven-client').value;
-  const courriel    = document.getElementById('ven-courriel').value;
-  const telephone   = document.getElementById('ven-telephone').value;
-  const livraison   = parseFloat(document.getElementById('ven-livraison').value) || 0;
-  const ven_id      = venIdEnCours;
+  const client    = document.getElementById('ven-client').value;
+  const courriel  = document.getElementById('ven-courriel').value;
+  const telephone = document.getElementById('ven-telephone').value;
+  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const ven_id    = venIdEnCours;
   const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement });
   if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la création.', 'erreur'); return; }
   for (const l of venPanier) {
@@ -472,4 +469,3 @@ async function finaliserVente(modePaiement) {
 async function voirDetailVente(ven_id) {
   afficherMsg('ventes', 'Fonctionnalité à venir.');
 }
-
