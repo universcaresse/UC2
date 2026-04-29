@@ -374,6 +374,7 @@ async function payerParSquare() {
   boutons.querySelectorAll('button').forEach(b => b.disabled = true);
   spinner.classList.remove('cache');
   const res = await appelAPI('getSquareAppId');
+  console.log('App ID:', res?.app_id);
   if (!res || !res.app_id) { afficherMsg('ventes', 'App ID Square introuvable.', 'erreur'); return; }
 
   const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
@@ -381,7 +382,9 @@ async function payerParSquare() {
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
   const totalPropre = parseFloat(String(total).replace(',', '.')) || 0;
-const montantCents = Math.round(totalPropre * 100);
+  const montantCents = Math.round(totalPropre * 100);
+  console.log('Panier:', JSON.stringify(venPanier));
+  console.log('sousTotal:', sousTotal, '| livraison:', livraison, '| rabais:', rabais, '| total:', total, '| totalPropre:', totalPropre, '| cents:', montantCents);
 
   const callbackURL = 'https://universcaresse.github.io/UC2/admin/';
 
