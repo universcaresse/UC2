@@ -385,7 +385,14 @@ async function payerParSquare() {
   const montantCents = Math.round(totalPropre * 100);
   console.log('Panier:', JSON.stringify(venPanier));
   console.log('sousTotal:', sousTotal, '| livraison:', livraison, '| rabais:', rabais, '| total:', total, '| totalPropre:', totalPropre, '| cents:', montantCents);
-
+const payload = JSON.stringify({
+    amount_money: { amount: montantCents, currency_code: 'CAD' },
+    callback_url: callbackURL,
+    client_id: res.app_id,
+    version: '1.3',
+    notes: `Facture ${venNumeroAffiche}`
+  });
+  console.log('Payload Square:', payload);
   const callbackURL = 'https://universcaresse.github.io/UC2/admin/';
 
   const data = encodeURIComponent(JSON.stringify({
