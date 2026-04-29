@@ -392,7 +392,7 @@ const payload = JSON.stringify({
     version: '1.3',
     notes: `Facture ${venNumeroAffiche}`
   });
-  console.log('Payload Square:', payload);
+  document.getElementById('fv-spinner').innerHTML += '<div style="font-size:11px;word-break:break-all">' + payload + '</div>';
   const callbackURL = 'https://universcaresse.github.io/UC2/admin/';
 
   const data = encodeURIComponent(JSON.stringify({
