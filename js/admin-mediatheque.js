@@ -33,15 +33,19 @@ function medFiltrer() {
   const grille = document.getElementById('med-grille');
   document.getElementById('med-compteur').textContent = items.length + ' photo(s)';
   if (!items.length) { grille.innerHTML = '<p class="vide-desc">Aucune photo.</p>'; return; }
- grille.innerHTML = items.map(i => `
+	grille.innerHTML = items.map(i => `
+	
     <div class="collection-carte" onclick="medOuvrirPhoto('${i.url}', '${i.nom}')">
       <div class="collection-carte-bg" style="background:#888"></div>
-      <div style="position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top, rgba(0,0,0,0.95), transparent);"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);"></div>
       <img src="${i.url}" alt="${i.nom}" onerror="this.style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
-      <div class="collection-carte-contenu">
-        <span class="collection-carte-nom">${i.categorie}</span>
-        <span class="collection-carte-slogan">${i.nom}</span>
-      </div>
+      
+	<div class="collection-carte-contenu" style="background:rgba(0,0,0,0.5);width:100%;padding:8px 12px;border-radius:0 0 8px 8px;">
+  <span class="collection-carte-nom">${i.categorie}</span>
+  <span class="collection-carte-slogan">${i.nom}</span>
+</div>
+	  
+	  
     </div>`).join('');
 }
 
