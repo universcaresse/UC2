@@ -2583,13 +2583,17 @@
     </div>
     <div class="modal-admin-body" id="modal-fv-contenu"></div>
     <div class="modal-admin-body">
-      <div class="form-actions-vertical">
-        <button class="bouton bouton-plein-largeur" onclick="finaliserVente('argent')">Comptant</button>
-        <button class="bouton bouton-plein-largeur" onclick="payerParSquare()">Payer par Square</button>
-        <button class="bouton bouton-plein-largeur" onclick="finaliserVente()">Finaliser</button>
-        <button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="envoyerFactureTexto()">Envoyer par texto</button>
-        <button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
-      </div>
+      <div class="form-actions-vertical" id="fv-boutons">
+  <div id="fv-spinner" class="cache" style="text-align:center;padding:16px">
+    <span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>
+    <div style="margin-top:8px;font-size:0.85rem;color:var(--gris)">Ouverture de Square…</div>
+  </div>
+  <button class="bouton bouton-plein-largeur" onclick="payerParSquare()" style="padding:20px;font-size:1.1rem">Payer par Square</button>
+  <button class="bouton bouton-plein-largeur" onclick="finaliserVente('argent')">Comptant</button>
+  <button class="bouton bouton-plein-largeur" onclick="finaliserVente()">Finaliser</button>
+  <button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="envoyerFactureTexto()">Envoyer par texto</button>
+  <button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
+</div>
     </div>
   </div>
 </div>
