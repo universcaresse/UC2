@@ -380,7 +380,8 @@ async function payerParSquare() {
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
-  const montantCents = Math.round(total * 100);
+  const totalPropre = parseFloat(String(total).replace(',', '.')) || 0;
+const montantCents = Math.round(totalPropre * 100);
 
   const callbackURL = 'https://universcaresse.github.io/UC2/admin/';
 
