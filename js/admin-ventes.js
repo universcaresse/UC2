@@ -360,7 +360,7 @@ function ouvrirApercuFacture() {
   </div>`;
   document.getElementById('modal-fv-contenu').innerHTML = html;
   document.getElementById('modal-fv-numero').textContent = venNumeroAffiche;
-  const estAPayer = v?.statut === 'a-payer';
+  const estAPayer = venModeReprise;
   const boutons = document.getElementById('fv-boutons');
   if (boutons) {
     document.querySelector('#fv-boutons .bouton-plein-largeur[onclick="payerParSquare()"]').style.display = estAPayer ? '' : 'none';
