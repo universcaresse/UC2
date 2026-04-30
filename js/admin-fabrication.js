@@ -58,7 +58,7 @@ function afficherTableauFabrication(lots) {
         <td>${l.date_fabrication}</td>
         <td>${l.date_disponibilite}</td>
         <td>${l.nb_unites}</td>
-        <td>${l.nb_vendus || 0}</td>
+     <td>${l.nb_unites_vendu || 0}</td>
         <td>${l.cout_par_unite ? parseFloat(l.cout_par_unite).toFixed(2) + ' $' : '—'}</td>
       </tr>
       <tr class="fab-lot-detail cache" id="fab-detail-${l.lot_id}">
