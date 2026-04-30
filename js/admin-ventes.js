@@ -368,7 +368,7 @@ function ouvrirApercuFacture() {
   document.getElementById('modal-fv-contenu').innerHTML = html;
   document.getElementById('modal-fv-numero').textContent = venNumeroAffiche;
   const btnSquare = document.getElementById('btn-payer-square');
-  if (btnSquare) btnSquare.style.display = venModeReprise ? 'none' : '';
+  if (btnSquare) btnSquare.style.display = '';
   document.getElementById('modal-facture-vente').classList.add('ouvert');
 }
 
