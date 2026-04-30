@@ -161,7 +161,8 @@ async function sauvegarderFamille() {
   if (!nom || !col_id) { afficherMsg('familles', 'Nom et collection requis.', 'erreur'); return; }
   const positionChoisie = parseInt(document.getElementById('ff-position')?.value) || 0;
   const d = {
-    fam_id:      id || ('FAM-' + Date.now()),
+    const dernierNumFam = donneesFamilles.length ? Math.max(...donneesFamilles.map(f => parseInt((f.fam_id || '').replace('FAM-', '')) || 0)) : 0;
+fam_id: id || ('FAM-' + String(dernierNumFam + 1).padStart(4, '0')),
     col_id,
     gam_id:      document.getElementById('ff-gamme')?.value || '',
     rang:        positionChoisie + 1,

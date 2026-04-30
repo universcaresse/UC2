@@ -404,7 +404,8 @@ async function sauvegarderLot() {
   const ings2   = (resIng2 && resIng2.success) ? resIng2.items : [];
   const cout    = calculerCoutRevient(ings2);
   const coutParUnite = nbUnitesFormat > 0 ? cout / nbUnitesFormat : 0;
-  const lot_id = 'LOT-' + Date.now();
+  const dernierNumLot = _lotsData.length ? Math.max(..._lotsData.map(l => parseInt((l.lot_id || '').replace('LOT-', '')) || 0)) : 0;
+const lot_id = 'LOT-' + String(dernierNumLot + 1).padStart(4, '0');
   const res = await appelAPIPost('saveLot', {
     lot_id,
     pro_id:             opt.value,

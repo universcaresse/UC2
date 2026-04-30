@@ -677,7 +677,8 @@ async function sauvegarderRecette() {
   const gam_id = document.getElementById('fr-ligne').value;
 
   const d = {
-    pro_id:      id || ('PRO-' + Date.now()),
+    const dernierNumPro = donneesProduits.length ? Math.max(...donneesProduits.map(p => parseInt((p.pro_id || '').replace('PRO-', '')) || 0)) : 0;
+pro_id: id || ('PRO-' + String(dernierNumPro + 1).padStart(4, '0')),
     col_id,
   gam_id,
     fam_id:      document.getElementById('fr-famille')?.value || '',

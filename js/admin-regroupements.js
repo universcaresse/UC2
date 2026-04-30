@@ -165,7 +165,8 @@ async function sauvegarderRegroupement() {
   if (!ing_id) { cacherChargement(); afficherMsg('regroupements', 'L\'ingrédient est requis.', 'erreur'); return; }
   const positionChoisie = parseInt(document.getElementById('freg-position')?.value) || 0;
   const d = {
-    fra_id:         id || ('FRA-' + Date.now()),
+    const dernierNumFra = donneesRegroupements.length ? Math.max(...donneesRegroupements.map(f => parseInt((f.fra_id || '').replace('FRA-', '')) || 0)) : 0;
+fra_id: id || ('FRA-' + String(dernierNumFra + 1).padStart(4, '0')),
     rang:           positionChoisie + 1,
     nom,
     slogan:         document.getElementById('freg-slogan').value,
