@@ -23,6 +23,8 @@ async function chargerVentes() {
     }
     window.history.replaceState({}, '', window.location.pathname);
   }
+  document.getElementById('modal-apres-vente')?.classList.remove('ouvert');
+  document.getElementById('modal-facture-vente')?.classList.remove('ouvert');
 
   // Charger l'App ID Square une fois pour toutes
   if (!squareAppId) {
