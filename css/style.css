@@ -335,8 +335,6 @@ main { padding-top: var(--nav-h); }
 .bouton.invisible svg { opacity: 0; }
 .bouton:not(.invisible) svg { opacity: 1; }
 .bouton-vert-pale { background: var(--gris); color: var(--blanc); }
-.bouton-accent { background: var(--accent color: var(--blanc); }
-
 .bouton-rouge { background: var(--danger); }
 .bouton-or { background: var(--accent); }
 .bouton-contour { background: transparent; color: var(--beige); border: 1px solid var(--beige); }
