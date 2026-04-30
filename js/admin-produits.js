@@ -666,7 +666,6 @@ await chargerCollectionsPourSelecteur();
 // Compatibilité nom V1
 function modifierRecette(id) { return modifierProduit(id); }
 
-
 async function sauvegarderRecette() {
   afficherChargement();
   const btnSauvegarder = document.querySelector('#form-recettes .form-body-actions .bouton');
@@ -676,13 +675,13 @@ async function sauvegarderRecette() {
   const col_id = document.getElementById('fr-collection').value;
   const gam_id = document.getElementById('fr-ligne').value;
 
+  const dernierNumPro = donneesProduits.length ? Math.max(...donneesProduits.map(p => parseInt((p.pro_id || '').replace('PRO-', '')) || 0)) : 0;
   const d = {
-    const dernierNumPro = donneesProduits.length ? Math.max(...donneesProduits.map(p => parseInt((p.pro_id || '').replace('PRO-', '')) || 0)) : 0;
-pro_id: id || ('PRO-' + String(dernierNumPro + 1).padStart(4, '0')),
+    pro_id:      id || ('PRO-' + String(dernierNumPro + 1).padStart(4, '0')),
     col_id,
-  gam_id,
+    gam_id,
     fam_id:      document.getElementById('fr-famille')?.value || '',
-   nom: (document.getElementById('fr-nom')?.value || '').toUpperCase(),
+    nom:         (document.getElementById('fr-nom')?.value || '').toUpperCase(),
     couleur_hex: document.getElementById('fr-couleur').value || document.getElementById('fr-couleur-visible').value || '',
     nb_unites:   parseInt(document.getElementById('fr-unites').value) || 1,
     cure:        parseInt(document.getElementById('fr-cure').value) || 0,
@@ -736,11 +735,10 @@ pro_id: id || ('PRO-' + String(dernierNumPro + 1).padStart(4, '0')),
       d.formats = formatsRecette.map(f => ({ poids: f.poids, unite: f.unite, prix_vente: f.prix, emb_id: '' }));
     }
   }
-  
+
   const res = await appelAPIPost('saveProduit', d);
   if (res && res.success) {
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
-  // Sauvegarder les emballages par format
     for (const f of formatsRecette) {
       const cle = `${f.poids}_${f.unite}`;
       const embs = emballagesRecette[cle] || [];
@@ -757,13 +755,12 @@ pro_id: id || ('PRO-' + String(dernierNumPro + 1).padStart(4, '0')),
     await chargerProduitsData();
     const contenu = document.querySelector('.admin-contenu');
     if (contenu) contenu.scrollTop = scrollAvantProduit;
- } else {
+  } else {
     cacherChargement();
     afficherMsg('recettes', 'Erreur.', 'erreur');
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
   }
 }
-
 async function supprimerProduit(pro_id) {
  const resLots = await appelAPI('getLots');
   const lotsLies = (resLots && resLots.success ? resLots.items : []).filter(l => l.pro_id === pro_id);
