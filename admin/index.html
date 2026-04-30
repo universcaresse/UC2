@@ -51,8 +51,15 @@
       <li class="nav-admin-item">
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Production <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
-		<button class="nav-dropdown-item" onclick="afficherSection('fabrication', this)">Fabrication</button>
-		<button class="nav-dropdown-item" onclick="afficherSection('ventes', null)">Ventes</button>
+          <button class="nav-dropdown-item" onclick="afficherSection('fabrication', this)">Fabrication</button>
+        </div>
+      </li>
+      <li class="nav-admin-item">
+        <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Vente <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-item" onclick="allerVersNouvelleVente()">Nouvelle vente</button>
+          <button class="nav-dropdown-item" onclick="afficherSection('ventes', null)">Ventes</button>
+          <button class="nav-dropdown-item" onclick="afficherSection('fabrication', null)">Stock</button>
         </div>
       </li>
 	  
@@ -102,6 +109,8 @@
     <div class="sidebar-groupe">
         <button class="sidebar-lien" onclick="afficherSection('accueil', this)">Accueil</button>
       </div>
+	  
+	  
       <div class="sidebar-sep"></div>
       <div class="sidebar-groupe">
         <div class="sidebar-titre">Création</div>
@@ -121,14 +130,26 @@
            <button class="sidebar-lien" onclick="afficherSection('factures', this)">Les factures</button>
         <button class="sidebar-lien" onclick="afficherSection('inventaire', this)">Inventaire</button>
       </div>
-      <div class="sidebar-sep"></div>
+	  
+	  
+     <div class="sidebar-sep"></div>
       <div class="sidebar-groupe">
         <div class="sidebar-titre">Production</div>
         <button class="sidebar-lien" onclick="afficherSection('fabrication', this)">Fabrication</button>
         <button class="sidebar-lien" onclick="afficherSection('inventaire-production', this)">Stock</button>
-		<button class="sidebar-lien bientot">Corrections Stock</button>
-        <button class="sidebar-lien" onclick="afficherSection('ventes', this)">Ventes</button>
+        <button class="sidebar-lien bientot">Corrections Stock</button>
       </div>
+	  
+	  
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-groupe">
+        <div class="sidebar-titre">Vente</div>
+        <button class="sidebar-lien" onclick="allerVersNouvelleVente()">Nouvelle vente</button>
+        <button class="sidebar-lien" onclick="afficherSection('ventes', this)">Ventes</button>
+        <button class="sidebar-lien" onclick="afficherSection('fabrication', this)">Stock</button>
+      </div>
+	  
+	  
       <div class="sidebar-sep"></div>
      <div class="sidebar-groupe">
         <div class="sidebar-titre">Système</div>
