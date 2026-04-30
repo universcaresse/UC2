@@ -436,3 +436,24 @@ async function finaliserVente(modePaiement) {
 async function voirDetailVente(ven_id) {
   afficherMsg('ventes', 'Fonctionnalité à venir.');
 }
+
+async function allerVersNouvelleVente() {
+  afficherSection('ventes', null);
+  const [resPro, resFmt, resLots] = await Promise.all([
+    appelAPI('getProduits'),
+    appelAPI('getProduitsFormats'),
+    appelAPI('getLotsDisponibles')
+  ]);
+  if (resPro && resPro.success) {
+    const formatsMap = {};
+    if (resFmt && resFmt.success) {
+      (resFmt.items || []).forEach(f => {
+        if (!formatsMap[f.pro_id]) formatsMap[f.pro_id] = [];
+        formatsMap[f.pro_id].push({ poids: f.poids, unite: f.unite, prix_vente: f.prix_vente });
+      });
+    }
+    donneesProduits = (resPro.items || []).map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
+  }
+  venLotsDisponibles = (resLots && resLots.success) ? resLots.items : [];
+  ouvrirFormVente();
+}

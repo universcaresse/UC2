@@ -52,7 +52,7 @@
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">Production <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
 		<button class="nav-dropdown-item" onclick="afficherSection('fabrication', this)">Fabrication</button>
-	
+		<button class="nav-dropdown-item" onclick="afficherSection('ventes', null)">Ventes</button>
         </div>
       </li>
 	  
@@ -127,7 +127,7 @@
         <button class="sidebar-lien" onclick="afficherSection('fabrication', this)">Fabrication</button>
         <button class="sidebar-lien" onclick="afficherSection('inventaire-production', this)">Stock</button>
 		<button class="sidebar-lien bientot">Corrections Stock</button>
-       
+        <button class="sidebar-lien" onclick="afficherSection('ventes', this)">Ventes</button>
       </div>
       <div class="sidebar-sep"></div>
      <div class="sidebar-groupe">
@@ -177,7 +177,7 @@
           
 		       <div class="accueil-droite">
   <div class="accueil-grande-tuile accueil-grande-tuile-vert">
-    <button class="accueil-tuile" onclick="afficherSection('ventes', this); setTimeout(ouvrirFormVente, 100)">
+   <button class="accueil-tuile" onclick="allerVersNouvelleVente()">
       <span class="tuile-icone">
         <svg viewBox="0 0 48 48" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="6" y="10" width="36" height="28" rx="3"/>
