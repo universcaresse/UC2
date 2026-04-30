@@ -1641,7 +1641,19 @@
           </div>
         </div>
 
-        <!-- LISTE DES VENTES -->
+       <!-- FILTRES VENTES -->
+        <div class="filtres-bar" id="filtres-ventes">
+          <select class="form-ctrl filtre-select" id="filtre-ventes-statut" onchange="filtrerVentes()">
+            <option value="">Tous les statuts</option>
+            <option value="Finalisée">Finalisée</option>
+            <option value="a-payer">À payer</option>
+            <option value="En cours">En cours</option>
+          </select>
+          <input type="text" class="form-ctrl filtre-recherche" id="filtre-ventes-client" placeholder="Rechercher par client…" oninput="filtrerVentes()">
+          <button class="bouton bouton-petit bouton-contour" onclick="reinitialiserFiltresVentes()" title="Réinitialiser">✕</button>
+        </div>
+
+<!-- LISTE DES VENTES -->
         <div id="contenu-ventes">
           <div class="chargement" id="loading-ventes"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
           <div id="tableau-ventes"></div>

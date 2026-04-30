@@ -39,21 +39,8 @@ async function chargerVentes() {
     if (vide) vide.classList.remove('cache');
     return;
   }
-  let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>Date</th><th>Client</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody>';
-  res.items.forEach(v => {
-    const estAPayerR = v.statut === 'a-payer';
-html += `<tr class="cliquable${estAPayerR ? ' ven-a-payer' : ''}" onclick="voirDetailVente('${v.ven_id}')">
-      <td>${v.date}</td>
-      <td>${v.client || '—'}</td>
-      <td>${v.mode_paiement || '—'}</td>
-      <td>${formaterPrix(v.total)}</td>
-      <td>${estAPayerR ? '<span class="badge-statut-cours">À payer</span>' : v.statut}</td>
-    </tr>`;
-  });
-  html += '</tbody></table></div>';
-  if (tableau) tableau.innerHTML = html;
-  if (vide) vide.classList.add('cache');
-}
+ toutesVentes = res.items;
+  afficherTableauVentes(toutesVentes);
 
 function ouvrirFormVente() {
   venPanier = [];
@@ -474,7 +461,48 @@ async function finaliserVente(modePaiement) {
   chargerVentes();
 }
 
-async function voirDetailVente(ven_id) {
+var toutesVentes = [];
+
+function filtrerVentes() {
+  const statut = document.getElementById('filtre-ventes-statut').value;
+  const client = document.getElementById('filtre-ventes-client').value.toLowerCase();
+  const filtrees = toutesVentes.filter(v => {
+    const okStatut = !statut || v.statut === statut;
+    const okClient = !client || (v.client || '').toLowerCase().includes(client);
+    return okStatut && okClient;
+  });
+  afficherTableauVentes(filtrees);
+}
+
+function reinitialiserFiltresVentes() {
+  document.getElementById('filtre-ventes-statut').value = '';
+  document.getElementById('filtre-ventes-client').value = '';
+  afficherTableauVentes(toutesVentes);
+}
+
+function afficherTableauVentes(items) {
+  const tableau = document.getElementById('tableau-ventes');
+  const vide = document.getElementById('vide-ventes');
+  if (!items.length) {
+    if (tableau) tableau.innerHTML = '';
+    if (vide) vide.classList.remove('cache');
+    return;
+  }
+  if (vide) vide.classList.add('cache');
+  let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>Date</th><th>Client</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody>';
+  items.forEach(v => {
+    const estAPayerR = v.statut === 'a-payer';
+    html += `<tr class="cliquable" onclick="voirDetailVente('${v.ven_id}')">
+      <td>${v.date}</td>
+      <td>${v.client || '—'}</td>
+      <td>${v.mode_paiement || '—'}</td>
+      <td>${formaterPrix(v.total)}</td>
+      <td>${estAPayerR ? '<span class="badge-statut-cours">À payer</span>' : v.statut}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  if (tableau) tableau.innerHTML = html;
+}
   const [resEntete, resLignes] = await Promise.all([
     appelAPI('getVentesEntete'),
     appelAPI('getVentesLignes', { ven_id })
