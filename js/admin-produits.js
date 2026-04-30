@@ -203,8 +203,10 @@ function onFiltreCollection() {
 }
 
 function filtrerRecettes() {
-  const col    = document.getElementById('filtre-recette-collection')?.value;
-  const gamme  = document.getElementById('filtre-recette-ligne')?.value;
+  const colBtn = document.querySelector('#filtre-recette-collection-bar .filtre-btn.actif');
+  const col    = colBtn ? colBtn.dataset.col : '';
+  const gamBtn = document.querySelector('#filtre-recette-ligne-bar .filtre-btn.actif');
+  const gamme  = gamBtn ? gamBtn.textContent.trim() : '';
   const statut = document.getElementById('filtre-recette-statut')?.value;
   const nom    = (document.getElementById('filtre-recette-nom')?.value || '').toLowerCase().trim();
   const cartes = document.querySelectorAll('#grille-produits .carte-produit');
@@ -235,10 +237,11 @@ function filtrerRecettes() {
 }
 
 function reinitialiserFiltresRecettes() {
-  const f = ['filtre-recette-collection','filtre-recette-ligne','filtre-recette-statut','filtre-recette-nom'];
-  f.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  const filtreLig = document.getElementById('filtre-recette-ligne');
-  if (filtreLig) filtreLig.disabled = true;
+  document.querySelectorAll('#filtre-recette-collection-bar .filtre-btn').forEach(b => b.classList.remove('actif'));
+  const btnTout = document.querySelector('#filtre-recette-collection-bar .filtre-btn');
+  if (btnTout) btnTout.classList.add('actif');
+  const bar = document.getElementById('filtre-recette-ligne-bar');
+  if (bar) { bar.innerHTML = ''; bar.classList.add('cache'); }
   filtrerRecettes();
 }
 
