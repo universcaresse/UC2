@@ -845,7 +845,7 @@ tr.cliquable { cursor: pointer; }
    ADMIN — BADGES
    ═══════════════════════════════════════ */
 .badge-collection { display: inline-block; font-family: 'DM Sans', sans-serif; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; font-weight: 500; background: rgba(212,164,69,0.12); color: var(--accent); }
-.badge-statut-ok { font-family: 'DM Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; font-weight: 500; background: rgba(90,138,58,0.1); color: var(--primary); }
+.badge-statut-ok { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; font-weight: 500;  color: var(--primary); }
 .facture-totaux { padding: 16px 0; border-top: 1px solid var(--beige); margin-top: 8px; }
 .facture-total-ligne { display: flex; justify-content: space-between; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; color: var(--gris); padding: 4px 0; }
 .facture-total-final { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary); font-weight: 500; border-top: 1px solid var(--beige); margin-top: 8px; padding-top: 8px; }
