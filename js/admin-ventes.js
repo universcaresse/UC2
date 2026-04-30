@@ -82,9 +82,10 @@ function ouvrirFormVente() {
   document.getElementById('ven-sous-total').value = '';
   document.getElementById('ven-total').value = '';
   venRafraichirPanier();
-  document.getElementById('contenu-ventes').classList.add('cache');
+ document.getElementById('contenu-ventes').classList.add('cache');
   document.getElementById('form-vente').classList.remove('cache');
   document.getElementById('form-vente').style.display = 'block';
+  document.querySelector('#section-ventes .page-entete .bouton')?.classList.add('cache');
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }

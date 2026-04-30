@@ -206,7 +206,7 @@ function filtrerRecettes() {
   const colBtn = document.querySelector('#filtre-recette-collection-bar .filtre-btn.actif');
   const col    = colBtn ? colBtn.dataset.col : '';
   const gamBtn = document.querySelector('#filtre-recette-ligne-bar .filtre-btn.actif');
-  const gamme  = gamBtn ? gamBtn.textContent.trim() : '';
+  const gamme  = (gamBtn && gamBtn.textContent.trim() !== 'Toutes') ? gamBtn.textContent.trim() : '';
   const statut = document.getElementById('filtre-recette-statut')?.value;
   const nom    = (document.getElementById('filtre-recette-nom')?.value || '').toLowerCase().trim();
   const cartes = document.querySelectorAll('#grille-produits .carte-produit');
