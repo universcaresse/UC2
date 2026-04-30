@@ -52,6 +52,7 @@ html += `<tr class="cliquable${estAPayerR ? ' ven-a-payer' : ''}" onclick="voirD
   });
   html += '</tbody></table></div>';
   if (tableau) tableau.innerHTML = html;
+  if (vide) vide.classList.add('cache');
 }
 
 function ouvrirFormVente() {
@@ -371,6 +372,14 @@ function ouvrirApercuFacture() {
   </div>`;
   document.getElementById('modal-fv-contenu').innerHTML = html;
   document.getElementById('modal-fv-numero').textContent = venNumeroAffiche;
+  const estAPayer = v?.statut === 'a-payer';
+  const boutons = document.getElementById('fv-boutons');
+  if (boutons) {
+    document.querySelector('#fv-boutons .bouton-plein-largeur[onclick="payerParSquare()"]').style.display = estAPayer ? '' : 'none';
+    document.querySelector('#fv-boutons .bouton-plein-largeur[onclick="finaliserVente(\'argent\')"]').style.display = estAPayer ? '' : 'none';
+    document.querySelector('#fv-boutons .bouton-plein-largeur[onclick="finaliserVente()"]').style.display = estAPayer ? '' : 'none';
+    document.querySelector('#fv-boutons .bouton-contour[onclick="finaliserVente(\'plus-tard\')"]').style.display = 'none';
+  }
   document.getElementById('modal-facture-vente').classList.add('ouvert');
 }
 
@@ -380,7 +389,29 @@ function fermerApercuFacture() {
 
 
 
-function envoyerFactureCourriel() {
+function imprimerFacture() {
+  const contenu = document.getElementById('modal-fv-contenu').innerHTML;
+  const numero = document.getElementById('modal-fv-numero').textContent;
+  const fenetre = window.open('', '_blank');
+  fenetre.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Facture ${numero}</title>
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+      <style>
+        body { font-family: 'DM Sans', sans-serif; font-weight: 300; padding: 40px; max-width: 500px; margin: 0 auto; color: #3d3b39; }
+        @media print { body { padding: 20px; } }
+      </style>
+    </head>
+    <body>${contenu}</body>
+    </html>
+  `);
+  fenetre.document.close();
+  fenetre.focus();
+  setTimeout(() => fenetre.print(), 500);
+}
   const courriel = document.getElementById('ven-courriel').value;
   if (!courriel) { afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur'); return; }
   afficherMsg('ventes', 'Fonctionnalité courriel à venir.', 'erreur');
@@ -455,7 +486,7 @@ async function voirDetailVente(ven_id) {
     ...l,
     nom: donneesProduits.find(p => p.pro_id === l.pro_id)?.nom || l.pro_id
   }));
-  if (v.statut === 'a-payer') {
+ if (true || v.statut === 'a-payer') {
     venModeReprise = true;
 venIdEnCours = ven_id;
     venNumeroAffiche = v.numero_affiche || ven_id;
