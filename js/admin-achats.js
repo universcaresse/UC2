@@ -740,8 +740,10 @@ function efRendreLignesSauvegardees() {
       <td>${formaterPrix(l.prixTotal)}</td>
       <td>${l.catUC}<br><small>${l.nomUC}</small></td>
       <td>
-        <button class="bouton bouton-petit bouton-secondaire" onclick="efEditerLigne(${idx})" title="Modifier">✏️</button>
-        <button class="bouton bouton-petit bouton-rouge" onclick="efSupprimerLigne(${idx})">✕</button>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+          <button class="bouton bouton-petit bouton-secondaire" onclick="efEditerLigne(${idx})" title="Modifier" style="width:100%">✏️</button>
+          <button class="bouton bouton-petit bouton-rouge" onclick="efSupprimerLigne(${idx})" style="width:100%">✕</button>
+        </div>
       </td>`;
     if (ligneSaisie) tbody.insertBefore(tr, ligneSaisie);
     else tbody.appendChild(tr);
