@@ -34,7 +34,7 @@ function afficherTableauFabrication(lots) {
   const epuises     = lots.filter(l => l.statut === 'epuise');
 
   const totalEnCure      = enCure.reduce((s, l) => s + l.nb_unites, 0);
-  const totalDisponibles = disponibles.reduce((s, l) => s + l.nb_unites, 0);
+  const totalDisponibles = disponibles.reduce((s, l) => s + (l.nb_unites - (l.nb_unites_vendu || 0)), 0);
   const totalEpuises     = epuises.reduce((s, l) => s + l.nb_unites, 0);
 
   function grouperParCollection(liste) {
@@ -107,7 +107,7 @@ function afficherTableauFabrication(lots) {
     } else {
       const groupes = grouperParCollection(liste);
       groupes.forEach(g => {
-        const totalGroupe = g.lots.reduce((s, l) => s + l.nb_unites, 0);
+        const totalGroupe = g.lots.reduce((s, l) => s + (l.nb_unites - (l.nb_unites_vendu || 0)), 0);
         h += `<div class="form-panel visible" style="margin:8px 0">
           <div class="form-panel-header" onclick="fabToggleAccordeon(this)" style="cursor:pointer">
             <div class="form-panel-titre">${g.collection} — ${g.gamme}</div>
