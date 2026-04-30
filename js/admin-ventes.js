@@ -45,7 +45,9 @@ async function chargerVentes() {
 
 function ouvrirFormVente() {
   venPanier = [];
-  venIdEnCours = 'VEN-' + Date.now();
+  const dernierNum = toutesVentes.length ? Math.max(...toutesVentes.map(v => parseInt((v.ven_id || '').replace('VEN-', '')) || 0)) : 0;
+  venIdEnCours = 'VEN-' + String(dernierNum + 1).padStart(4, '0');
+  venNumeroAffiche = String(dernierNum + 1).padStart(4, '0');
   appelAPI('getLotsDisponibles').then(resLots => {
     venLotsDisponibles = (resLots && resLots.success) ? resLots.items : [];
   });
@@ -376,7 +378,8 @@ function fermerApercuFacture() {
 }
 
 function imprimerFacture() {
-  const numero  = document.getElementById('modal-fv-numero').textContent;
+  const numeroRaw = document.getElementById('modal-fv-numero').textContent;
+  const numero = numeroRaw.replace('VEN-', '');
   const date    = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
   const client  = document.getElementById('ven-client').value;
   const courriel  = document.getElementById('ven-courriel').value;
@@ -409,14 +412,15 @@ function imprimerFacture() {
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:'DM Sans',sans-serif; font-weight:300; background:#fff; color:#3d3b39; }
-    .page { max-width:600px; margin:0 auto; padding:48px 40px; }
+    .page { width:21.59cm; min-height:27.94cm; margin:0 auto; padding:48px 40px; }
+    @page { size:letter; margin:0; }
     .entete { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:40px; padding-bottom:24px; border-bottom:2px solid #5a8a3a; }
     .logo-nom { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:600; color:#333; letter-spacing:0.04em; }
     .logo-tagline { font-family:'Birthstone',cursive; font-size:1.1rem; color:#d4a445; margin-top:2px; }
     .logo-sub { font-size:0.6rem; letter-spacing:0.18em; color:#8b8680; text-transform:lowercase; margin-top:2px; }
     .facture-ref { text-align:right; }
     .facture-label { font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:#8b8680; font-weight:500; }
-    .facture-numero { font-family:'Playfair Display',serif; font-size:1.3rem; color:#5a8a3a; margin-top:4px; }
+    .facture-numero { font-family:'Playfair Display',serif; font-size:0.95rem; color:#5a8a3a; margin-top:4px; }
     .facture-date { font-size:0.78rem; color:#8b8680; margin-top:4px; }
     .client-bloc { margin-bottom:32px; padding:16px 20px; background:#f9f7f4; border-left:3px solid #d4a445; }
     .client-label { font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:#8b8680; font-weight:500; margin-bottom:8px; }
@@ -440,9 +444,7 @@ function imprimerFacture() {
 <div class="page">
   <div class="entete">
     <div>
-      <div class="logo-nom">Univers Caresse</div>
-      <div class="logo-tagline">simplement la nature</div>
-      <div class="logo-sub">savonnerie artisanale</div>
+      <img src="../Images/Logofinal.png" alt="Univers Caresse" style="width:180px;">
     </div>
     <div class="facture-ref">
       <div class="facture-label">Facture</div>
@@ -479,7 +481,7 @@ function imprimerFacture() {
 
   <div class="merci">
     <div class="merci-texte">Merci pour votre confiance !</div>
-    <div class="boutique">universcaresse.ca &nbsp;·&nbsp; info@universcaresse.ca</div>
+    <div class="boutique">universcaresse.ca &nbsp;·&nbsp; universcaresse@gmail.com</div>
   </div>
 </div>
 </body></html>`);
