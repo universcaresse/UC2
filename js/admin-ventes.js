@@ -635,6 +635,9 @@ async function voirDetailVente(ven_id) {
 
 async function allerVersNouvelleVente() {
   afficherSection('ventes', null);
+  document.getElementById('contenu-ventes').classList.add('cache');
+  document.getElementById('filtres-ventes').classList.add('cache');
+  document.querySelector('#section-ventes .page-entete .bouton')?.classList.add('cache');
   const [resPro, resFmt, resLots] = await Promise.all([
     appelAPI('getProduits'),
     appelAPI('getProduitsFormats'),
