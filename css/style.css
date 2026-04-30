@@ -762,8 +762,8 @@ footer > * { position: relative; z-index: 1; }
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(30,28,25,0.4); z-index: 89; top: var(--nav-h); }
 .sidebar-overlay.visible { display: block; }
 .sidebar-groupe { margin-bottom: 4px; }
-.sidebar-titre { font-family: 'DM Sans', sans-serif; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gris); padding: 14px 24px 6px; font-weight: 500; font-variant: small-caps;}
-.sidebar-lien { display: block; padding: 9px 24px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 300; color: var(--gris); text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: right; transition: all 0.15s; border-left: 3px solid transparent;font-variant: small-caps; }
+.sidebar-titre { font-family: 'DM Sans', sans-serif; font-size: 0.80rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gris); padding: 14px 24px 6px; font-weight: 500; font-variant: small-caps;}
+.sidebar-lien { display: block; padding: 9px 24px; font-family: 'DM Sans', sans-serif; font-size: 0.90rem; font-weight: 300; color: var(--gris); text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: right; transition: all 0.15s; border-left: 3px solid transparent;font-variant: small-caps; }
 .sidebar-lien:hover { background: rgba(90,138,58,0.05); color: var(--primary); }
 .sidebar-lien.actif { background: rgba(90,138,58,0.08); color: var(--primary); border-left-color: var(--primary); font-weight: 500; }
 .sidebar-lien.bientot { color: var(--beige); cursor: default; font-style: italic; }
