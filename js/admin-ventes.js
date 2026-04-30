@@ -66,6 +66,12 @@ function ouvrirFormVente() {
   document.getElementById('ven-client').value = '';
   document.getElementById('ven-courriel').value = '';
   document.getElementById('ven-telephone').value = '';
+  document.getElementById('ven-telephone').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '').slice(0, 10);
+    if (v.length >= 7) this.value = v.slice(0,3) + ' ' + v.slice(3,6) + '-' + v.slice(6);
+    else if (v.length >= 4) this.value = v.slice(0,3) + ' ' + v.slice(3);
+    else this.value = v;
+  });
   const elPaiement = document.getElementById('modal-fv-paiement');
   if (elPaiement) elPaiement.value = '';
   document.getElementById('ven-livraison').value = '0';
@@ -73,6 +79,7 @@ function ouvrirFormVente() {
   document.getElementById('ven-total').value = '';
   venRafraichirPanier();
   document.getElementById('contenu-ventes').classList.add('cache');
+  document.getElementById('filtres-ventes').classList.add('cache');
   document.getElementById('form-vente').classList.remove('cache');
   document.getElementById('form-vente').style.display = 'block';
   document.querySelector('#section-ventes .page-entete .bouton')?.classList.add('cache');
@@ -81,6 +88,7 @@ function ouvrirFormVente() {
 }
 function fermerFormVente() {
   document.getElementById('form-vente').classList.add('cache');
+  document.getElementById('filtres-ventes').classList.remove('cache');
   document.getElementById('contenu-ventes').classList.remove('cache');
   venPanier = [];
   venIdEnCours = null;
@@ -454,7 +462,7 @@ function imprimerFacture() {
     <div class="client-label">Client</div>
     ${client ? `<div class="client-nom">${client}</div>` : ''}
     ${courriel ? `<div class="client-info">${courriel}</div>` : ''}
-    ${telephone ? `<div class="client-info">${telephone}</div>` : ''}
+${telephone ? `<div class="client-info">${telephone.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2-$3')}</div>` : ''}
   </div>` : ''}
 
   <table>
