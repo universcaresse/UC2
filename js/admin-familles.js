@@ -160,7 +160,7 @@ async function sauvegarderFamille() {
   const nom    = document.getElementById('ff-nom').value.trim().toUpperCase();
   if (!nom || !col_id) { afficherMsg('familles', 'Nom et collection requis.', 'erreur'); return; }
   const positionChoisie = parseInt(document.getElementById('ff-position')?.value) || 0;
-  aconst dernierNumFam = donneesFamilles.length ? Math.max(...donneesFamilles.map(f => parseInt((f.fam_id || '').replace('FAM-', '')) || 0)) : 0;
+  const dernierNumFam = donneesFamilles.length ? Math.max(...donneesFamilles.map(f => parseInt((f.fam_id || '').replace('FAM-', '')) || 0)) : 0;
   const d = {
     fam_id: id || ('FAM-' + String(dernierNumFam + 1).padStart(4, '0')),
     col_id,
