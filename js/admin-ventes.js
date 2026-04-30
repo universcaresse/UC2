@@ -40,12 +40,13 @@ async function chargerVentes() {
   }
   let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>Date</th><th>Client</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody>';
   res.items.forEach(v => {
-    html += `<tr class="cliquable" onclick="voirDetailVente('${v.ven_id}')">
+    const estAPayerR = v.statut === 'a-payer';
+html += `<tr class="cliquable${estAPayerR ? ' ven-a-payer' : ''}" onclick="voirDetailVente('${v.ven_id}')">
       <td>${v.date}</td>
       <td>${v.client || '—'}</td>
       <td>${v.mode_paiement || '—'}</td>
       <td>${formaterPrix(v.total)}</td>
-      <td>${v.statut}</td>
+      <td>${estAPayerR ? '<span class="badge-statut-cours">À payer</span>' : v.statut}</td>
     </tr>`;
   });
   html += '</tbody></table></div>';
@@ -424,7 +425,8 @@ async function finaliserVente(modePaiement) {
     livraison,
     promo_id: promoData?.promo_id || '',
     rabais,
-    total_net
+    total_net,
+    statut: modePaiement === 'plus-tard' ? 'a-payer' : 'Finalisé'
   });
   if (!resFin || !resFin.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur'); return; }
   cacherChargement();
@@ -435,7 +437,25 @@ async function finaliserVente(modePaiement) {
 }
 
 async function voirDetailVente(ven_id) {
-  afficherMsg('ventes', 'Fonctionnalité à venir.');
+  const res = await appelAPI('getVenteDetail', { ven_id });
+  if (!res || !res.success) { afficherMsg('ventes', 'Erreur de chargement.', 'erreur'); return; }
+  const v = res.item;
+  if (v.statut === 'a-payer') {
+    venIdEnCours = ven_id;
+    venNumeroAffiche = v.numero_affiche || ven_id;
+    venPanier = (v.lignes || []).map(l => ({
+      pro_id: l.pro_id, lot_id: l.lot_id, nom: l.nom,
+      poids: l.format_poids, unite: l.format_unite,
+      quantite: l.quantite, prix_unitaire: l.prix_unitaire
+    }));
+    document.getElementById('ven-livraison').value = v.livraison || 0;
+    document.getElementById('ven-client').value = v.client || '';
+    document.getElementById('ven-courriel').value = v.courriel || '';
+    document.getElementById('ven-telephone').value = v.telephone || '';
+    ouvrirApercuFacture();
+  } else {
+    afficherMsg('ventes', 'Fonctionnalité à venir.');
+  }
 }
 
 async function allerVersNouvelleVente() {
