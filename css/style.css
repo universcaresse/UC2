@@ -236,7 +236,7 @@ nav.scrolled { box-shadow: none; }
   font-family: 'Birthstone', serif;
   font-size: var(--texte-160);
   letter-spacing: 0.1em;
-  font-variant: normal; !important;
+  font-variant: normal;
   text-transform: lowercase;
   color: var(--gris);
   font-weight: 400;
@@ -271,7 +271,7 @@ nav.scrolled { box-shadow: none; }
 
 .btn-nav-admin {
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: lowercase;
   padding: 8px 18px; border: 1px solid var(--beige);
   background: transparent; color: var(--gris); cursor: pointer; transition: all 0.2s;
   text-decoration: none; display: inline-flex; align-items: center;
@@ -958,17 +958,6 @@ tr.cliquable { cursor: pointer; }
 .total-final-montant { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gris-fonce); }
 .total-final-label { font-family: 'DM Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); }
 
-/* ═══════════════════════════════════════
-   ADMIN — WIZARD
-   ═══════════════════════════════════════ */
-.wizard-etapes { display: flex; align-items: center; margin-top: 20px;  margin-bottom: 40px; }
-.wizard-etape { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.wizard-cercle { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--beige); background: var(--blanc); color: var(--gris); font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
-.wizard-label { font-family: 'DM Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); transition: color 0.3s; }
-.wizard-etape.active .wizard-cercle { border-color: var(--primary); background: var(--primary); color: white; }
-.wizard-etape.active .wizard-label { color: var(--primary); font-weight: 500; }
-.wizard-etape.complete .wizard-cercle { border-color: var(--primary); background: rgba(90,138,58,0.1); color: var(--primary); }
-.wizard-trait { flex: 1; height: 1px; background: var(--beige); margin: 0 12px; margin-bottom: 24px; }
 
 /* ═══════════════════════════════════════
    ADMIN — ÉTATS
@@ -1028,7 +1017,7 @@ tr.cliquable { cursor: pointer; }
 	font-family: 'Birthstone', serif;
 	font-variant: normal;
 	font-size: var(--texte-160);
-	 text-transform: lowercase; !important;
+	text-transform: lowercase; !important;
     padding-top: 8px;
     background: var(--blanc);
     border: 1px solid var(--beige);
@@ -1044,12 +1033,14 @@ tr.cliquable { cursor: pointer; }
     padding: 11px 20px;
 	font-family: 'Birthstone', serif;
 	font-size: var(--texte-150);
+	letter-spacing: 0.1em;
     background: none;
     border: none;
     text-align: left;
     cursor: pointer;
     transition: all 0.15s;
     border-left: 3px solid transparent;
+	
    
   }
   .nav-dropdown-item:hover {
