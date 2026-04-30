@@ -243,6 +243,8 @@ function reinitialiserFiltresRecettes() {
   const bar = document.getElementById('filtre-recette-ligne-bar');
   if (bar) { bar.innerHTML = ''; bar.classList.add('cache'); }
   filtrerRecettes();
+  window.scrollTo(0, 0);
+  document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
 
 async function chargerCollectionsPourSelecteur() {
