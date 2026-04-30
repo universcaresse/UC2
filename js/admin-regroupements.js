@@ -155,7 +155,6 @@ function modifierRegroupement(fra_id) {
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
   document.getElementById('form-regroupements').scrollIntoView({ behavior: 'smooth' });
 }
-
 async function sauvegarderRegroupement() {
   afficherChargement();
   const id     = document.getElementById('freg-id').value;
@@ -164,11 +163,10 @@ async function sauvegarderRegroupement() {
   if (!nom)    { cacherChargement(); afficherMsg('regroupements', 'Le nom est requis.', 'erreur'); return; }
   if (!ing_id) { cacherChargement(); afficherMsg('regroupements', 'L\'ingrédient est requis.', 'erreur'); return; }
   const positionChoisie = parseInt(document.getElementById('freg-position')?.value) || 0;
-  const d = {
   const dernierNumFra = donneesRegroupements.length ? Math.max(...donneesRegroupements.map(f => parseInt((f.fra_id || '').replace('FRA-', '')) || 0)) : 0;
   const d = {
-    fra_id: id || ('FRA-' + String(dernierNumFra + 1).padStart(4, '0')),
-    rang:          positionChoisie + 1,
+    fra_id:         id || ('FRA-' + String(dernierNumFra + 1).padStart(4, '0')),
+    rang:           positionChoisie + 1,
     nom,
     slogan:         document.getElementById('freg-slogan').value,
     description:    document.getElementById('freg-desc').value,
@@ -190,6 +188,7 @@ async function sauvegarderRegroupement() {
     afficherMsg('regroupements', res?.message || 'Erreur lors de la sauvegarde.', 'erreur');
   }
 }
+
 
 async function supprimerRegroupement(fra_id) {
   confirmerAction('Supprimer ce regroupement ?', async () => {
