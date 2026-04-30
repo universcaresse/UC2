@@ -231,7 +231,7 @@ nav.scrolled { box-shadow: none; }
 
 .nav-links { display: flex; gap: 32px; list-style: none; margin-left: auto; }
 .nav-links a, .nav-admin-btn {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Birthstone', serif;
   font-size: var(--texte-110);
   letter-spacing: 0.1em;
   text-transform: lowercase;
