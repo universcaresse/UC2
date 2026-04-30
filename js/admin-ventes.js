@@ -6,6 +6,7 @@ var venPanier = [];
 var venIdEnCours = null;
 var venNumeroAffiche = '';
 var venLotsDisponibles = [];
+var venModeReprise = false;
 
 
 async function chargerVentes() {
@@ -410,10 +411,15 @@ async function finaliserVente(modePaiement) {
   const telephone = document.getElementById('ven-telephone').value;
   const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
   const ven_id    = venIdEnCours;
-  const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement });
-  if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la création.', 'erreur'); return; }
-  for (const l of venPanier) {
-    await appelAPIPost('addVenteLigne', { ven_id, pro_id: l.pro_id, lot_id: l.lot_id, quantite: l.quantite, prix_unitaire: l.prix_unitaire, format_poids: l.poids, format_unite: l.unite });
+  if (venModeReprise) {
+    const resUpdate = await appelAPIPost('updateStatutVente', { ven_id, statut: 'Finalisée', mode_paiement: paiement });
+    if (!resUpdate || !resUpdate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la mise à jour.', 'erreur'); return; }
+  } else {
+    const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement });
+    if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la création.', 'erreur'); return; }
+    for (const l of venPanier) {
+      await appelAPIPost('addVenteLigne', { ven_id, pro_id: l.pro_id, lot_id: l.lot_id, quantite: l.quantite, prix_unitaire: l.prix_unitaire, format_poids: l.poids, format_unite: l.unite });
+    }
   }
   const promoSel  = document.getElementById('ven-promotion').value;
   const promoData = promoSel ? JSON.parse(promoSel) : null;
@@ -430,6 +436,7 @@ async function finaliserVente(modePaiement) {
   });
   if (!resFin || !resFin.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur'); return; }
   cacherChargement();
+  venModeReprise = false;
   fermerApercuFacture();
   fermerFormVente();
   afficherMsg('ventes', '✅ Vente enregistrée.');
@@ -449,7 +456,8 @@ async function voirDetailVente(ven_id) {
     nom: donneesProduits.find(p => p.pro_id === l.pro_id)?.nom || l.pro_id
   }));
   if (v.statut === 'a-payer') {
-    venIdEnCours = ven_id;
+    venModeReprise = true;
+venIdEnCours = ven_id;
     venNumeroAffiche = v.numero_affiche || ven_id;
     venPanier = (v.lignes || []).map(l => ({
       pro_id: l.pro_id, lot_id: l.lot_id, nom: l.nom,
