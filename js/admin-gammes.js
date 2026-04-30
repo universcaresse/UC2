@@ -18,14 +18,12 @@ function afficherGammes() {
   if (loading) loading.classList.add('cache');
   if (btnNew)  btnNew.classList.remove('cache');
 
-  let optionsCol = '<option value="">Toutes les collections</option>';
-  donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
-    const sel = filtreGammesColId === col.col_id ? 'selected' : '';
-    optionsCol += `<option value="${col.col_id}" ${sel}>${col.nom}</option>`;
-  });
   let html = `<div class="filtres-bar" style="margin-bottom:1.2rem;">
-    <select class="form-ctrl" style="max-width:260px;" onchange="filtreGammesColId=this.value;afficherGammes();">${optionsCol}</select>
-  </div>`;
+    <button class="filtre-btn ${!filtreGammesColId ? 'actif' : ''}" onclick="filtreGammesColId='';afficherGammes();">Tout</button>`;
+  donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
+    html += `<button class="filtre-btn ${filtreGammesColId === col.col_id ? 'actif' : ''}" onclick="filtreGammesColId='${col.col_id}';afficherGammes();">${col.nom}</button>`;
+  });
+  html += `</div>`;
 
   const colsFiltrees = filtreGammesColId
     ? donneesCollections.filter(c => c.col_id === filtreGammesColId)
