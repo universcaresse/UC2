@@ -794,18 +794,15 @@
      PRODUITS — Liste des produits + filtres
 -->
         <div class="filtres-bar">
-          <select class="form-ctrl filtre-select" id="filtre-recette-collection" onchange="onFiltreCollection()">
-            <option value="">Collections</option>
-          </select>
-          <select class="form-ctrl filtre-select" id="filtre-recette-ligne" onchange="filtrerRecettes()" disabled>
-            <option value="">Gammes</option>
-          </select>
-          <select class="form-ctrl filtre-select" id="filtre-recette-statut" onchange="filtrerRecettes()">
+          <div id="filtre-recette-collection-bar" class="filtres-ligne"></div>
+          <div id="filtre-recette-ligne-bar" class="filtres-ligne cache"></div>
+<select class="form-ctrl filtre-select cache" id="filtre-recette-ligne" onchange="filtrerRecettes()" disabled></select>
+          <select class="form-ctrl filtre-select cache" id="filtre-recette-statut" onchange="filtrerRecettes()">
             <option value="">Statuts</option>
             <option value="test">Test</option>
             <option value="public">Public</option>
           </select>
-          <input type="text" class="form-ctrl filtre-recherche" id="filtre-recette-nom" oninput="filtrerRecettes()" placeholder="Par nom">
+          <input type="text" class="form-ctrl filtre-recherche cache" id="filtre-recette-nom" oninput="filtrerRecettes()" placeholder="Par nom">
           
           <button class="bouton bouton-petit bouton-contour" onclick="reinitialiserFiltresRecettes()" title="Réinitialiser">✕</button>
         </div>

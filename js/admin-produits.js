@@ -145,16 +145,42 @@ async function afficherProduits() {
 }
 
 function peuplerFiltresRecettes() {
-  const sel = document.getElementById('filtre-recette-collection');
-  if (!sel) return;
-  const valActuelle = sel.value;
-  sel.innerHTML = '<option value="">Toutes les collections</option>';
+  const bar = document.getElementById('filtre-recette-collection-bar');
+  if (!bar) return;
+  bar.innerHTML = '<button class="filtre-btn actif" data-col="" onclick="onFiltreCollectionBtn(this, \'\')">Tout</button>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
-    const opt = document.createElement('option');
-    opt.value = col.nom; opt.textContent = col.nom;
-    sel.appendChild(opt);
+    bar.innerHTML += `<button class="filtre-btn" data-col="${col.nom}" onclick="onFiltreCollectionBtn(this, '${col.nom}')">${col.nom}</button>`;
   });
-  sel.value = valActuelle;
+}
+
+function onFiltreCollectionBtn(btn, colNom) {
+  document.querySelectorAll('#filtre-recette-collection-bar .filtre-btn').forEach(b => b.classList.remove('actif'));
+  btn.classList.add('actif');
+  const bar = document.getElementById('filtre-recette-ligne-bar');
+  bar.innerHTML = '';
+  if (colNom) {
+    const col = donneesCollections.find(c => c.nom === colNom);
+    const gammes = col ? donneesGammes.filter(g => g.col_id === col.col_id) : [];
+    if (gammes.length > 1) {
+      bar.classList.remove('cache');
+      bar.innerHTML = '<button class="filtre-btn actif" onclick="onFiltreGammeBtn(this, \'\')">Toutes</button>';
+      gammes.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(g => {
+        bar.innerHTML += `<button class="filtre-btn" onclick="onFiltreGammeBtn(this, '${g.nom}')">${g.nom}</button>`;
+      });
+    } else {
+      bar.classList.add('cache');
+    }
+  } else {
+    bar.classList.add('cache');
+  }
+  filtrerRecettes();
+}
+
+function onFiltreGammeBtn(btn, gamNom) {
+  document.querySelectorAll('#filtre-recette-ligne-bar .filtre-btn').forEach(b => b.classList.remove('actif'));
+  btn.classList.add('actif');
+  document.getElementById('filtre-recette-ligne').value = gamNom;
+  filtrerRecettes();
 }
 
 function onFiltreCollection() {
