@@ -874,7 +874,7 @@ tr.cliquable { cursor: pointer; }
 .collection-ligne-nom { color: white; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; flex: 1; }
 .collection-ligne-format { color: rgba(255,255,255,0.7); font-family: 'DM Sans', sans-serif; font-size: 0.75rem; }
 .collection-ligne-actions { display: flex; gap: 4px; margin-left: 8px; }
-.photo-preview { width: 120px; height: 120px; object-fit: cover; border-radius: 6px; display: block; margin-top: 8px; }
+.photo-preview { width: 120px; height: 120px; object-fit: cover;  display: block; margin-top: 8px; }
 
 .couleur-apercu { width: 32px; height: 32px; border: 1px solid var(--beige); display: inline-block; vertical-align: middle; margin-left: 8px; background: var(--beige); }
 .btn-ajouter-ingredient { margin-top: 8px; }
@@ -1213,8 +1213,8 @@ font-variant: small-caps;
 .fiche-ligne-actions { margin-top: 24px; }
 .form-valeur { font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--gris-fonce); padding: 4px 0; }
 .fiche-extras-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-.fiche-couleur { width: 80px; height: 80px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; font-size: 1.5rem; font-weight: 700; color: rgba(255,255,255,0.8); }
-.fiche-photo img { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; }
+.fiche-couleur { width: 80px; height: 80px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; font-size: 1.5rem; font-weight: 700; color: rgba(255,255,255,0.8); }
+.fiche-photo img { width: 80px; height: 80px; object-fit: cover;  }
 .fiche-ligne-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--beige); cursor: pointer; }
 .fiche-ligne-item:last-child { border-bottom: none; }
 .fiche-ligne-info { flex: 1; }
@@ -1238,7 +1238,7 @@ font-variant: small-caps;
    ═══════════════════════════════════════ */
 
 
-.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: var(--gris-fonce); color: var(--blanc); padding: 16px 32px; border-radius: 1px; font-family: 'DM Sans', sans-serif; font-size: 1rem; z-index: 9999; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
+.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: var(--gris-fonce); color: var(--blanc); padding: 16px 32px; font-family: 'DM Sans', sans-serif; font-size: 1rem; z-index: 9999; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
 .toast.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 .toast.toast-succes { background: var(--primary); }
 .toast.toast-erreur { background: var(--danger); }
@@ -1252,7 +1252,7 @@ font-variant: small-caps;
 .ecran-connexion.visible { display: flex; }
 .cache { display: none !important; }
 .invisible { opacity: 0; pointer-events: none; }
-.connexion-boite { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 300px; padding: 48px 40px; background: white; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+.connexion-boite { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 300px; padding: 48px 40px; background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
 .connexion-logo { width: 80px; margin-bottom: 8px; }
 .connexion-titre { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--gris-fonce); letter-spacing: 0.05em; }
 .connexion-erreur { color: var(--danger); font-size: 0.85rem; min-height: 20px; }
@@ -1354,7 +1354,7 @@ font-variant: small-caps;
 .texte-brut { font-size: 0.95rem; color: var(--gris); line-height: 1.5; user-select: text; cursor: text; }
 .form-groupe { margin-top: 1rem; }
 .accordeon-detail .form-actions { justify-content: space-between; }
-.carte-admin { border: 1px solid var(--beige); border-radius: 6px; padding: 16px; margin-bottom: 12px; }
+.carte-admin { border: 1px solid var(--beige); padding: 16px; margin-bottom: 12px; }
 .fab-apercu { margin-top: 16px; }
 .carte-admin-entete { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
 .carte-admin-entete .form-ctrl { flex: 1; }
