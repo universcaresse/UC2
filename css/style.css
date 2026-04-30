@@ -188,6 +188,7 @@
    --texte-115: 1.15rem;
   --texte-130: 1.30rem;
   --texte-150: 1.50rem;
+  --texte-175: 1.75rem;
   --texte-200: 2rem;
 }
 /* ═══════════════════════════════════════
@@ -232,7 +233,7 @@ nav.scrolled { box-shadow: none; }
 .nav-links { display: flex; gap: 32px; list-style: none; margin-left: auto; }
 .nav-links a, .nav-admin-btn {
   font-family: 'Birthstone', serif;
-  font-size: var(--texte-150);
+  font-size: var(--texte-175);
   letter-spacing: 0.1em;
   text-transform: lowercase;
   color: var(--gris);
@@ -1005,8 +1006,8 @@ tr.cliquable { cursor: pointer; }
   .nav-admin-btn {
     background: none;
     border: none;
-		text-transform: none; /* On annule le lowercase */
-font-variant: small-caps;
+	text-transform: none; /* On annule le lowercase */
+	font-variant: small-caps;
     cursor: pointer;
     padding: 8px 14px;
     display: flex;
@@ -1022,6 +1023,8 @@ font-variant: small-caps;
     position: absolute;
     top: 100%;
     left: 0;
+	 font-family: 'Birthstone', serif;
+  font-size: var(--texte-175);
     padding-top: 8px;
     background: var(--blanc);
     border: 1px solid var(--beige);
@@ -1035,7 +1038,7 @@ font-variant: small-caps;
     display: block;
     width: 100%;
     padding: 11px 20px;
-    font-size: var(--texte-105);
+    font-size: var(--texte-175);
     font-family: 'Playfair Display', serif;
 	
 	text-transform: none; /* On annule le lowercase */
