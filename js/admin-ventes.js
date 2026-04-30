@@ -437,9 +437,17 @@ async function finaliserVente(modePaiement) {
 }
 
 async function voirDetailVente(ven_id) {
-  const res = await appelAPI('getVenteDetail', { ven_id });
-  if (!res || !res.success) { afficherMsg('ventes', 'Erreur de chargement.', 'erreur'); return; }
-  const v = res.item;
+  const [resEntete, resLignes] = await Promise.all([
+    appelAPI('getVentesEntete'),
+    appelAPI('getVentesLignes', { ven_id })
+  ]);
+  if (!resEntete || !resEntete.success || !resLignes || !resLignes.success) { afficherMsg('ventes', 'Erreur de chargement.', 'erreur'); return; }
+  const v = resEntete.items.find(x => x.ven_id === ven_id);
+  if (!v) { afficherMsg('ventes', 'Vente introuvable.', 'erreur'); return; }
+  v.lignes = resLignes.items.map(l => ({
+    ...l,
+    nom: donneesProduits.find(p => p.pro_id === l.pro_id)?.nom || l.pro_id
+  }));
   if (v.statut === 'a-payer') {
     venIdEnCours = ven_id;
     venNumeroAffiche = v.numero_affiche || ven_id;
