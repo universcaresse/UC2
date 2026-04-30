@@ -90,14 +90,13 @@ async function sauvegarderPromotion() {
   const type = document.getElementById('fp-type').value;
   const nom  = document.getElementById('fp-nom').value.trim();
   if (!type || !nom) { cacherChargement(); afficherMsg('promotions', 'Type et nom requis.', 'erreur'); return; }
+  const dernierNumPromo = donneesPromotions.length ? Math.max(...donneesPromotions.map(p => parseInt((p.promo_id || '').replace('PROMO-', '')) || 0)) : 0;
   const d = {
-    const dernierNumPromo = donneesPromotions.length ? Math.max(...donneesPromotions.map(p => parseInt((p.promo_id || '').replace('PROMO-', '')) || 0)) : 0;
-  const d = {
-    promo_id: id || ('PROMO-' + String(dernierNumPromo + 1).padStart(4, '0')),
-    fam_id:       document.getElementById('fp-famille').value || '',
+    promo_id:       id || ('PROMO-' + String(dernierNumPromo + 1).padStart(4, '0')),
+    fam_id:         document.getElementById('fp-famille').value || '',
     type,
     nom,
-    valeur:       parseFloat(document.getElementById('fp-valeur').value) || 0,
+    valeur:         parseFloat(document.getElementById('fp-valeur').value) || 0,
     quantite_min:   parseInt(document.getElementById('fp-quantite-min').value)   || 0,
     quantite_seuil: parseInt(document.getElementById('fp-quantite-seuil').value) || 1
   };
