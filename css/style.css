@@ -236,6 +236,7 @@ nav.scrolled { box-shadow: none; }
   font-family: 'Birthstone', serif;
   font-size: var(--texte-160);
   letter-spacing: 0.1em;
+  font-variant: normal;
   text-transform: lowercase;
   color: var(--gris);
   font-weight: 400;
@@ -1025,7 +1026,9 @@ tr.cliquable { cursor: pointer; }
     top: 100%;
     left: 0;
 	font-family: 'Birthstone', serif;
+	font-variant: normal;
 	font-size: var(--texte-160);
+	 text-transform: lowercase;
     padding-top: 8px;
     background: var(--blanc);
     border: 1px solid var(--beige);
