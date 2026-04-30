@@ -7,6 +7,7 @@ var venIdEnCours = null;
 var venNumeroAffiche = '';
 var venLotsDisponibles = [];
 var venModeReprise = false;
+var venStatutReprise = '';
 
 
 async function chargerVentes() {
@@ -419,9 +420,6 @@ function imprimerFacture() {
     .page { width:21.59cm; min-height:27.94cm; margin:0 auto; padding:48px 40px; }
     @page { size:letter; margin:0; }
     .entete { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:40px; padding-bottom:24px; border-bottom:2px solid #5a8a3a; }
-    .logo-nom { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:600; color:#333; letter-spacing:0.04em; }
-    .logo-tagline { font-family:'Birthstone',cursive; font-size:1.1rem; color:#d4a445; margin-top:2px; }
-    .logo-sub { font-size:0.6rem; letter-spacing:0.18em; color:#8b8680; text-transform:lowercase; margin-top:2px; }
     .facture-ref { text-align:right; }
     .facture-label { font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:#8b8680; font-weight:500; }
     .facture-numero { font-family:'Playfair Display',serif; font-size:0.95rem; color:#5a8a3a; margin-top:4px; }
@@ -448,7 +446,7 @@ function imprimerFacture() {
 <div class="page">
   <div class="entete">
     <div>
-      <img src="../Images/Logofinal.png" alt="Univers Caresse" style="width:180px;">
+      <img src="../Images/Logofinal.png" alt="Univers Caresse" style="width:200px;">
     </div>
     <div class="facture-ref">
       <div class="facture-label">Facture</div>
