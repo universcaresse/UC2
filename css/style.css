@@ -1038,6 +1038,8 @@ tr.cliquable { cursor: pointer; }
     display: block;
     width: 100%;
     padding: 11px 20px;
+	font-family: 'Birthstone', serif;
+	font-size: var(--texte-150);
     background: none;
     border: none;
     text-align: left;
