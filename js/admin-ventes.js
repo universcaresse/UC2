@@ -382,7 +382,19 @@ function fermerModalApresVente() {
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
 }
 
-function imprimerFacture() {
+async function sauvegarderCoordonnees() {
+  const courriel   = document.getElementById('apv-courriel').value;
+  const telephone  = document.getElementById('apv-telephone').value;
+  const infolettre = document.getElementById('apv-infolettre').checked ? '1' : '0';
+  document.getElementById('ven-courriel').value  = courriel;
+  document.getElementById('ven-telephone').value = telephone;
+  if (venIdEnCours) {
+    await appelAPIPost('updateStatutVente', { ven_id: venIdEnCours, courriel, telephone, infolettre });
+  }
+}
+
+async function imprimerFacture() {
+  await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
   const numeroRaw = document.getElementById('modal-fv-numero').textContent;
   const numero = numeroRaw.replace('VEN-', '');
@@ -492,9 +504,10 @@ ${telephone ? `<div class="client-info">${telephone.replace(/\D/g,'').replace(/(
   fenetre.focus();
   setTimeout(() => fenetre.print(), 800);
 }
-function envoyerFactureCourriel() {
+async function envoyerFactureCourriel() {
+  await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
-  const courriel = document.getElementById('ven-courriel').value;
+  const courriel = document.getElementById('apv-courriel').value;
   if (!courriel) { afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur'); return; }
   const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
@@ -510,9 +523,10 @@ function envoyerFactureCourriel() {
   window.location.href = `mailto:${courriel}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
 }
 
-function envoyerFactureTexto() {
+async function envoyerFactureTexto() {
+  await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
-  const telephone = document.getElementById('ven-telephone').value;
+  const telephone = document.getElementById('apv-telephone').value;
   if (!telephone) { afficherMsg('ventes', 'Aucun téléphone indiqué pour ce client.', 'erreur'); return; }
   const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
@@ -540,7 +554,8 @@ async function finaliserVente(modePaiement) {
     const resUpdate = await appelAPIPost('updateStatutVente', { ven_id, statut: 'Finalisée', mode_paiement: paiement });
     if (!resUpdate || !resUpdate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la mise à jour.', 'erreur'); return; }
   } else {
-    const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement });
+    const infolettre = document.getElementById('ven-infolettre')?.checked ? '1' : '0';
+  const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement, infolettre });
     if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la création.', 'erreur'); return; }
     for (const l of venPanier) {
       await appelAPIPost('addVenteLigne', { ven_id, pro_id: l.pro_id, lot_id: l.lot_id, quantite: l.quantite, prix_unitaire: l.prix_unitaire, format_poids: l.poids, format_unite: l.unite });
@@ -566,6 +581,9 @@ async function finaliserVente(modePaiement) {
   fermerFormVente();
   chargerVentes();
   if (modePaiement !== 'plus-tard') {
+    document.getElementById('apv-courriel').value     = document.getElementById('ven-courriel').value;
+    document.getElementById('apv-telephone').value    = document.getElementById('ven-telephone').value;
+    document.getElementById('apv-infolettre').checked = document.getElementById('ven-infolettre')?.checked || false;
     document.getElementById('modal-apres-vente').classList.add('ouvert');
   } else {
     afficherMsg('ventes', '✅ Vente enregistrée.');
