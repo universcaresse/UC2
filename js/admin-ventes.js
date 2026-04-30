@@ -41,6 +41,7 @@ async function chargerVentes() {
   }
  toutesVentes = res.items;
   afficherTableauVentes(toutesVentes);
+}
 
 function ouvrirFormVente() {
   venPanier = [];
@@ -374,8 +375,6 @@ function fermerApercuFacture() {
   document.getElementById('modal-facture-vente').classList.remove('ouvert');
 }
 
-
-
 function imprimerFacture() {
   const contenu = document.getElementById('modal-fv-contenu').innerHTML;
   const numero = document.getElementById('modal-fv-numero').textContent;
@@ -399,7 +398,8 @@ function imprimerFacture() {
   fenetre.focus();
   setTimeout(() => fenetre.print(), 500);
 }
-  function envoyerFactureCourriel() {
+
+function envoyerFactureCourriel() {
   const courriel = document.getElementById('ven-courriel').value;
   if (!courriel) { afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur'); return; }
   afficherMsg('ventes', 'Fonctionnalité courriel à venir.', 'erreur');
@@ -504,7 +504,8 @@ function afficherTableauVentes(items) {
   html += '</tbody></table></div>';
   if (tableau) tableau.innerHTML = html;
 }
-  async function voirDetailVente(ven_id) {
+
+async function voirDetailVente(ven_id) {
   venModeReprise = false;
   const [resEntete, resLignes] = await Promise.all([
     appelAPI('getVentesEntete'),
@@ -519,7 +520,7 @@ function afficherTableauVentes(items) {
   }));
  if (true || v.statut === 'a-payer') {
     venModeReprise = true;
-venIdEnCours = ven_id;
+	venIdEnCours = ven_id;
     venNumeroAffiche = v.numero_affiche || ven_id;
     venPanier = (v.lignes || []).map(l => ({
       pro_id: l.pro_id, lot_id: l.lot_id, nom: l.nom,
