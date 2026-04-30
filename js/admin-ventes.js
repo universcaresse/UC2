@@ -382,6 +382,10 @@ function fermerApercuFacture() {
   document.getElementById('modal-facture-vente').classList.remove('ouvert');
 }
 
+function fermerModalApresVente() {
+  document.getElementById('modal-apres-vente').classList.remove('ouvert');
+}
+
 function imprimerFacture() {
   const numeroRaw = document.getElementById('modal-fv-numero').textContent;
   const numero = numeroRaw.replace('VEN-', '');
@@ -550,8 +554,12 @@ async function finaliserVente(modePaiement) {
   venModeReprise = false;
   fermerApercuFacture();
   fermerFormVente();
-  afficherMsg('ventes', '✅ Vente enregistrée.');
   chargerVentes();
+  if (modePaiement !== 'plus-tard') {
+    document.getElementById('modal-apres-vente').classList.add('ouvert');
+  } else {
+    afficherMsg('ventes', '✅ Vente enregistrée.');
+  }
 }
 
 var toutesVentes = [];

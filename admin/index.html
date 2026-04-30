@@ -2606,19 +2606,32 @@
     <span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>
     <div style="margin-top:8px;font-size:0.85rem;color:var(--gris)">Ouverture de Square…</div>
   </div>
-  <button class="bouton bouton-plein-largeur" onclick="payerParSquare()" style="padding:20px;font-size:1.1rem">Payer par Square</button>
+  
+  
+ <button class="bouton bouton-plein-largeur" id="btn-payer-square" onclick="payerParSquare()" style="padding:20px;font-size:1.1rem">Payer par Square</button>
   <button class="bouton bouton-plein-largeur" onclick="finaliserVente('argent')">Comptant</button>
-  <button class="bouton bouton-plein-largeur" onclick="finaliserVente()">Finaliser</button>
-<button class="bouton bouton-contour bouton-plein-largeur" onclick="finaliserVente('plus-tard')">Payer plus tard</button>
-  <button class="bouton bouton-vert-pale bouton-plein-largeur" o<button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="envoyerFactureTexto()">Envoyer par texto</button>
-<button class="bouton bouton-vert-pale bouton-plein-largeur" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
-<button class="bouton bouton-contour bouton-plein-largeur" onclick="imprimerFacture()">Imprimer / PDF</button>
+  <button class="bouton bouton-plein-largeur" onclick="finaliserVente('plus-tard')">Payer plus tard</button>
+
 </div>
     </div>
   </div>
 </div>
 
-<div class="modal-admin-overlay" id="modal-confirm">
+<div class="modal-admin-overlay" id="modal-apres-vente">
+  <div class="modal-admin" style="max-width:400px">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Vente enregistrée ✅</div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions-vertical">
+        <button class="bouton bouton-plein-largeur" onclick="envoyerFactureTexto()">Envoyer par texto</button>
+        <button class="bouton bouton-plein-largeur" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
+        <button class="bouton bouton-plein-largeur" onclick="imprimerFacture()">Imprimer / PDF</button>
+        <button class="bouton bouton-contour bouton-plein-largeur" onclick="fermerModalApresVente()">Ne pas imprimer</button>
+      </div>
+    </div>
+  </div>
+</div>
     <div class="modal-admin">
       <div class="modal-admin-header">
         <div class="modal-admin-titre" id="modal-confirm-message"></div>
