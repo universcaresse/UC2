@@ -383,6 +383,7 @@ function fermerModalApresVente() {
 }
 
 function imprimerFacture() {
+  document.getElementById('modal-apres-vente').classList.remove('ouvert');
   const numeroRaw = document.getElementById('modal-fv-numero').textContent;
   const numero = numeroRaw.replace('VEN-', '');
   const date    = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -492,12 +493,25 @@ ${telephone ? `<div class="client-info">${telephone.replace(/\D/g,'').replace(/(
   setTimeout(() => fenetre.print(), 800);
 }
 function envoyerFactureCourriel() {
+  document.getElementById('modal-apres-vente').classList.remove('ouvert');
   const courriel = document.getElementById('ven-courriel').value;
   if (!courriel) { afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur'); return; }
-  afficherMsg('ventes', 'Fonctionnalité courriel à venir.', 'erreur');
+  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais    = venCalculerRabais();
+  const total     = Math.max(0, sousTotal + livraison - rabais);
+  const sujet = `Votre facture Univers Caresse`;
+  let corps = `Bonjour,\n\nVoici le détail de votre commande :\n\n`;
+  venPanier.forEach(l => { corps += `${l.nom} — ${l.poids} ${l.unite} x${l.quantite} = ${formaterPrix(l.prix_unitaire * l.quantite)}\n`; });
+  corps += `\nSous-total : ${formaterPrix(sousTotal)}`;
+  if (rabais > 0) corps += `\nRabais : -${formaterPrix(rabais)}`;
+  if (livraison > 0) corps += `\nLivraison : ${formaterPrix(livraison)}`;
+  corps += `\nTOTAL : ${formaterPrix(total)}\n\nMerci pour votre confiance !\nUnivers Caresse`;
+  window.location.href = `mailto:${courriel}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
 }
 
 function envoyerFactureTexto() {
+  document.getElementById('modal-apres-vente').classList.remove('ouvert');
   const telephone = document.getElementById('ven-telephone').value;
   if (!telephone) { afficherMsg('ventes', 'Aucun téléphone indiqué pour ce client.', 'erreur'); return; }
   const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
