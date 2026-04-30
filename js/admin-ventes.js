@@ -367,14 +367,8 @@ function ouvrirApercuFacture() {
   </div>`;
   document.getElementById('modal-fv-contenu').innerHTML = html;
   document.getElementById('modal-fv-numero').textContent = venNumeroAffiche;
-  const estAPayer = venModeReprise;
-  const boutons = document.getElementById('fv-boutons');
-  if (boutons) {
-    document.querySelector('#fv-boutons .bouton-plein-largeur[onclick="payerParSquare()"]').style.display = estAPayer ? '' : 'none';
-    document.querySelector('#fv-boutons .bouton-plein-largeur[onclick="finaliserVente(\'argent\')"]').style.display = estAPayer ? '' : 'none';
-    document.querySelector('#fv-boutons .bouton-plein-largeur[onclick="finaliserVente()"]').style.display = estAPayer ? '' : 'none';
-    document.querySelector('#fv-boutons .bouton-contour[onclick="finaliserVente(\'plus-tard\')"]').style.display = 'none';
-  }
+  const btnSquare = document.getElementById('btn-payer-square');
+  if (btnSquare) btnSquare.style.display = venModeReprise ? 'none' : '';
   document.getElementById('modal-facture-vente').classList.add('ouvert');
 }
 
