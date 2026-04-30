@@ -127,9 +127,9 @@ async function sauvegarderGamme2() {
   }
   const positionChoisie = parseInt(document.getElementById('fg-position')?.value) || 0;
   const rangCalcule = positionChoisie + 1;
+  const dernierNumGam = donneesGammes.length ? Math.max(...donneesGammes.map(g => parseInt((g.gam_id || '').replace('GAM-', '')) || 0)) : 0;
   const d = {
-	const dernierNumGam = donneesGammes.length ? Math.max(...donneesGammes.map(g => parseInt((g.gam_id || '').replace('GAM-', '')) || 0)) : 0;
-gam_id: rowIndex || ('GAM-' + String(dernierNumGam + 1).padStart(4, '0')),
+    gam_id: rowIndex || ('GAM-' + String(dernierNumGam + 1).padStart(4, '0')),
     col_id,
     rang:        rangCalcule,
     nom,

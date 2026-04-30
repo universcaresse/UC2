@@ -45,15 +45,12 @@ async function chargerVentes() {
 
 function ouvrirFormVente() {
   venPanier = [];
-  const dernierNum = toutesVentes.length ? Math.max(...toutesVentes.map(v => parseInt((v.ven_id || '').replace('VEN-', '')) || 0)) : 0;
-  venIdEnCours = 'VEN-' + String(dernierNum + 1).padStart(4, '0');
-  venNumeroAffiche = String(dernierNum + 1).padStart(4, '0');
+  const dernierNumVen = toutesVentes.length ? Math.max(...toutesVentes.map(v => parseInt((v.ven_id || '').replace('VEN-', '')) || 0)) : 0;
+  venIdEnCours = 'VEN-' + String(dernierNumVen + 1).padStart(4, '0');
+  venNumeroAffiche = String(dernierNumVen + 1).padStart(4, '0');
   appelAPI('getLotsDisponibles').then(resLots => {
     venLotsDisponibles = (resLots && resLots.success) ? resLots.items : [];
   });
-  const derniereVente = [...(toutesFactures || [])].sort((a, b) => (b.ven_id || '').localeCompare(a.ven_id || '')).find(v => v.ven_id);
-  const dernierNum = derniereVente ? parseInt(derniereVente.numero_affiche || '0') || 0 : 0;
-  venNumeroAffiche = String(dernierNum + 1).padStart(4, '0');
   const selCol = document.getElementById('ven-collection');
   selCol.innerHTML = '<option value="">— Collection —</option>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(c => {
@@ -75,14 +72,13 @@ function ouvrirFormVente() {
   document.getElementById('ven-sous-total').value = '';
   document.getElementById('ven-total').value = '';
   venRafraichirPanier();
- document.getElementById('contenu-ventes').classList.add('cache');
+  document.getElementById('contenu-ventes').classList.add('cache');
   document.getElementById('form-vente').classList.remove('cache');
   document.getElementById('form-vente').style.display = 'block';
   document.querySelector('#section-ventes .page-entete .bouton')?.classList.add('cache');
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
-
 function fermerFormVente() {
   document.getElementById('form-vente').classList.add('cache');
   document.getElementById('contenu-ventes').classList.remove('cache');

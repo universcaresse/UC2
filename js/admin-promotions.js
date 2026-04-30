@@ -92,7 +92,8 @@ async function sauvegarderPromotion() {
   if (!type || !nom) { cacherChargement(); afficherMsg('promotions', 'Type et nom requis.', 'erreur'); return; }
   const d = {
     const dernierNumPromo = donneesPromotions.length ? Math.max(...donneesPromotions.map(p => parseInt((p.promo_id || '').replace('PROMO-', '')) || 0)) : 0;
-promo_id: id || ('PROMO-' + String(dernierNumPromo + 1).padStart(4, '0')),
+  const d = {
+    promo_id: id || ('PROMO-' + String(dernierNumPromo + 1).padStart(4, '0')),
     fam_id:       document.getElementById('fp-famille').value || '',
     type,
     nom,
