@@ -376,29 +376,117 @@ function fermerApercuFacture() {
 }
 
 function imprimerFacture() {
-  const contenu = document.getElementById('modal-fv-contenu').innerHTML;
-  const numero = document.getElementById('modal-fv-numero').textContent;
+  const numero  = document.getElementById('modal-fv-numero').textContent;
+  const date    = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+  const client  = document.getElementById('ven-client').value;
+  const courriel  = document.getElementById('ven-courriel').value;
+  const telephone = document.getElementById('ven-telephone').value;
+  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais    = venCalculerRabais();
+  const total     = Math.max(0, sousTotal + livraison - rabais);
+  const promoSel  = document.getElementById('ven-promotion').value;
+  const promoData = promoSel ? JSON.parse(promoSel) : null;
+  const promo     = promoData ? donneesPromotions.find(p => p.promo_id === promoData.promo_id) : null;
+
+  let lignesHTML = venPanier.map(l => `
+    <tr>
+      <td style="padding:12px 0;border-bottom:1px solid #f2e4cf">
+        <div style="font-weight:400;color:#3d3b39">${l.nom}</div>
+        <div style="font-size:0.78rem;color:#8b8680;margin-top:2px">${l.poids} ${l.unite} &nbsp;·&nbsp; ${formaterPrix(l.prix_unitaire)} / unité</div>
+      </td>
+      <td style="padding:12px 0;border-bottom:1px solid #f2e4cf;text-align:center;color:#8b8680;font-size:0.85rem">${l.quantite}</td>
+      <td style="padding:12px 0;border-bottom:1px solid #f2e4cf;text-align:right;font-family:'Playfair Display',serif;color:#5a8a3a">${formaterPrix(l.prix_unitaire * l.quantite)}</td>
+    </tr>`).join('');
+
   const fenetre = window.open('', '_blank');
-  fenetre.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Facture ${numero}</title>
-      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-      <style>
-        body { font-family: 'DM Sans', sans-serif; font-weight: 300; padding: 40px; max-width: 500px; margin: 0 auto; color: #3d3b39; }
-        @media print { body { padding: 20px; } }
-      </style>
-    </head>
-    <body>${contenu}</body>
-    </html>
-  `);
+  fenetre.document.write(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture ${numero}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Birthstone&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'DM Sans',sans-serif; font-weight:300; background:#fff; color:#3d3b39; }
+    .page { max-width:600px; margin:0 auto; padding:48px 40px; }
+    .entete { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:40px; padding-bottom:24px; border-bottom:2px solid #5a8a3a; }
+    .logo-nom { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:600; color:#333; letter-spacing:0.04em; }
+    .logo-tagline { font-family:'Birthstone',cursive; font-size:1.1rem; color:#d4a445; margin-top:2px; }
+    .logo-sub { font-size:0.6rem; letter-spacing:0.18em; color:#8b8680; text-transform:lowercase; margin-top:2px; }
+    .facture-ref { text-align:right; }
+    .facture-label { font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:#8b8680; font-weight:500; }
+    .facture-numero { font-family:'Playfair Display',serif; font-size:1.3rem; color:#5a8a3a; margin-top:4px; }
+    .facture-date { font-size:0.78rem; color:#8b8680; margin-top:4px; }
+    .client-bloc { margin-bottom:32px; padding:16px 20px; background:#f9f7f4; border-left:3px solid #d4a445; }
+    .client-label { font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:#8b8680; font-weight:500; margin-bottom:8px; }
+    .client-nom { font-family:'Playfair Display',serif; font-size:1rem; color:#3d3b39; }
+    .client-info { font-size:0.82rem; color:#8b8680; margin-top:2px; }
+    table { width:100%; border-collapse:collapse; margin-bottom:24px; }
+    thead tr { border-bottom:2px solid #f2e4cf; }
+    th { font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; color:#8b8680; font-weight:500; padding:8px 0; }
+    th:last-child { text-align:right; }
+    th:nth-child(2) { text-align:center; }
+    .totaux { margin-left:auto; width:240px; }
+    .total-ligne { display:flex; justify-content:space-between; font-size:0.85rem; color:#8b8680; padding:4px 0; }
+    .total-final { display:flex; justify-content:space-between; font-family:'Playfair Display',serif; font-size:1.4rem; color:#5a8a3a; border-top:2px solid #5a8a3a; padding-top:10px; margin-top:8px; }
+    .merci { text-align:center; margin-top:48px; padding-top:24px; border-top:1px solid #f2e4cf; }
+    .merci-texte { font-family:'Playfair Display',serif; font-style:italic; font-size:1.1rem; color:#8b8680; }
+    .boutique { text-align:center; margin-top:12px; font-size:0.72rem; color:#8b8680; letter-spacing:0.06em; line-height:1.8; }
+    @media print { body { -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="entete">
+    <div>
+      <div class="logo-nom">Univers Caresse</div>
+      <div class="logo-tagline">simplement la nature</div>
+      <div class="logo-sub">savonnerie artisanale</div>
+    </div>
+    <div class="facture-ref">
+      <div class="facture-label">Facture</div>
+      <div class="facture-numero">${numero}</div>
+      <div class="facture-date">${date}</div>
+    </div>
+  </div>
+
+  ${client || courriel || telephone ? `
+  <div class="client-bloc">
+    <div class="client-label">Client</div>
+    ${client ? `<div class="client-nom">${client}</div>` : ''}
+    ${courriel ? `<div class="client-info">${courriel}</div>` : ''}
+    ${telephone ? `<div class="client-info">${telephone}</div>` : ''}
+  </div>` : ''}
+
+  <table>
+    <thead>
+      <tr>
+        <th style="text-align:left">Produit</th>
+        <th>Qté</th>
+        <th style="text-align:right">Total</th>
+      </tr>
+    </thead>
+    <tbody>${lignesHTML}</tbody>
+  </table>
+
+  <div class="totaux">
+    <div class="total-ligne"><span>Sous-total</span><span>${formaterPrix(sousTotal)}</span></div>
+    ${rabais > 0 && promo ? `<div class="total-ligne" style="color:#5a8a3a"><span>Rabais — ${promo.nom}</span><span>-${formaterPrix(rabais)}</span></div>` : ''}
+    ${livraison > 0 ? `<div class="total-ligne"><span>Livraison</span><span>${formaterPrix(livraison)}</span></div>` : ''}
+    <div class="total-final"><span>Total</span><span>${formaterPrix(total)}</span></div>
+  </div>
+
+  <div class="merci">
+    <div class="merci-texte">Merci pour votre confiance !</div>
+    <div class="boutique">universcaresse.ca &nbsp;·&nbsp; info@universcaresse.ca</div>
+  </div>
+</div>
+</body></html>`);
   fenetre.document.close();
   fenetre.focus();
-  setTimeout(() => fenetre.print(), 500);
+  setTimeout(() => fenetre.print(), 800);
 }
-
 function envoyerFactureCourriel() {
   const courriel = document.getElementById('ven-courriel').value;
   if (!courriel) { afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur'); return; }
