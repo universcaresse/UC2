@@ -389,9 +389,7 @@ function efRendreLigneSaisie() {
         ${optsCatFourn}
         <option value="__nouveau__">+ Nouvelle catégorie…</option>
       </select>
-    </td>
-    <td>
-      <select class="form-ctrl" id="ef-saisie-nom-fourn" onchange="efOnChangeSaisieNomFourn()">
+      <select class="form-ctrl" id="ef-saisie-nom-fourn" onchange="efOnChangeSaisieNomFourn()" style="margin-top:4px">
         <option value="">— Nom —</option>
       </select>
     </td>
@@ -413,9 +411,7 @@ function efRendreLigneSaisie() {
         <option value="">— Cat. UC —</option>
         ${optsCatUC}
       </select>
-    </td>
-    <td>
-      <select class="form-ctrl" id="ef-saisie-nom-uc" onchange="efOnChangeSaisieNomUC()">
+      <select class="form-ctrl" id="ef-saisie-nom-uc" onchange="efOnChangeSaisieNomUC()" style="margin-top:4px">
         <option value="">— Nom UC —</option>
       </select>
       <input type="text" class="form-ctrl cache" id="ef-saisie-nom-uc-nouveau" placeholder="Nouveau nom UC" autocomplete="off">
@@ -737,14 +733,12 @@ function efRendreLignesSauvegardees() {
     const tr  = document.createElement('tr');
     if (idx === ef._editIdx) tr.classList.add('cache');
     tr.innerHTML = `
-      <td>${l.catFourn}</td>
-      <td>${l.nomFourn}</td>
+      <td>${l.catFourn}<br><small>${l.nomFourn}</small></td>
       <td>${fmt}</td>
       <td>${l.quantite}</td>
       <td>${formaterPrix(l.prixUnitaire)}</td>
       <td>${formaterPrix(l.prixTotal)}</td>
-      <td>${l.catUC}</td>
-      <td>${l.nomUC}</td>
+      <td>${l.catUC}<br><small>${l.nomUC}</small></td>
       <td>
         <button class="bouton bouton-petit bouton-secondaire" onclick="efEditerLigne(${idx})" title="Modifier">✏️</button>
         <button class="bouton bouton-petit bouton-rouge" onclick="efSupprimerLigne(${idx})">✕</button>
