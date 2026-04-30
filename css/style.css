@@ -1023,8 +1023,8 @@ tr.cliquable { cursor: pointer; }
     position: absolute;
     top: 100%;
     left: 0;
-	 font-family: 'Birthstone', serif;
-  font-size: var(--texte-175);
+	font-family: 'Birthstone', serif;
+	font-size: var(--texte-175);
     padding-top: 8px;
     background: var(--blanc);
     border: 1px solid var(--beige);
@@ -1038,13 +1038,6 @@ tr.cliquable { cursor: pointer; }
     display: block;
     width: 100%;
     padding: 11px 20px;
-    font-size: var(--texte-175);
-    font-family: 'Playfair Display', serif;
-	
-	text-transform: none; /* On annule le lowercase */
-font-variant: small-caps;
-	
-   /* text-transform: lowercase;*/
     background: none;
     border: none;
     text-align: left;
