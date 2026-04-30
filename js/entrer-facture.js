@@ -1131,3 +1131,36 @@ function efConfirmerModalNomFourn() {
   if (selNomUC) selNomUC.innerHTML = '<option value="">— Nom UC —</option>';
   ef._saisieIngId = null;
 }
+
+
+async function efAnnulerFactureActive() {
+  if (!ef.factureActive) return;
+  confirmerAction('Annuler cette facture et supprimer toutes les lignes ?', async () => {
+    afficherChargement();
+    const res = await appelAPIPost('deleteAchat', { ach_id: ef.factureActive.ach_id });
+    if (res && res.success) {
+      ef.factureActive  = null;
+      ef.lignes         = [];
+      ef._saisieIngId   = null;
+      ef.scrapingItems  = [];
+      ef._editIdx       = null;
+      document.getElementById('ef-fournisseur').value = '';
+      document.getElementById('ef-fournisseur-nouveau')?.classList.add('cache');
+      document.getElementById('ef-numero').value    = '';
+      document.getElementById('ef-tps').value       = '';
+      document.getElementById('ef-tvq').value       = '';
+      document.getElementById('ef-livraison').value = '';
+      document.getElementById('ef-soustotal').value = '';
+      document.getElementById('ef-total').value     = '';
+      document.getElementById('ef-btn-creer')?.classList.remove('cache');
+      document.getElementById('ef-zone-items')?.classList.add('cache');
+      document.getElementById('ef-tbody').innerHTML = '';
+      efInitDate();
+      cacherChargement();
+      afficherMsg('ef', '✅ Facture annulée.');
+    } else {
+      cacherChargement();
+      afficherMsg('ef', res?.message || 'Erreur annulation.', 'erreur');
+    }
+  });
+}
