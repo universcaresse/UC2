@@ -399,6 +399,7 @@ function imprimerFacture() {
   fenetre.focus();
   setTimeout(() => fenetre.print(), 500);
 }
+  function envoyerFactureCourriel() {
   const courriel = document.getElementById('ven-courriel').value;
   if (!courriel) { afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur'); return; }
   afficherMsg('ventes', 'Fonctionnalité courriel à venir.', 'erreur');
@@ -504,6 +505,7 @@ function afficherTableauVentes(items) {
   if (tableau) tableau.innerHTML = html;
 }
   async function voirDetailVente(ven_id) {
+  venModeReprise = false;
   const [resEntete, resLignes] = await Promise.all([
     appelAPI('getVentesEntete'),
     appelAPI('getVentesLignes', { ven_id })
