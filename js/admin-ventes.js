@@ -503,6 +503,7 @@ function afficherTableauVentes(items) {
   html += '</tbody></table></div>';
   if (tableau) tableau.innerHTML = html;
 }
+  async function voirDetailVente(ven_id) {
   const [resEntete, resLignes] = await Promise.all([
     appelAPI('getVentesEntete'),
     appelAPI('getVentesLignes', { ven_id })
