@@ -69,6 +69,8 @@ function ouvrirFormVente() {
   document.getElementById('ven-client').value = '';
   document.getElementById('ven-courriel').value = '';
   document.getElementById('ven-telephone').value = '';
+  const infolettre = document.getElementById('ven-infolettre');
+  if (infolettre) infolettre.checked = false;
   document.getElementById('ven-telephone').addEventListener('input', function() {
     let v = this.value.replace(/\D/g, '').slice(0, 10);
     if (v.length >= 7) this.value = v.slice(0,3) + ' ' + v.slice(3,6) + '-' + v.slice(6);
@@ -528,16 +530,35 @@ async function envoyerFactureTexto() {
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
   const telephone = document.getElementById('apv-telephone').value;
   if (!telephone) { afficherMsg('ventes', 'Aucun téléphone indiqué pour ce client.', 'erreur'); return; }
+  const client    = document.getElementById('ven-client').value;
   const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
-  let texte = `Univers Caresse\n\n`;
-  venPanier.forEach(l => { texte += `${l.nom} ${l.poids}${l.unite} x${l.quantite} = ${formaterPrix(l.prix_unitaire * l.quantite)}\n`; });
-  texte += `\nSous-total: ${formaterPrix(sousTotal)}`;
-  if (rabais > 0) texte += `\nRabais: -${formaterPrix(rabais)}`;
-  if (livraison > 0) texte += `\nLivraison: ${formaterPrix(livraison)}`;
-  texte += `\nTOTAL: ${formaterPrix(total)}\n\nMerci!`;
+  const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+  const promoSel  = document.getElementById('ven-promotion').value;
+  const promoData = promoSel ? JSON.parse(promoSel) : null;
+  const promo     = promoData ? donneesPromotions.find(p => p.promo_id === promoData.promo_id) : null;
+  const ligne     = '─────────────────────';
+  let texte = `UNIVERS CARESSE\n`;
+  texte += `universcaresse.ca\n`;
+  texte += `${date}\n`;
+  texte += `Facture ${venNumeroAffiche}\n`;
+  if (client) texte += `Client : ${client}\n`;
+  texte += `\n${ligne}\n`;
+  venPanier.forEach(l => {
+    texte += `${l.nom}\n`;
+    texte += `  ${l.poids} ${l.unite}  x${l.quantite}  ${formaterPrix(l.prix_unitaire)}/u\n`;
+    texte += `  ${formaterPrix(l.prix_unitaire * l.quantite)}\n`;
+  });
+  texte += `${ligne}\n`;
+  texte += `Sous-total : ${formaterPrix(sousTotal)}\n`;
+  if (rabais > 0 && promo) texte += `Rabais (${promo.nom}) : -${formaterPrix(rabais)}\n`;
+  if (livraison > 0) texte += `Livraison : ${formaterPrix(livraison)}\n`;
+  texte += `${ligne}\n`;
+  texte += `TOTAL : ${formaterPrix(total)}\n`;
+  texte += `${ligne}\n`;
+  texte += `Merci pour votre confiance !`;
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
 }
 
@@ -555,8 +576,13 @@ async function finaliserVente(modePaiement) {
     if (!resUpdate || !resUpdate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la mise à jour.', 'erreur'); return; }
   } else {
     const infolettre = document.getElementById('ven-infolettre')?.checked ? '1' : '0';
-  const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement, infolettre });
-    if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la création.', 'erreur'); return; }
+  if (venModeReprise) {
+      const resReset = await appelAPIPost('resetVenteLignes', { ven_id });
+      if (!resReset || !resReset.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la réinitialisation.', 'erreur'); return; }
+    } else {
+      const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement, infolettre });
+      if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la création.', 'erreur'); return; }
+    }
     for (const l of venPanier) {
       await appelAPIPost('addVenteLigne', { ven_id, pro_id: l.pro_id, lot_id: l.lot_id, quantite: l.quantite, prix_unitaire: l.prix_unitaire, format_poids: l.poids, format_unite: l.unite });
     }
@@ -580,14 +606,10 @@ async function finaliserVente(modePaiement) {
   fermerApercuFacture();
   fermerFormVente();
   chargerVentes();
-  if (modePaiement !== 'plus-tard') {
-    document.getElementById('apv-courriel').value     = document.getElementById('ven-courriel').value;
-    document.getElementById('apv-telephone').value    = document.getElementById('ven-telephone').value;
-    document.getElementById('apv-infolettre').checked = document.getElementById('ven-infolettre')?.checked || false;
-    document.getElementById('modal-apres-vente').classList.add('ouvert');
-  } else {
-    afficherMsg('ventes', '✅ Vente enregistrée.');
-  }
+  document.getElementById('apv-courriel').value     = document.getElementById('ven-courriel').value;
+  document.getElementById('apv-telephone').value    = document.getElementById('ven-telephone').value;
+  document.getElementById('apv-infolettre').checked = document.getElementById('ven-infolettre')?.checked || false;
+  document.getElementById('modal-apres-vente').classList.add('ouvert');
 }
 
 var toutesVentes = [];
@@ -646,7 +668,24 @@ async function voirDetailVente(ven_id) {
     ...l,
     nom: donneesProduits.find(p => p.pro_id === l.pro_id)?.nom || l.pro_id
   }));
- if (true || v.statut === 'a-payer') {
+ if (v.statut === 'Finalisé') {
+    venModeReprise = true;
+    venIdEnCours = ven_id;
+    venNumeroAffiche = v.numero_affiche || ven_id;
+    venPanier = (v.lignes || []).map(l => ({
+      pro_id: l.pro_id, lot_id: l.lot_id, nom: l.nom,
+      poids: l.format_poids, unite: l.format_unite,
+      quantite: l.quantite, prix_unitaire: l.prix_unitaire
+    }));
+    document.getElementById('ven-livraison').value = v.livraison || 0;
+    document.getElementById('ven-client').value = v.client || '';
+    document.getElementById('ven-courriel').value = v.courriel || '';
+    document.getElementById('ven-telephone').value = v.telephone || '';
+    document.getElementById('apv-courriel').value = v.courriel || '';
+    document.getElementById('apv-telephone').value = v.telephone || '';
+    document.getElementById('apv-infolettre').checked = false;
+    ouvrirApercuFacture();
+  } else {
     venModeReprise = true;
 	venIdEnCours = ven_id;
     venNumeroAffiche = v.numero_affiche || ven_id;
@@ -659,6 +698,9 @@ async function voirDetailVente(ven_id) {
     document.getElementById('ven-client').value = v.client || '';
     document.getElementById('ven-courriel').value = v.courriel || '';
     document.getElementById('ven-telephone').value = v.telephone || '';
+   const estFinalisee = v.statut === 'Finalisé';
+    document.getElementById('fv-boutons-paiement').style.display = estFinalisee ? 'none' : '';
+    document.getElementById('fv-boutons-impression').style.display = '';
     ouvrirApercuFacture();
   } else {
     afficherMsg('ventes', 'Fonctionnalité à venir.');
