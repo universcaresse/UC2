@@ -975,13 +975,19 @@ function efOnChangeModalIngNom() {
     document.getElementById('modal-ef-ing-nouveau-nom').value = '';
   }
 }
-
 async function efConfirmerModalIngredient() {
   const nouveauNom = document.getElementById('modal-ef-ing-nouveau-nom')?.value?.trim();
   if (!nouveauNom) { document.getElementById('modal-ef-ing-nouveau-nom').focus(); return; }
 
   const cat_id = document.getElementById('ef-saisie-cat-uc')?.value || '';
   if (!cat_id) { afficherMsg('ef', 'Choisir une catégorie UC avant d\'ajouter un ingrédient.', 'erreur'); efFermerModalIngredient(); return; }
+
+  // ── Verrou anti double-clic ──
+  const btn = document.getElementById('btn-ef-confirmer-ingredient');
+  if (btn) { 
+    if (btn.disabled) return; 
+    btn.disabled = true; 
+  }
 
   let ing_id, nomUC;
   const ingExistant = (listesDropdown.fullData || []).find(d => d.nom_UC === nouveauNom && d.cat_id === cat_id);
@@ -996,7 +1002,11 @@ async function efConfirmerModalIngredient() {
       nom_fournisseur: nomFourn || nouveauNom,
       inci: '', statut: 'actif', source: ef.factureActive?.four_code || ''
     });
-    if (!res || !res.success) { afficherMsg('ef', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
+    if (!res || !res.success) { 
+      afficherMsg('ef', res?.message || 'Erreur création ingrédient.', 'erreur'); 
+      if (btn) btn.disabled = false; // réactiver si erreur
+      return; 
+    }
     listesDropdown.fullData.push({ ing_id, cat_id, nom_UC: nouveauNom, inci: '', source: ef.factureActive?.four_code || '', nom_fournisseur: nomFourn || nouveauNom });
     nomUC = nouveauNom;
   }
@@ -1017,9 +1027,8 @@ async function efConfirmerModalIngredient() {
     }
     selNomUC.value = ing_id;
   }
-efFermerModalIngredient();
+  efFermerModalIngredient();
 
-  // Restaurer le format saisi avant
   const selFmtApres = document.getElementById('ef-saisie-format');
   if (selFmtApres && optsAvant.length > 0) {
     selFmtApres.innerHTML = '';
