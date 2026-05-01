@@ -627,6 +627,7 @@ async function finaliserVente(modePaiement) {
     promo_id: promoData?.promo_id || '',
     rabais,
     total_net,
+    mode_paiement: paiement,
     statut: modePaiement === 'plus-tard' ? 'a-payer' : 'Finalisé'
   });
 
