@@ -509,8 +509,9 @@ ${telephone ? `<div class="client-info">${telephone.replace(/\D/g,'').replace(/(
 async function envoyerFactureCourriel() {
   await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
-const client    = document.getElementById('apv-courriel') ? document.getElementById('ven-client').value || '' : '';
+  const client    = document.getElementById('ven-client').value || '';
   const livraison = parseFloat(document.getElementById('ven-livraison')?.value) || 0;
+  const courriel  = document.getElementById('apv-courriel').value;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
