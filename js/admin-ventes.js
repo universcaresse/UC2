@@ -399,12 +399,11 @@ async function sauvegarderCoordonnees() {
 async function imprimerFacture() {
   await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
-  const numeroRaw = document.getElementById('modal-fv-numero').textContent;
-  const numero = numeroRaw.replace('VEN-', '');
-  const date    = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
-  const client  = document.getElementById('ven-client').value;
-  const courriel  = document.getElementById('ven-courriel').value;
-  const telephone = document.getElementById('ven-telephone').value;
+  const numero    = venNumeroAffiche;
+  const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+  const client    = document.getElementById('apv-courriel') ? document.getElementById('ven-client').value || '' : '';
+  const courriel  = document.getElementById('apv-courriel').value;
+  const telephone = document.getElementById('apv-telephone').value;
   const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
@@ -510,9 +509,8 @@ ${telephone ? `<div class="client-info">${telephone.replace(/\D/g,'').replace(/(
 async function envoyerFactureCourriel() {
   await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
-  const courriel = document.getElementById('apv-courriel').value;
-  if (!courriel) { afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur'); return; }
-  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+const client    = document.getElementById('apv-courriel') ? document.getElementById('ven-client').value || '' : '';
+  const livraison = parseFloat(document.getElementById('ven-livraison')?.value) || 0;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
@@ -531,8 +529,8 @@ async function envoyerFactureTexto() {
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
   const telephone = document.getElementById('apv-telephone').value;
   if (!telephone) { afficherMsg('ventes', 'Aucun téléphone indiqué pour ce client.', 'erreur'); return; }
-  const client    = document.getElementById('ven-client').value;
-  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+ const client    = document.getElementById('apv-courriel') ? document.getElementById('ven-client').value || '' : '';
+  const livraison = parseFloat(document.getElementById('ven-livraison')?.value) || 0;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
@@ -603,9 +601,14 @@ async function finaliserVente(modePaiement) {
   });
   if (!resFin || !resFin.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur'); return; }
   cacherChargement();
-  venModeReprise = false;
   fermerApercuFacture();
+  const panierSauvegarde = [...venPanier];
+  const idSauvegarde     = venIdEnCours;
+  const numeroSauvegarde = venNumeroAffiche;
   fermerFormVente();
+  venPanier        = panierSauvegarde;
+  venIdEnCours     = idSauvegarde;
+  venNumeroAffiche = numeroSauvegarde;
   chargerVentes();
   document.getElementById('apv-courriel').value     = document.getElementById('ven-courriel').value;
   document.getElementById('apv-telephone').value    = document.getElementById('ven-telephone').value;
