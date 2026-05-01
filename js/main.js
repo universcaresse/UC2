@@ -689,11 +689,21 @@ function afficherPageRegroupements(fraIdActif) {
           </div>
         </div>
       </div>
-      <div class="produits-grille">
-        ${(donneesCatalogue?.produits || [])
-          .filter(p => (p.ingredients || []).some(i => i.ing_id === fra.ing_id))
-          .map(p => carteProduit(p)).join('')}
-      </div>`;
+      ${(() => {
+        const prods = (donneesCatalogue?.produits || []).filter(p => (p.ingredients || []).some(i => i.ing_id === fra.ing_id));
+        const parGamme = {};
+        const ordreGammes = [];
+        prods.forEach(p => {
+          const g = p.nom_gamme || '';
+          if (!parGamme[g]) { parGamme[g] = []; ordreGammes.push(g); }
+          parGamme[g].push(p);
+        });
+        return ordreGammes.map(g => `
+          <div class="ligne-groupe">
+            ${g ? `<div class="ligne-groupe-entete"><div class="ligne-groupe-nom">${g.toUpperCase()}</div></div>` : ''}
+            <div class="produits-grille">${parGamme[g].map(p => carteProduit(p)).join('')}</div>
+          </div>`).join('');
+      })()}`;
     body.appendChild(section);
     if (scrollObserver) {
       section.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
