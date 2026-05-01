@@ -702,9 +702,7 @@ async function voirDetailVente(ven_id) {
    const estFinalisee = v.statut === 'Finalisé';
     document.getElementById('fv-boutons-paiement').style.display = estFinalisee ? 'none' : '';
     document.getElementById('fv-boutons-impression').style.display = '';
-    ouvrirApercuFacture();
-  } else {
-    afficherMsg('ventes', 'Fonctionnalité à venir.');
+   ouvrirApercuFacture();
   }
 }
 
