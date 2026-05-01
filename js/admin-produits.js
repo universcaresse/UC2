@@ -148,6 +148,10 @@ function peuplerFiltresRecettes() {
   const bar = document.getElementById('filtre-recette-collection-bar');
   if (!bar) return;
   bar.innerHTML = '<button class="filtre-btn actif" data-col="" onclick="onFiltreCollectionBtn(this, \'\')">Tout</button>';
+  const filtreStatut = document.getElementById('filtre-recette-statut');
+  const filtreNom = document.getElementById('filtre-recette-nom');
+  if (filtreStatut) filtreStatut.classList.remove('cache');
+  if (filtreNom) filtreNom.classList.remove('cache');
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
     bar.innerHTML += `<button class="filtre-btn" data-col="${col.nom}" onclick="onFiltreCollectionBtn(this, '${col.nom}')">${col.nom}</button>`;
   });
