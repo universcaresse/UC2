@@ -737,8 +737,10 @@ async function voirDetailVente(ven_id) {
   document.getElementById('apv-infolettre').checked = false;
 
   const estFinalisee = v.statut === 'Finalisé';
-  document.getElementById('fv-boutons-paiement').style.display  = estFinalisee ? 'none' : '';
-  document.getElementById('fv-boutons-impression').style.display = '';
+  if (!venModeReprise) {
+    document.getElementById('fv-boutons-paiement').style.display = '';
+    document.getElementById('fv-boutons-impression').style.display = '';
+  }
 
   ouvrirApercuFacture();
 }
