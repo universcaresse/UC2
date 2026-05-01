@@ -153,6 +153,7 @@
         <button class="sidebar-lien" onclick="afficherSection('densites', this)">densité</button>
         <button class="sidebar-lien" onclick="afficherSection('promotions', this)">promotions</button>
         <button class="sidebar-lien" onclick="afficherSection('contenu-site', this)">contenu du site</button>
+		<button class="sidebar-lien" onclick="afficherSection('redaction', this)">rédaction</button>
 		<button class="sidebar-lien" onclick="afficherSection('catalogue-builder', null)">catalogue PDF</button>
         <button class="sidebar-lien" onclick="exporterTextes()">exporter textes</button>
         <button class="sidebar-lien" onclick="afficherSection('mediatheque', this)">médiathèque</button>
@@ -2169,7 +2170,495 @@
       </div>
 
 
-   <!-- MÉDIATHÈQUE — Photos Cloudinary-->
+   <!-- RÉDACTION -->
+<!-- RÉDACTION -->
+<div class="section-admin" id="section-redaction">
+
+  <div class="page-entete fade-in">
+    <div>
+      <div class="page-entete-eyebrow">Modifier le contenu du site public</div>
+      <div class="page-entete-titre">Rédaction</div>
+    </div>
+    <button class="bouton" onclick="redSauvegarder()">Enregistrer</button>
+  </div>
+  <div class="msg-zone" id="msg-redaction"></div>
+
+  <!-- FILTRES PRINCIPAUX -->
+  <div class="filtres-bar">
+    <button class="red-filtre-btn filtre-btn actif" data-red-section="accueil" onclick="redAfficherSections('accueil')">Accueil</button>
+    <button class="red-filtre-btn filtre-btn" data-red-section="educatif" onclick="redAfficherSections('educatif')">Le savon artisanal</button>
+    <button class="red-filtre-btn filtre-btn" data-red-section="bon-a-savoir" onclick="redAfficherSections('bon-a-savoir')">Bon à savoir</button>
+    <button class="red-filtre-btn filtre-btn" data-red-section="contact" onclick="redAfficherSections('contact')">Contact</button>
+  </div>
+
+  <!-- SOUS-NAV ÉDUCATIF -->
+  <div id="red-edu-nav" class="filtres-bar cache">
+    <button class="red-edu-btn filtre-btn actif" data-edu="1" onclick="redAfficherEduSection(1)">1 · Saponification</button>
+    <button class="red-edu-btn filtre-btn" data-edu="2" onclick="redAfficherEduSection(2)">2 · La cure</button>
+    <button class="red-edu-btn filtre-btn" data-edu="3" onclick="redAfficherEduSection(3)">3 · Surgraissage</button>
+    <button class="red-edu-btn filtre-btn" data-edu="4" onclick="redAfficherEduSection(4)">4 · Les huiles</button>
+    <button class="red-edu-btn filtre-btn" data-edu="5" onclick="redAfficherEduSection(5)">5 · Argiles</button>
+    <button class="red-edu-btn filtre-btn" data-edu="6" onclick="redAfficherEduSection(6)">6 · Huiles essentielles</button>
+    <button class="red-edu-btn filtre-btn" data-edu="7" onclick="redAfficherEduSection(7)">7 · Connaître sa peau</button>
+  </div>
+
+  <div class="chargement cache" id="red-chargement">
+    <span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...
+  </div>
+
+  <!-- INPUT CACHÉ POUR MÉDIATHÈQUE -->
+  <input type="hidden" id="red-med-url">
+  <div id="red-med-preview" class="cache"></div>
+
+  <!-- LAYOUT -->
+  <div id="red-layout" class="red-layout cache">
+
+    <!-- GAUCHE — APERÇU -->
+    <div id="red-apercu" class="red-apercu">
+
+      <!-- ══ ACCUEIL ══ -->
+      <div class="red-section" id="red-s-accueil">
+
+        <div class="red-section-label">HERO</div>
+        <div class="bonne-section">
+          <p class="hero-eyebrow red-editable" data-key="accueil_eyebrow" data-label="Accroche hero" onclick="redCliquer(this)"></p>
+          <div class="bouton" style="margin-top:12px;cursor:default;display:inline-flex">
+            <span class="red-editable" data-key="accueil_cta" data-label="Texte du bouton CTA" onclick="redCliquer(this);event.stopPropagation()"></span>
+          </div>
+          <div class="hero-stats" style="margin-top:16px">
+            <div class="hero-stat"><div class="hero-stat-num">—</div><div class="hero-stat-label">Collections</div></div>
+            <div class="hero-stat"><div class="hero-stat-num">—</div><div class="hero-stat-label">Produits</div></div>
+            <div class="hero-stat">
+              <div class="hero-stat-num red-editable" data-key="accueil_stat_valeur" data-label="Statistique — valeur" onclick="redCliquer(this)"></div>
+              <div class="hero-stat-label">Artisanal</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="red-section-label">QUI SOMMES-NOUS</div>
+        <div class="section-texte">
+          <div class="texte-principal">
+            <p class="page-hero-eyebrow red-editable" data-key="qui_eyebrow" data-label="Eyebrow" onclick="redCliquer(this)"></p>
+            <h1 class="page-hero-titre">
+              <span class="red-editable" data-key="qui_titre" data-label="Titre" onclick="redCliquer(this)"></span>&nbsp;<em class="red-editable" data-key="qui_titre_em" data-label="Titre italique" onclick="redCliquer(this)"></em>
+            </h1>
+            <p class="page-hero-texte red-editable" data-key="qui_texte" data-label="Texte principal" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            <div class="page-hero-signature-bloc">
+              <div class="page-hero-signature red-editable" data-key="qui_signature_nom" data-label="Nom signature" onclick="redCliquer(this)"></div>
+              <div class="page-hero-titre-signature red-editable" data-key="qui_signature_titre" data-label="Titre signature" onclick="redCliquer(this)"></div>
+            </div>
+          </div>
+          <div class="red-editable-photo section-texte-photo-3-4" data-key="edu_photo_qui" data-label="Photo atelier portrait" data-type="photo" onclick="redCliquer(this)">
+            <img class="red-photo-img" src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774627932/m%C3%A9langeur.jpg" alt="">
+          </div>
+        </div>
+
+        <div class="red-section-label">PARAGRAPHES &amp; VALEURS</div>
+        <div class="section-texte">
+          <div class="texte-principal">
+            <p class="red-editable" data-key="section_texte_p1" data-label="Paragraphe 1" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            <p class="red-editable" data-key="section_texte_p2" data-label="Paragraphe 2" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            <p class="red-editable" data-key="section_texte_p3" data-label="Paragraphe 3" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            <div class="red-editable-photo section-texte-photo-16-9" data-key="edu_photo_moule" data-label="Photo atelier paysage" data-type="photo" onclick="redCliquer(this)">
+              <img class="red-photo-img" src="https://res.cloudinary.com/dfasrauyy/image/upload/v1774628531/moule.jpg" alt="">
+            </div>
+          </div>
+          <div>
+            <div class="valeur-item">
+              <div class="valeur-num">01</div>
+              <div class="valeur-titre red-editable" data-key="valeur_01_titre" data-label="Valeur 01 — titre" onclick="redCliquer(this)"></div>
+              <div class="valeur-desc red-editable" data-key="valeur_01_desc" data-label="Valeur 01 — description" data-fieldtype="textarea" onclick="redCliquer(this)"></div>
+            </div>
+            <div class="valeur-item">
+              <div class="valeur-num">02</div>
+              <div class="valeur-titre red-editable" data-key="valeur_02_titre" data-label="Valeur 02 — titre" onclick="redCliquer(this)"></div>
+              <div class="valeur-desc red-editable" data-key="valeur_02_desc" data-label="Valeur 02 — description" data-fieldtype="textarea" onclick="redCliquer(this)"></div>
+            </div>
+            <div class="valeur-item">
+              <div class="valeur-num">03</div>
+              <div class="valeur-titre red-editable" data-key="valeur_03_titre" data-label="Valeur 03 — titre" onclick="redCliquer(this)"></div>
+              <div class="valeur-desc red-editable" data-key="valeur_03_desc" data-label="Valeur 03 — description" data-fieldtype="textarea" onclick="redCliquer(this)"></div>
+            </div>
+            <div class="valeur-item">
+              <div class="valeur-num">04</div>
+              <div class="valeur-titre red-editable" data-key="valeur_04_titre" data-label="Valeur 04 — titre" onclick="redCliquer(this)"></div>
+              <div class="valeur-desc red-editable" data-key="valeur_04_desc" data-label="Valeur 04 — description" data-fieldtype="textarea" onclick="redCliquer(this)"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="red-section-label">CITATION</div>
+        <div class="bandeau-citation">
+          <p class="citation-texte">
+            <span class="citation-guillemet">«&nbsp;</span><span class="red-editable" data-key="citation_texte" data-label="Texte de la citation" data-fieldtype="textarea" onclick="redCliquer(this)"></span><span class="citation-guillemet">&nbsp;»</span>
+          </p>
+          <span class="citation-source red-editable" data-key="citation_source" data-label="Source de la citation" onclick="redCliquer(this)"></span>
+        </div>
+
+      </div><!-- /accueil -->
+
+      <!-- ══ ÉDUCATIF ══ -->
+      <div class="red-section cache" id="red-s-educatif">
+
+        <!-- S1 — Saponification -->
+        <div class="red-edu-panel" id="red-edu-1">
+          <div class="page-entete">
+            <div>
+              <p class="page-entete-eyebrow red-editable" data-key="edu_s1_surtitre" data-label="S1 — Surtitre" onclick="redCliquer(this)"></p>
+              <h1 class="page-entete-titre"><span class="red-editable" data-key="edu_s1_titre" data-label="S1 — Titre" onclick="redCliquer(this)"></span> <em class="red-editable" data-key="edu_s1_titre_em" data-label="S1 — Titre italique" onclick="redCliquer(this)"></em></h1>
+              <p class="edu-accroche red-editable" data-key="edu_s1_accroche" data-label="S1 — Accroche" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+          </div>
+          <div class="section-texte">
+            <div class="texte-principal">
+              <p class="page-hero-texte red-editable" data-key="edu_s1_p1" data-label="S1 — Paragraphe 1" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+              <p class="page-hero-texte red-editable" data-key="edu_s1_p2" data-label="S1 — Paragraphe 2" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+              <p class="page-hero-texte red-editable" data-key="edu_s1_p3" data-label="S1 — Paragraphe 3" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+            <div class="red-editable-photo section-texte-photo-auto" data-key="edu_photo_sapo" data-label="S1 — Photo" data-type="photo" onclick="redCliquer(this)">
+              <img class="red-photo-img" src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773875360/sapo_g8kmwq.jpg" alt="">
+            </div>
+          </div>
+          <div class="bonne-section">
+            <h2 class="bonne-section-titre red-editable" data-key="edu_s1_section_titre" data-label="S1 — Titre section cartes" onclick="redCliquer(this)"></h2>
+            <div class="items-grille">
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s1_card1_titre" data-label="S1 — Carte 1 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s1_card1_texte" data-label="S1 — Carte 1 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s1_card2_titre" data-label="S1 — Carte 2 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s1_card2_texte" data-label="S1 — Carte 2 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card accent"><div class="info-card-titre red-editable" data-key="edu_s1_card3_titre" data-label="S1 — Carte 3 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s1_card3_texte" data-label="S1 — Carte 3 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s1_card4_titre" data-label="S1 — Carte 4 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s1_card4_texte" data-label="S1 — Carte 4 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card neutre"><div class="info-card-titre red-editable" data-key="edu_s1_card5_titre" data-label="S1 — Carte 5 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s1_card5_texte" data-label="S1 — Carte 5 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- S2 — La cure -->
+        <div class="red-edu-panel cache" id="red-edu-2">
+          <div class="page-entete">
+            <div>
+              <p class="page-entete-eyebrow red-editable" data-key="edu_s2_surtitre" data-label="S2 — Surtitre" onclick="redCliquer(this)"></p>
+              <h1 class="page-entete-titre"><span class="red-editable" data-key="edu_s2_titre" data-label="S2 — Titre" onclick="redCliquer(this)"></span> <em class="red-editable" data-key="edu_s2_titre_em" data-label="S2 — Titre italique" onclick="redCliquer(this)"></em></h1>
+              <p class="edu-accroche red-editable" data-key="edu_s2_accroche" data-label="S2 — Accroche" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+          </div>
+          <div class="section-texte">
+            <div class="texte-principal">
+              <p class="red-editable" data-key="edu_s2_p1" data-label="S2 — Paragraphe 1" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+              <p class="red-editable" data-key="edu_s2_p2" data-label="S2 — Paragraphe 2" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+              <p class="red-editable" data-key="edu_s2_p3" data-label="S2 — Paragraphe 3" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+            <div>
+              <div class="valeur-item"><div class="valeur-titre red-editable" data-key="edu_s2_val1_titre" data-label="S2 — Valeur 1 titre" onclick="redCliquer(this)"></div><div class="valeur-desc red-editable" data-key="edu_s2_val1_texte" data-label="S2 — Valeur 1 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="valeur-item"><div class="valeur-titre red-editable" data-key="edu_s2_val2_titre" data-label="S2 — Valeur 2 titre" onclick="redCliquer(this)"></div><div class="valeur-desc red-editable" data-key="edu_s2_val2_texte" data-label="S2 — Valeur 2 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="valeur-item"><div class="valeur-titre red-editable" data-key="edu_s2_val3_titre" data-label="S2 — Valeur 3 titre" onclick="redCliquer(this)"></div><div class="valeur-desc red-editable" data-key="edu_s2_val3_texte" data-label="S2 — Valeur 3 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="valeur-item"><div class="valeur-titre red-editable" data-key="edu_s2_val4_titre" data-label="S2 — Valeur 4 titre" onclick="redCliquer(this)"></div><div class="valeur-desc red-editable" data-key="edu_s2_val4_texte" data-label="S2 — Valeur 4 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            </div>
+          </div>
+          <div class="bandeau-citation">
+            <p class="citation-texte"><span class="citation-guillemet">«&nbsp;</span><span class="red-editable" data-key="edu_s2_citation" data-label="S2 — Citation" data-fieldtype="textarea" onclick="redCliquer(this)"></span><span class="citation-guillemet">&nbsp;»</span></p>
+            <span class="citation-source red-editable" data-key="edu_s2_citation_source" data-label="S2 — Source citation" onclick="redCliquer(this)"></span>
+          </div>
+        </div>
+
+        <!-- S3 — Surgraissage -->
+        <div class="red-edu-panel cache" id="red-edu-3">
+          <div class="page-entete">
+            <div>
+              <p class="page-entete-eyebrow red-editable" data-key="edu_s3_surtitre" data-label="S3 — Surtitre" onclick="redCliquer(this)"></p>
+              <h1 class="page-entete-titre"><span class="red-editable" data-key="edu_s3_titre" data-label="S3 — Titre" onclick="redCliquer(this)"></span> <em class="red-editable" data-key="edu_s3_titre_em" data-label="S3 — Titre italique" onclick="redCliquer(this)"></em></h1>
+              <p class="edu-accroche red-editable" data-key="edu_s3_accroche" data-label="S3 — Accroche" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+          </div>
+          <div class="section-texte">
+            <div class="texte-principal">
+              <p class="red-editable" data-key="edu_s3_p1" data-label="S3 — Paragraphe 1" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+              <p class="red-editable" data-key="edu_s3_p2" data-label="S3 — Paragraphe 2" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+              <p class="red-editable" data-key="edu_s3_p3" data-label="S3 — Paragraphe 3" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+            <div class="red-editable-photo section-texte-photo-auto" data-key="edu_photo_surgras" data-label="S3 — Photo" data-type="photo" onclick="redCliquer(this)">
+              <img class="red-photo-img" src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773879204/surgras_yw29r3.jpg" alt="">
+            </div>
+          </div>
+          <div class="bonne-section">
+            <h2 class="bonne-section-titre red-editable" data-key="edu_s3_section_titre" data-label="S3 — Titre section niveaux" onclick="redCliquer(this)"></h2>
+            <div class="edu-niveaux">
+              <div class="edu-niveau">
+                <div><div class="edu-niveau-pct red-editable" data-key="edu_s3_niv1_pct" data-label="S3 — Niveau 1 %" data-pct="1" onclick="redCliquer(this)"></div><div class="edu-niveau-label red-editable" data-key="edu_s3_niv1_label" data-label="S3 — Niveau 1 label" onclick="redCliquer(this)"></div></div>
+                <div><p class="edu-niveau-texte red-editable" data-key="edu_s3_niv1_texte" data-label="S3 — Niveau 1 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+              </div>
+              <div class="edu-niveau">
+                <div><div class="edu-niveau-pct red-editable" data-key="edu_s3_niv2_pct" data-label="S3 — Niveau 2 %" data-pct="1" onclick="redCliquer(this)"></div><div class="edu-niveau-label red-editable" data-key="edu_s3_niv2_label" data-label="S3 — Niveau 2 label" onclick="redCliquer(this)"></div></div>
+                <div><p class="edu-niveau-texte red-editable" data-key="edu_s3_niv2_texte" data-label="S3 — Niveau 2 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+              </div>
+              <div class="edu-niveau">
+                <div><div class="edu-niveau-pct red-editable" data-key="edu_s3_niv3_pct" data-label="S3 — Niveau 3 %" data-pct="1" onclick="redCliquer(this)"></div><div class="edu-niveau-label red-editable" data-key="edu_s3_niv3_label" data-label="S3 — Niveau 3 label" onclick="redCliquer(this)"></div></div>
+                <div><p class="edu-niveau-texte red-editable" data-key="edu_s3_niv3_texte" data-label="S3 — Niveau 3 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+              </div>
+            </div>
+          </div>
+          <div class="note-allergenes">
+            <div class="note-allergenes-texte"><strong>💡 Astuce saisonnière</strong> <span class="red-editable" data-key="edu_s3_astuce" data-label="S3 — Astuce saisonnière" data-fieldtype="textarea" onclick="redCliquer(this)"></span></div>
+          </div>
+        </div>
+
+        <!-- S4 — Les huiles -->
+        <div class="red-edu-panel cache" id="red-edu-4">
+          <div class="page-entete">
+            <div>
+              <p class="page-entete-eyebrow red-editable" data-key="edu_s4_surtitre" data-label="S4 — Surtitre" onclick="redCliquer(this)"></p>
+              <h1 class="page-entete-titre"><span class="red-editable" data-key="edu_s4_titre" data-label="S4 — Titre" onclick="redCliquer(this)"></span> <em class="red-editable" data-key="edu_s4_titre_em" data-label="S4 — Titre italique" onclick="redCliquer(this)"></em></h1>
+              <p class="edu-accroche red-editable" data-key="edu_s4_accroche" data-label="S4 — Accroche" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+          </div>
+          <div class="section-texte">
+            <div class="texte-principal">
+              <p class="page-hero-texte red-editable" data-key="edu_s4_p1" data-label="S4 — Paragraphe 1" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+              <p class="page-hero-texte red-editable" data-key="edu_s4_p2" data-label="S4 — Paragraphe 2" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+            <div class="red-editable-photo section-texte-photo-auto" data-key="edu_photo_huiles" data-label="S4 — Photo" data-type="photo" onclick="redCliquer(this)">
+              <img class="red-photo-img" src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773869994/huiles_lnjxah.jpg" alt="">
+            </div>
+          </div>
+          <div class="bonne-section">
+            <h2 class="bonne-section-titre red-editable" data-key="edu_s4_section_titre" data-label="S4 — Titre section huiles" onclick="redCliquer(this)"></h2>
+            <div class="items-grille">
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s4_h1_titre" data-label="S4 — Huile 1 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s4_h1_texte" data-label="S4 — Huile 1 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s4_h2_titre" data-label="S4 — Huile 2 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s4_h2_texte" data-label="S4 — Huile 2 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s4_h3_titre" data-label="S4 — Huile 3 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s4_h3_texte" data-label="S4 — Huile 3 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card accent"><div class="info-card-titre red-editable" data-key="edu_s4_h4_titre" data-label="S4 — Huile 4 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s4_h4_texte" data-label="S4 — Huile 4 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s4_h5_titre" data-label="S4 — Huile 5 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s4_h5_texte" data-label="S4 — Huile 5 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card neutre"><div class="info-card-titre red-editable" data-key="edu_s4_h6_titre" data-label="S4 — Huile 6 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s4_h6_texte" data-label="S4 — Huile 6 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            </div>
+          </div>
+          <div class="bandeau-citation">
+            <p class="citation-texte"><span class="citation-guillemet">«&nbsp;</span><span class="red-editable" data-key="edu_s4_citation" data-label="S4 — Citation" data-fieldtype="textarea" onclick="redCliquer(this)"></span><span class="citation-guillemet">&nbsp;»</span></p>
+            <span class="citation-source red-editable" data-key="edu_s4_citation_source" data-label="S4 — Source citation" onclick="redCliquer(this)"></span>
+          </div>
+        </div>
+
+        <!-- S5 — Argiles et additifs -->
+        <div class="red-edu-panel cache" id="red-edu-5">
+          <div class="page-entete">
+            <div>
+              <p class="page-entete-eyebrow red-editable" data-key="edu_s5_surtitre" data-label="S5 — Surtitre" onclick="redCliquer(this)"></p>
+              <h1 class="page-entete-titre"><span class="red-editable" data-key="edu_s5_titre" data-label="S5 — Titre" onclick="redCliquer(this)"></span> <em class="red-editable" data-key="edu_s5_titre_em" data-label="S5 — Titre italique" onclick="redCliquer(this)"></em></h1>
+              <p class="edu-accroche red-editable" data-key="edu_s5_accroche" data-label="S5 — Accroche" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+          </div>
+          <div class="section-texte">
+            <div class="texte-principal">
+              <p class="red-editable" data-key="edu_s5_p1" data-label="S5 — Paragraphe 1" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+              <p class="red-editable" data-key="edu_s5_p2" data-label="S5 — Paragraphe 2" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+            <div class="red-editable-photo section-texte-photo-auto" data-key="edu_photo_additif" data-label="S5 — Photo" data-type="photo" onclick="redCliquer(this)">
+              <img class="red-photo-img" src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773869994/additif_bcbpgh.jpg" alt="">
+            </div>
+          </div>
+          <div class="bonne-section">
+            <h2 class="bonne-section-titre red-editable" data-key="edu_s5_section1_titre" data-label="S5 — Titre section argiles" onclick="redCliquer(this)"></h2>
+            <div class="items-grille">
+              <div class="info-card neutre"><div class="info-card-titre red-editable" data-key="edu_s5_a1_titre" data-label="S5 — Argile 1 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s5_a1_texte" data-label="S5 — Argile 1 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card accent"><div class="info-card-titre red-editable" data-key="edu_s5_a2_titre" data-label="S5 — Argile 2 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s5_a2_texte" data-label="S5 — Argile 2 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s5_a3_titre" data-label="S5 — Argile 3 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s5_a3_texte" data-label="S5 — Argile 3 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s5_a4_titre" data-label="S5 — Argile 4 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s5_a4_texte" data-label="S5 — Argile 4 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s5_a5_titre" data-label="S5 — Argile 5 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s5_a5_texte" data-label="S5 — Argile 5 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            </div>
+          </div>
+          <div class="bonne-section">
+            <h2 class="bonne-section-titre red-editable" data-key="edu_s5_section2_titre" data-label="S5 — Titre section additifs" onclick="redCliquer(this)"></h2>
+            <div class="items-grille">
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s5_ad1_titre" data-label="S5 — Additif 1 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s5_ad1_texte" data-label="S5 — Additif 1 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card accent"><div class="info-card-titre red-editable" data-key="edu_s5_ad2_titre" data-label="S5 — Additif 2 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s5_ad2_texte" data-label="S5 — Additif 2 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card neutre"><div class="info-card-titre red-editable" data-key="edu_s5_ad3_titre" data-label="S5 — Additif 3 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s5_ad3_texte" data-label="S5 — Additif 3 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- S6 — Huiles essentielles -->
+        <div class="red-edu-panel cache" id="red-edu-6">
+          <div class="page-entete">
+            <div>
+              <p class="page-entete-eyebrow red-editable" data-key="edu_s6_surtitre" data-label="S6 — Surtitre" onclick="redCliquer(this)"></p>
+              <h1 class="page-entete-titre"><span class="red-editable" data-key="edu_s6_titre" data-label="S6 — Titre" onclick="redCliquer(this)"></span> <em class="red-editable" data-key="edu_s6_titre_em" data-label="S6 — Titre italique" onclick="redCliquer(this)"></em></h1>
+              <p class="edu-accroche red-editable" data-key="edu_s6_accroche" data-label="S6 — Accroche" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+          </div>
+          <div class="section-texte">
+            <div class="texte-principal">
+              <p class="page-hero-texte red-editable" data-key="edu_s6_p1" data-label="S6 — Paragraphe 1" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+              <p class="page-hero-texte red-editable" data-key="edu_s6_p2" data-label="S6 — Paragraphe 2" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+            <div class="red-editable-photo section-texte-photo-auto" data-key="edu_photo_essences" data-label="S6 — Photo" data-type="photo" onclick="redCliquer(this)">
+              <img class="red-photo-img" src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773878615/essences_vevuvf.jpg" alt="">
+            </div>
+          </div>
+          <div class="bonne-section">
+            <h2 class="bonne-section-titre red-editable" data-key="edu_s6_section_titre" data-label="S6 — Titre section HE" onclick="redCliquer(this)"></h2>
+            <div class="items-grille">
+              <div class="info-card accent"><div class="info-card-titre red-editable" data-key="edu_s6_he1_titre" data-label="S6 — HE 1 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s6_he1_texte" data-label="S6 — HE 1 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s6_he2_titre" data-label="S6 — HE 2 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s6_he2_texte" data-label="S6 — HE 2 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s6_he3_titre" data-label="S6 — HE 3 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s6_he3_texte" data-label="S6 — HE 3 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s6_he4_titre" data-label="S6 — HE 4 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s6_he4_texte" data-label="S6 — HE 4 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card neutre"><div class="info-card-titre red-editable" data-key="edu_s6_he5_titre" data-label="S6 — HE 5 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s6_he5_texte" data-label="S6 — HE 5 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s6_he6_titre" data-label="S6 — HE 6 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s6_he6_texte" data-label="S6 — HE 6 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s6_he7_titre" data-label="S6 — HE 7 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s6_he7_texte" data-label="S6 — HE 7 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card accent"><div class="info-card-titre red-editable" data-key="edu_s6_he8_titre" data-label="S6 — HE 8 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s6_he8_texte" data-label="S6 — HE 8 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s6_he9_titre" data-label="S6 — HE 9 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s6_he9_texte" data-label="S6 — HE 9 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card"><div class="info-card-titre red-editable" data-key="edu_s6_he10_titre" data-label="S6 — HE 10 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s6_he10_texte" data-label="S6 — HE 10 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+              <div class="info-card neutre"><div class="info-card-titre red-editable" data-key="edu_s6_he11_titre" data-label="S6 — HE 11 titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="edu_s6_he11_texte" data-label="S6 — HE 11 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            </div>
+          </div>
+          <div class="note-allergenes">
+            <div class="note-allergenes-texte"><strong>Précautions d'usage</strong> <span class="red-editable" data-key="edu_s6_precautions" data-label="S6 — Précautions" data-fieldtype="textarea" onclick="redCliquer(this)"></span></div>
+          </div>
+        </div>
+
+        <!-- S7 — Connaître sa peau -->
+        <div class="red-edu-panel cache" id="red-edu-7">
+          <div class="page-entete">
+            <div>
+              <p class="page-entete-eyebrow red-editable" data-key="edu_s7_surtitre" data-label="S7 — Surtitre" onclick="redCliquer(this)"></p>
+              <h1 class="page-entete-titre"><span class="red-editable" data-key="edu_s7_titre" data-label="S7 — Titre" onclick="redCliquer(this)"></span> <em class="red-editable" data-key="edu_s7_titre_em" data-label="S7 — Titre italique" onclick="redCliquer(this)"></em></h1>
+              <p class="edu-accroche red-editable" data-key="edu_s7_accroche" data-label="S7 — Accroche" data-fieldtype="textarea" onclick="redCliquer(this)"></p>
+            </div>
+          </div>
+          <div class="bonne-section">
+            <h2 class="bonne-section-titre red-editable" data-key="edu_s7_section1_titre" data-label="S7 — Titre types de peau" onclick="redCliquer(this)"></h2>
+            <div class="edu-types-grille">
+              <div class="edu-type-peau"><div class="edu-type-titre red-editable" data-key="edu_s7_peau1_titre" data-label="S7 — Peau 1 titre" onclick="redCliquer(this)"></div><span class="edu-type-label">Les signes</span><p class="edu-type-texte red-editable" data-key="edu_s7_peau1_signes" data-label="S7 — Peau 1 signes" data-fieldtype="textarea" onclick="redCliquer(this)"></p><span class="edu-type-label">Ce qu'elle aime</span><p class="edu-type-texte red-editable" data-key="edu_s7_peau1_aime" data-label="S7 — Peau 1 aime" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+              <div class="edu-type-peau"><div class="edu-type-titre red-editable" data-key="edu_s7_peau2_titre" data-label="S7 — Peau 2 titre" onclick="redCliquer(this)"></div><span class="edu-type-label">Les signes</span><p class="edu-type-texte red-editable" data-key="edu_s7_peau2_signes" data-label="S7 — Peau 2 signes" data-fieldtype="textarea" onclick="redCliquer(this)"></p><span class="edu-type-label">Ce qu'elle aime</span><p class="edu-type-texte red-editable" data-key="edu_s7_peau2_aime" data-label="S7 — Peau 2 aime" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+              <div class="edu-type-peau"><div class="edu-type-titre red-editable" data-key="edu_s7_peau3_titre" data-label="S7 — Peau 3 titre" onclick="redCliquer(this)"></div><span class="edu-type-label">Les signes</span><p class="edu-type-texte red-editable" data-key="edu_s7_peau3_signes" data-label="S7 — Peau 3 signes" data-fieldtype="textarea" onclick="redCliquer(this)"></p><span class="edu-type-label">Ce qu'elle aime</span><p class="edu-type-texte red-editable" data-key="edu_s7_peau3_aime" data-label="S7 — Peau 3 aime" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+              <div class="edu-type-peau"><div class="edu-type-titre red-editable" data-key="edu_s7_peau4_titre" data-label="S7 — Peau 4 titre" onclick="redCliquer(this)"></div><span class="edu-type-label">Les signes</span><p class="edu-type-texte red-editable" data-key="edu_s7_peau4_signes" data-label="S7 — Peau 4 signes" data-fieldtype="textarea" onclick="redCliquer(this)"></p><span class="edu-type-label">Ce qu'elle aime</span><p class="edu-type-texte red-editable" data-key="edu_s7_peau4_aime" data-label="S7 — Peau 4 aime" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+              <div class="edu-type-peau"><div class="edu-type-titre red-editable" data-key="edu_s7_peau5_titre" data-label="S7 — Peau 5 titre" onclick="redCliquer(this)"></div><span class="edu-type-label">Les signes</span><p class="edu-type-texte red-editable" data-key="edu_s7_peau5_signes" data-label="S7 — Peau 5 signes" data-fieldtype="textarea" onclick="redCliquer(this)"></p><span class="edu-type-label">Ce qu'elle aime</span><p class="edu-type-texte red-editable" data-key="edu_s7_peau5_aime" data-label="S7 — Peau 5 aime" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+            </div>
+          </div>
+          <div class="note-allergenes">
+            <div class="note-allergenes-texte"><strong>💡 Astuce saisonnière</strong> <span class="red-editable" data-key="edu_s7_astuce" data-label="S7 — Astuce saisonnière" data-fieldtype="textarea" onclick="redCliquer(this)"></span></div>
+          </div>
+          <div class="bonne-section">
+            <h2 class="bonne-section-titre red-editable" data-key="edu_s7_section2_titre" data-label="S7 — Titre usages" onclick="redCliquer(this)"></h2>
+            <div class="edu-besoins">
+              <div class="edu-besoin"><div class="edu-besoin-titre red-editable" data-key="edu_s7_usage1_titre" data-label="S7 — Usage 1 titre" onclick="redCliquer(this)"></div><p class="edu-besoin-texte red-editable" data-key="edu_s7_usage1_texte" data-label="S7 — Usage 1 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+              <div class="edu-besoin"><div class="edu-besoin-titre red-editable" data-key="edu_s7_usage2_titre" data-label="S7 — Usage 2 titre" onclick="redCliquer(this)"></div><p class="edu-besoin-texte red-editable" data-key="edu_s7_usage2_texte" data-label="S7 — Usage 2 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+              <div class="edu-besoin"><div class="edu-besoin-titre red-editable" data-key="edu_s7_usage3_titre" data-label="S7 — Usage 3 titre" onclick="redCliquer(this)"></div><p class="edu-besoin-texte red-editable" data-key="edu_s7_usage3_texte" data-label="S7 — Usage 3 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+              <div class="edu-besoin"><div class="edu-besoin-titre red-editable" data-key="edu_s7_usage4_titre" data-label="S7 — Usage 4 titre" onclick="redCliquer(this)"></div><p class="edu-besoin-texte red-editable" data-key="edu_s7_usage4_texte" data-label="S7 — Usage 4 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+              <div class="edu-besoin"><div class="edu-besoin-titre red-editable" data-key="edu_s7_usage5_titre" data-label="S7 — Usage 5 titre" onclick="redCliquer(this)"></div><p class="edu-besoin-texte red-editable" data-key="edu_s7_usage5_texte" data-label="S7 — Usage 5 texte" data-fieldtype="textarea" onclick="redCliquer(this)"></p></div>
+            </div>
+          </div>
+          <div class="bonne-section">
+            <h2 class="bonne-section-titre red-editable" data-key="edu_s7_section3_titre" data-label="S7 — Titre checklists" onclick="redCliquer(this)"></h2>
+            <div class="edu-checklists">
+              <div class="edu-checklist">
+                <div class="edu-checklist-titre">Signes qu'il vous convient</div>
+                <ul class="edu-checklist-liste">
+                  <li class="red-editable" data-key="edu_s7_ok1" data-label="S7 — OK 1" onclick="redCliquer(this)"></li>
+                  <li class="red-editable" data-key="edu_s7_ok2" data-label="S7 — OK 2" onclick="redCliquer(this)"></li>
+                  <li class="red-editable" data-key="edu_s7_ok3" data-label="S7 — OK 3" onclick="redCliquer(this)"></li>
+                  <li class="red-editable" data-key="edu_s7_ok4" data-label="S7 — OK 4" onclick="redCliquer(this)"></li>
+                </ul>
+              </div>
+              <div class="edu-checklist non">
+                <div class="edu-checklist-titre">Signes qu'il ne convient pas</div>
+                <ul class="edu-checklist-liste">
+                  <li class="red-editable" data-key="edu_s7_non1" data-label="S7 — NON 1" onclick="redCliquer(this)"></li>
+                  <li class="red-editable" data-key="edu_s7_non2" data-label="S7 — NON 2" onclick="redCliquer(this)"></li>
+                  <li class="red-editable" data-key="edu_s7_non3" data-label="S7 — NON 3" onclick="redCliquer(this)"></li>
+                  <li class="red-editable" data-key="edu_s7_non4" data-label="S7 — NON 4" onclick="redCliquer(this)"></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="bonne-section">
+            <h2 class="bonne-section-titre red-editable" data-key="edu_guide_titre" data-label="S7 — Titre guide rapide" onclick="redCliquer(this)"></h2>
+            <div class="edu-tableau-wrap">
+              <table class="edu-tableau">
+                <thead><tr><th>Type de peau</th><th>Surgraissage</th><th>Huiles privilégiées</th><th>Argiles / Additifs</th></tr></thead>
+                <tbody>
+                  <tr><td class="red-editable" data-key="edu_guide_ligne1_peau" data-label="Guide L1 — Peau" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne1_surgraissage" data-label="Guide L1 — Surgraissage" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne1_huiles" data-label="Guide L1 — Huiles" data-fieldtype="textarea" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne1_argiles" data-label="Guide L1 — Argiles" data-fieldtype="textarea" onclick="redCliquer(this)"></td></tr>
+                  <tr><td class="red-editable" data-key="edu_guide_ligne2_peau" data-label="Guide L2 — Peau" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne2_surgraissage" data-label="Guide L2 — Surgraissage" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne2_huiles" data-label="Guide L2 — Huiles" data-fieldtype="textarea" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne2_argiles" data-label="Guide L2 — Argiles" data-fieldtype="textarea" onclick="redCliquer(this)"></td></tr>
+                  <tr><td class="red-editable" data-key="edu_guide_ligne3_peau" data-label="Guide L3 — Peau" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne3_surgraissage" data-label="Guide L3 — Surgraissage" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne3_huiles" data-label="Guide L3 — Huiles" data-fieldtype="textarea" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne3_argiles" data-label="Guide L3 — Argiles" data-fieldtype="textarea" onclick="redCliquer(this)"></td></tr>
+                  <tr><td class="red-editable" data-key="edu_guide_ligne4_peau" data-label="Guide L4 — Peau" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne4_surgraissage" data-label="Guide L4 — Surgraissage" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne4_huiles" data-label="Guide L4 — Huiles" data-fieldtype="textarea" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne4_argiles" data-label="Guide L4 — Argiles" data-fieldtype="textarea" onclick="redCliquer(this)"></td></tr>
+                  <tr><td class="red-editable" data-key="edu_guide_ligne5_peau" data-label="Guide L5 — Peau" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne5_surgraissage" data-label="Guide L5 — Surgraissage" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne5_huiles" data-label="Guide L5 — Huiles" data-fieldtype="textarea" onclick="redCliquer(this)"></td><td class="red-editable" data-key="edu_guide_ligne5_argiles" data-label="Guide L5 — Argiles" data-fieldtype="textarea" onclick="redCliquer(this)"></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /educatif -->
+
+      <!-- ══ BON À SAVOIR ══ -->
+      <div class="red-section cache" id="red-s-bon-a-savoir">
+
+        <div class="red-section-label">ENGAGEMENTS</div>
+        <div class="bonne-section">
+          <div class="items-grille">
+            <div class="info-card"><div class="info-card-titre red-editable" data-key="bas_engagement_01_titre" data-label="Engagement 01 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_engagement_01_texte" data-label="Engagement 01 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card"><div class="info-card-titre red-editable" data-key="bas_engagement_02_titre" data-label="Engagement 02 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_engagement_02_texte" data-label="Engagement 02 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card"><div class="info-card-titre red-editable" data-key="bas_engagement_03_titre" data-label="Engagement 03 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_engagement_03_texte" data-label="Engagement 03 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card"><div class="info-card-titre red-editable" data-key="bas_engagement_04_titre" data-label="Engagement 04 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_engagement_04_texte" data-label="Engagement 04 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card"><div class="info-card-titre red-editable" data-key="bas_engagement_05_titre" data-label="Engagement 05 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_engagement_05_texte" data-label="Engagement 05 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+          </div>
+        </div>
+
+        <div class="red-section-label">NOTES IMPORTANTES</div>
+        <div class="bonne-section">
+          <div class="note-allergenes"><div class="note-allergenes-texte"><strong class="red-editable" data-key="bas_note_01_titre" data-label="Note 01 — titre" onclick="redCliquer(this)"></strong> <span class="red-editable" data-key="bas_note_01_texte" data-label="Note 01 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></span></div></div>
+          <div class="note-allergenes"><div class="note-allergenes-texte"><strong class="red-editable" data-key="bas_note_02_titre" data-label="Note 02 — titre" onclick="redCliquer(this)"></strong> <span class="red-editable" data-key="bas_note_02_texte" data-label="Note 02 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></span></div></div>
+          <div class="note-allergenes"><div class="note-allergenes-texte"><strong class="red-editable" data-key="bas_note_03_titre" data-label="Note 03 — titre" onclick="redCliquer(this)"></strong> <span class="red-editable" data-key="bas_note_03_texte" data-label="Note 03 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></span></div></div>
+          <div class="note-allergenes"><div class="note-allergenes-texte"><strong class="red-editable" data-key="bas_note_04_titre" data-label="Note 04 — titre" onclick="redCliquer(this)"></strong> <span class="red-editable" data-key="bas_note_04_texte" data-label="Note 04 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></span></div></div>
+          <div class="note-allergenes"><div class="note-allergenes-texte"><strong class="red-editable" data-key="bas_note_05_titre" data-label="Note 05 — titre" onclick="redCliquer(this)"></strong> <span class="red-editable" data-key="bas_note_05_texte" data-label="Note 05 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></span></div></div>
+        </div>
+
+        <div class="red-section-label">CONSERVATION ET UTILISATION</div>
+        <div class="bonne-section">
+          <div class="items-grille">
+            <div class="info-card accent"><div class="info-card-titre red-editable" data-key="bas_conservation_01_titre" data-label="Conservation 01 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_conservation_01_texte" data-label="Conservation 01 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card accent"><div class="info-card-titre red-editable" data-key="bas_conservation_02_titre" data-label="Conservation 02 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_conservation_02_texte" data-label="Conservation 02 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card accent"><div class="info-card-titre red-editable" data-key="bas_conservation_03_titre" data-label="Conservation 03 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_conservation_03_texte" data-label="Conservation 03 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card accent"><div class="info-card-titre red-editable" data-key="bas_conservation_04_titre" data-label="Conservation 04 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_conservation_04_texte" data-label="Conservation 04 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card accent"><div class="info-card-titre red-editable" data-key="bas_conservation_05_titre" data-label="Conservation 05 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_conservation_05_texte" data-label="Conservation 05 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+          </div>
+        </div>
+
+        <div class="red-section-label">COMMANDES ET DÉLAIS</div>
+        <div class="bonne-section">
+          <div class="items-grille">
+            <div class="info-card neutre"><div class="info-card-titre red-editable" data-key="bas_commande_01_titre" data-label="Commande 01 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_commande_01_texte" data-label="Commande 01 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card neutre"><div class="info-card-titre red-editable" data-key="bas_commande_02_titre" data-label="Commande 02 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_commande_02_texte" data-label="Commande 02 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card neutre"><div class="info-card-titre red-editable" data-key="bas_commande_03_titre" data-label="Commande 03 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_commande_03_texte" data-label="Commande 03 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card neutre"><div class="info-card-titre red-editable" data-key="bas_commande_04_titre" data-label="Commande 04 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_commande_04_texte" data-label="Commande 04 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+            <div class="info-card neutre"><div class="info-card-titre red-editable" data-key="bas_commande_05_titre" data-label="Commande 05 — titre" onclick="redCliquer(this)"></div><div class="info-card-texte red-editable" data-key="bas_commande_05_texte" data-label="Commande 05 — texte" data-fieldtype="textarea" onclick="redCliquer(this)"></div></div>
+          </div>
+        </div>
+
+      </div><!-- /bon-a-savoir -->
+
+      <!-- ══ CONTACT ══ -->
+      <div class="red-section cache" id="red-s-contact">
+        <div class="red-section-label">CONTACT</div>
+        <div class="bonne-section">
+          <p class="texte-secondaire">Le texte de la section Contact est fixe — courriel et formulaire seulement.</p>
+          <div class="red-editable-photo section-texte-photo-16-9" data-key="edu_photo_contact" data-label="Photo contact" data-type="photo" onclick="redCliquer(this)">
+            <img class="red-photo-img" src="https://res.cloudinary.com/dfasrauyy/image/upload/v1773870810/couriel_tgdykb.jpg" alt="">
+          </div>
+        </div>
+      </div><!-- /contact -->
+
+    </div><!-- /red-apercu -->
+
+    <!-- DROITE — PANNEAU -->
+    <div id="red-panneau" class="red-panneau">
+      <div class="red-panneau-vide">
+        <div style="font-size:2rem;margin-bottom:12px">←</div>
+        Cliquez sur un élément<br>dans l'aperçu pour le modifier
+      </div>
+    </div>
+
+  </div><!-- /red-layout -->
+
+</div><!-- /section-redaction -->
+
+<!-- MÉDIATHÈQUE — Photos Cloudinary-->
     <div class="section-admin" id="section-mediatheque">
 		<div class="page-entete fade-in">
 			<div class="page-entete-gauche">
@@ -2725,6 +3214,7 @@
 <script src="../js/admin-densites.js"></script>
 <script src="../js/admin-mediatheque.js"></script>
 <script src="../js/admin-contenu-site.js"></script>
+<script src="../js/admin-redaction.js"></script>
 <script src="../js/admin-achats.js"></script>
 <script src="../js/catalogue-builder.js"></script>
 

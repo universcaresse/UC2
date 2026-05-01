@@ -168,6 +168,7 @@ if (id === 'familles')       afficherFamilles();
   if (id === 'inventaire')     { const r = document.getElementById('inv-recherche'); if (r) r.value = ''; chargerInventaire(); }
   if (id === 'factures')       { reinitialiserFiltres(); chargerFactures(); }
   if (id === 'contenu-site')   chargerContenuSite();
+if (id === 'redaction')      redInit();
   if (id === 'mediatheque')    chargerMediatheque();
   if (id === 'inventaire-production') { afficherSection('inventaire', null); return; }
   if (id === 'ventes')        { chargerVentes(); }
