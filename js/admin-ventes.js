@@ -538,26 +538,40 @@ async function envoyerFactureTexto() {
   const promoSel  = document.getElementById('ven-promotion').value;
   const promoData = promoSel ? JSON.parse(promoSel) : null;
   const promo     = promoData ? donneesPromotions.find(p => p.promo_id === promoData.promo_id) : null;
-  const ligne     = '─────────────────────';
-  let texte = `UNIVERS CARESSE\n`;
-  texte += `universcaresse.ca\n`;
-  texte += `${date}\n`;
-  texte += `Facture ${venNumeroAffiche}\n`;
-  if (client) texte += `Client : ${client}\n`;
-  texte += `\n${ligne}\n`;
+  const sep = '--------------------';
+  const numeroTexto = 'f-' + venNumeroAffiche.replace('VEN-','').replace('ven-','');
+
+  // Regrouper les mêmes produits/formats
+  const panierGroupé = [];
   venPanier.forEach(l => {
-    texte += `${l.nom}\n`;
-    texte += `  ${l.poids} ${l.unite}  x${l.quantite}  ${formaterPrix(l.prix_unitaire)}/u\n`;
-    texte += `  ${formaterPrix(l.prix_unitaire * l.quantite)}\n`;
+    const clé = l.pro_id + '_' + l.poids + '_' + l.unite;
+    const exist = panierGroupé.find(x => x.clé === clé);
+    if (exist) { exist.quantite += l.quantite; }
+    else panierGroupé.push({ ...l, clé, quantite: l.quantite });
   });
-  texte += `${ligne}\n`;
-  texte += `Sous-total : ${formaterPrix(sousTotal)}\n`;
-  if (rabais > 0 && promo) texte += `Rabais (${promo.nom}) : -${formaterPrix(rabais)}\n`;
-  if (livraison > 0) texte += `Livraison : ${formaterPrix(livraison)}\n`;
-  texte += `${ligne}\n`;
-  texte += `TOTAL : ${formaterPrix(total)}\n`;
-  texte += `${ligne}\n`;
-  texte += `Merci pour votre confiance !`;
+
+  let texte = `f-${venNumeroAffiche.replace('VEN-','').replace('ven-','')}\n`;
+  texte += `${date}\n`;
+  texte += `\n`;
+  texte += `univers caresse\n`;
+  texte += `savonnerie artisanale\n`;
+  texte += `\n`;
+  texte += `universcaresse.ca\n`;
+  texte += `\n`;
+  texte += `${sep}\n`;
+  panierGroupé.forEach(l => {
+    const total_ligne = l.prix_unitaire * l.quantite;
+    texte += `${l.nom}\n`;
+    texte += `${l.quantite} x ${formaterPrix(l.prix_unitaire)} = ${formaterPrix(total_ligne)}\n`;
+  });
+  texte += `${sep}\n`;
+  texte += `sous-total : ${formaterPrix(sousTotal)}\n`;
+  texte += `livraison : ${formaterPrix(livraison)}\n`;
+  if (rabais > 0 && promo) texte += `rabais (${promo.nom}) : -${formaterPrix(rabais)}\n`;
+  texte += `${sep}\n`;
+  texte += `total : ${formaterPrix(total)}\n`;
+  texte += `\n`;
+  texte += `Merci !`;
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
 }
 
