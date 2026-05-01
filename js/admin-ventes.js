@@ -8,7 +8,8 @@ var venNumeroAffiche = '';
 var venLotsDisponibles = [];
 var venModeReprise = false;
 var venStatutReprise = '';
-
+var venClientSauvegarde = '';
+var venLivraisonSauvegarde = 0;
 
 async function chargerVentes() {
   const params = new URLSearchParams(window.location.search);
@@ -26,14 +27,12 @@ async function chargerVentes() {
   document.getElementById('modal-apres-vente')?.classList.remove('ouvert');
   document.getElementById('modal-facture-vente')?.classList.remove('ouvert');
 
-  // Charger l'App ID Square une fois pour toutes
   if (!squareAppId) {
     const resSquare = await appelAPI('getSquareAppId');
     if (resSquare && resSquare.app_id) squareAppId = resSquare.app_id;
   }
 
   const loading = document.getElementById('loading-ventes');
-  const tableau = document.getElementById('tableau-ventes');
   const vide    = document.getElementById('vide-ventes');
   if (loading) loading.classList.remove('cache');
   const res = await appelAPI('getVentesEntete');
@@ -42,12 +41,13 @@ async function chargerVentes() {
     if (vide) vide.classList.remove('cache');
     return;
   }
- toutesVentes = res.items;
+  toutesVentes = res.items;
   afficherTableauVentes(toutesVentes);
 }
 
 function ouvrirFormVente() {
   venPanier = [];
+  venModeReprise = false;
   const dernierNumVen = toutesVentes.length ? Math.max(...toutesVentes.map(v => parseInt((v.ven_id || '').replace('VEN-', '')) || 0)) : 0;
   venIdEnCours = 'VEN-' + String(dernierNumVen + 1).padStart(4, '0');
   venNumeroAffiche = String(dernierNumVen + 1).padStart(4, '0');
@@ -91,6 +91,7 @@ function ouvrirFormVente() {
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
+
 function fermerFormVente() {
   document.getElementById('form-vente').classList.add('cache');
   document.getElementById('filtres-ventes').classList.remove('cache');
@@ -98,6 +99,7 @@ function fermerFormVente() {
   document.querySelector('#section-ventes .page-entete .bouton')?.classList.remove('cache');
   venPanier = [];
   venIdEnCours = null;
+  venModeReprise = false;
 }
 
 function venFiltrerGammes() {
@@ -312,7 +314,6 @@ function venAppliquerPromotion() {
 
 function ouvrirApercuFacture() {
   if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
-  const paiement  = document.getElementById('modal-fv-paiement')?.value || '';
   const client    = document.getElementById('ven-client').value;
   const courriel  = document.getElementById('ven-courriel').value;
   const telephone = document.getElementById('ven-telephone').value;
@@ -389,8 +390,6 @@ async function sauvegarderCoordonnees() {
   const courriel   = document.getElementById('apv-courriel').value;
   const telephone  = document.getElementById('apv-telephone').value;
   const infolettre = document.getElementById('apv-infolettre').checked ? '1' : '0';
-  document.getElementById('ven-courriel').value  = courriel;
-  document.getElementById('ven-telephone').value = telephone;
   if (venIdEnCours) {
     await appelAPIPost('updateStatutVente', { ven_id: venIdEnCours, courriel, telephone, infolettre });
   }
@@ -401,10 +400,10 @@ async function imprimerFacture() {
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
   const numero    = venNumeroAffiche;
   const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
-  const client    = document.getElementById('apv-courriel') ? document.getElementById('ven-client').value || '' : '';
+  const client    = venClientSauvegarde;
   const courriel  = document.getElementById('apv-courriel').value;
   const telephone = document.getElementById('apv-telephone').value;
-  const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
+  const livraison = venLivraisonSauvegarde;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
@@ -469,15 +468,13 @@ async function imprimerFacture() {
       <div class="facture-date">${date}</div>
     </div>
   </div>
-
   ${client || courriel || telephone ? `
   <div class="client-bloc">
     <div class="client-label">Client</div>
     ${client ? `<div class="client-nom">${client}</div>` : ''}
     ${courriel ? `<div class="client-info">${courriel}</div>` : ''}
-${telephone ? `<div class="client-info">${telephone.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2-$3')}</div>` : ''}
+    ${telephone ? `<div class="client-info">${telephone.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2-$3')}</div>` : ''}
   </div>` : ''}
-
   <table>
     <thead>
       <tr>
@@ -488,14 +485,12 @@ ${telephone ? `<div class="client-info">${telephone.replace(/\D/g,'').replace(/(
     </thead>
     <tbody>${lignesHTML}</tbody>
   </table>
-
   <div class="totaux">
     <div class="total-ligne"><span>Sous-total</span><span>${formaterPrix(sousTotal)}</span></div>
     ${rabais > 0 && promo ? `<div class="total-ligne" style="color:#5a8a3a"><span>Rabais — ${promo.nom}</span><span>-${formaterPrix(rabais)}</span></div>` : ''}
     ${livraison > 0 ? `<div class="total-ligne"><span>Livraison</span><span>${formaterPrix(livraison)}</span></div>` : ''}
     <div class="total-final"><span>Total</span><span>${formaterPrix(total)}</span></div>
   </div>
-
   <div class="merci">
     <div class="merci-texte">Merci pour votre confiance !</div>
     <div class="boutique">universcaresse.ca &nbsp;·&nbsp; universcaresse@gmail.com</div>
@@ -506,23 +501,45 @@ ${telephone ? `<div class="client-info">${telephone.replace(/\D/g,'').replace(/(
   fenetre.focus();
   setTimeout(() => fenetre.print(), 800);
 }
+
 async function envoyerFactureCourriel() {
   await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
-  const client    = document.getElementById('ven-client').value || '';
-  const livraison = parseFloat(document.getElementById('ven-livraison')?.value) || 0;
   const courriel  = document.getElementById('apv-courriel').value;
+  if (!courriel) { afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur'); return; }
+  const client    = venClientSauvegarde;
+  const livraison = venLivraisonSauvegarde;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
-  const sujet = `Votre facture Univers Caresse`;
-  let corps = `Bonjour,\n\nVoici le détail de votre commande :\n\n`;
-  venPanier.forEach(l => { corps += `${l.nom} — ${l.poids} ${l.unite} x${l.quantite} = ${formaterPrix(l.prix_unitaire * l.quantite)}\n`; });
-  corps += `\nSous-total : ${formaterPrix(sousTotal)}`;
-  if (rabais > 0) corps += `\nRabais : -${formaterPrix(rabais)}`;
-  if (livraison > 0) corps += `\nLivraison : ${formaterPrix(livraison)}`;
-  corps += `\nTOTAL : ${formaterPrix(total)}\n\nMerci pour votre confiance !\nUnivers Caresse`;
-  window.location.href = `mailto:${courriel}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
+  const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+  const promoSel  = document.getElementById('ven-promotion').value;
+  const promoData = promoSel ? JSON.parse(promoSel) : null;
+  const promo     = promoData ? donneesPromotions.find(p => p.promo_id === promoData.promo_id) : null;
+  const lignes    = venPanier.map(l => ({
+    nom: l.nom, poids: l.poids, unite: l.unite,
+    quantite: l.quantite,
+    prix_unitaire: formaterPrix(l.prix_unitaire),
+    prix_total: formaterPrix(l.prix_unitaire * l.quantite)
+  }));
+  afficherChargement();
+  const res = await appelAPIPost('envoyerFacture', {
+    courriel, client,
+    numero:     venNumeroAffiche,
+    date,
+    lignes,
+    sous_total: formaterPrix(sousTotal),
+    rabais:     rabais > 0 ? formaterPrix(rabais) : 0,
+    promo_nom:  promo ? promo.nom : '',
+    livraison:  livraison > 0 ? formaterPrix(livraison) : 0,
+    total:      formaterPrix(total)
+  });
+  cacherChargement();
+  if (res && res.success) {
+    afficherMsg('ventes', '✅ Facture envoyée par courriel.');
+  } else {
+    afficherMsg('ventes', '❌ Erreur : ' + (res?.message || 'inconnue'), 'erreur');
+  }
 }
 
 async function envoyerFactureTexto() {
@@ -530,8 +547,8 @@ async function envoyerFactureTexto() {
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
   const telephone = document.getElementById('apv-telephone').value;
   if (!telephone) { afficherMsg('ventes', 'Aucun téléphone indiqué pour ce client.', 'erreur'); return; }
- const client    = document.getElementById('apv-courriel') ? document.getElementById('ven-client').value || '' : '';
-  const livraison = parseFloat(document.getElementById('ven-livraison')?.value) || 0;
+  const client    = venClientSauvegarde;
+  const livraison = venLivraisonSauvegarde;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
@@ -540,7 +557,6 @@ async function envoyerFactureTexto() {
   const promoData = promoSel ? JSON.parse(promoSel) : null;
   const promo     = promoData ? donneesPromotions.find(p => p.promo_id === promoData.promo_id) : null;
   const sep = '--------------------';
-  const numeroTexto = 'f-' + venNumeroAffiche.replace('VEN-','').replace('ven-','');
 
   // Regrouper les mêmes produits/formats
   const panierGroupé = [];
@@ -561,9 +577,8 @@ async function envoyerFactureTexto() {
   texte += `\n`;
   texte += `${sep}\n`;
   panierGroupé.forEach(l => {
-    const total_ligne = l.prix_unitaire * l.quantite;
     texte += `${l.nom}\n`;
-    texte += `${l.quantite} x ${formaterPrix(l.prix_unitaire)} = ${formaterPrix(total_ligne)}\n`;
+    texte += `${l.quantite} x ${formaterPrix(l.prix_unitaire)} = ${formaterPrix(l.prix_unitaire * l.quantite)}\n`;
   });
   texte += `${sep}\n`;
   texte += `sous-total : ${formaterPrix(sousTotal)}\n`;
@@ -578,34 +593,34 @@ async function envoyerFactureTexto() {
 
 async function finaliserVente(modePaiement) {
   if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
-  const paiement = modePaiement || document.getElementById('modal-fv-paiement')?.value || '';
-  afficherChargement();
+  const paiement  = modePaiement || '';
+  const ven_id    = venIdEnCours;
   const client    = document.getElementById('ven-client').value;
   const courriel  = document.getElementById('ven-courriel').value;
   const telephone = document.getElementById('ven-telephone').value;
   const livraison = parseFloat(document.getElementById('ven-livraison').value) || 0;
-  const ven_id    = venIdEnCours;
+  const infolettre = document.getElementById('ven-infolettre')?.checked ? '1' : '0';
+
+  afficherChargement();
+
   if (venModeReprise) {
-    const resUpdate = await appelAPIPost('updateStatutVente', { ven_id, statut: 'Finalisée', mode_paiement: paiement });
-    if (!resUpdate || !resUpdate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la mise à jour.', 'erreur'); return; }
+    const resReset = await appelAPIPost('resetVenteLignes', { ven_id });
+    if (!resReset || !resReset.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la réinitialisation.', 'erreur'); return; }
   } else {
-    const infolettre = document.getElementById('ven-infolettre')?.checked ? '1' : '0';
-  if (venModeReprise) {
-      const resReset = await appelAPIPost('resetVenteLignes', { ven_id });
-      if (!resReset || !resReset.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la réinitialisation.', 'erreur'); return; }
-    } else {
-      const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement, infolettre });
-      if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la création.', 'erreur'); return; }
-    }
-    for (const l of venPanier) {
-      await appelAPIPost('addVenteLigne', { ven_id, pro_id: l.pro_id, lot_id: l.lot_id, quantite: l.quantite, prix_unitaire: l.prix_unitaire, format_poids: l.poids, format_unite: l.unite });
-    }
+    const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: paiement, infolettre });
+    if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la création.', 'erreur'); return; }
   }
+
+  for (const l of venPanier) {
+    await appelAPIPost('addVenteLigne', { ven_id, pro_id: l.pro_id, lot_id: l.lot_id, quantite: l.quantite, prix_unitaire: l.prix_unitaire, format_poids: l.poids, format_unite: l.unite });
+  }
+
   const promoSel  = document.getElementById('ven-promotion').value;
   const promoData = promoSel ? JSON.parse(promoSel) : null;
   const rabais    = venCalculerRabais();
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const total_net = Math.max(0, sousTotal + livraison - rabais);
+
   const resFin = await appelAPIPost('finaliserVente', {
     ven_id,
     livraison,
@@ -614,20 +629,31 @@ async function finaliserVente(modePaiement) {
     total_net,
     statut: modePaiement === 'plus-tard' ? 'a-payer' : 'Finalisé'
   });
+
   if (!resFin || !resFin.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur'); return; }
   cacherChargement();
+
+  // Sauvegarder avant de fermer le formulaire
+  const panierSauvegarde  = [...venPanier];
+  const idSauvegarde      = venIdEnCours;
+  const numeroSauvegarde  = venNumeroAffiche;
+  venClientSauvegarde     = client;
+  venLivraisonSauvegarde  = livraison;
+
   fermerApercuFacture();
-  const panierSauvegarde = [...venPanier];
-  const idSauvegarde     = venIdEnCours;
-  const numeroSauvegarde = venNumeroAffiche;
   fermerFormVente();
+
+  // Restaurer après fermeture
   venPanier        = panierSauvegarde;
   venIdEnCours     = idSauvegarde;
   venNumeroAffiche = numeroSauvegarde;
+
   chargerVentes();
-  document.getElementById('apv-courriel').value     = document.getElementById('ven-courriel').value;
-  document.getElementById('apv-telephone').value    = document.getElementById('ven-telephone').value;
-  document.getElementById('apv-infolettre').checked = document.getElementById('ven-infolettre')?.checked || false;
+
+  // Peupler le modal après-vente
+  document.getElementById('apv-courriel').value     = courriel;
+  document.getElementById('apv-telephone').value    = telephone;
+  document.getElementById('apv-infolettre').checked = infolettre === '1';
   document.getElementById('modal-apres-vente').classList.add('ouvert');
 }
 
@@ -687,41 +713,31 @@ async function voirDetailVente(ven_id) {
     ...l,
     nom: donneesProduits.find(p => p.pro_id === l.pro_id)?.nom || l.pro_id
   }));
- if (v.statut === 'Finalisé') {
-    venModeReprise = true;
-    venIdEnCours = ven_id;
-    venNumeroAffiche = v.numero_affiche || ven_id;
-    venPanier = (v.lignes || []).map(l => ({
-      pro_id: l.pro_id, lot_id: l.lot_id, nom: l.nom,
-      poids: l.format_poids, unite: l.format_unite,
-      quantite: l.quantite, prix_unitaire: l.prix_unitaire
-    }));
-    document.getElementById('ven-livraison').value = v.livraison || 0;
-    document.getElementById('ven-client').value = v.client || '';
-    document.getElementById('ven-courriel').value = v.courriel || '';
-    document.getElementById('ven-telephone').value = v.telephone || '';
-    document.getElementById('apv-courriel').value = v.courriel || '';
-    document.getElementById('apv-telephone').value = v.telephone || '';
-    document.getElementById('apv-infolettre').checked = false;
-    ouvrirApercuFacture();
-  } else {
-    venModeReprise = true;
-	venIdEnCours = ven_id;
-    venNumeroAffiche = v.numero_affiche || ven_id;
-    venPanier = (v.lignes || []).map(l => ({
-      pro_id: l.pro_id, lot_id: l.lot_id, nom: l.nom,
-      poids: l.format_poids, unite: l.format_unite,
-      quantite: l.quantite, prix_unitaire: l.prix_unitaire
-    }));
-    document.getElementById('ven-livraison').value = v.livraison || 0;
-    document.getElementById('ven-client').value = v.client || '';
-    document.getElementById('ven-courriel').value = v.courriel || '';
-    document.getElementById('ven-telephone').value = v.telephone || '';
-   const estFinalisee = v.statut === 'Finalisé';
-    document.getElementById('fv-boutons-paiement').style.display = estFinalisee ? 'none' : '';
-    document.getElementById('fv-boutons-impression').style.display = '';
-   ouvrirApercuFacture();
-  }
+
+  venModeReprise   = true;
+  venIdEnCours     = ven_id;
+  venNumeroAffiche = ven_id.replace('VEN-', '');
+  venPanier = (v.lignes || []).map(l => ({
+    pro_id: l.pro_id, lot_id: l.lot_id, nom: l.nom,
+    poids: l.format_poids, unite: l.format_unite,
+    quantite: l.quantite, prix_unitaire: l.prix_unitaire
+  }));
+  venClientSauvegarde    = v.client || '';
+  venLivraisonSauvegarde = v.livraison || 0;
+
+  document.getElementById('ven-livraison').value = v.livraison || 0;
+  document.getElementById('ven-client').value    = v.client || '';
+  document.getElementById('ven-courriel').value  = v.courriel || '';
+  document.getElementById('ven-telephone').value = v.telephone || '';
+  document.getElementById('apv-courriel').value  = v.courriel || '';
+  document.getElementById('apv-telephone').value = v.telephone || '';
+  document.getElementById('apv-infolettre').checked = false;
+
+  const estFinalisee = v.statut === 'Finalisé';
+  document.getElementById('fv-boutons-paiement').style.display  = estFinalisee ? 'none' : '';
+  document.getElementById('fv-boutons-impression').style.display = '';
+
+  ouvrirApercuFacture();
 }
 
 async function allerVersNouvelleVente() {
