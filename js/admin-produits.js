@@ -983,8 +983,11 @@ function rafraichirListeFormatsRecette() {
   }).join('');
 }
 
+
 function apercuCouleurRecette(input) {
+  let val = input.value.trim();
+  if (/^[0-9a-fA-F]{6}$/.test(val)) { val = '#' + val; input.value = val; }
   const apercu = document.getElementById('fr-couleur-apercu');
-  if (apercu) apercu.style.background = /^#[0-9a-fA-F]{6}$/.test(input.value.trim()) ? input.value.trim() : 'var(--beige)';
-  document.getElementById('fr-couleur').value = input.value;
+  if (apercu) apercu.style.background = /^#[0-9a-fA-F]{6}$/.test(val) ? val : 'var(--beige)';
+  document.getElementById('fr-couleur').value = val;
 }
