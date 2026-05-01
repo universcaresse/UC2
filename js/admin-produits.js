@@ -84,7 +84,7 @@ async function afficherProduits() {
       grilleInner.className = 'recette-cartes-grille';
 
       gamData.produits.forEach(pro => {
-        const couleur = pro.couleur_hex || 'var(--gris)';
+        const couleur = (typeof pro.couleur_hex === 'string' && pro.couleur_hex) ? pro.couleur_hex : '#ffffff';
 		
 		
     const div = document.createElement('div');
