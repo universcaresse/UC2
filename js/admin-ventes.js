@@ -95,6 +95,7 @@ function fermerFormVente() {
   document.getElementById('form-vente').classList.add('cache');
   document.getElementById('filtres-ventes').classList.remove('cache');
   document.getElementById('contenu-ventes').classList.remove('cache');
+  document.querySelector('#section-ventes .page-entete .bouton')?.classList.remove('cache');
   venPanier = [];
   venIdEnCours = null;
 }
