@@ -375,8 +375,10 @@ function ouvrirApercuFacture() {
   document.getElementById('modal-fv-numero').textContent = venNumeroAffiche;
   const btnSquare = document.getElementById('btn-payer-square');
   if (btnSquare) btnSquare.style.display = '';
-  document.getElementById('fv-boutons-paiement').style.display = '';
-  document.getElementById('fv-boutons-impression').style.display = '';
+  if (!venModeReprise) {
+    document.getElementById('fv-boutons-paiement').style.display = '';
+    document.getElementById('fv-boutons-impression').style.display = '';
+  }
   document.getElementById('modal-facture-vente').classList.add('ouvert');
 }
 
@@ -757,12 +759,9 @@ async function voirDetailVente(ven_id) {
   };
 
   const estFinalisee = v.statut === 'Finalisé';
-  if (!venModeReprise) {
-    document.getElementById('fv-boutons-paiement').style.display = '';
-    document.getElementById('fv-boutons-impression').style.display = '';
-  }
-
   ouvrirApercuFacture();
+  document.getElementById('fv-boutons-paiement').style.display = estFinalisee ? 'none' : '';
+  document.getElementById('fv-boutons-impression').style.display = '';
 }
 
 async function allerVersNouvelleVente() {
