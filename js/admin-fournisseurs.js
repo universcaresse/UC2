@@ -25,17 +25,13 @@ async function afficherFournisseurs() {
     .sort((a, b) => (a.nom || '').localeCompare(b.nom || '', 'fr'))
     .forEach(f => {
       const tr = document.createElement('tr');
+      tr.classList.add('ligne-cliquable');
+      tr.onclick = () => ouvrirModalFournisseur(f.four_id);
       tr.innerHTML = `
         <td>${f.code || ''}</td>
         <td>${f.nom || ''}</td>
-        <td>${f.site_web ? `<a href="${f.site_web}" target="_blank">${f.site_web}</a>` : ''}</td>
-        <td>${f.notes || ''}</td>
-        <td>
-          <div style="display:flex;gap:4px;justify-content:center">
-            <button class="bouton bouton-petit bouton-secondaire" onclick="ouvrirModalFournisseur('${f.four_id}')">✏️</button>
-            <button class="bouton bouton-petit bouton-rouge" onclick="supprimerFournisseur('${f.four_id}')">✕</button>
-          </div>
-        </td>`;
+        <td>${f.site_web ? `<a href="${f.site_web}" target="_blank" onclick="event.stopPropagation()">${f.site_web}</a>` : ''}</td>
+        <td>${f.notes || ''}</td>`;
       tbody.appendChild(tr);
     });
 }
@@ -49,6 +45,8 @@ function ouvrirModalFournisseur(four_id) {
   document.getElementById('modal-four-site').value     = f.site_web || '';
   document.getElementById('modal-four-notes').value    = f.notes   || '';
   document.getElementById('modal-four-titre').textContent = f.four_id ? 'Modifier le fournisseur' : 'Nouveau fournisseur';
+  const btnSupp = document.getElementById('btn-four-supprimer');
+  if (btnSupp) { f.four_id ? btnSupp.classList.remove('cache') : btnSupp.classList.add('cache'); }
   document.getElementById('modal-fournisseur').classList.add('ouvert');
   document.getElementById('modal-four-nom').focus();
 }
@@ -60,6 +58,8 @@ function ouvrirModalNouveauFournisseur() {
   document.getElementById('modal-four-site').value  = '';
   document.getElementById('modal-four-notes').value = '';
   document.getElementById('modal-four-titre').textContent = 'Nouveau fournisseur';
+  const btnSupp = document.getElementById('btn-four-supprimer');
+  if (btnSupp) btnSupp.classList.add('cache');
   document.getElementById('modal-fournisseur').classList.add('ouvert');
   document.getElementById('modal-four-nom').focus();
 }
@@ -115,6 +115,14 @@ async function sauvegarderFournisseur() {
   fermerModalFournisseur();
   afficherMsg('fournisseurs', `✅ Fournisseur "${nom}" sauvegardé.`);
   await afficherFournisseurs();
+}
+
+// ─── SUPPRIMER DEPUIS MODAL ───
+function supprimerFournisseurDepuisModal() {
+  const four_id = document.getElementById('modal-four-id')?.value?.trim();
+  if (!four_id) return;
+  fermerModalFournisseur();
+  supprimerFournisseur(four_id);
 }
 
 // ─── SUPPRIMER ───

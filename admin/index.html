@@ -1323,7 +1323,7 @@
           <th>Nom</th>
           <th>Site web</th>
           <th>Notes</th>
-          <th></th>
+         
         </tr>
       </thead>
       <tbody id="fournisseurs-tbody"></tbody>
@@ -1359,8 +1359,9 @@
     </div>
     <div class="modal-admin-body">
       <div class="form-actions">
-        <button class="bouton bouton-secondaire" onclick="fermerModalFournisseur()">Annuler</button>
-        <button class="bouton" id="btn-four-sauvegarder" onclick="sauvegarderFournisseur()">Sauvegarder</button>
+        <button class="bouton bouton-rouge cache" id="btn-four-supprimer" onclick="supprimerFournisseurDepuisModal()">Supprimer</button>
+        <button class="bouton bouton-contour" onclick="fermerModalFournisseur()">Annuler</button>
+        <button class="bouton" id="btn-four-sauvegarder" onclick="sauvegarderFournisseur()">Enregistrer</button>
       </div>
     </div>
   </div>
