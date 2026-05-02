@@ -42,6 +42,7 @@
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">achats <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
 		<button class="nav-dropdown-item" onclick="afficherSection('entrer-facture', null)">achats</button>
+<button class="nav-dropdown-item" onclick="afficherSection('fournisseurs', null)">fournisseurs</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('factures', null)">les factures</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('inventaire', null)">stock</button>
         </div>
@@ -124,6 +125,7 @@
 		<div class="sidebar-groupe">
         <div class="sidebar-titre">achats</div>
          <button class="sidebar-lien" onclick="afficherSection('entrer-facture', this)">achat</button>
+<button class="sidebar-lien" onclick="afficherSection('fournisseurs', this)">fournisseurs</button>
          <button class="sidebar-lien" onclick="afficherSection('factures', this)">les factures</button>
         <button class="sidebar-lien" onclick="afficherSection('inventaire', this)">stock</button>
 		</div>
@@ -1303,7 +1305,68 @@
   </div>
 </div>
 
-      <!-- ════════════════════════════════════════
+  <!-- FOURNISSEURS -->
+<div class="section-admin" id="section-fournisseurs">
+  <div class="page-entete fade-in">
+    <div>
+      <div class="page-entete-eyebrow">Gérer les fournisseurs</div>
+      <div class="page-entete-titre">Fournisseurs</div>
+    </div>
+    <button class="bouton" onclick="ouvrirModalNouveauFournisseur()">+ Nouveau fournisseur</button>
+  </div>
+  <div class="msg-zone" id="msg-fournisseurs"></div>
+  <div class="tableau-wrap">
+    <table class="tableau-admin" id="tableau-fournisseurs">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Nom</th>
+          <th>Site web</th>
+          <th>Notes</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="fournisseurs-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL FOURNISSEUR -->
+<div class="modal-admin-overlay" id="modal-fournisseur">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre" id="modal-four-titre">Nouveau fournisseur</div>
+      <button class="btn-fermer-panneau" onclick="fermerModalFournisseur()">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <input type="hidden" id="modal-four-id">
+      <div class="form-groupe">
+        <label class="form-label">Nom *</label>
+        <input type="text" class="form-ctrl" id="modal-four-nom" oninput="fourAutoCode()" placeholder="Ex: Plantex">
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Code</label>
+        <input type="text" class="form-ctrl" id="modal-four-code" oninput="fourCodeManuel()" placeholder="Ex: PLAN" maxlength="10">
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Site web</label>
+        <input type="text" class="form-ctrl" id="modal-four-site" placeholder="https://...">
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Notes</label>
+        <textarea class="form-ctrl" id="modal-four-notes" rows="3"></textarea>
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-secondaire" onclick="fermerModalFournisseur()">Annuler</button>
+        <button class="bouton" id="btn-four-sauvegarder" onclick="sauvegarderFournisseur()">Sauvegarder</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
      LES FACTURES — Liste et détail
  -->
       <div class="section-admin" id="section-factures">
@@ -3216,6 +3279,7 @@
 <script src="../js/admin-contenu-site.js"></script>
 <script src="../js/admin-redaction.js"></script>
 <script src="../js/admin-achats.js"></script>
+<script src="../js/admin-fournisseurs.js"></script>
 <script src="../js/catalogue-builder.js"></script>
 
 <!-- MODALE FICHE PRODUIT -->

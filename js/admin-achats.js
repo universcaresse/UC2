@@ -278,9 +278,10 @@ async function efCreerFacture() {
   if (four_id === '__nouveau__') {
     const champNouv = document.getElementById('ef-fournisseur-nouveau')?.value?.trim();
     if (!champNouv) { afficherMsg('ef', 'Entrez le nom du nouveau fournisseur.', 'erreur'); return; }
-    four_id  = champNouv;
-    fourNom  = champNouv;
-    fourCode = '';
+   fourNom  = champNouv;
+	const saved = await efSauvegarderNouveauFournisseur(champNouv);
+	four_id  = saved.four_id;
+	fourCode = saved.code;
   }
 
   if (!four_id || !date || !numero) {
