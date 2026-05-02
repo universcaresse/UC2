@@ -636,8 +636,8 @@ async function finaliserVente(modePaiement) {
     promo_id: promoData?.promo_id || '',
     rabais,
     total_net,
-    mode_paiement: paiement,
-  const estFinalisee = v.statut === 'Finalisé' || v.statut === 'Finalisée';
+   mode_paiement: paiement,
+    statut: modePaiement === 'plus-tard' ? 'a-payer' : 'Finalisé'
   });
 
   if (!resFin || !resFin.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur'); return; }
@@ -758,7 +758,7 @@ async function voirDetailVente(ven_id) {
     }
   };
 
-  const estFinalisee = v.statut === 'Finalisé';
+  const estFinalisee = v.statut === 'Finalisé' || v.statut === 'Finalisée';
   ouvrirApercuFacture();
   document.getElementById('fv-boutons-paiement').style.display = estFinalisee ? 'none' : '';
   document.getElementById('fv-boutons-impression').style.display = '';
