@@ -34,7 +34,7 @@
 			<button class="nav-dropdown-item" onclick="afficherSection('gammes', null)">gammes</button>
 			<button class="nav-dropdown-item" onclick="afficherSection('familles', null)">familles</button>
 			<button class="nav-dropdown-item" onclick=	"afficherSection('produits', null)">produits</button>
-			<button class="nav-dropdown-item" onclick="afficherSection('regroupements', null)">regroupements</button>
+			<button class="nav-dropdown-item" onclick="afficherSection('regroupements', null)">univers</button>
 		</div>
       </li>
 	  
@@ -119,7 +119,7 @@
 		<button class="sidebar-lien" onclick="afficherSection('gammes', this)">gammes</button>
 		<button class="sidebar-lien" onclick="afficherSection('familles', this)">familles</button>
 		<button class="sidebar-lien" onclick="afficherSection('produits', this)">produits</button>
-		<button class="sidebar-lien" onclick="afficherSection('regroupements', this)">regroupements</button>
+		<button class="sidebar-lien" onclick="afficherSection('regroupements', this)">univers</button>
       </div>
      
 		<div class="sidebar-sep"></div>
@@ -560,9 +560,9 @@
   <div class="page-entete fade-in">
     <div>
       <div class="page-entete-eyebrow">Regrouper les produits par ingrédient vedette</div>
-      <div class="page-entete-titre">Regroupements</div>
+      <div class="page-entete-titre">Nos univers</div>
     </div>
-    <button class="bouton" id="btn-nouveau-regroupement" onclick="ouvrirFormRegroupement()">+ Nouveau regroupement</button>
+    <button class="bouton" id="btn-nouveau-regroupement" onclick="ouvrirFormRegroupement()">+ Nouvel univers</button>
   </div>
   <div class="msg-zone" id="msg-regroupements"></div>
 
@@ -589,8 +589,8 @@
     </div>
     <div class="form-panel form-body-actions visible">
       <div class="form-actions">
-        <button class="bouton" id="fiche-regroupement-modifier">Modifier ce regroupement</button>
-        <button class="bouton bouton-rouge" id="btn-supprimer-regroupement">Supprimer ce regroupement</button>
+        <button class="bouton" id="fiche-regroupement-modifier">Modifier cet univers</button>
+        <button class="bouton bouton-rouge" id="btn-supprimer-regroupement">Supprimer cet univers</button>
       </div>
     </div>
   </div>
@@ -600,7 +600,7 @@
     <div class="form-panel">
       <div class="form-panel-header">
         <div class="fiche-bandeau" id="form-regroupements-bandeau">
-          <span class="form-panel-titre" id="form-regroupements-titre">Nouveau regroupement</span>
+          <span class="form-panel-titre" id="form-regroupements-titre">Nouvel univers</span>
         </div>
         <button class="btn-fermer-panneau" onclick="fermerFormRegroupement()" title="Fermer">✕</button>
       </div>
@@ -674,8 +674,8 @@
   </div>
   <div id="contenu-regroupements"></div>
   <div class="vide cache" id="vide-regroupements">
-    <div class="vide-titre">Aucun regroupement</div>
-    <div class="vide-desc">Créez votre premier regroupement</div>
+    <div class="vide-titre">Aucun univers</div>
+    <div class="vide-desc">Créez votre premier univers</div>
   </div>
 </div>
 
