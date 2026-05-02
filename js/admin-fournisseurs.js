@@ -115,6 +115,12 @@ async function sauvegarderFournisseur() {
   fermerModalFournisseur();
   afficherMsg('fournisseurs', `✅ Fournisseur "${nom}" sauvegardé.`);
   await afficherFournisseurs();
+  if (typeof efPopulerFournisseurs === 'function') {
+    ef.fournisseurs = fournisseursDonnees;
+    efPopulerFournisseurs();
+    const sel = document.getElementById('ef-fournisseur');
+    if (sel) sel.value = payload.four_id;
+  }
 }
 
 // ─── SUPPRIMER DEPUIS MODAL ───
