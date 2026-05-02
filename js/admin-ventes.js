@@ -441,10 +441,9 @@ async function imprimerFacture() {
     .page { width:21.59cm; min-height:27.94cm; margin:0 auto; padding:48px 40px; }
     @page { size:letter; margin:0; }
     .entete { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:40px; padding-bottom:24px; border-bottom:2px solid #5a8a3a; }
-   .entete { flex-direction:column; align-items:flex-start; border-bottom:none; padding-bottom:0; margin-bottom:0; }
-    .facture-ref { text-align:left; display:flex; justify-content:space-between; width:100%; padding-top:12px; margin-top:12px; border-top:2px solid #5a8a3a; }
+   .facture-ref { text-align:right; align-self:flex-end; }
     .facture-numero { font-family:'Playfair Display',serif; font-size:0.95rem; color:#5a8a3a; }
-    .facture-date { font-size:0.78rem; color:#8b8680; }
+    .facture-date { font-size:0.78rem; color:#8b8680; margin-top:4px; }
     .client-bloc { margin-bottom:32px; padding:16px 20px; background:#f9f7f4; border-left:3px solid #d4a445; }
     .client-label { font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:#8b8680; font-weight:500; margin-bottom:8px; }
     .client-nom { font-family:'Playfair Display',serif; font-size:1rem; color:#3d3b39; }
