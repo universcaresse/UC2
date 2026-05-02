@@ -368,7 +368,7 @@ function efRendreLigneSaisie() {
   let col1Html = '';
 
   if (aScraping) {
-    // Fournisseur avec scraping — Cat Fournisseur + Nom Fournisseur + Cat UC + Nom UC
+    // Fournisseur avec scraping — Cat Fournisseur + Nom Fournisseur + Cat UC + Nom UC (cachés, auto-remplis)
     const catsFournActives = ef.catsFourn.filter(c =>
       ef.prodsFourn.some(p => p.cat_fourn_id === c.cat_fourn_id && p.four_id === four_id)
     ).sort((a,b) => a.nom.localeCompare(b.nom,'fr'));
@@ -392,9 +392,11 @@ function efRendreLigneSaisie() {
       </select>
       <select class="form-ctrl cache" id="ef-saisie-nom-uc" onchange="efOnChangeSaisieNomUC()" style="margin-top:4px">
         <option value="">— Nom UC —</option>
-      </select>`;
+      </select>
+      <input type="text" class="form-ctrl cache" id="ef-saisie-nom-uc-nouveau" placeholder="Nouveau nom UC" autocomplete="off">`;
   } else {
     // Fournisseur sans scraping — Cat UC + Nom UC directement
+    // Cat fournisseur et nom fournisseur sont cachés (champs hidden)
     col1Html = `
       <input type="hidden" id="ef-saisie-cat-fourn" value="">
       <input type="hidden" id="ef-saisie-nom-fourn" value="">
@@ -404,7 +406,8 @@ function efRendreLigneSaisie() {
       </select>
       <select class="form-ctrl" id="ef-saisie-nom-uc" onchange="efOnChangeSaisieNomUC()" style="margin-top:4px">
         <option value="">— Nom —</option>
-      </select>`;
+      </select>
+      <input type="text" class="form-ctrl cache" id="ef-saisie-nom-uc-nouveau" placeholder="Nouveau nom UC" autocomplete="off">`;
   }
 
   const tr = document.createElement('tr');
@@ -430,6 +433,8 @@ function efRendreLigneSaisie() {
     </td>`;
   tbody.appendChild(tr);
 }
+
+
 // ─── CASCADES ───
 function efOnChangeSaisieCatFourn() {
   const sel = document.getElementById('ef-saisie-cat-fourn');
