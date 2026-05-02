@@ -296,7 +296,7 @@ function fermerModalConfirm() {
 var squareAppId = '';
 
 var listesDropdown = { types: [], fullData: [], config: {}, fournisseurs: [], formats: [] };
-const CATS_SANS_INCI = ['CAT-1776369774938', 'CAT-1776641557249', 'CAT-014'];
+const CATS_SANS_INCI = ['CAT-014', 'CAT-015', 'CAT-016', 'CAT-017'];
 
 function afficherChargement() {
   document.getElementById('overlay-chargement')?.classList.remove('cache');
