@@ -356,34 +356,61 @@ function efRendreLigneSaisie() {
   const ancienne = document.getElementById('ef-ligne-saisie');
   if (ancienne) ancienne.remove();
 
-  // Catégories fournisseur — filtrées par four_id actif
-  const four_id = ef.factureActive ? (ef.fournisseurs.find(f => f.nom === ef.factureActive.fournisseur)?.four_id || '') : '';
-  const catsFournActives = ef.catsFourn.filter(c =>
-    ef.prodsFourn.some(p => p.cat_fourn_id === c.cat_fourn_id && p.four_id === four_id)
-  ).sort((a,b) => a.nom.localeCompare(b.nom,'fr'));
-
-  const optsCatFourn = catsFournActives.map(c =>
-    `<option value="${c.cat_fourn_id}">${c.nom}</option>`
-  ).join('');
+  const fourCode  = ef.factureActive?.four_code || '';
+  const aScraping = EF_SCRAPING_CODES.includes(fourCode);
+  const four_id   = ef.factureActive ? (ef.fournisseurs.find(f => f.nom === ef.factureActive.fournisseur)?.four_id || '') : '';
 
   const optsCatUC = Object.keys(listesDropdown.categoriesMap || {})
     .sort((a,b) => (listesDropdown.categoriesMap[a]||'').localeCompare(listesDropdown.categoriesMap[b]||'','fr'))
     .map(k => `<option value="${k}">${listesDropdown.categoriesMap[k]}</option>`).join('') +
     '<option value="__nouvelle_cat__">+ Nouvelle catégorie UC…</option>';
 
-  const tr = document.createElement('tr');
-  tr.id = 'ef-ligne-saisie';
-  tr.innerHTML = `
-    <td>
+  let col1Html = '';
+
+  if (aScraping) {
+    // Fournisseur avec scraping — Cat Fournisseur + Nom Fournisseur + Cat UC + Nom UC
+    const catsFournActives = ef.catsFourn.filter(c =>
+      ef.prodsFourn.some(p => p.cat_fourn_id === c.cat_fourn_id && p.four_id === four_id)
+    ).sort((a,b) => a.nom.localeCompare(b.nom,'fr'));
+
+    const optsCatFourn = catsFournActives.map(c =>
+      `<option value="${c.cat_fourn_id}">${c.nom}</option>`
+    ).join('');
+
+    col1Html = `
       <select class="form-ctrl" id="ef-saisie-cat-fourn" onchange="efOnChangeSaisieCatFourn()">
-        <option value="">— Catégorie —</option>
+        <option value="">— Catégorie fourn. —</option>
         ${optsCatFourn}
         <option value="__nouveau__">+ Nouvelle catégorie…</option>
       </select>
       <select class="form-ctrl" id="ef-saisie-nom-fourn" onchange="efOnChangeSaisieNomFourn()" style="margin-top:4px">
-        <option value="">— Nom —</option>
+        <option value="">— Nom fourn. —</option>
       </select>
-    </td>
+      <select class="form-ctrl cache" id="ef-saisie-cat-uc" onchange="efOnChangeSaisieCatUC()" style="margin-top:4px">
+        <option value="">— Cat. UC —</option>
+        ${optsCatUC}
+      </select>
+      <select class="form-ctrl cache" id="ef-saisie-nom-uc" onchange="efOnChangeSaisieNomUC()" style="margin-top:4px">
+        <option value="">— Nom UC —</option>
+      </select>`;
+  } else {
+    // Fournisseur sans scraping — Cat UC + Nom UC directement
+    col1Html = `
+      <input type="hidden" id="ef-saisie-cat-fourn" value="">
+      <input type="hidden" id="ef-saisie-nom-fourn" value="">
+      <select class="form-ctrl" id="ef-saisie-cat-uc" onchange="efOnChangeSaisieCatUC()">
+        <option value="">— Catégorie —</option>
+        ${optsCatUC}
+      </select>
+      <select class="form-ctrl" id="ef-saisie-nom-uc" onchange="efOnChangeSaisieNomUC()" style="margin-top:4px">
+        <option value="">— Nom —</option>
+      </select>`;
+  }
+
+  const tr = document.createElement('tr');
+  tr.id = 'ef-ligne-saisie';
+  tr.innerHTML = `
+    <td>${col1Html}</td>
     <td>
       <select class="form-ctrl" id="ef-saisie-format" onchange="efOnChangeSaisieFormat()">
         <option value="">— Format —</option>
@@ -398,22 +425,11 @@ function efRendreLigneSaisie() {
     </td>
     <td id="ef-saisie-total">—</td>
     <td>
-      <select class="form-ctrl" id="ef-saisie-cat-uc" onchange="efOnChangeSaisieCatUC()">
-        <option value="">— Cat. UC —</option>
-        ${optsCatUC}
-      </select>
-      <select class="form-ctrl" id="ef-saisie-nom-uc" onchange="efOnChangeSaisieNomUC()" style="margin-top:4px">
-        <option value="">— Nom UC —</option>
-      </select>
-      <input type="text" class="form-ctrl cache" id="ef-saisie-nom-uc-nouveau" placeholder="Nouveau nom UC" autocomplete="off">
-    </td>
-    <td>
       <button class="bouton bouton-petit" id="ef-btn-ajouter" onclick="efAjouterLigne()" title="Ajouter">+</button>
       <button class="bouton bouton-petit bouton-secondaire cache" id="ef-btn-annuler-edit" onclick="efAnnulerEdit()" title="Annuler">✕</button>
     </td>`;
   tbody.appendChild(tr);
 }
-
 // ─── CASCADES ───
 function efOnChangeSaisieCatFourn() {
   const sel = document.getElementById('ef-saisie-cat-fourn');
@@ -555,6 +571,12 @@ function efOnChangeSaisieNomUC() {
 
   champ.classList.add('cache');
   ef._saisieIngId = sel.value || null;
+  const fourCode = ef.factureActive?.four_code || '';
+  if (!EF_SCRAPING_CODES.includes(fourCode)) {
+    ef._saisieProdFournId = sel.value || null;
+    ef._saisieCatFournId  = document.getElementById('ef-saisie-cat-uc')?.value || null;
+    efPopulerFormats(sel.value);
+  }
 }
 
 function efMajLigneTotal() {
@@ -571,11 +593,17 @@ async function efAjouterLigne() {
   const btn = document.getElementById('ef-btn-ajouter');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
 
-  const selCatF    = document.getElementById('ef-saisie-cat-fourn');
-  const cat_fourn_id = selCatF?.value === '__nouveau__' ? '' : selCatF?.value || '';
+  const fourCode  = ef.factureActive?.four_code || '';
+  const aScraping = EF_SCRAPING_CODES.includes(fourCode);
 
-  const selNomF    = document.getElementById('ef-saisie-nom-fourn');
-  const prod_fourn_id = selNomF?.value === '__nouveau__' ? '' : selNomF?.value || '';
+  const selCatF      = document.getElementById('ef-saisie-cat-fourn');
+  const selNomF      = document.getElementById('ef-saisie-nom-fourn');
+  const cat_fourn_id = aScraping
+    ? (selCatF?.value === '__nouveau__' ? '' : selCatF?.value || '')
+    : (ef._saisieCatFournId || '');
+  const prod_fourn_id = aScraping
+    ? (selNomF?.value === '__nouveau__' ? '' : selNomF?.value || '')
+    : (ef._saisieProdFournId || '');
 
   const selFmt = document.getElementById('ef-saisie-format');
   let formatQte = '', formatUnite = 'g', contenant = '';
