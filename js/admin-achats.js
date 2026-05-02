@@ -292,7 +292,12 @@ async function efCreerFacture() {
   const btn = document.getElementById('ef-btn-creer');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
 
-  const ach_id = 'ACH-' + Date.now();
+  const resAch = await appelAPI('getAchatsEntete');
+  const dernierNum = (resAch?.items || []).reduce((max, a) => {
+    const num = parseInt((a.ach_id || '').replace('ACH-', '')) || 0;
+    return num > max ? num : max;
+  }, 0);
+  const ach_id = 'ACH-' + String(dernierNum + 1).padStart(4, '0');
   const res = await appelAPIPost('createAchatEntete', { ach_id, date, four_id, numero_facture: numero });
 
   if (btn) { btn.disabled = false; btn.innerHTML = 'Créer'; }
