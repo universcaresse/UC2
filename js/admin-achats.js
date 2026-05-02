@@ -257,10 +257,12 @@ function efPopulerFournisseurs() {
 }
 
 function efOnChangeFournisseur() {
-  const sel   = document.getElementById('ef-fournisseur');
-  const champ = document.getElementById('ef-fournisseur-nouveau');
-  if (!sel || !champ) return;
-  champ.classList.toggle('cache', sel.value !== '__nouveau__');
+  const sel = document.getElementById('ef-fournisseur');
+  if (!sel) return;
+  if (sel.value === '__nouveau__') {
+    sel.value = '';
+    ouvrirModalNouveauFournisseur();
+  }
 }
 
 // ─── CRÉER LA FACTURE ───
