@@ -741,6 +741,21 @@ async function voirDetailVente(ven_id) {
   document.getElementById('apv-telephone').value = v.telephone || '';
   document.getElementById('apv-infolettre').checked = false;
 
+  // Restaurer la promotion
+  if (v.promo_id) {
+    venRafraichirPanier();
+    const selPromo = document.getElementById('ven-promotion');
+    if (selPromo) {
+      const opts = [...selPromo.options];
+      const match = opts.find(o => {
+        if (!o.value) return false;
+        try { return JSON.parse(o.value).promo_id === v.promo_id; } catch(e) { return false; }
+      });
+      if (match) selPromo.value = match.value;
+      venAppliquerPromotion();
+    }
+  };
+
   const estFinalisee = v.statut === 'Finalisé';
   if (!venModeReprise) {
     document.getElementById('fv-boutons-paiement').style.display = '';
