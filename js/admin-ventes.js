@@ -360,7 +360,7 @@ function ouvrirApercuFacture() {
   });
   html += `</tbody></table>
     <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;font-size:0.85rem;padding-left:30%">
-      <div style="display:flex;justify-content:space-between;width:220px"><span style="color:var(--gris)">Sous-total</span><span>${formaterPrix(sousTotal)}</span></div>`;
+      <div style="display:flex;justify-content:space-between;width:280px"><span style="color:var(--gris)">Sous-total</span><span>${formaterPrix(sousTotal)}</span></div>`;
   if (rabais > 0 && promo) {
     html += `<div style="display:flex;justify-content:space-between;width:220px;color:var(--primary)"><span>Rabais — ${promo.nom}</span><span>-${formaterPrix(rabais)}</span></div>`;
   }
@@ -637,7 +637,7 @@ async function finaliserVente(modePaiement) {
     rabais,
     total_net,
     mode_paiement: paiement,
-    statut: modePaiement === 'plus-tard' ? 'a-payer' : 'Finalisé'
+  const estFinalisee = v.statut === 'Finalisé' || v.statut === 'Finalisée';
   });
 
   if (!resFin || !resFin.success) { cacherChargement(); afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur'); return; }
