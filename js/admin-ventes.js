@@ -362,12 +362,12 @@ function ouvrirApercuFacture() {
     <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;font-size:0.85rem;padding-left:30%">
       <div style="display:flex;justify-content:space-between;width:280px"><span style="color:var(--gris)">Sous-total</span><span>${formaterPrix(sousTotal)}</span></div>`;
   if (rabais > 0 && promo) {
-    html += `<div style="display:flex;justify-content:space-between;width:220px;color:var(--primary)"><span>Rabais — ${promo.nom}</span><span>-${formaterPrix(rabais)}</span></div>`;
+    html += `<div style="display:flex;justify-content:space-between;width:280px;color:var(--primary)"><span>Rabais — ${promo.nom}</span><span>-${formaterPrix(rabais)}</span></div>`;
   }
   if (livraison > 0) {
-    html += `<div style="display:flex;justify-content:space-between;width:220px"><span style="color:var(--gris)">Livraison</span><span>${formaterPrix(livraison)}</span></div>`;
+    html += `<div style="display:flex;justify-content:space-between;width:280px"><span style="color:var(--gris)">Livraison</span><span>${formaterPrix(livraison)}</span></div>`;
   }
-  html += `<div style="display:flex;justify-content:space-between;width:220px;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--primary);border-top:1px solid var(--beige);padding-top:8px;margin-top:4px"><span>Total</span><span>${formaterPrix(total)}</span></div>
+  html += `<div style="display:flex;justify-content:space-between;width:280px;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--primary);border-top:1px solid var(--beige);padding-top:8px;margin-top:4px"><span>Total</span><span>${formaterPrix(total)}</span></div>
     </div>
     <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--beige);font-family:'Playfair Display',serif;font-style:italic;color:var(--gris);font-size:0.9rem">Merci pour votre achat !</div>
   </div>`;
