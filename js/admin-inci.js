@@ -123,7 +123,7 @@ function inciRendreLigne(l, cat, uid) {
   return `
     <tr class="ligne-cliquable" onclick="inciToggleDetail('${id}')">
       <td>${l.nom_UC || l.ing_id}</td>
-      <td>${l.nom_fournisseur || ''}</td>
+     <td>${l.source || ''}</td>
       <td>${l.inci || ''}</td>
       <td><span>${statutLabel}</span></td>
     </tr>
@@ -166,7 +166,7 @@ async function inciToggleDetail(id) {
   const zoneScraping = document.getElementById(`${id}-scraping`);
   if (!zoneScraping || zoneScraping.dataset.charge === 'true') return;
   zoneScraping.textContent = 'Recherche en cours…';
-  const res = await appelAPI('rechercherScraping', { source: ing.source, nom_UC: ing.nom_fournisseur || ing.nom_UC });
+  const res = await appelAPI('rechercherScraping', { source: ing.source, nom_UC: ing.nom_UC });
   if (!res || !res.success || !res.found) { zoneScraping.textContent = 'Aucune donnée de scraping trouvée.'; return; }
   zoneScraping.dataset.charge = 'true';
   if (res.inci && !document.getElementById(`${id}-inci`).value) document.getElementById(`${id}-inci`).value = res.inci;
@@ -286,17 +286,7 @@ async function modalInciGo() {
   if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
   listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: inci || '' });
   const item = ifItems[idx];
-  if (fournisseur && item) {
-    await appelAPIPost('saveMappingFournisseur', {
-      fournisseur,
-      categorie_fournisseur: listesDropdown.categoriesMap?.[cat] || cat,
-      nom_fournisseur:       item.description,
-      categorie_UC:          listesDropdown.categoriesMap?.[cat] || cat,
-      nom_UC:                nom,
-      ing_id
-    });
-    ifMapping.push({ fournisseur, categorie_fournisseur: listesDropdown.categoriesMap?.[cat] || cat, nom_fournisseur: item.description, categorie_UC: listesDropdown.categoriesMap?.[cat] || cat, nom_UC: nom, ing_id });
-  }
+  // import désactivé
   const select = document.getElementById(`if-nomuc-${idx}`);
   if (select) {
     const opt = document.createElement('option');
