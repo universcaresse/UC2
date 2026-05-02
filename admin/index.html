@@ -41,8 +41,9 @@
       <li class="nav-admin-item">
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">achats <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
+		
+		<button class="nav-dropdown-item" onclick="afficherSection('fournisseurs', null)">fournisseurs</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('entrer-facture', null)">achats</button>
-<button class="nav-dropdown-item" onclick="afficherSection('fournisseurs', null)">fournisseurs</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('factures', null)">les factures</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('inventaire', null)">stock</button>
         </div>
@@ -124,9 +125,9 @@
 		<div class="sidebar-sep"></div>
 		<div class="sidebar-groupe">
         <div class="sidebar-titre">achats</div>
-         <button class="sidebar-lien" onclick="afficherSection('entrer-facture', this)">achat</button>
-<button class="sidebar-lien" onclick="afficherSection('fournisseurs', this)">fournisseurs</button>
-         <button class="sidebar-lien" onclick="afficherSection('factures', this)">les factures</button>
+         <button class="sidebar-lien" onclick="afficherSection('fournisseurs', this)">fournisseurs</button>
+		 <button class="sidebar-lien" onclick="afficherSection('entrer-facture', this)">achats</button>
+		 <button class="sidebar-lien" onclick="afficherSection('factures', this)">les factures</button>
         <button class="sidebar-lien" onclick="afficherSection('inventaire', this)">stock</button>
 		</div>
 	  	  
