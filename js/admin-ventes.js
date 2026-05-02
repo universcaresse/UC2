@@ -504,6 +504,7 @@ async function imprimerFacture() {
 </body></html>`);
   fenetre.document.close();
   fenetre.focus();
+  cacherChargement();
   setTimeout(() => fenetre.print(), 800);
 }
 
@@ -598,9 +599,8 @@ async function envoyerFactureTexto() {
   texte += `universcaresse.ca\n`;
    texte += `universcaresse@gmail.com\n`;
 
-  
-  
-  window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
+   cacherChargement();
+    window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
 }
 
 async function finaliserVente(modePaiement) {
