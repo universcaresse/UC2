@@ -440,7 +440,8 @@ async function imprimerFacture() {
     body { font-family:'DM Sans',sans-serif; font-weight:300; background:#fff; color:#3d3b39; }
     .page { width:21.59cm; min-height:27.94cm; margin:0 auto; padding:48px 40px; }
     @page { size:letter; margin:0; }
-    .entete { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:40px; padding-bottom:24px; border-bottom:2px solid #5a8a3a; }
+    .entete { display:flex; flex-direction:column; align-items:center; margin-bottom:40px; padding-bottom:24px; border-bottom:2px solid #5a8a3a; }
+    .entete-bas { display:flex; justify-content:space-between; width:100%; margin-top:16px; }
    .facture-ref { text-align:right; align-self:flex-end; }
     .facture-numero { font-family:'Playfair Display',serif; font-size:0.95rem; color:#5a8a3a; }
     .facture-date { font-size:0.78rem; color:#8b8680; margin-top:4px; }
@@ -465,12 +466,13 @@ async function imprimerFacture() {
 <body>
 <div class="page">
   <div class="entete">
-    <div style="text-align:center;width:100%">
-      <img src="../Images/Logofinal.png" alt="Univers Caresse" style="width:200px;">
-    </div>
-    <div class="facture-ref">
-      <div class="facture-numero">Facture : ${numero}</div>
+    <img src="../Images/Logofinal.png" alt="Univers Caresse" style="width:200px;">
+    <div class="entete-bas">
       <div class="facture-date">${date}</div>
+      <div class="facture-ref">
+        <div class="facture-label">Facture</div>
+        <div class="facture-numero">${numero}</div>
+      </div>
     </div>
   </div>
   ${client || courriel || telephone ? `
