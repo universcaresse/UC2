@@ -605,10 +605,10 @@ async function efAjouterLigne() {
   const selNomF      = document.getElementById('ef-saisie-nom-fourn');
   const cat_fourn_id = aScraping
     ? (selCatF?.value === '__nouveau__' ? '' : selCatF?.value || '')
-    : (ef._saisieCatFournId || '');
+    : (document.getElementById('ef-saisie-cat-uc')?.value || '');
   const prod_fourn_id = aScraping
     ? (selNomF?.value === '__nouveau__' ? '' : selNomF?.value || '')
-    : (ef._saisieProdFournId || '');
+    : (document.getElementById('ef-saisie-nom-uc')?.value || '');
 
   const selFmt = document.getElementById('ef-saisie-format');
   let formatQte = '', formatUnite = 'g', contenant = '';
