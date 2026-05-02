@@ -359,7 +359,7 @@ function ouvrirApercuFacture() {
     </tr>`;
   });
   html += `</tbody></table>
-  `<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;font-size:0.85rem;padding-left:30%">`
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;font-size:0.85rem;padding-left:30%">`
       <div style="display:flex;justify-content:space-between;width:220px"><span style="color:var(--gris)">Sous-total</span><span>${formaterPrix(sousTotal)}</span></div>`;
   if (rabais > 0 && promo) {
     html += `<div style="display:flex;justify-content:space-between;width:220px;color:var(--primary)"><span>Rabais — ${promo.nom}</span><span>-${formaterPrix(rabais)}</span></div>`;
