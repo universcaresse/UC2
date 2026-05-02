@@ -93,7 +93,7 @@ async function sauvegarderFournisseur() {
   if (!nom) { document.getElementById('modal-four-nom').focus(); return; }
 
   const payload = {
-    four_id:  four_id || ('FOUR-' + Date.now()),
+    four_id:  four_id || ('FOUR-' + String(fournisseursDonnees.reduce((acc, f) => { const n = parseInt(f.four_id?.replace('FOUR-', '')) || 0; return n > acc ? n : acc; }, 0) + 1).padStart(3, '0')),
     nom,
     code,
     site_web,
@@ -148,7 +148,8 @@ async function supprimerFournisseur(four_id) {
 // ─── CRÉER DEPUIS FACTURE ───
 // Appelé par efCreerFacture() quand four_id === '__nouveau__'
 async function efSauvegarderNouveauFournisseur(nom) {
-  const four_id = 'FOUR-' + Date.now();
+  const max = fournisseursDonnees.reduce((acc, f) => { const n = parseInt(f.four_id?.replace('FOUR-', '')) || 0; return n > acc ? n : acc; }, 0);
+const four_id = 'FOUR-' + String(max + 1).padStart(3, '0');
   const code    = nom.trim().slice(0, 4).toUpperCase();
   const res     = await appelAPIPost('saveFournisseur', { four_id, nom, code, site_web: '', notes: '' });
   if (res && res.success) {
