@@ -272,7 +272,6 @@ function inciRechercher()              {}
 function retourRecetteDepuisInci()     { afficherSection('produits', null); }
 function ajouterIngredientInci()       {}
 function fermerModalAjouterInci()      { document.getElementById('modal-ajouter-inci')?.classList.remove('ouvert'); }
-
 async function modalInciGo() {
   const modal      = document.getElementById('modal-ajouter-inci');
   const idx        = modal?.dataset.idx;
