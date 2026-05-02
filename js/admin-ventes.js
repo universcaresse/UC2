@@ -314,6 +314,7 @@ function venAppliquerPromotion() {
 
 function ouvrirApercuFacture() {
   if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
+  afficherChargement();
   const client    = document.getElementById('ven-client').value;
   const courriel  = document.getElementById('ven-courriel').value;
   const telephone = document.getElementById('ven-telephone').value;
@@ -379,6 +380,7 @@ function ouvrirApercuFacture() {
     document.getElementById('fv-boutons-paiement').style.display = '';
     document.getElementById('fv-boutons-impression').style.display = '';
   }
+  cacherChargement();
   document.getElementById('modal-facture-vente').classList.add('ouvert');
 }
 
@@ -400,6 +402,7 @@ async function sauvegarderCoordonnees() {
 }
 
 async function imprimerFacture() {
+  afficherChargement();
   await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
   const numero    = venNumeroAffiche;
@@ -507,6 +510,7 @@ async function imprimerFacture() {
 }
 
 async function envoyerFactureCourriel() {
+  afficherChargement();
   await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
   const courriel  = document.getElementById('apv-courriel').value;
@@ -547,6 +551,7 @@ async function envoyerFactureCourriel() {
 }
 
 async function envoyerFactureTexto() {
+  afficherChargement();
   await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
   const telephone = document.getElementById('apv-telephone').value;
@@ -602,6 +607,7 @@ async function envoyerFactureTexto() {
 
 async function finaliserVente(modePaiement) {
   if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
+  afficherChargement();
   const paiement  = modePaiement || '';
   const ven_id    = venIdEnCours;
   const client    = document.getElementById('ven-client').value;
