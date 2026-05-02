@@ -465,7 +465,7 @@ async function imprimerFacture() {
 <body>
 <div class="page">
   <div class="entete">
-    <div>
+    <div style="text-align:center;width:100%">
       <img src="../Images/Logofinal.png" alt="Univers Caresse" style="width:200px;">
     </div>
     <div class="facture-ref">
