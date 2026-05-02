@@ -454,7 +454,19 @@ function efPopulerNomsFourn(catFourn) {
     .filter(m => m.fournisseur === fourNom && (!catFourn || m.categorie_fournisseur === catFourn))
     .map(m => m.nom_fournisseur).filter(Boolean);
 
- const ingExistant = (listesDropdown.fullData || []).find(d => d.ing_id === ing_id && d.cat_id === cat_id);
+ // Fusionner les deux sources — scraping + mapping historique
+  let noms = [...new Set([...nomsScrap, ...nomsMapping])].sort((a,b) => a.localeCompare(b,'fr'));
+
+  // Si aucun nom trouvé, utiliser les noms UC de la catégorie
+  if (noms.length === 0 && catFourn) {
+    const cat_id = Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === catFourn);
+    if (cat_id) {
+      noms = (listesDropdown.fullData || [])
+        .filter(d => d.cat_id === cat_id)
+        .map(d => d.nom_UC).filter(Boolean)
+        .sort((a,b) => a.localeCompare(b,'fr'));
+    }
+  }
 
   sel.innerHTML = '<option value="">— Nom —</option>' +
     noms.map(n => `<option value="${n}">${n}</option>`).join('') +
@@ -486,8 +498,7 @@ function efOnChangeSaisieNomFourn() {
       // Pré-remplir Cat UC depuis le mapping
       const selCatUC = document.getElementById('ef-saisie-cat-uc');
       if (selCatUC) {
-        const cat_id = Object.keys(listesDropdown.categoriesMap || {})
-          .find(k => listesDropdown.categoriesMap[k] === mapping.categorie_UC) || '';
+        const cat_id = mapping.ing_id ? ((listesDropdown.fullData || []).find(d => d.ing_id === mapping.ing_id)?.cat_id || '') : '';
         selCatUC.value = cat_id;
         efOnChangeSaisieCatUC();
         setTimeout(() => {
@@ -765,7 +776,7 @@ function efEditerLigne(idx) {
     if (selNomF) selNomF.value = l.nomFourn;
 
     const selCatUC = document.getElementById('ef-saisie-cat-uc');
-    const cat_id = Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === l.catUC) || '';
+    const cat_id = l.ing_id ? ((listesDropdown.fullData || []).find(d => d.ing_id === l.ing_id)?.cat_id || '') : '';
     if (selCatUC) { selCatUC.value = cat_id; efOnChangeSaisieCatUC(); }
 
     setTimeout(() => {
