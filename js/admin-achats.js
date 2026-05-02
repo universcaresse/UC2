@@ -1,43 +1,46 @@
 /* ═══════════════════════════════════════
    UNIVERS CARESSE — entrer-facture.js
-   Module saisie facture V3 — corrigé
-   Tous les IDs sont préfixés ef-
+   Module saisie facture V4 — IDs partout
    ═══════════════════════════════════════ */
 
 // ─── ÉTAT ───
 var ef = {
-  factureActive: null,  // { ach_id, numero, date, fournisseur, four_id, four_code }
-  lignes:        [],    // lignes sauvegardées { ..., rowIndex }
-  mapping:       [],    // [{fournisseur, categorie_fournisseur, nom_fournisseur, categorie_UC, nom_UC, ing_id}]
-  formats:       [],    // [{ing_id, contenant, quantite, unite, fournisseur}]
-  fournisseurs:  [],    // [{four_id, code, nom}]
-  scrapingItems: [],    // [{nom, categorie}]
-  _saisieIngId:  null,
-  _initEnCours:  false,
-  _editIdx:      null,
+  factureActive:      null, // { ach_id, numero, date, fournisseur, four_id, four_code }
+  lignes:             [],   // lignes sauvegardées
+  mapping:            [],   // [{four_id, cat_fourn_id, prod_fourn_id, ing_id}]
+  formats:            [],   // [{ing_id, four_id, contenant, quantite, unite}]
+  fournisseurs:       [],   // [{four_id, code, nom}]
+  scrapingItems:      [],   // [{nom, categorie, cat_fourn_id, prod_fourn_id}]
+  catsFourn:          [],   // [{cat_fourn_id, nom}]
+  prodsFourn:         [],   // [{prod_fourn_id, cat_fourn_id, four_id, nom}]
+  _saisieIngId:       null,
+  _saisieProdFournId: null,
+  _saisieCatFournId:  null,
+  _initEnCours:       false,
+  _editIdx:           null,
 };
 
-// Codes fournisseurs avec scraping (colonne B de Fournisseurs_v2)
 var EF_SCRAPING_CODES = ['PA', 'MH', 'Arbressence', 'DE'];
 
-// ─── parseFloat robuste — gère virgule et point ───
 function efParseFlt(val) {
   if (val === null || val === undefined || val === '') return 0;
   return parseFloat(String(val).replace(/\s/g, '').replace(',', '.')) || 0;
 }
 
-// ─── INIT (appelé par admin.js via afficherSection) ───
+// ─── INIT ───
 async function efInit() {
   if (ef._initEnCours) return;
   ef._initEnCours = true;
   try {
-    const [resFour, resInci, resCats, resMap, resFmt, resCfg] = await Promise.all([
+    const [resFour, resInci, resCats, resMap, resFmt, resCfg, resCatsFourn, resProdsFourn] = await Promise.all([
       appelAPI('getFournisseurs'),
       appelAPI('getIngredientsInci'),
       appelAPI('getCategoriesUC'),
       appelAPI('getMappingFournisseurs'),
       appelAPI('getFormatsIngredients'),
-      appelAPI('getConfig')
+      appelAPI('getConfig'),
+      appelAPI('getCategoriesFournisseurs'),
+      appelAPI('getProduitsFournisseurs')
     ]);
 
     if (resFour && resFour.success) {
@@ -52,8 +55,10 @@ async function efInit() {
       listesDropdown.categoriesMap = {};
       (resCats.items || []).forEach(c => { listesDropdown.categoriesMap[c.cat_id] = c.nom; });
     }
-    if (resMap && resMap.success) ef.mapping = resMap.items || [];
-    if (resFmt && resFmt.success) ef.formats = resFmt.items || [];
+    if (resMap && resMap.success)       ef.mapping    = resMap.items    || [];
+    if (resFmt && resFmt.success)       ef.formats    = resFmt.items    || [];
+    if (resCatsFourn && resCatsFourn.success) ef.catsFourn  = resCatsFourn.items || [];
+    if (resProdsFourn && resProdsFourn.success) ef.prodsFourn = resProdsFourn.items || [];
     if (resCfg && resCfg.success) {
       listesDropdown.config = {};
       (resCfg.items || []).forEach(c => {
@@ -67,7 +72,6 @@ async function efInit() {
 
     efPopulerFournisseurs();
     efInitDate();
-
     await efVerifierFactureEnCours();
 
     if (ef.factureActive) {
@@ -114,44 +118,40 @@ async function efVerifierFactureEnCours() {
 
 async function efReprendreFacture() {
   if (!ef._factureEnAttente) return;
-
   const f = ef._factureEnAttente;
   ef.factureActive = f;
-
-  ef.scrapingItems = [];
-  if (f.four_code && EF_SCRAPING_CODES.includes(f.four_code)) {
-    const resScraping = await appelAPI('getScrapingFournisseur', { source: f.four_code });
-    if (resScraping && resScraping.success) ef.scrapingItems = resScraping.items || [];
-  }
 
   const resLignes = await appelAPI('getAchatsLignes', { ach_id: f.ach_id });
   ef.lignes = [];
   if (resLignes && resLignes.success) {
     (resLignes.items || []).forEach(l => {
-      const ing    = (listesDropdown.fullData || []).find(d => d.ing_id === l.ing_id);
-      const nomUC  = ing?.nom_UC || '';
-      const cat_id = ing?.cat_id || '';
-      const catUC  = listesDropdown.categoriesMap?.[cat_id] || '';
+      const ing     = (listesDropdown.fullData || []).find(d => d.ing_id === l.ing_id);
+      const nomUC   = ing?.nom_UC  || '';
+      const cat_id  = ing?.cat_id  || '';
+      const catUC   = listesDropdown.categoriesMap?.[cat_id] || '';
 
-      // Reconstruire catFourn et nomFourn depuis le mapping
-      const mappingEntry = ef.mapping.find(m => m.ing_id === l.ing_id && m.fournisseur === f.fournisseur);
-      const catFourn = mappingEntry?.categorie_fournisseur || '';
-      const nomFourn = mappingEntry?.nom_fournisseur || '';
+      const mappingEntry   = ef.mapping.find(m => m.ing_id === l.ing_id && m.four_id === f.four_id);
+      const cat_fourn_id   = mappingEntry?.cat_fourn_id  || '';
+      const prod_fourn_id  = mappingEntry?.prod_fourn_id || '';
+      const catFournNom    = ef.catsFourn.find(c => c.cat_fourn_id  === cat_fourn_id)?.nom  || '';
+      const prodFournNom   = ef.prodsFourn.find(p => p.prod_fourn_id === prod_fourn_id)?.nom || '';
 
       ef.lignes.push({
-        rowIndex:     l.rowIndex,
-        ing_id:       l.ing_id,
+        rowIndex:      l.rowIndex,
+        ing_id:        l.ing_id,
         nomUC,
-        catFourn,
-        nomFourn,
+        cat_fourn_id,
+        prod_fourn_id,
+        catFournNom,
+        prodFournNom,
         catUC,
-        formatQte:    l.format_qte,
-        formatUnite:  l.format_unite,
-        contenant:    l.notes || '',
-        prixUnitaire: l.prix_unitaire,
-        quantite:     l.quantite,
-        prixTotal:    l.prix_total,
-        prixParG:     l.prix_par_g
+        formatQte:     l.format_qte,
+        formatUnite:   l.format_unite,
+        contenant:     l.notes || '',
+        prixUnitaire:  l.prix_unitaire,
+        quantite:      l.quantite,
+        prixTotal:     l.prix_total,
+        prixParG:      l.prix_par_g
       });
     });
   }
@@ -177,9 +177,7 @@ async function efAnnulerFactureEnCours() {
   }
 }
 
-// ─── CALCUL PRIX/G ou PRIX/UNITÉ ───
-// Pour 'unité' : formatQte = nb d'unités dans le contenant
-// prix_par_g = prix_unitaire / nb_unites_contenant = prix par unité individuelle
+// ─── CALCULS ───
 function efCalculerGrammes(formatQte, formatUnite, cat_id) {
   const qte     = efParseFlt(formatQte);
   const cfg     = listesDropdown.config?.[cat_id] || {};
@@ -190,7 +188,7 @@ function efCalculerGrammes(formatQte, formatUnite, cat_id) {
   if (formatUnite === 'ml')    return qte * densite;
   if (formatUnite === 'L')     return qte * 1000 * densite;
   if (formatUnite === 'l')     return qte * 1000 * densite;
-  if (formatUnite === 'unité') return qte; // nb unités dans le contenant
+  if (formatUnite === 'unité') return qte;
   return qte;
 }
 
@@ -280,10 +278,10 @@ async function efCreerFacture() {
   if (four_id === '__nouveau__') {
     const champNouv = document.getElementById('ef-fournisseur-nouveau')?.value?.trim();
     if (!champNouv) { afficherMsg('ef', 'Entrez le nom du nouveau fournisseur.', 'erreur'); return; }
-   fourNom  = champNouv;
-	const saved = await efSauvegarderNouveauFournisseur(champNouv);
-	four_id  = saved.four_id;
-	fourCode = saved.code;
+    fourNom = champNouv;
+    const saved = await efSauvegarderNouveauFournisseur(champNouv);
+    four_id  = saved.four_id;
+    fourCode = saved.code;
   }
 
   if (!four_id || !date || !numero) {
@@ -293,12 +291,6 @@ async function efCreerFacture() {
 
   const btn = document.getElementById('ef-btn-creer');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
-
-  ef.scrapingItems = [];
-  if (fourCode && EF_SCRAPING_CODES.includes(fourCode)) {
-    const resScraping = await appelAPI('getScrapingFournisseur', { source: fourCode });
-    if (resScraping && resScraping.success) ef.scrapingItems = resScraping.items || [];
-  }
 
   const ach_id = 'ACH-' + Date.now();
   const res = await appelAPIPost('createAchatEntete', { ach_id, date, four_id, numero_facture: numero });
@@ -359,24 +351,15 @@ function efRendreLigneSaisie() {
   const ancienne = document.getElementById('ef-ligne-saisie');
   if (ancienne) ancienne.remove();
 
-  // Catégories fournisseur : scraping > mapping > catégories UC
-  const catsScrap = [...new Set(
-    ef.scrapingItems.map(i => i.categorie).filter(Boolean)
-  )].sort((a,b) => a.localeCompare(b,'fr'));
+  // Catégories fournisseur — filtrées par four_id actif
+  const four_id = ef.factureActive ? (ef.fournisseurs.find(f => f.nom === ef.factureActive.fournisseur)?.four_id || '') : '';
+  const catsFournActives = ef.catsFourn.filter(c =>
+    ef.prodsFourn.some(p => p.cat_fourn_id === c.cat_fourn_id && p.four_id === four_id)
+  ).sort((a,b) => a.nom.localeCompare(b.nom,'fr'));
 
-  const fourNom = ef.factureActive?.fournisseur || '';
-  const catsMapping = [...new Set(
-    ef.mapping.filter(m => m.fournisseur === fourNom).map(m => m.categorie_fournisseur).filter(Boolean)
-  )].sort((a,b) => a.localeCompare(b,'fr'));
-
-  // Fusionner scraping + mapping pour avoir toutes les catégories connues
-  const toutesLesCats = [...new Set([...catsScrap, ...catsMapping])].sort((a,b) => a.localeCompare(b,'fr'));
-  const catsUC = Object.keys(listesDropdown.categoriesMap || {})
-      .sort((a,b) => (listesDropdown.categoriesMap[a]||'').localeCompare(listesDropdown.categoriesMap[b]||'','fr'))
-      .map(k => listesDropdown.categoriesMap[k]);
-  const cats = [...new Set([...toutesLesCats, ...catsUC])].sort((a,b) => a.localeCompare(b,'fr'));
-
-  const optsCatFourn = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  const optsCatFourn = catsFournActives.map(c =>
+    `<option value="${c.cat_fourn_id}">${c.nom}</option>`
+  ).join('');
 
   const optsCatUC = Object.keys(listesDropdown.categoriesMap || {})
     .sort((a,b) => (listesDropdown.categoriesMap[a]||'').localeCompare(listesDropdown.categoriesMap[b]||'','fr'))
@@ -427,93 +410,58 @@ function efRendreLigneSaisie() {
 }
 
 // ─── CASCADES ───
-
-// Catégorie fournisseur → peuple Nom fournisseur
 function efOnChangeSaisieCatFourn() {
-  const sel   = document.getElementById('ef-saisie-cat-fourn');
-  const champ = document.getElementById('ef-saisie-cat-fourn-nouveau');
+  const sel = document.getElementById('ef-saisie-cat-fourn');
   if (!sel) return;
-  const isNew = sel.value === '__nouveau__';
-  if (champ) champ.classList.toggle('cache', !isNew);
-  if (isNew) { efOuvrirModalCatFourn(); return; }
+  if (sel.value === '__nouveau__') { efOuvrirModalCatFourn(); return; }
+  ef._saisieCatFournId = sel.value || null;
   efPopulerNomsFourn(sel.value);
 }
 
-// Peuple la liste des noms fournisseur — fusionne scraping + mapping
-function efPopulerNomsFourn(catFourn) {
-  const sel   = document.getElementById('ef-saisie-nom-fourn');
-  const champ = document.getElementById('ef-saisie-nom-fourn-nouveau');
+function efPopulerNomsFourn(cat_fourn_id) {
+  const sel = document.getElementById('ef-saisie-nom-fourn');
   if (!sel) return;
-  const fourNom = ef.factureActive?.fournisseur || '';
+  const four_id = ef.factureActive ? (ef.fournisseurs.find(f => f.nom === ef.factureActive.fournisseur)?.four_id || '') : '';
 
-  const nomsScrap = ef.scrapingItems
-    .filter(i => !catFourn || i.categorie === catFourn)
-    .map(i => i.nom).filter(Boolean);
-
-  const nomsMapping = ef.mapping
-    .filter(m => m.fournisseur === fourNom && (!catFourn || m.categorie_fournisseur === catFourn))
-    .map(m => m.nom_fournisseur).filter(Boolean);
-
- // Fusionner les deux sources — scraping + mapping historique
-  let noms = [...new Set([...nomsScrap, ...nomsMapping])].sort((a,b) => a.localeCompare(b,'fr'));
-
-  // Si aucun nom trouvé, utiliser les noms UC de la catégorie
-  if (noms.length === 0 && catFourn) {
-    const cat_id = Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === catFourn);
-    if (cat_id) {
-      noms = (listesDropdown.fullData || [])
-        .filter(d => d.cat_id === cat_id)
-        .map(d => d.nom_UC).filter(Boolean)
-        .sort((a,b) => a.localeCompare(b,'fr'));
-    }
-  }
+  const prods = ef.prodsFourn.filter(p =>
+    p.four_id === four_id && (!cat_fourn_id || p.cat_fourn_id === cat_fourn_id)
+  ).sort((a,b) => a.nom.localeCompare(b.nom,'fr'));
 
   sel.innerHTML = '<option value="">— Nom —</option>' +
-    noms.map(n => `<option value="${n}">${n}</option>`).join('') +
+    prods.map(p => `<option value="${p.prod_fourn_id}">${p.nom}</option>`).join('') +
     '<option value="__nouveau__">+ Nouveau nom…</option>';
 
-  if (champ) champ.classList.add('cache');
   efResetFormat();
 }
 
-// Nom fournisseur → auto-remplit Cat UC + Nom UC + Formats si connu dans le mapping
 function efOnChangeSaisieNomFourn() {
-  const sel   = document.getElementById('ef-saisie-nom-fourn');
-  const champ = document.getElementById('ef-saisie-nom-fourn-nouveau');
+  const sel = document.getElementById('ef-saisie-nom-fourn');
   if (!sel) return;
 
-  const isNew = sel.value === '__nouveau__';
-  if (champ) champ.classList.toggle('cache', !isNew);
-
-  if (isNew) {
+  if (sel.value === '__nouveau__') {
     efOuvrirModalNomFourn();
     efResetFormat();
     return;
   }
 
+  ef._saisieProdFournId = sel.value || null;
+
   if (sel.value) {
-    const fourNom = ef.factureActive?.fournisseur || '';
-    const mapping = ef.mapping.find(m => m.fournisseur === fourNom && m.nom_fournisseur === sel.value);
-    if (mapping) {
-      // Pré-remplir Cat UC depuis le mapping
+    const four_id = ef.factureActive ? (ef.fournisseurs.find(f => f.nom === ef.factureActive.fournisseur)?.four_id || '') : '';
+    const mapping = ef.mapping.find(m => m.four_id === four_id && m.prod_fourn_id === sel.value);
+    if (mapping && mapping.ing_id) {
+      const ing      = (listesDropdown.fullData || []).find(d => d.ing_id === mapping.ing_id);
       const selCatUC = document.getElementById('ef-saisie-cat-uc');
-      if (selCatUC) {
-        const cat_id = mapping.ing_id ? ((listesDropdown.fullData || []).find(d => d.ing_id === mapping.ing_id)?.cat_id || '') : '';
-        selCatUC.value = cat_id;
+      if (selCatUC && ing) {
+        selCatUC.value = ing.cat_id || '';
         efOnChangeSaisieCatUC();
-        setTimeout(() => {
-          // Pré-remplir Nom UC
-          const selNomUC = document.getElementById('ef-saisie-nom-uc');
-          if (selNomUC && mapping.ing_id) {
-            selNomUC.value = mapping.ing_id;
-            ef._saisieIngId = mapping.ing_id;
-          }
-          // Pré-remplir Formats
-          if (mapping.ing_id) efPopulerFormats(mapping.ing_id);
-        }, 50);
       }
+      setTimeout(() => {
+        const selNomUC = document.getElementById('ef-saisie-nom-uc');
+        if (selNomUC) { selNomUC.value = mapping.ing_id; ef._saisieIngId = mapping.ing_id; }
+        efPopulerFormats(mapping.ing_id);
+      }, 50);
     } else {
-      // Nom connu dans scraping mais pas encore dans le mapping → reset
       efResetFormat();
     }
   } else {
@@ -521,25 +469,19 @@ function efOnChangeSaisieNomFourn() {
   }
 }
 
-function efOnSaisieNomFournTexte() {
-  efResetFormat();
-}
-
-// Reset du format uniquement
 function efResetFormat() {
   const selFmt = document.getElementById('ef-saisie-format');
   if (selFmt) selFmt.innerHTML = '<option value="">— Format —</option><option value="__nouveau__">+ Nouveau format…</option>';
   ef._saisieIngId = null;
 }
 
-// Peuple la liste des formats pour un ingrédient donné
 function efPopulerFormats(ing_id) {
-  const selFmt  = document.getElementById('ef-saisie-format');
+  const selFmt = document.getElementById('ef-saisie-format');
   if (!selFmt) return;
-  const fourNom = ef.factureActive?.fournisseur || '';
+  const four_id = ef.factureActive ? (ef.fournisseurs.find(f => f.nom === ef.factureActive.fournisseur)?.four_id || '') : '';
 
   const formatsConnus = ef.formats.filter(f =>
-    f.ing_id === ing_id && (!f.fournisseur || f.fournisseur === fourNom)
+    f.ing_id === ing_id && (!f.four_id || f.four_id === four_id)
   );
 
   selFmt.innerHTML = '<option value="">— Format —</option>';
@@ -563,7 +505,6 @@ function efOnChangeSaisieFormat() {
   }
 }
 
-// Catégorie UC → peuple Nom UC
 function efOnChangeSaisieCatUC() {
   const selCatUC  = document.getElementById('ef-saisie-cat-uc');
   const selNomUC  = document.getElementById('ef-saisie-nom-uc');
@@ -596,7 +537,6 @@ function efOnChangeSaisieCatUC() {
   ef._saisieIngId = null;
 }
 
-// Nom UC → enregistre l'ingrédient et charge ses formats
 function efOnChangeSaisieNomUC() {
   const sel   = document.getElementById('ef-saisie-nom-uc');
   const champ = document.getElementById('ef-saisie-nom-uc-nouveau');
@@ -608,7 +548,7 @@ function efOnChangeSaisieNomUC() {
     return;
   }
 
-champ.classList.add('cache');
+  champ.classList.add('cache');
   ef._saisieIngId = sel.value || null;
 }
 
@@ -626,11 +566,11 @@ async function efAjouterLigne() {
   const btn = document.getElementById('ef-btn-ajouter');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
 
-  const selCatF = document.getElementById('ef-saisie-cat-fourn');
-  let catFourn = selCatF?.value === '__nouveau__' ? '' : selCatF?.value;
+  const selCatF    = document.getElementById('ef-saisie-cat-fourn');
+  const cat_fourn_id = selCatF?.value === '__nouveau__' ? '' : selCatF?.value || '';
 
-  const selNomF = document.getElementById('ef-saisie-nom-fourn');
-  let nomFourn = selNomF?.value === '__nouveau__' ? '' : selNomF?.value;
+  const selNomF    = document.getElementById('ef-saisie-nom-fourn');
+  const prod_fourn_id = selNomF?.value === '__nouveau__' ? '' : selNomF?.value || '';
 
   const selFmt = document.getElementById('ef-saisie-format');
   let formatQte = '', formatUnite = 'g', contenant = '';
@@ -652,18 +592,18 @@ async function efAjouterLigne() {
     afficherMsg('ef-items', msg, 'erreur');
   };
 
-  if (!catFourn)  return erreur('Catégorie fournisseur requise.');
-  if (!nomFourn)  return erreur('Nom fournisseur requis.');
-  if (!formatQte) return erreur('Format requis.');
-  if (!prixUnit)  return erreur('Prix unitaire requis.');
-  if (!quantite)  return erreur('Quantité requise.');
-  if (!ing_id)    return erreur('Ingrédient UC requis.');
+  if (!cat_fourn_id) return erreur('Catégorie fournisseur requise.');
+  if (!prod_fourn_id) return erreur('Nom fournisseur requis.');
+  if (!formatQte)    return erreur('Format requis.');
+  if (!prixUnit)     return erreur('Prix unitaire requis.');
+  if (!quantite)     return erreur('Quantité requise.');
+  if (!ing_id)       return erreur('Ingrédient UC requis.');
 
-  const prixUnitNum = efParseFlt(prixUnit);
-  const quantiteNum = efParseFlt(quantite);
-  const prixTotal   = quantiteNum * prixUnitNum;
-  const prixParG    = efCalculerPrixParG(prixUnitNum, formatQte, formatUnite, cat_id);
-  const fourNom     = ef.factureActive.fournisseur;
+  const four_id      = ef.fournisseurs.find(f => f.nom === ef.factureActive.fournisseur)?.four_id || '';
+  const prixUnitNum  = efParseFlt(prixUnit);
+  const quantiteNum  = efParseFlt(quantite);
+  const prixTotal    = quantiteNum * prixUnitNum;
+  const prixParG     = efCalculerPrixParG(prixUnitNum, formatQte, formatUnite, cat_id);
 
   const res = await appelAPIPost('addAchatLigne', {
     ach_id:        ef.factureActive.ach_id,
@@ -673,7 +613,7 @@ async function efAjouterLigne() {
     prix_unitaire: prixUnitNum,
     prix_par_g:    prixParG,
     quantite:      quantiteNum,
-    fournisseur:   fourNom,
+    four_id,
     notes:         contenant
   });
 
@@ -683,15 +623,11 @@ async function efAjouterLigne() {
     return;
   }
 
-  // Sauvegarder mapping si nouveau lien fournisseur ↔ UC
-  const mappingExiste = ef.mapping.find(m => m.fournisseur === fourNom && m.nom_fournisseur === nomFourn);
+  // Sauvegarder mapping si nouveau lien
+  const mappingExiste = ef.mapping.find(m => m.four_id === four_id && m.prod_fourn_id === prod_fourn_id);
   if (!mappingExiste) {
-    const catUCNom = listesDropdown.categoriesMap?.[cat_id] || cat_id;
-    await appelAPIPost('saveMappingFournisseur', {
-      fournisseur: fourNom, categorie_fournisseur: catFourn,
-      nom_fournisseur: nomFourn, categorie_UC: catUCNom, nom_UC: nomUC, ing_id
-    });
-    ef.mapping.push({ fournisseur: fourNom, categorie_fournisseur: catFourn, nom_fournisseur: nomFourn, categorie_UC: catUCNom, nom_UC: nomUC, ing_id });
+    await appelAPIPost('saveMappingFournisseur', { four_id, cat_fourn_id, prod_fourn_id, ing_id });
+    ef.mapping.push({ four_id, cat_fourn_id, prod_fourn_id, ing_id });
   }
 
   // Mémoriser format si nouveau
@@ -699,16 +635,22 @@ async function efAjouterLigne() {
     f.ing_id === ing_id &&
     efParseFlt(f.quantite) === efParseFlt(formatQte) &&
     f.unite === formatUnite &&
-    f.fournisseur === fourNom
+    f.four_id === four_id
   );
   if (!fmtExiste) {
-    ef.formats.push({ ing_id, contenant, quantite: efParseFlt(formatQte), unite: formatUnite, fournisseur: fourNom });
+    ef.formats.push({ ing_id, four_id, contenant, quantite: efParseFlt(formatQte), unite: formatUnite });
   }
 
-  const catUCNom = listesDropdown.categoriesMap?.[cat_id] || cat_id;
+  const catUCNom     = listesDropdown.categoriesMap?.[cat_id] || cat_id;
+  const catFournNom  = ef.catsFourn.find(c => c.cat_fourn_id  === cat_fourn_id)?.nom  || '';
+  const prodFournNom = ef.prodsFourn.find(p => p.prod_fourn_id === prod_fourn_id)?.nom || '';
+
   const nouvelleLigne = {
-    rowIndex:     res.rowIndex || 0,
-    ing_id, nomUC, catFourn, nomFourn, catUC: catUCNom,
+    rowIndex: res.rowIndex || 0,
+    ing_id, nomUC,
+    cat_fourn_id, prod_fourn_id,
+    catFournNom, prodFournNom,
+    catUC: catUCNom,
     formatQte: efParseFlt(formatQte), formatUnite, contenant,
     prixUnitaire: prixUnitNum, quantite: quantiteNum,
     prixTotal, prixParG
@@ -746,7 +688,7 @@ function efRendreLignesSauvegardees() {
     const tr  = document.createElement('tr');
     if (idx === ef._editIdx) tr.classList.add('cache');
     tr.innerHTML = `
-      <td>${l.catFourn}<br><small>${l.nomFourn}</small></td>
+      <td>${l.catFournNom}<br><small>${l.prodFournNom}</small></td>
       <td>${fmt}</td>
       <td>${l.quantite}</td>
       <td>${formaterPrix(l.prixUnitaire)}</td>
@@ -769,14 +711,15 @@ function efEditerLigne(idx) {
   ef._editIdx = idx;
 
   const selCatF = document.getElementById('ef-saisie-cat-fourn');
-  if (selCatF) { selCatF.value = l.catFourn; efPopulerNomsFourn(l.catFourn); }
+  if (selCatF) { selCatF.value = l.cat_fourn_id; efPopulerNomsFourn(l.cat_fourn_id); }
 
   setTimeout(() => {
     const selNomF = document.getElementById('ef-saisie-nom-fourn');
-    if (selNomF) selNomF.value = l.nomFourn;
+    if (selNomF) selNomF.value = l.prod_fourn_id;
+    ef._saisieProdFournId = l.prod_fourn_id;
 
     const selCatUC = document.getElementById('ef-saisie-cat-uc');
-    const cat_id = l.ing_id ? ((listesDropdown.fullData || []).find(d => d.ing_id === l.ing_id)?.cat_id || '') : '';
+    const cat_id   = l.ing_id ? ((listesDropdown.fullData || []).find(d => d.ing_id === l.ing_id)?.cat_id || '') : '';
     if (selCatUC) { selCatUC.value = cat_id; efOnChangeSaisieCatUC(); }
 
     setTimeout(() => {
@@ -818,7 +761,6 @@ function efAnnulerEdit() {
   efRendreLigneSaisie();
 }
 
-// Supprime la ligne dans Sheets ET en mémoire
 async function efSupprimerLigne(idx) {
   const ligne = ef.lignes[idx];
   if (!ligne) return;
@@ -868,11 +810,12 @@ async function efFinaliser() {
   afficherMsg('ef', `✅ Facture finalisée — Total : ${formaterPrix(res.total)}`);
 
   setTimeout(() => {
-    ef.factureActive  = null;
-    ef.lignes         = [];
-    ef._saisieIngId   = null;
-    ef.scrapingItems  = [];
-    ef._editIdx       = null;
+    ef.factureActive    = null;
+    ef.lignes           = [];
+    ef._saisieIngId     = null;
+    ef._saisieProdFournId = null;
+    ef._saisieCatFournId  = null;
+    ef._editIdx         = null;
     if (btn) { btn.disabled = false; btn.innerHTML = 'Finaliser'; }
     document.getElementById('ef-fournisseur').value = '';
     document.getElementById('ef-fournisseur-nouveau')?.classList.add('cache');
@@ -894,7 +837,7 @@ async function efFinaliser() {
 function efOuvrirModalFormat() {
   const modal = document.getElementById('modal-ef-format');
   if (!modal) return;
-  document.getElementById('modal-ef-fmt-qte').value      = '';
+  document.getElementById('modal-ef-fmt-qte').value       = '';
   document.getElementById('modal-ef-fmt-qte').placeholder = 'Ex: 500';
   document.getElementById('modal-ef-fmt-unite').value     = '';
   document.getElementById('modal-ef-fmt-qte-bloc')?.classList.remove('cache');
@@ -906,13 +849,12 @@ function efFermerModalFormat() {
   document.getElementById('modal-ef-format')?.classList.remove('ouvert');
 }
 
-// Pour 'unité' : le champ quantité reste visible — c'est le nb d'unités dans le contenant
 function efOnChangeModalFmtUnite() {
   const unite = document.getElementById('modal-ef-fmt-unite')?.value;
   const bloc  = document.getElementById('modal-ef-fmt-qte-bloc');
   const input = document.getElementById('modal-ef-fmt-qte');
   if (!bloc) return;
-  bloc.classList.remove('cache'); // toujours visible peu importe l'unité
+  bloc.classList.remove('cache');
   if (input) input.placeholder = unite === 'unité' ? 'Nb d\'unités dans le contenant (ex: 25)' : 'Ex: 500';
 }
 
@@ -988,6 +930,7 @@ function efOnChangeModalIngNom() {
     document.getElementById('modal-ef-ing-nouveau-nom').value = '';
   }
 }
+
 async function efConfirmerModalIngredient() {
   const nouveauNom = document.getElementById('modal-ef-ing-nouveau-nom')?.value?.trim();
   if (!nouveauNom) { document.getElementById('modal-ef-ing-nouveau-nom').focus(); return; }
@@ -995,12 +938,8 @@ async function efConfirmerModalIngredient() {
   const cat_id = document.getElementById('ef-saisie-cat-uc')?.value || '';
   if (!cat_id) { afficherMsg('ef', 'Choisir une catégorie UC avant d\'ajouter un ingrédient.', 'erreur'); efFermerModalIngredient(); return; }
 
-  // ── Verrou anti double-clic ──
   const btn = document.getElementById('btn-ef-confirmer-ingredient');
-  if (btn) { 
-    if (btn.disabled) return; 
-    btn.disabled = true; 
-  }
+  if (btn) { if (btn.disabled) return; btn.disabled = true; }
 
   let ing_id, nomUC;
   const ingExistant = (listesDropdown.fullData || []).find(d => d.nom_UC === nouveauNom && d.cat_id === cat_id);
@@ -1009,24 +948,23 @@ async function efConfirmerModalIngredient() {
     nomUC  = ingExistant.nom_UC;
   } else {
     ing_id = 'ING-' + Date.now();
-    const nomFourn = document.getElementById('ef-saisie-nom-fourn')?.value || '';
     const res = await appelAPIPost('createIngredientInci', {
       ing_id, cat_id, nom_UC: nouveauNom,
-      nom_fournisseur: nomFourn || nouveauNom,
       inci: '', statut: 'actif', source: ef.factureActive?.four_code || ''
     });
-    if (!res || !res.success) { 
-      afficherMsg('ef', res?.message || 'Erreur création ingrédient.', 'erreur'); 
-      if (btn) btn.disabled = false; // réactiver si erreur
-      return; 
+    if (!res || !res.success) {
+      afficherMsg('ef', res?.message || 'Erreur création ingrédient.', 'erreur');
+      if (btn) btn.disabled = false;
+      return;
     }
-    listesDropdown.fullData.push({ ing_id, cat_id, nom_UC: nouveauNom, inci: '', source: ef.factureActive?.four_code || '', nom_fournisseur: nomFourn || nouveauNom });
+    listesDropdown.fullData.push({ ing_id, cat_id, nom_UC: nouveauNom, inci: '', source: ef.factureActive?.four_code || '' });
     nomUC = nouveauNom;
   }
 
   const selFmtAvant = document.getElementById('ef-saisie-format');
   const valFmtAvant = selFmtAvant?.value;
   const optsAvant   = selFmtAvant ? [...selFmtAvant.options].map(o => ({ value: o.value, text: o.textContent })) : [];
+
   ef._saisieIngId = ing_id;
   const selNomUC = document.getElementById('ef-saisie-nom-uc');
   if (selNomUC) {
@@ -1103,20 +1041,28 @@ function efFermerModalCatFourn() {
   document.getElementById('modal-ef-cat-fourn')?.classList.remove('ouvert');
 }
 
-function efConfirmerModalCatFourn() {
+async function efConfirmerModalCatFourn() {
   const val = document.getElementById('modal-ef-cat-fourn-valeur')?.value?.trim();
   if (!val) { document.getElementById('modal-ef-cat-fourn-valeur').focus(); return; }
+
+  const res = await appelAPIPost('saveCategoriesFournisseur', { nom: val });
+  if (!res || !res.success) { afficherMsg('ef', 'Erreur création catégorie fournisseur.', 'erreur'); return; }
+
+  const cat_fourn_id = res.cat_fourn_id;
+  ef.catsFourn.push({ cat_fourn_id, nom: val });
+
   const sel = document.getElementById('ef-saisie-cat-fourn');
   if (sel) {
     const opt = document.createElement('option');
-    opt.value = val; opt.textContent = val;
+    opt.value = cat_fourn_id; opt.textContent = val;
     const optNew = [...sel.options].find(o => o.value === '__nouveau__');
     if (optNew) sel.insertBefore(opt, optNew);
     else sel.appendChild(opt);
-    sel.value = val;
+    sel.value = cat_fourn_id;
   }
   document.getElementById('modal-ef-cat-fourn')?.classList.remove('ouvert');
-  efPopulerNomsFourn(val);
+  ef._saisieCatFournId = cat_fourn_id;
+  efPopulerNomsFourn(cat_fourn_id);
 }
 
 // ─── MODAL NOUVEAU NOM FOURNISSEUR ───
@@ -1134,20 +1080,30 @@ function efFermerModalNomFourn() {
   document.getElementById('modal-ef-nom-fourn')?.classList.remove('ouvert');
 }
 
-function efConfirmerModalNomFourn() {
+async function efConfirmerModalNomFourn() {
   const val = document.getElementById('modal-ef-nom-fourn-valeur')?.value?.trim();
   if (!val) { document.getElementById('modal-ef-nom-fourn-valeur').focus(); return; }
+
+  const cat_fourn_id = document.getElementById('ef-saisie-cat-fourn')?.value || '';
+  const four_id      = ef.fournisseurs.find(f => f.nom === ef.factureActive?.fournisseur)?.four_id || '';
+
+  const res = await appelAPIPost('saveProduitFournisseur', { nom: val, cat_fourn_id, four_id });
+  if (!res || !res.success) { afficherMsg('ef', 'Erreur création produit fournisseur.', 'erreur'); return; }
+
+  const prod_fourn_id = res.prod_fourn_id;
+  ef.prodsFourn.push({ prod_fourn_id, cat_fourn_id, four_id, nom: val });
+
   const sel = document.getElementById('ef-saisie-nom-fourn');
   if (sel) {
     const opt = document.createElement('option');
-    opt.value = val; opt.textContent = val;
+    opt.value = prod_fourn_id; opt.textContent = val;
     const optNew = [...sel.options].find(o => o.value === '__nouveau__');
     if (optNew) sel.insertBefore(opt, optNew);
     else sel.appendChild(opt);
-    sel.value = val;
+    sel.value = prod_fourn_id;
   }
   document.getElementById('modal-ef-nom-fourn')?.classList.remove('ouvert');
-  // Nouveau nom = pas encore de mapping → reset Cat UC, Nom UC et Format
+  ef._saisieProdFournId = prod_fourn_id;
   efResetFormat();
   const selCatUC = document.getElementById('ef-saisie-cat-uc');
   const selNomUC = document.getElementById('ef-saisie-nom-uc');
@@ -1156,18 +1112,19 @@ function efConfirmerModalNomFourn() {
   ef._saisieIngId = null;
 }
 
-
+// ─── ANNULER FACTURE ACTIVE ───
 async function efAnnulerFactureActive() {
   if (!ef.factureActive) return;
   confirmerAction('Annuler cette facture et supprimer toutes les lignes ?', async () => {
     afficherChargement();
     const res = await appelAPIPost('deleteAchat', { ach_id: ef.factureActive.ach_id });
     if (res && res.success) {
-      ef.factureActive  = null;
-      ef.lignes         = [];
-      ef._saisieIngId   = null;
-      ef.scrapingItems  = [];
-      ef._editIdx       = null;
+      ef.factureActive      = null;
+      ef.lignes             = [];
+      ef._saisieIngId       = null;
+      ef._saisieProdFournId = null;
+      ef._saisieCatFournId  = null;
+      ef._editIdx           = null;
       document.getElementById('ef-fournisseur').value = '';
       document.getElementById('ef-fournisseur-nouveau')?.classList.add('cache');
       document.getElementById('ef-numero').value    = '';
