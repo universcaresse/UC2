@@ -372,8 +372,8 @@ async function afficherRegroupementsPublic() {
     return;
   }
   window._regroupementsData = res.items;
-  const countEl = document.getElementById'regroupements-count';
-  if countEl countEl.textContent = res.items.length + ' univers';
+  const countEl = document.getElementById('regroupements-count');
+  if (countEl) countEl.textContent = res.items.length + ' univers';
   strip.innerHTML = '';
   res.items.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(fra => {
     const couleurs = couleurCollection(fra.nom, fra.couleur_hex);
