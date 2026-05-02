@@ -86,11 +86,12 @@ function fourCodeManuel() {
 async function sauvegarderFournisseur() {
   const four_id  = document.getElementById('modal-four-id')?.value?.trim();
   const nom      = document.getElementById('modal-four-nom')?.value?.trim();
-  const code     = document.getElementById('modal-four-code')?.value?.trim();
+  let code       = document.getElementById('modal-four-code')?.value?.trim();
   const site_web = document.getElementById('modal-four-site')?.value?.trim();
   const notes    = document.getElementById('modal-four-notes')?.value?.trim();
 
   if (!nom) { document.getElementById('modal-four-nom').focus(); return; }
+  if (!four_id && !code) code = nom.trim().slice(0, 4).toUpperCase();
 
   const payload = {
     four_id:  four_id || ('FOUR-' + String(fournisseursDonnees.reduce((acc, f) => { const n = parseInt(f.four_id?.replace('FOUR-', '')) || 0; return n > acc ? n : acc; }, 0) + 1).padStart(3, '0')),
