@@ -985,7 +985,11 @@ async function efConfirmerModalIngredient() {
     ing_id = ingExistant.ing_id;
     nomUC  = ingExistant.nom_UC;
   } else {
-    ing_id = 'ING-' + Date.now();
+    const dernierIngNum = (listesDropdown.fullData || []).reduce((max, d) => {
+  const num = parseInt((d.ing_id || '').replace('ING-', '')) || 0;
+  return num > max ? num : max;
+}, 0);
+ing_id = 'ING-' + String(dernierIngNum + 1).padStart(3, '0');
     const res = await appelAPIPost('createIngredientInci', {
       ing_id, cat_id, nom_UC: nouveauNom,
       inci: '', statut: 'actif', source: ef.factureActive?.four_code || ''
