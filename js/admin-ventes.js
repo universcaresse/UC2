@@ -494,7 +494,7 @@ async function imprimerFacture() {
     <div class="total-final"><span>Total</span><span>${formaterPrix(total)}</span></div>
   </div>
   <div class="merci">
-    <div class="merci-texte">Merci pour votre confiance !</div>
+    <div class="merci-texte">Merci pour votre achat !</div>
     <div class="boutique">universcaresse.ca &nbsp;·&nbsp; universcaresse@gmail.com</div>
   </div>
 </div>
@@ -569,13 +569,12 @@ async function envoyerFactureTexto() {
     else panierGroupé.push({ ...l, clé, quantite: l.quantite });
   });
 
-  let texte = `f-${venNumeroAffiche.replace('VEN-','').replace('ven-','')}\n`;
+  let texte = `FACTURE - ${venNumeroAffiche.replace('VEN-','').replace('ven-','')}\n`;
   texte += `${date}\n`;
   texte += `\n`;
-  texte += `univers caresse\n`;
+  texte += `UNIVERS CARESSE\n`;
   texte += `savonnerie artisanale\n`;
-  texte += `\n`;
-  texte += `universcaresse.ca\n`;
+  
   texte += `\n`;
   texte += `${sep}\n`;
   panierGroupé.forEach(l => {
@@ -589,7 +588,13 @@ async function envoyerFactureTexto() {
   texte += `${sep}\n`;
   texte += `total : ${formaterPrix(total)}\n`;
   texte += `\n`;
-  texte += `Merci !`;
+  texte += `Merci pour votre achat !`;
+  texte += `\n`;
+  texte += `universcaresse.ca\n`;
+   texte += `universcaresse@gmail.com\n`;
+
+  
+  
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
 }
 
