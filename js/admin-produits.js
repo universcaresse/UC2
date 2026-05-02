@@ -938,7 +938,7 @@ function rafraichirListeFormatsRecette() {
   if (formatsRecette.length === 0) { liste.innerHTML = ''; if (labels) labels.classList.add('cache'); return; }
   if (labels) labels.classList.remove('cache');
 
-  const catsEmb = ['CAT-1776180859522', 'CAT-1776369774938', 'CAT-014'];
+  const catsEmb = ['CAT-015', 'CAT-016',  'CAT-017','CAT-014'];
   const ingsEmb = (listesDropdown.fullData || []).filter(d => catsEmb.includes(d.cat_id));
 
   liste.innerHTML = formatsRecette.map((f, i) => {
