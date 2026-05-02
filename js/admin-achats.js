@@ -369,10 +369,10 @@ function efRendreLigneSaisie() {
 
   // Fusionner scraping + mapping pour avoir toutes les catégories connues
   const toutesLesCats = [...new Set([...catsScrap, ...catsMapping])].sort((a,b) => a.localeCompare(b,'fr'));
-  const cats = toutesLesCats.length > 0 ? toutesLesCats
-    : Object.keys(listesDropdown.categoriesMap || {})
-        .sort((a,b) => (listesDropdown.categoriesMap[a]||'').localeCompare(listesDropdown.categoriesMap[b]||'','fr'))
-        .map(k => listesDropdown.categoriesMap[k]);
+  const catsUC = Object.keys(listesDropdown.categoriesMap || {})
+      .sort((a,b) => (listesDropdown.categoriesMap[a]||'').localeCompare(listesDropdown.categoriesMap[b]||'','fr'))
+      .map(k => listesDropdown.categoriesMap[k]);
+  const cats = [...new Set([...toutesLesCats, ...catsUC])].sort((a,b) => a.localeCompare(b,'fr'));
 
   const optsCatFourn = cats.map(c => `<option value="${c}">${c}</option>`).join('');
 
@@ -452,8 +452,19 @@ function efPopulerNomsFourn(catFourn) {
     .filter(m => m.fournisseur === fourNom && (!catFourn || m.categorie_fournisseur === catFourn))
     .map(m => m.nom_fournisseur).filter(Boolean);
 
-  // Fusionner les deux sources — scraping + mapping historique
-  const noms = [...new Set([...nomsScrap, ...nomsMapping])].sort((a,b) => a.localeCompare(b,'fr'));
+ // Fusionner les deux sources — scraping + mapping historique
+  let noms = [...new Set([...nomsScrap, ...nomsMapping])].sort((a,b) => a.localeCompare(b,'fr'));
+
+  // Si aucun nom trouvé, utiliser les noms UC de la catégorie
+  if (noms.length === 0 && catFourn) {
+    const cat_id = Object.keys(listesDropdown.categoriesMap || {}).find(k => listesDropdown.categoriesMap[k] === catFourn);
+    if (cat_id) {
+      noms = (listesDropdown.fullData || [])
+        .filter(d => d.cat_id === cat_id)
+        .map(d => d.nom_UC).filter(Boolean)
+        .sort((a,b) => a.localeCompare(b,'fr'));
+    }
+  }
 
   sel.innerHTML = '<option value="">— Nom —</option>' +
     noms.map(n => `<option value="${n}">${n}</option>`).join('') +
