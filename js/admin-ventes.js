@@ -470,8 +470,7 @@ async function imprimerFacture() {
     <div class="entete-bas">
       <div class="facture-date">${date}</div>
       <div class="facture-ref">
-        <div class="facture-label">Facture</div>
-        <div class="facture-numero">${numero}</div>
+        <div class="facture-numero">Facture : ${numero}</div>
       </div>
     </div>
   </div>
