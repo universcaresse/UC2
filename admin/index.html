@@ -870,10 +870,13 @@
           </div>
           <div class="form-panel">
           <div class="form-body">
-           <input type="hidden" id="fr-id">
-                <input type="hidden" id="fr-couleur">
+		  
+		  
+		  
+<input type="hidden" id="fr-id">
+           <input type="hidden" id="fr-couleur">
             <div class="form-grille">
-              <div class="form-groupe col-demi">
+              <div class="form-groupe col-plein">
                 <label class="form-label">Nom</label>
                 <input type="text" class="form-ctrl" id="fr-nom">
               </div>
@@ -883,10 +886,8 @@
                   <option value="">— Choisir —</option>
                 </select>
               </div>
-			  
-			  
-             <div class="form-groupe">
-                <label class="form-label">Gammes</label>
+              <div class="form-groupe">
+                <label class="form-label">Gamme</label>
                 <select class="form-ctrl" id="fr-ligne" onchange="chargerIngredientsBaseRecette()">
                   <option value="">— Choisir collection —</option>
                 </select>
@@ -897,17 +898,10 @@
                   <option value="">— Aucune —</option>
                 </select>
               </div>
-              
               <div class="form-groupe col-plein">
                 <label class="form-label">Collections secondaires</label>
                 <div id="fr-collections-secondaires" class="checkboxes-groupe"></div>
               </div>
-              <div class="form-groupe">
-                <label class="form-label">Nb unités par recette</label>
-                <input type="text" inputmode="decimal" class="form-ctrl" id="fr-unites">
-              </div>
-              
-			  
               <div class="form-groupe">
                 <label class="form-label">Cure (jours)</label>
                 <input type="text" inputmode="decimal" class="form-ctrl" id="fr-cure">
@@ -916,14 +910,33 @@
                 <label class="form-label">Surgras (%)</label>
                 <input type="text" class="form-ctrl" id="fr-surgras">
               </div>
-              
-       <div class="form-groupe col-plein">
-                <label class="form-label">Description</label>
-                <textarea class="form-ctrl" id="fr-description" rows="3"></textarea>
+              <div class="form-groupe">
+                <label class="form-label">Couleur HEX</label>
+                <input type="text" class="form-ctrl" id="fr-couleur-visible" oninput="apercuCouleurRecette(this)">
+                <div id="fr-couleur-apercu" class="couleur-apercu"></div>
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Statut</label>
+                <select class="form-ctrl" id="fr-statut">
+                  <option value="test">Test</option>
+                  <option value="public">Public</option>
+                </select>
               </div>
               <div class="form-groupe col-plein">
                 <label class="form-label">Description pour emballage</label>
                 <textarea class="form-ctrl" id="fr-desc-emballage" rows="2"></textarea>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Description</label>
+                <textarea class="form-ctrl" id="fr-description" rows="3"></textarea>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Mode d'emploi</label>
+                <textarea class="form-ctrl" id="fr-mode-emploi" rows="3"></textarea>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Avertissement</label>
+                <textarea class="form-ctrl" id="fr-avertissement" rows="2"></textarea>
               </div>
               <div class="form-groupe col-plein">
                 <label class="form-label">Instructions</label>
@@ -933,54 +946,28 @@
                 <label class="form-label">Notes</label>
                 <textarea class="form-ctrl" id="fr-notes" rows="2"></textarea>
               </div>
-              <div class="form-groupe col-plein">
-                <label class="form-label">Avertissement</label>
-                <textarea class="form-ctrl" id="fr-avertissement" rows="2"></textarea>
-              </div>
-              <div class="form-groupe col-plein">
-                <label class="form-label">Mode d'emploi</label>
-                <textarea class="form-ctrl" id="fr-mode-emploi" rows="3"></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+              <div class="form-groupe">
+                <label class="form-label">Photo principale</label>
+                <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">Médiathèque</button>
+                <input type="text" class="form-ctrl" id="fr-image-url" style="display:none">
+                <div id="fr-image-preview"></div>
               </div>
               <div class="form-groupe">
-                <label class="form-label">Statut</label>
-                <select class="form-ctrl" id="fr-statut">
-                  <option value="test">Test</option>
-                  <option value="public">Public</option>
-                </select>
-              </div>
-              <div class="form-groupe">
-                <label class="form-label">Couleur HEX</label>
-                <input type="text" class="form-ctrl" id="fr-couleur-visible" oninput="apercuCouleurRecette(this)">
-                <div id="fr-couleur-apercu" class="couleur-apercu"></div>
+                <label class="form-label">Photo secondaire</label>
+                <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">Médiathèque</button>
+                <input type="text" class="form-ctrl" id="fr-image-url-noel" style="display:none">
+                <div id="fr-image-preview-noel"></div>
               </div>
             </div>
-          <div class="form-groupe col-plein">
-              <label class="form-label">Photo principale</label>
-              <div class="cloudinary-zone">
-                <input type="text" class="form-ctrl" id="fr-image-url">
-                <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirCloudinary()">Choisir une photo</button>
-				<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">Médiathèque</button>
-              </div>
-              <div id="fr-image-preview"></div>
-            </div>
-           <div class="form-groupe col-plein">
-              <label class="form-label">Photo secondaire</label>
-              <div class="cloudinary-zone">
-                <input type="text" class="form-ctrl" id="fr-image-url-noel">
-                <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediaLibrary('fr-image-url-noel', 'fr-image-preview-noel')">Choisir une photo</button>
-				<button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">Médiathèque</button>
-
-              </div>
-              <div id="fr-image-preview-noel"></div>
-            </div>
-           <div class="form-groupe col-plein" id="zone-ingredients-recette">
+            <div class="form-groupe col-plein" id="zone-ingredients-recette">
               <label class="form-label">Ingrédients</label>
               <div id="liste-ingredients-recette"></div>
               <button type="button" class="bouton bouton-vert-pale btn-ajouter-ingredient" onclick="ajouterIngredientRecette()">+ Ajouter un ingrédient</button>
             </div>
             <div class="form-groupe col-plein" id="zone-formats-recette">
-              <label class="form-label">Formats disponibles</label>
-             
+              <label class="form-label">Choisir contenants et emballages pour ce format</label>
               <div class="ingredient-rangee ingredient-rangee-labels" id="labels-formats-recette">
                 <span class="form-label">Contenu net</span>
                 <span class="form-label">Unité de mesure</span>
@@ -991,7 +978,7 @@
               <div id="liste-formats-recette"></div>
               <button type="button" class="bouton bouton-vert-pale btn-ajouter-ingredient" onclick="ajouterFormatRecette()">+ Ajouter un format</button>
             </div>
-             </div>
+          </div>
           </div>
           <div class="form-panel form-body-actions">
             <div class="form-actions">
@@ -1122,12 +1109,12 @@
            <table class="tableau-admin" id="ef-tableau" style="table-layout:fixed;width:100%;">
               <thead>
                 <tr>
-                  <th style="width:25%">Fournisseur</th>
-                  <th style="width:15%">Format</th>
-                  <th style="width:7%">Qté</th>
-                  <th style="width:10%">Prix unit.</th>
+                   <th style="width:23%">Fournisseur</th>
+                  <th style="width:13%">Format</th>
+                  <th style="width:11%">Qté</th>
+                  <th style="width:12%">Prix unit.</th>
                   <th style="width:10%">Total</th>
-                  <th style="width:25%">UC</th>
+                  <th style="width:23%">UC</th>
                   <th style="width:8%"></th>
                 </tr>
               </thead>

@@ -565,7 +565,7 @@ async function ouvrirFormProduit() {
   emballagesRecette = {};
   document.getElementById('form-recettes-titre').textContent = 'Nouveau produit';
   document.getElementById('fr-id').value = '';
-['fr-nom','fr-couleur','fr-unites','fr-cure','fr-description','fr-instructions','fr-notes','fr-surgras','fr-avertissement','fr-mode-emploi']
+['fr-nom','fr-couleur','fr-cure','fr-description','fr-instructions','fr-notes','fr-surgras','fr-avertissement','fr-mode-emploi']
     .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
   document.getElementById('fr-statut').value     = 'test';
  document.getElementById('fr-collection').value = '';
@@ -620,7 +620,7 @@ async function modifierProduit(pro_id) {
   document.getElementById('fr-couleur-visible').value          = pro.couleur_hex || '';
   const apercu = document.getElementById('fr-couleur-apercu');
   if (apercu) apercuCouleurRecette(document.getElementById('fr-couleur-visible'));
-  document.getElementById('fr-unites').value                   = pro.nb_unites || '';
+  
   document.getElementById('fr-cure').value                     = pro.cure || '';
   document.getElementById('fr-description').value              = pro.description || '';
   const descEmb = document.getElementById('fr-desc-emballage');
@@ -709,7 +709,7 @@ async function sauvegarderRecette() {
     fam_id:      document.getElementById('fr-famille')?.value || '',
     nom:         (document.getElementById('fr-nom')?.value || '').toUpperCase(),
     couleur_hex: document.getElementById('fr-couleur').value || document.getElementById('fr-couleur-visible').value || '',
-    nb_unites:   parseInt(document.getElementById('fr-unites').value) || 1,
+    nb_unites:   1,
     cure:        parseInt(document.getElementById('fr-cure').value) || 0,
     description: document.getElementById('fr-description').value,
     desc_emballage: document.getElementById('fr-desc-emballage')?.value || '',
