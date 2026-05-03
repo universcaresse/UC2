@@ -99,16 +99,25 @@ async function efInit() {
   }
 }
 
-function efAfficherEtatInitial() {
-  if (ef.factureActive) {
-    document.getElementById('ef-zone-items')?.classList.remove('cache');
-    document.getElementById('ef-bandeau-reprise')?.classList.add('cache');
-    efRendreLignesSauvegardees();
-    efRendreLigneSaisie();
-    efMajBanniere();
-  } else {
-    document.getElementById('ef-zone-items')?.classList.add('cache');
+async function efReprendreFacture() {
+  if (!ef.factureEnAttente) return;
+  ef.factureActive = ef.factureEnAttente;
+  ef.factureEnAttente = null;
+
+  var resLignes = await appelAPI('getAchatsLignes', { ach_id: ef.factureActive.ach_id });
+  ef.lignes = [];
+  if (resLignes && resLignes.success) {
+    (resLignes.items || []).forEach(function(l) {
+      ef.lignes.push(efConstruireLigneDepuisAPI(l));
+    });
   }
+
+  document.getElementById('ef-bandeau-reprise')?.classList.add('cache');
+  document.getElementById('ef-panel-entete')?.classList.add('cache');
+  document.getElementById('ef-zone-items')?.classList.remove('cache');
+  efRendreLignesSauvegardees();
+  efRendreLigneSaisie();
+  efMajBanniere();
 }
 
 // ─── DATE ───
@@ -220,8 +229,8 @@ async function efReprendreFacture() {
   }
 
   document.getElementById('ef-bandeau-reprise')?.classList.add('cache');
+  document.getElementById('ef-panel-entete')?.classList.add('cache');
   document.getElementById('ef-zone-items')?.classList.remove('cache');
-  document.getElementById('ef-btn-creer')?.classList.add('cache');
   efRendreLignesSauvegardees();
   efRendreLigneSaisie();
   efMajBanniere();
@@ -234,6 +243,7 @@ async function efAnnulerFactureEnCours() {
   if (res && res.success) {
     ef.factureEnAttente = null;
     document.getElementById('ef-bandeau-reprise')?.classList.add('cache');
+    document.getElementById('ef-panel-entete')?.classList.remove('cache');
     afficherMsg('ef', '✅ Facture annulée.');
   } else {
     afficherMsg('ef', (res && res.message) || 'Erreur.', 'erreur');
@@ -400,7 +410,9 @@ function efRendreLigneSaisie() {
     .map(function(k) { return '<option value="' + k + '">' + listesDropdown.categoriesMap[k] + '</option>'; })
     .join('') + '<option value="__nouveau__">+ Nouvelle catégorie UC…</option>';
 
-  var col1Html = '';
+  var colFournHtml = '';
+  var colUCHtml = '';
+
   if (aScraping) {
     var optsCatFourn = ef.catsFourn
       .filter(function(c) {
@@ -413,22 +425,25 @@ function efRendreLigneSaisie() {
       .map(function(c) { return '<option value="' + c.cat_fourn_id + '">' + c.nom + '</option>'; })
       .join('');
 
-    col1Html =
+    colFournHtml =
       '<select class="form-ctrl" id="ef-cat-fourn" onchange="efOnChangeCatFourn()">' +
         '<option value="">— Catégorie fourn. —</option>' + optsCatFourn +
         '<option value="__nouveau__">+ Nouvelle catégorie…</option>' +
       '</select>' +
       '<select class="form-ctrl" id="ef-nom-fourn" onchange="efOnChangeNomFourn()" style="margin-top:4px">' +
         '<option value="">— Nom fourn. —</option>' +
-      '</select>' +
-      '<select class="form-ctrl" id="ef-cat-uc" onchange="efOnChangeCatUC()" style="margin-top:4px">' +
+      '</select>';
+
+    colUCHtml =
+      '<select class="form-ctrl" id="ef-cat-uc" onchange="efOnChangeCatUC()">' +
         '<option value="">— Cat. UC —</option>' + optsCatUC +
       '</select>' +
       '<select class="form-ctrl" id="ef-nom-uc" onchange="efOnChangeNomUC()" style="margin-top:4px">' +
         '<option value="">— Nom UC —</option>' +
       '</select>';
   } else {
-    col1Html =
+    colFournHtml = '<span class="texte-secondaire" style="font-size:0.8rem;color:#999">Sans scraping</span>';
+    colUCHtml =
       '<select class="form-ctrl" id="ef-cat-uc" onchange="efOnChangeCatUC()">' +
         '<option value="">— Catégorie UC —</option>' + optsCatUC +
       '</select>' +
@@ -440,7 +455,7 @@ function efRendreLigneSaisie() {
   var tr = document.createElement('tr');
   tr.id = 'ef-ligne-saisie';
   tr.innerHTML =
-    '<td>' + col1Html + '</td>' +
+    '<td>' + colFournHtml + '</td>' +
     '<td>' +
       '<select class="form-ctrl" id="ef-format" onchange="efOnChangeFormat()">' +
         '<option value="">— Format —</option>' +
@@ -450,6 +465,7 @@ function efRendreLigneSaisie() {
     '<td><input type="text" inputmode="decimal" class="form-ctrl" id="ef-qte" placeholder="Qté" oninput="efMajLigneTotal()"></td>' +
     '<td><input type="text" inputmode="decimal" class="form-ctrl" id="ef-prix" placeholder="Prix $" oninput="efMajLigneTotal()"></td>' +
     '<td id="ef-total-ligne">—</td>' +
+    '<td>' + colUCHtml + '</td>' +
     '<td>' +
       '<button class="bouton bouton-petit" id="ef-btn-ajouter" onclick="efAjouterLigne()" title="Ajouter">+</button>' +
       '<button class="bouton bouton-petit bouton-secondaire cache" id="ef-btn-annuler-edit" onclick="efAnnulerEdit()" title="Annuler">✕</button>' +
