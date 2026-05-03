@@ -637,7 +637,7 @@ async function efAjouterLigne() {
   if (!quantite)     return erreur('Quantité requise.');
   if (!ing_id)       return erreur('Ingrédient UC requis.');
 
-  const four_id      = ef.fournisseurs.find(f => f.nom === ef.factureActive.fournisseur)?.four_id || '';
+  const four_id      = ef.factureActive.four_id || '';
   const prixUnitNum  = efParseFlt(prixUnit);
   const quantiteNum  = efParseFlt(quantite);
   const prixTotal    = quantiteNum * prixUnitNum;
