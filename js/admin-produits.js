@@ -979,33 +979,30 @@ function rafraichirListeFormatsRecette() {
             <option value="">— Catégorie —</option>
             ${catsEmb.map(c => `<option value="${c}" ${catEmb===c?'selected':''}>${listesDropdown.categoriesMap?.[c]||c}</option>`).join('')}
           </select>
-          <select class="form-ctrl" onchange="emballagesRecette['${cle}'][${j}].ing_id=this.value; emballagesRecette['${cle}'][${j}].nom=(listesDropdown.fullData.find(d=>d.ing_id===this.value)||{}).nom_UC||'';">
+          <select class="form-ctrl" onchange="emballagesRecette['${cle}'][${j}].ing_id=this.value; emballagesRecette['${cle}'][${j}].nom=(listesDropdown.fullData.find(d=>d.ing_id===this.value)||{}).nom_UC||''; emballagesRecette['${cle}'][${j}].nb_par_unite=1;">
             <option value="">— Nom UC —</option>
             ${ingsDecat.map(d => `<option value="${d.ing_id}" ${d.ing_id===e.ing_id?'selected':''}>${d.nom_UC}</option>`).join('')}
           </select>
-          <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${e.nb_par_unite||1}" placeholder="Nb/unité" onchange="emballagesRecette['${cle}'][${j}].nb_par_unite=parseFloat(this.value)||1">
           <button class="bouton bouton-petit bouton-rouge" onclick="supprimerEmballageFormat('${cle}',${j})">✕</button>
         </div>`;
       }).join('');
 
     return `
     <div class="ingredient-rangee">
-      <input type="text" inputmode="decimal" class="form-ctrl" value="${f.poids||''}" placeholder="Poids" onchange="formatsRecette[${i}].poids=this.value">
+      <input type="text" inputmode="decimal" class="form-ctrl" value="${f.poids||''}" placeholder="Contenu net" onchange="formatsRecette[${i}].poids=this.value">
       <select class="form-ctrl" onchange="formatsRecette[${i}].unite=this.value">
         <option value="g" ${f.unite==='g'?'selected':''}>g</option>
         <option value="ml" ${f.unite==='ml'?'selected':''}>ml</option>
       </select>
+      <input type="text" inputmode="decimal" class="form-ctrl" value="${f.nb_unites||''}" placeholder="Nb unités produits" onchange="formatsRecette[${i}].nb_unites=parseInt(this.value)||0">
       <input type="text" inputmode="decimal" class="form-ctrl" value="${f.prix||''}" placeholder="Prix $" onchange="formatsRecette[${i}].prix=parseFloat(this.value)||0">
-      <input type="text" inputmode="decimal" class="form-ctrl" value="${f.nb_unites||''}" placeholder="Nb unités" onchange="formatsRecette[${i}].nb_unites=parseInt(this.value)||0">
       <button class="bouton bouton-petit bouton-rouge" onclick="supprimerFormatRecette(${i})">✕</button>
     </div>
-    <div class="ingredient-rangee" style="font-size:0.75rem;color:var(--gris);text-transform:uppercase;">
-        <span style="flex:2">Contenant et emballage</span>
-        <span style="flex:2">Nom UC</span>
-        <span style="width:90px;flex:none">Nb/unité</span>
-      </div>
-      ${lignesEmb}
-      <button type="button" class="bouton bouton-petit bouton-vert-pale" onclick="ajouterEmballageFormat('${cle}')">+ Ajouter</button>`;
+    <div style="margin-top:12px;margin-bottom:4px;padding:6px 8px;background:var(--beige-fonce);border-left:3px solid var(--primary);font-size:0.75rem;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;font-weight:600">
+      Contenant et emballage par unité
+    </div>
+    ${lignesEmb}
+    <button type="button" class="bouton bouton-petit bouton-vert-pale" onclick="ajouterEmballageFormat('${cle}')">+ Ajouter</button>`;
   }).join('');
 }
 
