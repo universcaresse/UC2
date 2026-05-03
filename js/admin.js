@@ -123,7 +123,7 @@ document.addEventListener('click', function(e) {
   }
 });
 function appliquerCouleursHex() {
-  document.querySelectorAll('input.form-ctrl').forEach(input => {
+  document.querySelectorAll('input.form-ctrl:not(#fr-couleur-visible)').forEach(input => {
     const val = (input.value || '').trim();
     if (/^#[0-9a-fA-F]{6}$/.test(val)) {
       input.style.background = val;
