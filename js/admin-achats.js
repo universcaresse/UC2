@@ -1020,6 +1020,7 @@ ing_id = 'ING-' + String(dernierIngNum + 1).padStart(3, '0');
     }
     selNomUC.value = ing_id;
   }
+  if (btn) btn.disabled = false;
   efFermerModalIngredient();
 
   const selFmtApres = document.getElementById('ef-saisie-format');
