@@ -381,9 +381,7 @@ async function ouvrirFicheProduit(pro_id) {
             else if (CATS_EMBALLAGE.includes(ing?.cat_id || '')) coutEmballage += montant;
           });
 
-          const coutContenantParUnite = nbUnites > 0 ? coutContenant / nbUnites : coutContenant;
-          const coutEmballageParUnite = nbUnites > 0 ? coutEmballage / nbUnites : coutEmballage;
-          const coutTotal = coutIngParUnite + coutContenantParUnite + coutEmballageParUnite;
+          const coutTotal   = coutIngParUnite + coutContenant + coutEmballage;
           const marge       = f.prix_vente && coutTotal > 0
             ? ((f.prix_vente - coutTotal) / f.prix_vente * 100).toFixed(1) + ' %'
             : '—';
@@ -396,8 +394,8 @@ async function ouvrirFicheProduit(pro_id) {
             <td style="padding:14px 8px;font-weight:500">${f.poids} ${f.unite}</td>
             <td style="padding:14px 8px;text-align:right;color:var(--gris)">${nbUnites || '—'}</td>
             <td style="padding:14px 8px;text-align:right">${coutIngParUnite > 0 ? formaterPrix(coutIngParUnite) : '—'}</td>
-            <td style="padding:14px 8px;text-align:right">${coutContenantParUnite > 0 ? formaterPrix(coutContenantParUnite) : '—'}</td>
-            <td style="padding:14px 8px;text-align:right">${coutEmballageParUnite > 0 ? formaterPrix(coutEmballageParUnite) : '—'}</td>
+            <td style="padding:14px 8px;text-align:right">${coutContenant > 0 ? formaterPrix(coutContenant) : '—'}</td>
+            <td style="padding:14px 8px;text-align:right">${coutEmballage > 0 ? formaterPrix(coutEmballage) : '—'}</td>
             <td style="padding:14px 8px;text-align:right;font-weight:500">${coutTotal > 0 ? formaterPrix(coutTotal) : '—'}</td>
             <td style="padding:14px 8px;text-align:right">${coutTotal > 0 ? formaterPrix(coutTotal) : '—'}</td>
             <td style="padding:14px 8px;text-align:right;color:var(--primary);font-weight:500">${f.prix_vente ? formaterPrix(f.prix_vente) : '—'}</td>
