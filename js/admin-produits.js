@@ -5,7 +5,7 @@ var collectionsDisponibles = {};
 
 async function chargerProduitsData() {
   afficherChargement();
-  const [resPro, resFmt] = await Promise.all([
+	const [resPro, resFmt] = await Promise.all([
     appelAPI('getProduits'),
     appelAPI('getProduitsFormats')
   ]);
@@ -17,7 +17,7 @@ async function chargerProduitsData() {
       formatsMap[f.pro_id].push({ poids: f.poids, unite: f.unite, prix_vente: f.prix_vente });
     });
   }
-donneesProduits = (resPro.items || []).sort((a, b) => {
+	donneesProduits = (resPro.items || []).sort((a, b) => {
     const colA = donneesCollections.find(c => c.col_id === a.col_id);
     const colB = donneesCollections.find(c => c.col_id === b.col_id);
     const gamA = donneesGammes.find(g => g.gam_id === a.gam_id);
@@ -314,88 +314,120 @@ async function ouvrirFicheProduit(pro_id) {
   if (!pro) return;
   produitActif = pro;
 
-  // Charger les formats
-  const resFormats = await appelAPI('getProduitsFormats', { pro_id });
-  const formats    = (resFormats && resFormats.success) ? resFormats.items : [];
+  const [resFormats, resEmb, resIng] = await Promise.all([
+    appelAPI('getProduitsFormats', { pro_id }),
+    appelAPI('getFormatsEmballages', { pro_id }),
+    appelAPI('getProduitsIngredients', { pro_id })
+  ]);
+
+  const formats  = (resFormats && resFormats.success) ? resFormats.items : [];
+  const embItems = (resEmb    && resEmb.success)     ? resEmb.items     : [];
+  const ings     = (resIng    && resIng.success)     ? resIng.items     : [];
 
   const col = donneesCollections.find(c => c.col_id === pro.col_id);
   const gam = donneesGammes.find(g => g.gam_id === pro.gam_id);
 
-  const resEmb = await appelAPI('getFormatsEmballages', { pro_id });
-  const embItems = (resEmb && resEmb.success) ? resEmb.items : [];
-
-  // Charger les ingrédients
-  const resIng = await appelAPI('getProduitsIngredients', { pro_id });
-  const ings   = (resIng && resIng.success) ? resIng.items : [];
-
-  // Charger le stock si pas encore en mémoire
- if (!listesDropdown.stock || !listesDropdown.stock.length) {
+  if (!listesDropdown.stock || !listesDropdown.stock.length) {
     const resSto = await appelAPI('getStock');
     listesDropdown.stock = (resSto && resSto.success) ? resSto.items : [];
   }
   const stock  = listesDropdown.stock  || [];
   const config = listesDropdown.config || {};
-  let coutTotal  = 0;
+
+  // Coût total ingrédients (pour toute la recette)
+  let coutIngsTotal = 0;
   ings.forEach(ing => {
-    const stockItem = stock.find(s => s.ing_id === ing.ing_id);
-    const prixParG  = stockItem ? (stockItem.prix_par_g_reel || 0) : 0;
-    const cat_id    = stockItem ? (stockItem.cat_id || '') : '';
-    const cfg       = config[cat_id] || {};
-    const perte     = cfg.margePertePct || 0;
-    const facteur   = 1 + (perte / 100);
-    const sousTotal = (ing.quantite_g || 0) * prixParG * facteur;
-    coutTotal += sousTotal;
+    const s = stock.find(st => st.ing_id === ing.ing_id);
+    if (!s) return;
+    const cfg     = config[s.cat_id || ''] || {};
+    const facteur = 1 + ((cfg.margePertePct || 0) / 100);
+    coutIngsTotal += (ing.quantite_g || 0) * (s.prix_par_g_reel || 0) * facteur;
   });
-  const cout = coutTotal;
 
-  const formatsHtml = formats.length
-    ? formats.map(f => {
-        const nbUnites = f.nb_unites || 0;
-        const coutIngParUnite = nbUnites > 0 ? cout / nbUnites : 0;
-        const embsDuFormat = embItems.filter(e => String(e.poids) === String(f.poids) && e.unite === f.unite);
-        const coutEmb = embsDuFormat.reduce((s, e) => {
-          const stockItem = (listesDropdown.stock || []).find(st => st.ing_id === e.ing_id);
-          const prixParG  = stockItem?.prix_par_g_reel || 0;
-          return s + ((e.nb_par_unite || 1) * prixParG);
-        }, 0);
-        const coutTotal_f = coutIngParUnite + coutEmb;
-        const marge = f.prix_vente && coutTotal_f > 0 ? ((f.prix_vente - coutTotal_f) / f.prix_vente * 100).toFixed(1) : '—';
-        return `<div class="fiche-ingredient">
-          <span class="fiche-ing-nom">${f.poids} ${f.unite}</span>
-          <span class="fiche-ing-qte">${f.prix_vente ? formaterPrix(f.prix_vente) : '—'}</span>
-          <span class="fiche-ing-qte">${nbUnites ? nbUnites + ' unités' : '—'}</span>
-          <span class="fiche-ing-qte">${coutTotal_f > 0 ? formaterPrix(coutTotal_f) + '/unité' : '—'}</span>
-          <span class="fiche-ing-qte">${marge !== '—' ? marge + '% marge' : '—'}</span>
-        </div>`;
-      }).join('')
-    : '<div class="fiche-vide fiche-label-manquant">⚠ Aucun format</div>';
+  // Catégories contenant vs emballage
+  const CAT_CONTENANT  = 'CAT-016';
+  const CATS_EMBALLAGE = ['CAT-014', 'CAT-015', 'CAT-017'];
 
-  
-  const nbUnites    = pro.nb_unites || 1;
-  const coutParUnit = cout > 0 ? (cout / nbUnites).toFixed(2) + ' $' : '—';
-  const coutHtml = `<div class="fiche-champ"><span class="fiche-label">Coût de revient estimé</span><span class="fiche-valeur">${cout > 0 ? cout.toFixed(2) + ' $' : '—'}</span></div><div class="fiche-champ"><span class="fiche-label">Coût par unité (${nbUnites} unités)</span><span class="fiche-valeur">${coutParUnit}</span></div>`;
+  // Tableau des formats
+  const formatsHtml = formats.length ? `
+    <table style="width:100%;border-collapse:collapse;margin-top:8px">
+      <thead>
+        <tr style="border-bottom:2px solid var(--beige-fonce)">
+          <th style="text-align:left;padding:12px 8px;font-size:0.7rem;letter-spacing:0.1em;color:var(--gris);font-weight:500">FORMAT</th>
+          <th style="text-align:right;padding:12px 8px;font-size:0.7rem;letter-spacing:0.1em;color:var(--gris);font-weight:500">NB UNITÉS</th>
+          <th style="text-align:right;padding:12px 8px;font-size:0.7rem;letter-spacing:0.1em;color:var(--gris);font-weight:500">COÛT ING.</th>
+          <th style="text-align:right;padding:12px 8px;font-size:0.7rem;letter-spacing:0.1em;color:var(--gris);font-weight:500">CONTENANT</th>
+          <th style="text-align:right;padding:12px 8px;font-size:0.7rem;letter-spacing:0.1em;color:var(--gris);font-weight:500">EMBALLAGE</th>
+          <th style="text-align:right;padding:12px 8px;font-size:0.7rem;letter-spacing:0.1em;color:var(--gris);font-weight:500">COÛT TOTAL</th>
+          <th style="text-align:right;padding:12px 8px;font-size:0.7rem;letter-spacing:0.1em;color:var(--gris);font-weight:500">COÛT/UNITÉ</th>
+          <th style="text-align:right;padding:12px 8px;font-size:0.7rem;letter-spacing:0.1em;color:var(--gris);font-weight:500">PRIX VENTE</th>
+          <th style="text-align:right;padding:12px 8px;font-size:0.7rem;letter-spacing:0.1em;color:var(--gris);font-weight:500">MARGE</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${formats.map(f => {
+          const nbUnites = f.nb_unites || 0;
+          const coutIngParUnite = nbUnites > 0 ? coutIngsTotal / nbUnites : 0;
+          const embsDuFormat = embItems.filter(e => String(e.poids) === String(f.poids) && e.unite === f.unite);
+
+          let coutContenant = 0;
+          let coutEmballage = 0;
+          embsDuFormat.forEach(e => {
+            const s = stock.find(st => st.ing_id === e.ing_id);
+            const prix = s?.prix_par_g_reel || 0;
+            const montant = (e.nb_par_unite || 1) * prix;
+            const ing = (listesDropdown.fullData || []).find(d => d.ing_id === e.ing_id);
+            if (ing?.cat_id === CAT_CONTENANT) coutContenant += montant;
+            else if (CATS_EMBALLAGE.includes(ing?.cat_id || '')) coutEmballage += montant;
+          });
+
+          const coutTotal   = coutIngParUnite + coutContenant + coutEmballage;
+          const marge       = f.prix_vente && coutTotal > 0
+            ? ((f.prix_vente - coutTotal) / f.prix_vente * 100).toFixed(1) + ' %'
+            : '—';
+          const margeNum    = f.prix_vente && coutTotal > 0
+            ? (f.prix_vente - coutTotal) / f.prix_vente * 100
+            : null;
+          const margeCouleur = margeNum === null ? '' : margeNum >= 50 ? 'color:var(--vert)' : margeNum >= 30 ? 'color:var(--or)' : 'color:var(--rouge)';
+
+          return `<tr style="border-bottom:1px solid var(--beige)">
+            <td style="padding:14px 8px;font-weight:500">${f.poids} ${f.unite}</td>
+            <td style="padding:14px 8px;text-align:right;color:var(--gris)">${nbUnites || '—'}</td>
+            <td style="padding:14px 8px;text-align:right">${coutIngParUnite > 0 ? formaterPrix(coutIngParUnite) : '—'}</td>
+            <td style="padding:14px 8px;text-align:right">${coutContenant > 0 ? formaterPrix(coutContenant) : '—'}</td>
+            <td style="padding:14px 8px;text-align:right">${coutEmballage > 0 ? formaterPrix(coutEmballage) : '—'}</td>
+            <td style="padding:14px 8px;text-align:right;font-weight:500">${coutTotal > 0 ? formaterPrix(coutTotal) : '—'}</td>
+            <td style="padding:14px 8px;text-align:right">${coutTotal > 0 ? formaterPrix(coutTotal) : '—'}</td>
+            <td style="padding:14px 8px;text-align:right;color:var(--primary);font-weight:500">${f.prix_vente ? formaterPrix(f.prix_vente) : '—'}</td>
+            <td style="padding:14px 8px;text-align:right;font-weight:500;${margeCouleur}">${marge}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>` : '<div class="fiche-vide fiche-label-manquant">⚠ Aucun format</div>';
+
+  // Ingrédients
   const ingsHtml = ings.length
     ? ings.sort((a, b) => b.quantite_g - a.quantite_g).map(i => {
         const inciObj  = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient);
         const inciCode = inciObj?.inci || '';
         const sansInci = !inciCode;
-        const stockItem2 = (listesDropdown.stock || []).find(s => s.ing_id === i.ing_id);
-        const prixParG2  = stockItem2 ? (stockItem2.prix_par_g_reel || 0) : 0;
-        const coutIng    = prixParG2 > 0 ? (i.quantite_g * prixParG2).toFixed(2) + ' $' : '⚠';
-        return `<div class="fiche-ingredient"><span class="fiche-ing-nom${sansInci ? ' fiche-label-manquant' : ''}">${sansInci ? '⚠ ' : ''}${i.nom_ingredient}</span><span class="fiche-ing-inci">${inciCode}</span><span class="fiche-ing-qte">${i.quantite_g} g</span><span class="fiche-ing-qte">${coutIng}</span></div>`;
+        const s2       = stock.find(st => st.ing_id === i.ing_id);
+        const prixParG = s2?.prix_par_g_reel || 0;
+        const coutIng  = prixParG > 0 ? (i.quantite_g * prixParG).toFixed(2) + ' $' : '⚠';
+        return `<div class="fiche-ingredient">
+          <span class="fiche-ing-nom${sansInci ? ' fiche-label-manquant' : ''}">${sansInci ? '⚠ ' : ''}${i.nom_ingredient}</span>
+          <span class="fiche-ing-inci">${inciCode}</span>
+          <span class="fiche-ing-qte">${i.quantite_g} g</span>
+          <span class="fiche-ing-qte">${coutIng}</span>
+        </div>`;
       }).join('')
-   : '<div class="fiche-vide">Aucun ingrédient</div>';
+    : '<div class="fiche-vide">Aucun ingrédient</div>';
 
+  // Liste INCI
   const inciLabel = ings
-    .filter(i => {
-      const obj = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient);
-      return obj?.inci;
-    })
+    .filter(i => { const o = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient); return o?.inci; })
     .sort((a, b) => b.quantite_g - a.quantite_g)
-    .map(i => {
-      const obj = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient);
-      return obj.inci.trim();
-    })
+    .map(i => { const o = listesDropdown.fullData.find(d => d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient); return o.inci.trim(); })
     .join(', ');
   const inciLabelHtml = inciLabel
     ? `<div class="inci-label-texte">${inciLabel}</div>`
@@ -413,10 +445,8 @@ async function ouvrirFicheProduit(pro_id) {
       <div class="fiche-champ"><span class="fiche-label">Gamme</span><span class="fiche-valeur">${gam?.nom || '—'}</span></div>
       <div class="fiche-champ"><span class="fiche-label">Statut</span><span class="fiche-valeur">${pro.statut || 'test'}</span></div>
       <div class="fiche-champ"><span class="fiche-label">Cure</span><span class="fiche-valeur">${pro.cure || '—'} jours</span></div>
-      <div class="fiche-champ"><span class="fiche-label">Nb unités</span><span class="fiche-valeur">${pro.nb_unites || '—'}</span></div>
       <div class="fiche-champ"><span class="fiche-label">Surgras</span><span class="fiche-valeur">${pro.surgras || '—'}</span></div>
       <div class="fiche-champ"><span class="fiche-label">Couleur HEX</span><span class="fiche-valeur">${pro.couleur_hex || '—'}</span></div>
-      ${coutHtml}
     </div>
     <div class="fiche-section-titre">Description</div>
     <div class="fiche-texte">${pro.description || '—'}</div>
@@ -441,15 +471,8 @@ async function ouvrirFicheProduit(pro_id) {
     <div class="fiche-section-titre">Liste INCI pour étiquette</div>
     <div class="fiche-inci-etiquette">${inciLabelHtml}</div>
     <div class="fiche-section-titre">Formats disponibles</div>
-    <div class="fiche-ingredient fiche-ingredient-labels">
-      <span class="fiche-ing-nom">Format</span>
-      <span class="fiche-ing-qte">Prix vente</span>
-      <span class="fiche-ing-qte">Nb unités</span>
-      <span class="fiche-ing-qte">Coût/unité</span>
-      <span class="fiche-ing-qte">Marge</span>
-    </div>
-    <div class="fiche-ingredients">${formatsHtml}</div>
-    <div class="fiche-section-titre">Export</div>
+    ${formatsHtml}
+    <div class="fiche-section-titre" style="margin-top:24px">Export</div>
     <button class="bouton" onclick="exporterFicheProduit()">Copier pour le graphiste</button>
   `;
 
@@ -461,6 +484,7 @@ async function ouvrirFicheProduit(pro_id) {
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
+
 
 function exporterFicheProduit() {
   if (!produitActif) return;
