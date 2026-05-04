@@ -120,6 +120,23 @@ async function efReprendreFacture() {
   efMajBanniere();
 }
 
+function efAfficherEtatInitial() {
+  if (ef.factureActive) {
+    document.getElementById('ef-panel-entete')?.classList.add('cache');
+    document.getElementById('ef-zone-items')?.classList.remove('cache');
+    document.getElementById('ef-bandeau-reprise')?.classList.add('cache');
+    efRendreLignesSauvegardees();
+    efRendreLigneSaisie();
+    efMajBanniere();
+  } else if (ef.factureEnAttente) {
+    document.getElementById('ef-panel-entete')?.classList.add('cache');
+    document.getElementById('ef-zone-items')?.classList.add('cache');
+  } else {
+    document.getElementById('ef-panel-entete')?.classList.remove('cache');
+    document.getElementById('ef-zone-items')?.classList.add('cache');
+  }
+}
+
 // ─── DATE ───
 function efInitDate() {
   var selJour = document.getElementById('ef-date-jour');
