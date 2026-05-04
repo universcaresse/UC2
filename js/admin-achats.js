@@ -459,14 +459,14 @@ function efRendreLigneSaisie() {
         '<option value="">— Nom UC —</option>' +
       '</select>';
   } else {
-    colFournHtml = '<span class="texte-secondaire" style="font-size:0.8rem;color:#999">Sans scraping</span>';
-    colUCHtml =
+    colFournHtml =
       '<select class="form-ctrl" id="ef-cat-uc" onchange="efOnChangeCatUC()">' +
         '<option value="">— Catégorie UC —</option>' + optsCatUC +
       '</select>' +
       '<select class="form-ctrl" id="ef-nom-uc" onchange="efOnChangeNomUC()" style="margin-top:4px">' +
         '<option value="">— Nom UC —</option>' +
       '</select>';
+    colUCHtml = '';
   }
 
   var tr = document.createElement('tr');
