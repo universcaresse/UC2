@@ -1,11 +1,11 @@
 /* ═══════════════════════════════════════
    UNIVERS CARESSE — admin-achats.js
-   Réécrit selon LOGIQUE-ACHATS.md
+   Réécrit selon LOGIQUE-ACHATS.md — version révisée
    ═══════════════════════════════════════ */
 
 // ─── ÉTAT ───
 var ef = {
-  factureActive:    null,  // { ach_id, numero, date, fournisseur, four_id, four_code, a_scraping }
+  factureActive:    null,
   factureEnAttente: null,
   lignes:           [],
   fournisseurs:     [],
@@ -14,7 +14,9 @@ var ef = {
   formats:          [],
   mapping:          [],
   editIdx:          null,
-  initEnCours:      false
+  initEnCours:      false,
+  // Sauvegarde temporaire des saisies en cours (pour ne rien perdre)
+  saisieEnCours:    { qte: '', prix: '', formatVal: '', formatText: '' }
 };
 
 var EF_SCRAPING_CODES = ['PA', 'MH', 'Arbressence', 'DE'];
@@ -44,6 +46,49 @@ function efGrammesDuFormat(qte, unite, cat_id) {
   return q;
 }
 
+// Sauvegarder/restaurer l'état des champs qte/prix/format
+function efSauvegarderSaisie() {
+  var elQte   = document.getElementById('ef-qte');
+  var elPrix  = document.getElementById('ef-prix');
+  var selFmt  = document.getElementById('ef-format');
+  ef.saisieEnCours.qte  = elQte  ? elQte.value  : '';
+  ef.saisieEnCours.prix = elPrix ? elPrix.value : '';
+  if (selFmt && selFmt.value && selFmt.value !== '__nouveau__') {
+    ef.saisieEnCours.formatVal  = selFmt.value;
+    ef.saisieEnCours.formatText = selFmt.options[selFmt.selectedIndex].textContent;
+  } else {
+    ef.saisieEnCours.formatVal  = '';
+    ef.saisieEnCours.formatText = '';
+  }
+}
+
+function efRestaurerSaisie() {
+  var elQte  = document.getElementById('ef-qte');
+  var elPrix = document.getElementById('ef-prix');
+  if (elQte  && ef.saisieEnCours.qte)  elQte.value  = ef.saisieEnCours.qte;
+  if (elPrix && ef.saisieEnCours.prix) elPrix.value = ef.saisieEnCours.prix;
+  if (ef.saisieEnCours.formatVal) {
+    var selFmt = document.getElementById('ef-format');
+    if (selFmt) {
+      var existe = Array.from(selFmt.options).find(function(o) { return o.value === ef.saisieEnCours.formatVal; });
+      if (!existe) {
+        var opt = document.createElement('option');
+        opt.value = ef.saisieEnCours.formatVal;
+        opt.textContent = ef.saisieEnCours.formatText;
+        var optNew = Array.from(selFmt.options).find(function(o) { return o.value === '__nouveau__'; });
+        if (optNew) selFmt.insertBefore(opt, optNew);
+        else selFmt.appendChild(opt);
+      }
+      selFmt.value = ef.saisieEnCours.formatVal;
+    }
+  }
+  efMajLigneTotal();
+}
+
+function efResetSaisie() {
+  ef.saisieEnCours = { qte: '', prix: '', formatVal: '', formatText: '' };
+}
+
 // ─── INITIALISATION ───
 async function efInit() {
   if (ef.initEnCours) return;
@@ -59,29 +104,22 @@ async function efInit() {
       appelAPI('getMappingFournisseurs'),
       appelAPI('getConfig')
     ]);
-    var resFour = res[0], resInci = res[1], resCatsUC = res[2];
-    var resCatsF = res[3], resProdsF = res[4], resFmt = res[5];
-    var resMap = res[6], resCfg = res[7];
 
-    if (resFour && resFour.success) {
-      ef.fournisseurs = resFour.items || [];
-    }
-    if (resInci && resInci.success) {
-      listesDropdown.fullData = resInci.items || [];
-    }
-    if (resCatsUC && resCatsUC.success) {
+    if (res[0] && res[0].success) ef.fournisseurs = res[0].items || [];
+    if (res[1] && res[1].success) listesDropdown.fullData = res[1].items || [];
+    if (res[2] && res[2].success) {
       listesDropdown.categoriesMap = {};
-      (resCatsUC.items || []).forEach(function(c) {
+      (res[2].items || []).forEach(function(c) {
         listesDropdown.categoriesMap[c.cat_id] = c.nom;
       });
     }
-    if (resCatsF && resCatsF.success)   ef.catsFourn  = resCatsF.items  || [];
-    if (resProdsF && resProdsF.success) ef.prodsFourn = resProdsF.items || [];
-    if (resFmt && resFmt.success)       ef.formats    = resFmt.items    || [];
-    if (resMap && resMap.success)       ef.mapping    = resMap.items    || [];
-    if (resCfg && resCfg.success) {
+    if (res[3] && res[3].success) ef.catsFourn  = res[3].items || [];
+    if (res[4] && res[4].success) ef.prodsFourn = res[4].items || [];
+    if (res[5] && res[5].success) ef.formats    = res[5].items || [];
+    if (res[6] && res[6].success) ef.mapping    = res[6].items || [];
+    if (res[7] && res[7].success) {
       listesDropdown.config = {};
-      (resCfg.items || []).forEach(function(c) {
+      (res[7].items || []).forEach(function(c) {
         listesDropdown.config[c.cat_id] = {
           densite:       parseFloat(c.densite) || 1,
           unite:         c.unite || 'g',
@@ -97,27 +135,6 @@ async function efInit() {
   } finally {
     ef.initEnCours = false;
   }
-}
-
-async function efReprendreFacture() {
-  if (!ef.factureEnAttente) return;
-  ef.factureActive = ef.factureEnAttente;
-  ef.factureEnAttente = null;
-
-  var resLignes = await appelAPI('getAchatsLignes', { ach_id: ef.factureActive.ach_id });
-  ef.lignes = [];
-  if (resLignes && resLignes.success) {
-    (resLignes.items || []).forEach(function(l) {
-      ef.lignes.push(efConstruireLigneDepuisAPI(l));
-    });
-  }
-
-  document.getElementById('ef-bandeau-reprise')?.classList.add('cache');
-  document.getElementById('ef-panel-entete')?.classList.add('cache');
-  document.getElementById('ef-zone-items')?.classList.remove('cache');
-  efRendreLignesSauvegardees();
-  efRendreLigneSaisie();
-  efMajBanniere();
 }
 
 function efAfficherEtatInitial() {
@@ -329,7 +346,6 @@ async function efCreerFacture() {
   var fourNom  = selFour.options[selFour.selectedIndex].dataset.nom  || '';
   var fourCode = selFour.options[selFour.selectedIndex].dataset.code || '';
 
-  // Vérification : facture déjà entrée chez ce même fournisseur
   var resAch = await appelAPI('getAchatsEntete');
   if (resAch && resAch.success) {
     var doublon = (resAch.items || []).find(function(a) {
@@ -344,7 +360,6 @@ async function efCreerFacture() {
   var btn = document.getElementById('ef-btn-creer');
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
 
-  // Générer ach_id
   var dernierNum = (resAch?.items || []).reduce(function(max, a) {
     var n = parseInt((a.ach_id || '').replace('ACH-', '')) || 0;
     return n > max ? n : max;
@@ -363,18 +378,15 @@ async function efCreerFacture() {
   }
 
   ef.factureActive = {
-    ach_id:      ach_id,
-    numero:      numero,
-    date:        date,
-    fournisseur: fourNom,
-    four_id:     four_id,
-    four_code:   fourCode,
-    a_scraping:  efAScraping(fourCode)
+    ach_id: ach_id, numero: numero, date: date,
+    fournisseur: fourNom, four_id: four_id, four_code: fourCode,
+    a_scraping: efAScraping(fourCode)
   };
   ef.lignes = [];
   ef.editIdx = null;
+  efResetSaisie();
 
-  document.getElementById('ef-btn-creer')?.classList.add('cache');
+  document.getElementById('ef-panel-entete')?.classList.add('cache');
   document.getElementById('ef-zone-items')?.classList.remove('cache');
   efRendreLignesSauvegardees();
   efRendreLigneSaisie();
@@ -496,6 +508,7 @@ function efOnChangeCatFourn() {
   if (!sel) return;
   if (sel.value === '__nouveau__') {
     sel.value = '';
+    efSauvegarderSaisie();
     efOuvrirModalCatFourn();
     return;
   }
@@ -515,7 +528,6 @@ function efRemplirNomsFourn(cat_fourn_id) {
   sel.innerHTML = '<option value="">— Nom fourn. —</option>' +
     prods.map(function(p) { return '<option value="' + p.prod_fourn_id + '">' + p.nom + '</option>'; }).join('') +
     '<option value="__nouveau__">+ Nouveau nom…</option>';
-  efResetFormat();
 }
 
 function efOnChangeNomFourn() {
@@ -523,10 +535,11 @@ function efOnChangeNomFourn() {
   if (!sel) return;
   if (sel.value === '__nouveau__') {
     sel.value = '';
+    efSauvegarderSaisie();
     efOuvrirModalNomFourn();
     return;
   }
-  if (!sel.value) { efResetFormat(); return; }
+  if (!sel.value) return;
 
   // Vérifier si ce nom fournisseur est déjà mappé à un ingrédient UC
   var mapping = ef.mapping.find(function(m) {
@@ -541,10 +554,8 @@ function efOnChangeNomFourn() {
       efRemplirNomsUC(ing.cat_id);
       if (selNomUC) selNomUC.value = ing.ing_id;
       efRemplirFormats(ing.ing_id);
-      return;
     }
   }
-  efResetFormat();
 }
 
 // ─── CASCADES (cat UC / nom UC) ───
@@ -553,6 +564,7 @@ function efOnChangeCatUC() {
   if (!sel) return;
   if (sel.value === '__nouveau__') {
     sel.value = '';
+    efSauvegarderSaisie();
     efOuvrirModalNouvelleCatUC();
     return;
   }
@@ -578,7 +590,6 @@ function efRemplirNomsUC(cat_id) {
   optNew.value = '__nouveau__';
   optNew.textContent = '+ Nouvel ingrédient…';
   sel.appendChild(optNew);
-  efResetFormat();
 }
 
 function efOnChangeNomUC() {
@@ -586,24 +597,21 @@ function efOnChangeNomUC() {
   if (!sel) return;
   if (sel.value === '__nouveau__') {
     sel.value = '';
+    efSauvegarderSaisie();
     efOuvrirModalIngredient();
     return;
   }
   if (sel.value) efRemplirFormats(sel.value);
-  else efResetFormat();
 }
 
 // ─── FORMATS ───
-function efResetFormat() {
-  var sel = document.getElementById('ef-format');
-  if (sel) {
-    sel.innerHTML = '<option value="">— Format —</option><option value="__nouveau__">+ Nouveau format…</option>';
-  }
-}
-
 function efRemplirFormats(ing_id) {
   var sel = document.getElementById('ef-format');
   if (!sel) return;
+  // Mémoriser la valeur courante avant de rafraîchir
+  var ancienVal = sel.value;
+  var ancienText = (sel.selectedIndex >= 0) ? sel.options[sel.selectedIndex].textContent : '';
+
   sel.innerHTML = '<option value="">— Format —</option>';
   var formatsConnus = ef.formats.filter(function(f) {
     return f.ing_id === ing_id && (!f.four_id || f.four_id === ef.factureActive.four_id);
@@ -618,6 +626,21 @@ function efRemplirFormats(ing_id) {
   optNew.value = '__nouveau__';
   optNew.textContent = '+ Nouveau format…';
   sel.appendChild(optNew);
+
+  // Si l'ancienne valeur est encore valide, on la garde
+  if (ancienVal && ancienVal !== '__nouveau__' && ancienVal !== '') {
+    var existe = Array.from(sel.options).find(function(o) { return o.value === ancienVal; });
+    if (existe) {
+      sel.value = ancienVal;
+    } else {
+      // Format manuel saisi avant — on le rajoute
+      var opt = document.createElement('option');
+      opt.value = ancienVal;
+      opt.textContent = ancienText;
+      sel.insertBefore(opt, optNew);
+      sel.value = ancienVal;
+    }
+  }
 }
 
 function efOnChangeFormat() {
@@ -625,6 +648,7 @@ function efOnChangeFormat() {
   if (!sel) return;
   if (sel.value === '__nouveau__') {
     sel.value = '';
+    efSauvegarderSaisie();
     efOuvrirModalFormat();
   }
 }
@@ -648,7 +672,6 @@ async function efAjouterLigne() {
 
   var aScraping = ef.factureActive.a_scraping;
 
-  // Récupérer les valeurs
   var cat_id        = document.getElementById('ef-cat-uc')?.value || '';
   var ing_id        = document.getElementById('ef-nom-uc')?.value || '';
   var cat_fourn_id  = aScraping ? (document.getElementById('ef-cat-fourn')?.value || '') : '';
@@ -665,7 +688,6 @@ async function efAjouterLigne() {
   var prixUnit = document.getElementById('ef-prix')?.value?.trim();
   var quantite = document.getElementById('ef-qte')?.value?.trim();
 
-  // Validations
   function erreur(msg) {
     if (btn) { btn.disabled = false; btn.innerHTML = '+'; }
     afficherMsg('ef-items', msg, 'erreur');
@@ -683,7 +705,6 @@ async function efAjouterLigne() {
   var prixTotal   = quantiteNum * prixUnitNum;
   var four_id     = ef.factureActive.four_id;
 
-  // Calculer prix par g (ou par unité) pour l'enregistrement
   var prixParG = 0;
   if (formatUnite === 'unité') {
     prixParG = efParseFlt(formatQte) > 0 ? prixUnitNum / efParseFlt(formatQte) : 0;
@@ -709,13 +730,9 @@ async function efAjouterLigne() {
     return;
   }
 
-  // Mise à jour mapping (si pas déjà existant)
   await efAssurerMapping(four_id, cat_fourn_id, prod_fourn_id, ing_id);
-
-  // Mise à jour formats locaux (ne pas dupliquer)
   efAssurerFormatLocal(ing_id, four_id, formatQte, formatUnite);
 
-  // Construire l'objet ligne pour l'affichage
   var nomUC = (listesDropdown.fullData.find(function(d) { return d.ing_id === ing_id; }) || {}).nom_UC || '';
   var catUC = (listesDropdown.categoriesMap || {})[cat_id] || '';
   var catFournNom = '', prodFournNom = '';
@@ -729,30 +746,22 @@ async function efAjouterLigne() {
   }
 
   var ligne = {
-    rowIndex:      res.rowIndex || 0,
-    ing_id:        ing_id,
-    nomUC:         nomUC,
-    cat_id:        cat_id,
-    catUC:         catUC,
-    cat_fourn_id:  cat_fourn_id,
-    prod_fourn_id: prod_fourn_id,
-    catFournNom:   catFournNom,
-    prodFournNom:  prodFournNom,
-    formatQte:     efParseFlt(formatQte),
-    formatUnite:   formatUnite,
-    quantite:      quantiteNum,
-    prixUnitaire:  prixUnitNum,
-    prixTotal:     prixTotal
+    rowIndex: res.rowIndex || 0,
+    ing_id: ing_id, nomUC: nomUC, cat_id: cat_id, catUC: catUC,
+    cat_fourn_id: cat_fourn_id, prod_fourn_id: prod_fourn_id,
+    catFournNom: catFournNom, prodFournNom: prodFournNom,
+    formatQte: efParseFlt(formatQte), formatUnite: formatUnite,
+    quantite: quantiteNum, prixUnitaire: prixUnitNum, prixTotal: prixTotal
   };
 
   if (ef.editIdx !== null) {
-    // Remplacer la ligne en édition (la précédente a déjà été supprimée côté serveur dans efEditerLigne)
     ef.lignes[ef.editIdx] = ligne;
     ef.editIdx = null;
   } else {
     ef.lignes.push(ligne);
   }
 
+  efResetSaisie();
   if (btn) { btn.disabled = false; btn.innerHTML = '+'; }
   afficherMsg('ef-items', '');
   efRendreLignesSauvegardees();
@@ -769,16 +778,16 @@ async function efAssurerMapping(four_id, cat_fourn_id, prod_fourn_id, ing_id) {
   if (existe) return;
 
   await appelAPIPost('saveMappingFournisseur', {
-    four_id:       four_id,
-    cat_fourn_id:  cat_fourn_id || '',
+    four_id: four_id,
+    cat_fourn_id: cat_fourn_id || '',
     prod_fourn_id: prod_fourn_id || '',
-    ing_id:        ing_id
+    ing_id: ing_id
   });
   ef.mapping.push({
-    four_id:       four_id,
-    cat_fourn_id:  cat_fourn_id || '',
+    four_id: four_id,
+    cat_fourn_id: cat_fourn_id || '',
     prod_fourn_id: prod_fourn_id || '',
-    ing_id:        ing_id
+    ing_id: ing_id
   });
 }
 
@@ -791,10 +800,8 @@ function efAssurerFormatLocal(ing_id, four_id, formatQte, formatUnite) {
   });
   if (!existe) {
     ef.formats.push({
-      ing_id:   ing_id,
-      four_id:  four_id,
-      quantite: efParseFlt(formatQte),
-      unite:    formatUnite
+      ing_id: ing_id, four_id: four_id,
+      quantite: efParseFlt(formatQte), unite: formatUnite
     });
   }
 }
@@ -839,7 +846,6 @@ async function efEditerLigne(idx) {
   var l = ef.lignes[idx];
   if (!l) return;
 
-  // Supprimer la ligne actuelle côté serveur (on la recréera lors du Confirmer)
   if (l.rowIndex) {
     await appelAPIPost('deleteAchatLigne', {
       ach_id: ef.factureActive.ach_id,
@@ -853,47 +859,50 @@ async function efEditerLigne(idx) {
   efRendreLignesSauvegardees();
   efRendreLigneSaisie();
 
-  // Pré-remplir les champs après que la ligne de saisie soit dans le DOM
-  setTimeout(function() {
-    if (ef.factureActive.a_scraping) {
-      var selCatF = document.getElementById('ef-cat-fourn');
-      if (selCatF) { selCatF.value = l.cat_fourn_id; efRemplirNomsFourn(l.cat_fourn_id); }
+  // Pré-remplir directement, sans setTimeout empilés
+  if (ef.factureActive.a_scraping) {
+    var selCatF = document.getElementById('ef-cat-fourn');
+    if (selCatF) {
+      selCatF.value = l.cat_fourn_id;
+      efRemplirNomsFourn(l.cat_fourn_id);
+      var selNomF = document.getElementById('ef-nom-fourn');
+      if (selNomF) selNomF.value = l.prod_fourn_id;
     }
-    setTimeout(function() {
-      if (ef.factureActive.a_scraping) {
-        var selNomF = document.getElementById('ef-nom-fourn');
-        if (selNomF) selNomF.value = l.prod_fourn_id;
-      }
-      var selCatUC = document.getElementById('ef-cat-uc');
-      if (selCatUC) { selCatUC.value = l.cat_id; efRemplirNomsUC(l.cat_id); }
-      setTimeout(function() {
-        var selNomUC = document.getElementById('ef-nom-uc');
-        if (selNomUC) selNomUC.value = l.ing_id;
-        efRemplirFormats(l.ing_id);
-        setTimeout(function() {
-          var selFmt = document.getElementById('ef-format');
-          if (selFmt) {
-            var val = JSON.stringify({ quantite: l.formatQte, unite: l.formatUnite });
-            selFmt.value = val;
-          }
-          var elPrix = document.getElementById('ef-prix');
-          var elQte  = document.getElementById('ef-qte');
-          if (elPrix) elPrix.value = l.prixUnitaire;
-          if (elQte)  elQte.value  = l.quantite;
-          efMajLigneTotal();
-          var btnAjouter = document.getElementById('ef-btn-ajouter');
-          var btnAnnuler = document.getElementById('ef-btn-annuler-edit');
-          if (btnAjouter) btnAjouter.innerHTML = '✓';
-          if (btnAnnuler) btnAnnuler.classList.remove('cache');
-        }, 30);
-      }, 30);
-    }, 30);
-  }, 30);
+  }
+  var selCatUC = document.getElementById('ef-cat-uc');
+  if (selCatUC) {
+    selCatUC.value = l.cat_id;
+    efRemplirNomsUC(l.cat_id);
+    var selNomUC = document.getElementById('ef-nom-uc');
+    if (selNomUC) selNomUC.value = l.ing_id;
+  }
+  efRemplirFormats(l.ing_id);
+  var selFmt = document.getElementById('ef-format');
+  if (selFmt) {
+    var val = JSON.stringify({ quantite: l.formatQte, unite: l.formatUnite });
+    var optExiste = Array.from(selFmt.options).find(function(o) { return o.value === val; });
+    if (!optExiste) {
+      var opt = document.createElement('option');
+      opt.value = val;
+      opt.textContent = l.formatQte + ' ' + l.formatUnite;
+      var optNew = Array.from(selFmt.options).find(function(o) { return o.value === '__nouveau__'; });
+      if (optNew) selFmt.insertBefore(opt, optNew);
+      else selFmt.appendChild(opt);
+    }
+    selFmt.value = val;
+  }
+  var elPrix = document.getElementById('ef-prix');
+  var elQte  = document.getElementById('ef-qte');
+  if (elPrix) elPrix.value = l.prixUnitaire;
+  if (elQte)  elQte.value  = l.quantite;
+  efMajLigneTotal();
+  var btnAjouter = document.getElementById('ef-btn-ajouter');
+  var btnAnnuler = document.getElementById('ef-btn-annuler-edit');
+  if (btnAjouter) btnAjouter.innerHTML = '✓';
+  if (btnAnnuler) btnAnnuler.classList.remove('cache');
 }
 
 function efAnnulerEdit() {
-  // Si on annule l'édition, on n'a pas de moyen de récupérer la ligne supprimée côté serveur.
-  // On recharge donc les lignes depuis le serveur.
   ef.editIdx = null;
   efRechargerLignes();
 }
@@ -953,11 +962,8 @@ async function efFinaliser() {
   var liv = efParseFlt(document.getElementById('ef-livraison')?.value);
 
   var res = await appelAPIPost('finaliserAchat', {
-    ach_id:     ef.factureActive.ach_id,
-    sous_total: sousTotal,
-    tps:        tps,
-    tvq:        tvq,
-    livraison:  liv
+    ach_id: ef.factureActive.ach_id,
+    sous_total: sousTotal, tps: tps, tvq: tvq, livraison: liv
   });
 
   if (!res || !res.success) {
@@ -974,6 +980,7 @@ function efReinitialiserApresFinalisation() {
   ef.factureActive = null;
   ef.lignes = [];
   ef.editIdx = null;
+  efResetSaisie();
 
   var champs = ['ef-fournisseur', 'ef-numero', 'ef-tps', 'ef-tvq', 'ef-livraison', 'ef-soustotal', 'ef-total'];
   champs.forEach(function(id) {
@@ -981,7 +988,7 @@ function efReinitialiserApresFinalisation() {
     if (el) el.value = '';
   });
 
-  document.getElementById('ef-btn-creer')?.classList.remove('cache');
+  document.getElementById('ef-panel-entete')?.classList.remove('cache');
   document.getElementById('ef-zone-items')?.classList.add('cache');
   var tbody = document.getElementById('ef-tbody');
   if (tbody) tbody.innerHTML = '';
@@ -1021,6 +1028,7 @@ function efOuvrirModalFormat() {
 
 function efFermerModalFormat() {
   document.getElementById('modal-ef-format')?.classList.remove('ouvert');
+  efRestaurerSaisie();
 }
 
 function efOnChangeModalFmtUnite() {
@@ -1044,13 +1052,16 @@ function efConfirmerModalFormat() {
     var opt = document.createElement('option');
     opt.value = JSON.stringify({ quantite: efParseFlt(qte), unite: unite });
     opt.textContent = qte + ' ' + unite;
-    opt.selected = true;
     var optNew = Array.from(sel.options).find(function(o) { return o.value === '__nouveau__'; });
     if (optNew) sel.insertBefore(opt, optNew);
     else sel.appendChild(opt);
     sel.value = opt.value;
+    // Mémoriser pour la restauration
+    ef.saisieEnCours.formatVal = opt.value;
+    ef.saisieEnCours.formatText = opt.textContent;
   }
-  efFermerModalFormat();
+  document.getElementById('modal-ef-format')?.classList.remove('ouvert');
+  efRestaurerSaisie();
 }
 
 // ─── MODALES — NOUVEL INGRÉDIENT UC ───
@@ -1064,6 +1075,7 @@ function efOuvrirModalIngredient() {
 
 function efFermerModalIngredient() {
   document.getElementById('modal-ef-ingredient')?.classList.remove('ouvert');
+  efRestaurerSaisie();
 }
 
 async function efConfirmerModalIngredient() {
@@ -1075,11 +1087,11 @@ async function efConfirmerModalIngredient() {
   var cat_id = document.getElementById('ef-cat-uc')?.value || '';
   if (!cat_id) {
     afficherMsg('ef', 'Choisir une catégorie UC d\'abord.', 'erreur');
-    efFermerModalIngredient();
+    document.getElementById('modal-ef-ingredient')?.classList.remove('ouvert');
+    efRestaurerSaisie();
     return;
   }
 
-  // Vérifier si déjà existant
   var existant = (listesDropdown.fullData || []).find(function(d) {
     return d.nom_UC === nouveauNom && d.cat_id === cat_id;
   });
@@ -1088,22 +1100,17 @@ async function efConfirmerModalIngredient() {
   if (existant) {
     ing_id = existant.ing_id;
   } else {
-    // Générer ID
     var dernierNum = (listesDropdown.fullData || []).reduce(function(max, d) {
       var n = parseInt((d.ing_id || '').replace('ING-', '')) || 0;
       return n > max ? n : max;
     }, 0);
     ing_id = 'ING-' + String(dernierNum + 1).padStart(3, '0');
 
-    // Statut "validé" pour CAT-014/015/016/017, sinon "à valider"
     var statut = EF_CATS_SANS_INCI.indexOf(cat_id) >= 0 ? 'valide' : 'a-valider';
 
     var res = await appelAPIPost('createIngredientInci', {
-      ing_id: ing_id,
-      cat_id: cat_id,
-      nom_UC: nouveauNom,
-      statut: statut,
-      inci:   '',
+      ing_id: ing_id, cat_id: cat_id, nom_UC: nouveauNom,
+      statut: statut, inci: '',
       source: ef.factureActive ? ef.factureActive.four_code : ''
     });
     if (!res || !res.success) {
@@ -1115,13 +1122,6 @@ async function efConfirmerModalIngredient() {
     });
   }
 
-  // Sauvegarder le format actuellement sélectionné
-  var selFmtAvant = document.getElementById('ef-format');
-  var fmtValAvant = selFmtAvant ? selFmtAvant.value : '';
-  var fmtTextAvant = (selFmtAvant && selFmtAvant.selectedIndex >= 0)
-    ? selFmtAvant.options[selFmtAvant.selectedIndex].textContent : '';
-
-  // Ajouter dans la liste et sélectionner
   var sel = document.getElementById('ef-nom-uc');
   if (sel) {
     var opt = Array.from(sel.options).find(function(o) { return o.value === ing_id; });
@@ -1135,25 +1135,9 @@ async function efConfirmerModalIngredient() {
     }
     sel.value = ing_id;
   }
-  efFermerModalIngredient();
+  document.getElementById('modal-ef-ingredient')?.classList.remove('ouvert');
   efRemplirFormats(ing_id);
-
-  // Restaurer le format si on en avait déjà entré un
-  if (fmtValAvant && fmtValAvant !== '__nouveau__' && fmtValAvant !== '') {
-    var selFmtApres = document.getElementById('ef-format');
-    if (selFmtApres) {
-      var optExiste = Array.from(selFmtApres.options).find(function(o) { return o.value === fmtValAvant; });
-      if (!optExiste) {
-        var optFmt = document.createElement('option');
-        optFmt.value = fmtValAvant;
-        optFmt.textContent = fmtTextAvant;
-        var optFmtNew = Array.from(selFmtApres.options).find(function(o) { return o.value === '__nouveau__'; });
-        if (optFmtNew) selFmtApres.insertBefore(optFmt, optFmtNew);
-        else selFmtApres.appendChild(optFmt);
-      }
-      selFmtApres.value = fmtValAvant;
-    }
-  }
+  efRestaurerSaisie();
 }
 
 // ─── MODALES — NOUVELLE CAT UC ───
@@ -1167,6 +1151,7 @@ function efOuvrirModalNouvelleCatUC() {
 
 function efFermerModalNouvelleCatUC() {
   document.getElementById('modal-ef-nouvelle-cat-uc')?.classList.remove('ouvert');
+  efRestaurerSaisie();
 }
 
 async function efConfirmerModalNouvelleCatUC() {
@@ -1190,7 +1175,8 @@ async function efConfirmerModalNouvelleCatUC() {
     sel.value = cat_id;
     efRemplirNomsUC(cat_id);
   }
-  efFermerModalNouvelleCatUC();
+  document.getElementById('modal-ef-nouvelle-cat-uc')?.classList.remove('ouvert');
+  efRestaurerSaisie();
 }
 
 // ─── MODALES — NOUVELLE CAT FOURNISSEUR ───
@@ -1204,6 +1190,7 @@ function efOuvrirModalCatFourn() {
 
 function efFermerModalCatFourn() {
   document.getElementById('modal-ef-cat-fourn')?.classList.remove('ouvert');
+  efRestaurerSaisie();
 }
 
 async function efConfirmerModalCatFourn() {
@@ -1227,7 +1214,8 @@ async function efConfirmerModalCatFourn() {
     sel.value = cat_fourn_id;
     efRemplirNomsFourn(cat_fourn_id);
   }
-  efFermerModalCatFourn();
+  document.getElementById('modal-ef-cat-fourn')?.classList.remove('ouvert');
+  efRestaurerSaisie();
 }
 
 // ─── MODALES — NOUVEAU NOM FOURNISSEUR ───
@@ -1241,6 +1229,7 @@ function efOuvrirModalNomFourn() {
 
 function efFermerModalNomFourn() {
   document.getElementById('modal-ef-nom-fourn')?.classList.remove('ouvert');
+  efRestaurerSaisie();
 }
 
 async function efConfirmerModalNomFourn() {
@@ -1249,6 +1238,8 @@ async function efConfirmerModalNomFourn() {
   var cat_fourn_id = document.getElementById('ef-cat-fourn')?.value || '';
   if (!cat_fourn_id) {
     afficherMsg('ef', 'Choisir une catégorie fournisseur d\'abord.', 'erreur');
+    document.getElementById('modal-ef-nom-fourn')?.classList.remove('ouvert');
+    efRestaurerSaisie();
     return;
   }
   var four_id = ef.factureActive.four_id;
@@ -1261,10 +1252,8 @@ async function efConfirmerModalNomFourn() {
   }
   var prod_fourn_id = res.prod_fourn_id;
   ef.prodsFourn.push({
-    prod_fourn_id: prod_fourn_id,
-    cat_fourn_id:  cat_fourn_id,
-    four_id:       four_id,
-    nom:           val
+    prod_fourn_id: prod_fourn_id, cat_fourn_id: cat_fourn_id,
+    four_id: four_id, nom: val
   });
   var sel = document.getElementById('ef-nom-fourn');
   if (sel) {
@@ -1276,6 +1265,6 @@ async function efConfirmerModalNomFourn() {
     else sel.appendChild(opt);
     sel.value = prod_fourn_id;
   }
-  efFermerModalNomFourn();
-  efResetFormat();
+  document.getElementById('modal-ef-nom-fourn')?.classList.remove('ouvert');
+  efRestaurerSaisie();
 }

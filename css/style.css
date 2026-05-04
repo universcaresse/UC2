@@ -245,7 +245,7 @@ nav.scrolled { box-shadow: none; }
   letter-spacing: 0.1em;
   font-variant: normal;
   text-transform: lowercase;
-  color: var(--gris);
+  color: var(--primary);
   font-weight: 400;
   transition: color 0.2s;
 }
