@@ -172,7 +172,9 @@ if (id === 'fournisseurs')   afficherFournisseurs();
 if (id === 'redaction')      redInit();
   if (id === 'mediatheque')    chargerMediatheque();
   if (id === 'inventaire-production') { afficherSection('inventaire', null); return; }
-  if (id === 'ventes')        { chargerVentes(); }
+ if (id === 'ventes')          { chargerVentes(); }
+    if (id === 'remboursements')  { chargerRemboursements(); }
+  if (id === 'commandes')       { chargerCommandes(); }
   if (id === 'fabrication') {
     if (!donneesProduits || donneesProduits.length === 0) {
       Promise.all([appelAPI('getProduits'), appelAPI('getProduitsFormats')]).then(([resPro, resFmt]) => {

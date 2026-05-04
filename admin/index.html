@@ -58,11 +58,13 @@
 		</div>
       </li>
 	  
-      <li class="nav-admin-item">
+   <li class="nav-admin-item">
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">vente <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
           <button class="nav-dropdown-item" onclick="allerVersNouvelleVente()">nouvelle vente</button>
           <button class="nav-dropdown-item" onclick="afficherSection('ventes', null)">les ventes</button>
+          <button class="nav-dropdown-item" onclick="afficherSection('commandes', null)">commandes</button>
+          <button class="nav-dropdown-item" onclick="afficherSection('remboursements', null)">remboursements</button>
           <button class="nav-dropdown-item" onclick="afficherSection('fabrication', null)">inventaire</button>
 		  <button class="nav-dropdown-item bientot">corrections Inventaire</button></div>
       </li>
@@ -147,6 +149,8 @@
         <div class="sidebar-titre">vente</div>
         <button class="sidebar-lien" onclick="allerVersNouvelleVente()">nouvelle vente</button>
         <button class="sidebar-lien" onclick="afficherSection('ventes', this)">les ventes</button>
+        <button class="sidebar-lien" onclick="afficherSection('commandes', this)">commandes</button>
+        <button class="sidebar-lien" onclick="afficherSection('remboursements', this)">remboursements</button>
         <button class="sidebar-lien" onclick="afficherSection('fabrication', this)">inventaire</button>
       </div>
 	  
@@ -1650,16 +1654,20 @@
             </div>
           </div>
 
-          <!-- PROMOTION -->
+          <!-- PROMOTION / RABAIS -->
           <div class="form-panel visible">
             <div class="form-panel-header">
-              <span class="form-panel-titre">Promotion</span>
+              <span class="form-panel-titre">Promotion / Rabais</span>
             </div>
             <div class="form-body">
               <div class="form-groupe">
                 <select class="form-ctrl" id="ven-promotion" onchange="venAppliquerPromotion()">
-                  <option value="">— Aucune promotion —</option>
+                  <option value="">— Aucune —</option>
                 </select>
+              </div>
+              <div class="form-groupe" id="ven-rabais-libre-zone" style="display:none;margin-top:12px">
+                <label class="form-label" id="ven-rabais-libre-label">Rabais</label>
+                <input type="text" inputmode="decimal" class="form-ctrl" id="ven-rabais-libre" placeholder="" oninput="venCalculerTotal()">
               </div>
               <div id="ven-promo-info" style="display:none;margin-top:12px;padding:12px;background:var(--primary-06);border-left:3px solid var(--primary);font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--gris-fonce)"></div>
             </div>
@@ -1702,9 +1710,13 @@
             <option value="">Tous les statuts</option>
             <option value="Finalisé">Finalisé</option>
             <option value="a-payer">À payer</option>
+            <option value="En attente Square">En attente Square</option>
             <option value="En cours">En cours</option>
           </select>
-          <input type="text" class="form-ctrl filtre-recherche" id="filtre-ventes-client" placeholder="Rechercher par client…" oninput="filtrerVentes()">
+          <input type="text" class="form-ctrl filtre-recherche" id="filtre-ventes-client" placeholder="Par client…" oninput="filtrerVentes()">
+          <input type="text" class="form-ctrl filtre-recherche" id="filtre-ventes-produit" placeholder="Par produit…" oninput="filtrerVentes()">
+          <input type="date" class="form-ctrl filtre-select" id="filtre-ventes-date-debut" onchange="filtrerVentes()" title="Date début">
+          <input type="date" class="form-ctrl filtre-select" id="filtre-ventes-date-fin" onchange="filtrerVentes()" title="Date fin">
           <button class="bouton bouton-petit bouton-contour" onclick="reinitialiserFiltresVentes()" title="Réinitialiser">✕</button>
         </div>
 
@@ -1718,6 +1730,354 @@
           </div>
         </div>
       </div>
+	<!-- REMBOURSEMENTS -->
+<div class="section-admin" id="section-remboursements">
+  <div class="page-entete fade-in">
+    <div>
+      <div class="page-entete-eyebrow">Remboursements aux clients</div>
+      <div class="page-entete-titre">Remboursements</div>
+    </div>
+    <button class="bouton" onclick="ouvrirFormRemboursement()">+ Nouveau remboursement</button>
+  </div>
+  <div class="msg-zone" id="msg-remboursements"></div>
+
+  <!-- FORMULAIRE REMBOURSEMENT -->
+  <div id="form-remboursement" class="cache">
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Nouveau remboursement</span>
+        <button class="btn-fermer-panneau" onclick="fermerFormRemboursement()">✕</button>
+      </div>
+    </div>
+
+    <!-- TYPE DE REMBOURSEMENT -->
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Type de remboursement</span>
+      </div>
+      <div class="form-body">
+        <div class="form-groupe">
+          <select class="form-ctrl" id="rem-type" onchange="remChangerType()">
+            <option value="">— Choisir —</option>
+            <option value="avec-retour">Avec retour de produit (le stock remonte)</option>
+            <option value="sans-retour">Sans retour (juste un montant)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAISIE PRODUIT (avec retour) -->
+    <div id="rem-saisie-produit" class="form-panel cache">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Produit retourné</span>
+      </div>
+      <div class="form-body">
+        <div class="form-grille">
+          <div class="form-groupe col-plein">
+            <select class="form-ctrl" id="rem-collection" onchange="remFiltrerGammes()">
+              <option value="">— Collection —</option>
+            </select>
+          </div>
+          <div class="form-groupe col-plein">
+            <select class="form-ctrl" id="rem-gamme" onchange="remFiltrerProduits()">
+              <option value="">— Gamme (toutes) —</option>
+            </select>
+          </div>
+          <div class="form-groupe col-plein">
+            <select class="form-ctrl" id="rem-produit" onchange="remFiltrerFormats()">
+              <option value="">— Produit —</option>
+            </select>
+          </div>
+          <div class="form-groupe col-plein">
+            <select class="form-ctrl" id="rem-format" onchange="remMettreAJourPrix()">
+              <option value="">— Format —</option>
+            </select>
+          </div>
+          <div class="form-groupe col-plein">
+            <div class="ven-qte-ligne">
+              <button class="bouton bouton-petit" onclick="remChangerQte(-1)">−</button>
+              <input type="number" class="form-ctrl" id="rem-quantite" min="1" value="1" inputmode="numeric" oninput="remMettreAJourPrix()">
+              <button class="bouton bouton-petit" onclick="remChangerQte(1)">+</button>
+            </div>
+          </div>
+          <div class="form-groupe col-demi">
+            <label class="form-label">Prix unitaire (modifiable)</label>
+            <input type="text" inputmode="decimal" class="form-ctrl" id="rem-prix" oninput="remRecalculerLigne()">
+          </div>
+          <div class="form-groupe col-demi">
+            <label class="form-label">Total ligne</label>
+            <input type="text" class="form-ctrl" id="rem-total-ligne" readonly>
+          </div>
+          <div class="form-groupe col-plein">
+            <button class="bouton bouton-plein-largeur" onclick="remAjouterLigne()">+ Ajouter au remboursement</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAISIE LIBRE (sans retour) -->
+    <div id="rem-saisie-libre" class="form-panel cache">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Montant à rembourser</span>
+      </div>
+      <div class="form-body">
+        <div class="form-grille">
+          <div class="form-groupe col-plein">
+            <input type="text" class="form-ctrl" id="rem-libre-description" placeholder="Description (raison du remboursement)">
+          </div>
+          <div class="form-groupe col-plein">
+            <input type="text" inputmode="decimal" class="form-ctrl" id="rem-libre-montant" placeholder="Montant ($)">
+          </div>
+          <div class="form-groupe col-plein">
+            <button class="bouton bouton-plein-largeur" onclick="remAjouterLigneLibre()">+ Ajouter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LISTE DES LIGNES -->
+    <div class="form-panel cache" id="rem-liste-panel">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Lignes du remboursement</span>
+      </div>
+      <div class="form-body">
+        <div id="rem-liste"></div>
+        <div class="form-grille" style="margin-top:16px">
+          <div class="form-groupe col-plein">
+            <input type="text" class="form-ctrl" id="rem-total" placeholder="Total à rembourser" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENT -->
+    <div class="form-panel cache" id="rem-client-panel">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Client (optionnel)</span>
+      </div>
+      <div class="form-body">
+        <div class="form-grille">
+          <div class="form-groupe col-plein">
+            <input type="text" class="form-ctrl" id="rem-client" placeholder="Nom">
+          </div>
+          <div class="form-groupe col-plein">
+            <input type="text" inputmode="email" class="form-ctrl" id="rem-courriel" placeholder="Courriel">
+          </div>
+          <div class="form-groupe col-plein">
+            <input type="text" inputmode="tel" class="form-ctrl" id="rem-telephone" placeholder="Téléphone">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODE DE REMBOURSEMENT -->
+    <div class="form-panel cache" id="rem-paiement-panel">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Mode de remboursement</span>
+      </div>
+      <div class="form-body form-body-actions">
+        <div class="form-actions-vertical">
+          <button class="bouton bouton-plein-largeur" onclick="finaliserRemboursement('comptant')">Comptant</button>
+          <button class="bouton bouton-plein-largeur" onclick="finaliserRemboursement('credit')">Crédit (carte)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTRES REMBOURSEMENTS -->
+  <div class="filtres-bar" id="filtres-remboursements">
+    <select class="form-ctrl filtre-select" id="filtre-rem-statut" onchange="filtrerRemboursements()">
+      <option value="">Tous les statuts</option>
+      <option value="Finalisé">Finalisé</option>
+    </select>
+    <input type="text" class="form-ctrl filtre-recherche" id="filtre-rem-client" placeholder="Par client…" oninput="filtrerRemboursements()">
+    <input type="text" class="form-ctrl filtre-recherche" id="filtre-rem-produit" placeholder="Par produit…" oninput="filtrerRemboursements()">
+    <input type="date" class="form-ctrl filtre-select" id="filtre-rem-date-debut" onchange="filtrerRemboursements()" title="Date début">
+    <input type="date" class="form-ctrl filtre-select" id="filtre-rem-date-fin" onchange="filtrerRemboursements()" title="Date fin">
+    <button class="bouton bouton-petit bouton-contour" onclick="reinitialiserFiltresRemboursements()" title="Réinitialiser">✕</button>
+  </div>
+
+  <!-- LISTE DES REMBOURSEMENTS -->
+  <div id="contenu-remboursements">
+    <div class="chargement" id="loading-remboursements"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+    <div id="tableau-remboursements"></div>
+    <div class="vide cache" id="vide-remboursements">
+      <div class="vide-titre">Aucun remboursement</div>
+      <div class="vide-desc">Créez votre premier remboursement</div>
+    </div>
+  </div>
+</div>
+
+	<!-- COMMANDES -->
+<div class="section-admin" id="section-commandes">
+  <div class="page-entete fade-in">
+    <div>
+      <div class="page-entete-eyebrow">Commandes en attente de livraison</div>
+      <div class="page-entete-titre">Commandes</div>
+    </div>
+    <button class="bouton" onclick="ouvrirFormCommande()">+ Nouvelle commande</button>
+  </div>
+  <div class="msg-zone" id="msg-commandes"></div>
+
+  <!-- FORMULAIRE COMMANDE -->
+  <div id="form-commande" class="cache">
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <span class="form-panel-titre" id="form-commande-titre">Nouvelle commande</span>
+        <button class="btn-fermer-panneau" onclick="fermerFormCommande()">✕</button>
+      </div>
+    </div>
+
+    <!-- CLIENT (obligatoire) -->
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Client (obligatoire)</span>
+      </div>
+      <div class="form-body">
+        <div class="form-grille">
+          <div class="form-groupe col-plein">
+            <input type="text" class="form-ctrl" id="cmd-client" placeholder="Nom *">
+          </div>
+          <div class="form-groupe col-plein">
+            <input type="text" inputmode="email" class="form-ctrl" id="cmd-courriel" placeholder="Courriel (au moins un des deux)">
+          </div>
+          <div class="form-groupe col-plein">
+            <input type="text" inputmode="tel" class="form-ctrl" id="cmd-telephone" placeholder="Téléphone (au moins un des deux)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAISIE PRODUITS -->
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Produits commandés</span>
+      </div>
+      <div class="form-body">
+        <div class="form-grille">
+          <div class="form-groupe col-plein">
+            <select class="form-ctrl" id="cmd-collection" onchange="cmdFiltrerGammes()">
+              <option value="">— Collection —</option>
+            </select>
+          </div>
+          <div class="form-groupe col-plein">
+            <select class="form-ctrl" id="cmd-gamme" onchange="cmdFiltrerProduits()">
+              <option value="">— Gamme (toutes) —</option>
+            </select>
+          </div>
+          <div class="form-groupe col-plein">
+            <select class="form-ctrl" id="cmd-produit" onchange="cmdFiltrerFormats()">
+              <option value="">— Produit —</option>
+            </select>
+          </div>
+          <div class="form-groupe col-plein">
+            <select class="form-ctrl" id="cmd-format" onchange="cmdMettreAJourPrix()">
+              <option value="">— Format —</option>
+            </select>
+          </div>
+          <div class="form-groupe col-plein">
+            <div class="ven-qte-ligne">
+              <button class="bouton bouton-petit" onclick="cmdChangerQte(-1)">−</button>
+              <input type="number" class="form-ctrl" id="cmd-quantite" min="1" value="1" inputmode="numeric" oninput="cmdMettreAJourPrix()">
+              <button class="bouton bouton-petit" onclick="cmdChangerQte(1)">+</button>
+            </div>
+          </div>
+          <div class="form-groupe col-demi">
+            <input type="text" class="form-ctrl" id="cmd-prix" placeholder="Prix unitaire" readonly>
+          </div>
+          <div class="form-groupe col-demi">
+            <input type="text" class="form-ctrl" id="cmd-total-ligne" placeholder="Total" readonly>
+          </div>
+          <div class="form-groupe col-plein">
+            <button class="bouton bouton-plein-largeur" onclick="cmdAjouterLigne()">+ Ajouter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LISTE DES LIGNES -->
+    <div class="form-panel" id="cmd-panier-panel">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Items de la commande</span>
+      </div>
+      <div class="form-body">
+        <div id="cmd-panier-liste"></div>
+        <div class="form-grille" style="margin-top:16px">
+          <div class="form-groupe col-plein">
+            <input type="text" class="form-ctrl" id="cmd-total-prevu" placeholder="Total prévu" readonly>
+          </div>
+          <div class="form-groupe col-plein">
+            <label class="form-label">Acompte versé ($)</label>
+            <input type="text" inputmode="decimal" class="form-ctrl" id="cmd-acompte" placeholder="0,00" value="0" oninput="cmdCalculerSolde()">
+          </div>
+          <div class="form-groupe col-plein">
+            <label class="form-label">Solde à payer à la livraison</label>
+            <input type="text" class="form-ctrl" id="cmd-solde" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Notes</span>
+      </div>
+      <div class="form-body">
+        <div class="form-groupe">
+          <textarea class="form-ctrl" id="cmd-notes" rows="3" placeholder="Date prévue, demande spéciale, etc."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-panel form-body-actions">
+      <div class="form-actions">
+        <button class="bouton bouton-contour" onclick="fermerFormCommande()">Annuler</button>
+        <button class="bouton" onclick="enregistrerCommande()">Enregistrer la commande</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FICHE DÉTAIL COMMANDE -->
+  <div id="fiche-commande" class="cache">
+    <div class="form-panel">
+      <div class="form-panel-header">
+        <span class="form-panel-titre" id="fiche-commande-titre">Commande</span>
+        <button class="btn-fermer-panneau" onclick="fermerFicheCommande()">✕</button>
+      </div>
+    </div>
+    <div class="form-panel">
+      <div class="form-body" id="fiche-commande-contenu"></div>
+    </div>
+    <div class="form-panel form-body-actions">
+      <div class="form-actions" id="fiche-commande-actions"></div>
+    </div>
+  </div>
+
+  <!-- FILTRES COMMANDES -->
+  <div class="filtres-bar" id="filtres-commandes">
+    <select class="form-ctrl filtre-select" id="filtre-cmd-statut" onchange="filtrerCommandes()">
+      <option value="">Tous les statuts</option>
+      <option value="En attente">En attente</option>
+      <option value="Prête">Prête</option>
+      <option value="Livrée">Livrée</option>
+      <option value="Annulée">Annulée</option>
+    </select>
+    <input type="text" class="form-ctrl filtre-recherche" id="filtre-cmd-recherche" placeholder="Rechercher (nom, courriel, téléphone, produit…)" oninput="filtrerCommandes()">
+    <button class="bouton bouton-petit bouton-contour" onclick="reinitialiserFiltresCommandes()" title="Réinitialiser">✕</button>
+  </div>
+
+  <!-- LISTE DES COMMANDES -->
+  <div id="contenu-commandes">
+    <div class="chargement" id="loading-commandes"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+    <div id="tableau-commandes"></div>
+    <div class="vide cache" id="vide-commandes">
+      <div class="vide-titre">Aucune commande</div>
+      <div class="vide-desc">Créez votre première commande</div>
+    </div>
+  </div>
+</div>
+
 	<!-- INVENTAIRE PRODUCTION -->
 		        <div class="section-admin" id="section-inventaire-production">
         <div class="page-entete fade-in">
@@ -3196,7 +3556,7 @@
         <button class="bouton bouton-plein-largeur" onclick="envoyerFactureTexto()">Envoyer par texto</button>
         <button class="bouton bouton-plein-largeur" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
         <button class="bouton bouton-plein-largeur" onclick="imprimerFacture()">Imprimer / PDF</button>
-        <button class="bouton bouton-contour bouton-plein-largeur" onclick="fermerModalApresVente()">Ne pas imprimer</button>
+       <button class="bouton bouton-contour bouton-plein-largeur" onclick="fermerModalApresVente()">Ne pas envoyer</button>
       </div>
     </div>
   </div>
@@ -3258,6 +3618,8 @@
 
 
 <script src="../js/admin-ventes.js"></script>
+<script src="../js/admin-remboursements.js"></script>
+<script src="../js/admin-commandes.js"></script>
 <script src="../js/admin-collections.js"></script>
 <script src="../js/admin-gammes.js"></script>
 <script src="../js/admin-regroupements.js"></script>
