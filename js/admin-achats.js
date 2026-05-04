@@ -1115,6 +1115,12 @@ async function efConfirmerModalIngredient() {
     });
   }
 
+  // Sauvegarder le format actuellement sélectionné
+  var selFmtAvant = document.getElementById('ef-format');
+  var fmtValAvant = selFmtAvant ? selFmtAvant.value : '';
+  var fmtTextAvant = (selFmtAvant && selFmtAvant.selectedIndex >= 0)
+    ? selFmtAvant.options[selFmtAvant.selectedIndex].textContent : '';
+
   // Ajouter dans la liste et sélectionner
   var sel = document.getElementById('ef-nom-uc');
   if (sel) {
@@ -1131,6 +1137,23 @@ async function efConfirmerModalIngredient() {
   }
   efFermerModalIngredient();
   efRemplirFormats(ing_id);
+
+  // Restaurer le format si on en avait déjà entré un
+  if (fmtValAvant && fmtValAvant !== '__nouveau__' && fmtValAvant !== '') {
+    var selFmtApres = document.getElementById('ef-format');
+    if (selFmtApres) {
+      var optExiste = Array.from(selFmtApres.options).find(function(o) { return o.value === fmtValAvant; });
+      if (!optExiste) {
+        var optFmt = document.createElement('option');
+        optFmt.value = fmtValAvant;
+        optFmt.textContent = fmtTextAvant;
+        var optFmtNew = Array.from(selFmtApres.options).find(function(o) { return o.value === '__nouveau__'; });
+        if (optFmtNew) selFmtApres.insertBefore(optFmt, optFmtNew);
+        else selFmtApres.appendChild(optFmt);
+      }
+      selFmtApres.value = fmtValAvant;
+    }
+  }
 }
 
 // ─── MODALES — NOUVELLE CAT UC ───
