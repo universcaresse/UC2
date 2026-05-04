@@ -246,7 +246,7 @@ nav.scrolled { box-shadow: none; }
   font-variant: normal;
   text-transform: lowercase;
   color: var(--primary);
-  font-weight: 425;
+  font-weight: 450;
   transition: color 0.2s;
 }
 .nav-links a {

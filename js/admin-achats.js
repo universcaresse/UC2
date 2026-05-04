@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════
    UNIVERS CARESSE — admin-achats.js
-   Réécrit selon LOGIQUE-ACHATS.md — version révisée
+   Réécrit selon LOGIQUE-ACHATS.md — v3
    ═══════════════════════════════════════ */
 
 // ─── ÉTAT ───
@@ -15,7 +15,6 @@ var ef = {
   mapping:          [],
   editIdx:          null,
   initEnCours:      false,
-  // Sauvegarde temporaire des saisies en cours (pour ne rien perdre)
   saisieEnCours:    { qte: '', prix: '', formatVal: '', formatText: '' }
 };
 
@@ -46,7 +45,6 @@ function efGrammesDuFormat(qte, unite, cat_id) {
   return q;
 }
 
-// Sauvegarder/restaurer l'état des champs qte/prix/format
 function efSauvegarderSaisie() {
   var elQte   = document.getElementById('ef-qte');
   var elPrix  = document.getElementById('ef-prix');
@@ -89,10 +87,29 @@ function efResetSaisie() {
   ef.saisieEnCours = { qte: '', prix: '', formatVal: '', formatText: '' };
 }
 
+// Activer/désactiver la ligne de saisie (pendant les sauvegardes)
+function efBloquerLigneSaisie(bloquer) {
+  var ligne = document.getElementById('ef-ligne-saisie');
+  if (!ligne) return;
+  var champs = ligne.querySelectorAll('select, input, button');
+  champs.forEach(function(el) {
+    el.disabled = bloquer;
+  });
+  if (bloquer) ligne.classList.add('ligne-bloquee');
+  else ligne.classList.remove('ligne-bloquee');
+}
+
 // ─── INITIALISATION ───
 async function efInit() {
   if (ef.initEnCours) return;
   ef.initEnCours = true;
+
+  // Afficher le spinner et tout cacher avant la vérification
+  document.getElementById('ef-panel-entete')?.classList.add('cache');
+  document.getElementById('ef-zone-items')?.classList.add('cache');
+  document.getElementById('ef-bandeau-reprise')?.classList.add('cache');
+  afficherChargement();
+
   try {
     var res = await Promise.all([
       appelAPI('getFournisseurs'),
@@ -131,7 +148,11 @@ async function efInit() {
     efPopulerFournisseurs();
     efInitDate();
     await efVerifierFactureEnCours();
+    cacherChargement();
     efAfficherEtatInitial();
+  } catch(e) {
+    cacherChargement();
+    afficherMsg('ef', 'Erreur de chargement.', 'erreur');
   } finally {
     ef.initEnCours = false;
   }
@@ -148,6 +169,7 @@ function efAfficherEtatInitial() {
   } else if (ef.factureEnAttente) {
     document.getElementById('ef-panel-entete')?.classList.add('cache');
     document.getElementById('ef-zone-items')?.classList.add('cache');
+    document.getElementById('ef-bandeau-reprise')?.classList.remove('cache');
   } else {
     document.getElementById('ef-panel-entete')?.classList.remove('cache');
     document.getElementById('ef-zone-items')?.classList.add('cache');
@@ -235,7 +257,6 @@ async function efVerifierFactureEnCours() {
   if (bandeau && texte) {
     texte.textContent = 'Facture ' + (enCours.numero_facture || enCours.ach_id) +
                        ' — ' + fourNom + ' — ' + (enCours.date || '');
-    bandeau.classList.remove('cache');
   }
 
   ef.factureEnAttente = {
@@ -386,6 +407,10 @@ async function efCreerFacture() {
   ef.editIdx = null;
   efResetSaisie();
 
+  // Recharger le mapping depuis le serveur (pour avoir tous les mappings de ce fournisseur)
+  var resMap = await appelAPI('getMappingFournisseurs');
+  if (resMap && resMap.success) ef.mapping = resMap.items || [];
+
   document.getElementById('ef-panel-entete')?.classList.add('cache');
   document.getElementById('ef-zone-items')?.classList.remove('cache');
   efRendreLignesSauvegardees();
@@ -424,6 +449,7 @@ function efCalculerTotal() {
 }
 
 // ─── LIGNE DE SAISIE ───
+// Ordre des colonnes : fourn → UC → format → qté → prix → total → bouton
 function efRendreLigneSaisie() {
   var tbody = document.getElementById('ef-tbody');
   if (!tbody) return;
@@ -440,8 +466,6 @@ function efRendreLigneSaisie() {
     .join('') + '<option value="__nouveau__">+ Nouvelle catégorie UC…</option>';
 
   var colFournHtml = '';
-  var colUCHtml = '';
-
   if (aScraping) {
     var optsCatFourn = ef.catsFourn
       .filter(function(c) {
@@ -462,29 +486,23 @@ function efRendreLigneSaisie() {
       '<select class="form-ctrl" id="ef-nom-fourn" onchange="efOnChangeNomFourn()" style="margin-top:4px">' +
         '<option value="">— Nom fourn. —</option>' +
       '</select>';
-
-    colUCHtml =
-      '<select class="form-ctrl" id="ef-cat-uc" onchange="efOnChangeCatUC()">' +
-        '<option value="">— Cat. UC —</option>' + optsCatUC +
-      '</select>' +
-      '<select class="form-ctrl" id="ef-nom-uc" onchange="efOnChangeNomUC()" style="margin-top:4px">' +
-        '<option value="">— Nom UC —</option>' +
-      '</select>';
   } else {
-    colFournHtml =
-      '<select class="form-ctrl" id="ef-cat-uc" onchange="efOnChangeCatUC()">' +
-        '<option value="">— Catégorie UC —</option>' + optsCatUC +
-      '</select>' +
-      '<select class="form-ctrl" id="ef-nom-uc" onchange="efOnChangeNomUC()" style="margin-top:4px">' +
-        '<option value="">— Nom UC —</option>' +
-      '</select>';
-    colUCHtml = '';
+    colFournHtml = '<span class="texte-secondaire" style="font-size:0.8rem;color:#999;display:block;text-align:center">—</span>';
   }
+
+  var colUCHtml =
+    '<select class="form-ctrl" id="ef-cat-uc" onchange="efOnChangeCatUC()">' +
+      '<option value="">— Cat. UC —</option>' + optsCatUC +
+    '</select>' +
+    '<select class="form-ctrl" id="ef-nom-uc" onchange="efOnChangeNomUC()" style="margin-top:4px">' +
+      '<option value="">— Nom UC —</option>' +
+    '</select>';
 
   var tr = document.createElement('tr');
   tr.id = 'ef-ligne-saisie';
   tr.innerHTML =
     '<td>' + colFournHtml + '</td>' +
+    '<td>' + colUCHtml + '</td>' +
     '<td>' +
       '<select class="form-ctrl" id="ef-format" onchange="efOnChangeFormat()">' +
         '<option value="">— Format —</option>' +
@@ -494,7 +512,6 @@ function efRendreLigneSaisie() {
     '<td><input type="text" inputmode="decimal" class="form-ctrl" id="ef-qte" placeholder="Qté" oninput="efMajLigneTotal()"></td>' +
     '<td><input type="text" inputmode="decimal" class="form-ctrl" id="ef-prix" placeholder="Prix $" oninput="efMajLigneTotal()"></td>' +
     '<td id="ef-total-ligne">—</td>' +
-    '<td>' + colUCHtml + '</td>' +
     '<td>' +
       '<button class="bouton bouton-petit" id="ef-btn-ajouter" onclick="efAjouterLigne()" title="Ajouter">+</button>' +
       '<button class="bouton bouton-petit bouton-secondaire cache" id="ef-btn-annuler-edit" onclick="efAnnulerEdit()" title="Annuler">✕</button>' +
@@ -513,6 +530,8 @@ function efOnChangeCatFourn() {
     return;
   }
   efRemplirNomsFourn(sel.value);
+  // Vider les champs UC qui pourraient être pré-remplis d'une autre ligne
+  efViderChampsUC();
 }
 
 function efRemplirNomsFourn(cat_fourn_id) {
@@ -530,7 +549,18 @@ function efRemplirNomsFourn(cat_fourn_id) {
     '<option value="__nouveau__">+ Nouveau nom…</option>';
 }
 
-function efOnChangeNomFourn() {
+function efViderChampsUC() {
+  var selCatUC = document.getElementById('ef-cat-uc');
+  var selNomUC = document.getElementById('ef-nom-uc');
+  var selFmt   = document.getElementById('ef-format');
+  if (selCatUC) selCatUC.value = '';
+  if (selNomUC) selNomUC.innerHTML = '<option value="">— Nom UC —</option><option value="__nouveau__">+ Nouvel ingrédient…</option>';
+  if (selFmt) {
+    selFmt.innerHTML = '<option value="">— Format —</option><option value="__nouveau__">+ Nouveau format…</option>';
+  }
+}
+
+async function efOnChangeNomFourn() {
   var sel = document.getElementById('ef-nom-fourn');
   if (!sel) return;
   if (sel.value === '__nouveau__') {
@@ -539,19 +569,29 @@ function efOnChangeNomFourn() {
     efOuvrirModalNomFourn();
     return;
   }
+
+  // Toujours vider les champs UC d'abord (pas de pré-remplissage erroné)
+  efViderChampsUC();
+
   if (!sel.value) return;
 
-  // Vérifier si ce nom fournisseur est déjà mappé à un ingrédient UC
+  // Recharger le mapping depuis le serveur pour être sûr d'avoir les derniers
+  var resMap = await appelAPI('getMappingFournisseurs');
+  if (resMap && resMap.success) ef.mapping = resMap.items || [];
+
   var mapping = ef.mapping.find(function(m) {
-    return m.four_id === ef.factureActive.four_id && m.prod_fourn_id === sel.value;
+    return String(m.four_id) === String(ef.factureActive.four_id) &&
+           String(m.prod_fourn_id) === String(sel.value);
   });
   if (mapping && mapping.ing_id) {
-    var ing = (listesDropdown.fullData || []).find(function(d) { return d.ing_id === mapping.ing_id; });
+    var ing = (listesDropdown.fullData || []).find(function(d) {
+      return String(d.ing_id) === String(mapping.ing_id);
+    });
     if (ing) {
       var selCatUC = document.getElementById('ef-cat-uc');
-      var selNomUC = document.getElementById('ef-nom-uc');
       if (selCatUC) selCatUC.value = ing.cat_id;
       efRemplirNomsUC(ing.cat_id);
+      var selNomUC = document.getElementById('ef-nom-uc');
       if (selNomUC) selNomUC.value = ing.ing_id;
       efRemplirFormats(ing.ing_id);
     }
@@ -608,7 +648,6 @@ function efOnChangeNomUC() {
 function efRemplirFormats(ing_id) {
   var sel = document.getElementById('ef-format');
   if (!sel) return;
-  // Mémoriser la valeur courante avant de rafraîchir
   var ancienVal = sel.value;
   var ancienText = (sel.selectedIndex >= 0) ? sel.options[sel.selectedIndex].textContent : '';
 
@@ -627,13 +666,11 @@ function efRemplirFormats(ing_id) {
   optNew.textContent = '+ Nouveau format…';
   sel.appendChild(optNew);
 
-  // Si l'ancienne valeur est encore valide, on la garde
   if (ancienVal && ancienVal !== '__nouveau__' && ancienVal !== '') {
     var existe = Array.from(sel.options).find(function(o) { return o.value === ancienVal; });
     if (existe) {
       sel.value = ancienVal;
     } else {
-      // Format manuel saisi avant — on le rajoute
       var opt = document.createElement('option');
       opt.value = ancienVal;
       opt.textContent = ancienText;
@@ -667,9 +704,6 @@ async function efAjouterLigne() {
     return;
   }
 
-  var btn = document.getElementById('ef-btn-ajouter');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
-
   var aScraping = ef.factureActive.a_scraping;
 
   var cat_id        = document.getElementById('ef-cat-uc')?.value || '';
@@ -689,7 +723,6 @@ async function efAjouterLigne() {
   var quantite = document.getElementById('ef-qte')?.value?.trim();
 
   function erreur(msg) {
-    if (btn) { btn.disabled = false; btn.innerHTML = '+'; }
     afficherMsg('ef-items', msg, 'erreur');
   }
   if (aScraping && !cat_fourn_id)  return erreur('Catégorie fournisseur requise.');
@@ -699,6 +732,11 @@ async function efAjouterLigne() {
   if (!formatQte) return erreur('Format requis.');
   if (!prixUnit)  return erreur('Prix unitaire requis.');
   if (!quantite)  return erreur('Quantité requise.');
+
+  // Bloquer la ligne pendant la sauvegarde
+  efBloquerLigneSaisie(true);
+  var btn = document.getElementById('ef-btn-ajouter');
+  if (btn) btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>';
 
   var prixUnitNum = efParseFlt(prixUnit);
   var quantiteNum = efParseFlt(quantite);
@@ -725,7 +763,8 @@ async function efAjouterLigne() {
   });
 
   if (!res || !res.success) {
-    if (btn) { btn.disabled = false; btn.innerHTML = '+'; }
+    efBloquerLigneSaisie(false);
+    if (btn) btn.innerHTML = '+';
     afficherMsg('ef-items', (res && res.message) || 'Erreur ajout ligne.', 'erreur');
     return;
   }
@@ -762,7 +801,6 @@ async function efAjouterLigne() {
   }
 
   efResetSaisie();
-  if (btn) { btn.disabled = false; btn.innerHTML = '+'; }
   afficherMsg('ef-items', '');
   efRendreLignesSauvegardees();
   efRendreLigneSaisie();
@@ -771,9 +809,9 @@ async function efAjouterLigne() {
 
 async function efAssurerMapping(four_id, cat_fourn_id, prod_fourn_id, ing_id) {
   var existe = ef.mapping.find(function(m) {
-    return m.four_id === four_id &&
-           (m.prod_fourn_id || '') === (prod_fourn_id || '') &&
-           m.ing_id === ing_id;
+    return String(m.four_id) === String(four_id) &&
+           String(m.prod_fourn_id || '') === String(prod_fourn_id || '') &&
+           String(m.ing_id) === String(ing_id);
   });
   if (existe) return;
 
@@ -807,6 +845,7 @@ function efAssurerFormatLocal(ing_id, four_id, formatQte, formatUnite) {
 }
 
 // ─── AFFICHAGE LIGNES SAUVEGARDÉES ───
+// Ordre : fourn → UC → format → qté → prix → total → actions
 function efRendreLignesSauvegardees() {
   var tbody = document.getElementById('ef-tbody');
   if (!tbody) return;
@@ -815,21 +854,20 @@ function efRendreLignesSauvegardees() {
 
   ef.lignes.forEach(function(l, idx) {
     var fmt = l.formatQte + ' ' + l.formatUnite;
-    var col1 = ef.factureActive.a_scraping
+    var colFourn = ef.factureActive.a_scraping
       ? l.catFournNom + '<br><small>' + l.prodFournNom + '</small>'
-      : l.catUC + '<br><small>' + l.nomUC + '</small>';
-    var col6 = ef.factureActive.a_scraping
-      ? l.catUC + '<br><small>' + l.nomUC + '</small>'
-      : '';
+      : '—';
+    var colUC = l.catUC + '<br><small>' + l.nomUC + '</small>';
+
     var tr = document.createElement('tr');
     if (idx === ef.editIdx) tr.classList.add('cache');
     tr.innerHTML =
-      '<td>' + col1 + '</td>' +
+      '<td>' + colFourn + '</td>' +
+      '<td>' + colUC + '</td>' +
       '<td>' + fmt + '</td>' +
       '<td>' + l.quantite + '</td>' +
       '<td>' + formaterPrix(l.prixUnitaire) + '</td>' +
       '<td>' + formaterPrix(l.prixTotal) + '</td>' +
-      '<td>' + col6 + '</td>' +
       '<td>' +
         '<div style="display:flex;flex-direction:column;gap:4px;align-items:center">' +
           '<button class="bouton bouton-petit bouton-secondaire" onclick="efEditerLigne(' + idx + ')" style="width:100%">✏️</button>' +
@@ -859,7 +897,6 @@ async function efEditerLigne(idx) {
   efRendreLignesSauvegardees();
   efRendreLigneSaisie();
 
-  // Pré-remplir directement, sans setTimeout empilés
   if (ef.factureActive.a_scraping) {
     var selCatF = document.getElementById('ef-cat-fourn');
     if (selCatF) {
@@ -1056,7 +1093,6 @@ function efConfirmerModalFormat() {
     if (optNew) sel.insertBefore(opt, optNew);
     else sel.appendChild(opt);
     sel.value = opt.value;
-    // Mémoriser pour la restauration
     ef.saisieEnCours.formatVal = opt.value;
     ef.saisieEnCours.formatText = opt.textContent;
   }
