@@ -852,11 +852,14 @@
           <div class="form-panel">
             <div class="form-body" id="fiche-recette-contenu"></div>
           </div>
+		  
+		  
           <div class="form-panel form-body-actions">
             <div class="form-actions">
-              <button class="bouton" onclick="basculerModeEditionRecette()">Modifier</button>
-              <button class="bouton bouton-rouge" onclick="supprimerRecetteActive()">Supprimer</button>
-            </div>
+  <button class="bouton bouton-contour" onclick="fermerFicheProduit()">Fermer</button>
+  <button class="bouton" onclick="basculerModeEditionRecette()">Modifier</button>
+  <button class="bouton bouton-rouge" onclick="supprimerRecetteActive()">Supprimer</button>
+</div>
           </div>
         </div>
        
@@ -909,21 +912,31 @@
               <div class="form-groupe">
                 <label class="form-label">Cure (jours)</label>
                 <input type="text" inputmode="decimal" class="form-ctrl" id="fr-cure">
+                <label style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:0.85rem;color:var(--gris);cursor:pointer">
+                  <input type="checkbox" id="fr-cure-na" onchange="appliquerCureNA()"> Pas applicable
+                </label>
               </div>
               <div class="form-groupe">
                 <label class="form-label">Surgras (%)</label>
                 <input type="text" class="form-ctrl" id="fr-surgras">
+                <label style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:0.85rem;color:var(--gris);cursor:pointer">
+                  <input type="checkbox" id="fr-surgras-na" onchange="appliquerSurgrasNA()"> Pas applicable
+                </label>
               </div>
               <div class="form-groupe">
                 <label class="form-label">Couleur HEX</label>
-                <input type="text" class="form-ctrl" id="fr-couleur-visible" oninput="apercuCouleurRecette(this)">
-                <div id="fr-couleur-apercu" class="couleur-apercu"></div>
+                <div id="fr-couleur-apercu" style="width:100%;aspect-ratio:1;max-width:200px;min-height:120px;background:var(--beige);border-radius:6px;border:1px solid var(--beige-fonce);margin-bottom:8px"></div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="font-size:1.1rem;color:var(--gris)">#</span>
+                  <input type="text" class="form-ctrl" id="fr-couleur-visible" maxlength="6" placeholder="6 caractères" oninput="apercuCouleurRecette(this)" style="font-family:monospace;letter-spacing:0.05em;text-transform:uppercase">
+                </div>
               </div>
               <div class="form-groupe">
                 <label class="form-label">Statut</label>
                 <select class="form-ctrl" id="fr-statut">
                   <option value="test">Test</option>
                   <option value="public">Public</option>
+                  <option value="archive">Archivé</option>
                 </select>
               </div>
               <div class="form-groupe col-plein">
@@ -951,18 +964,18 @@
                 <textarea class="form-ctrl" id="fr-notes" rows="2"></textarea>
               </div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px">
               <div class="form-groupe">
                 <label class="form-label">Photo principale</label>
-                <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">Médiathèque</button>
-                <input type="text" class="form-ctrl" id="fr-image-url" style="display:none">
-                <div id="fr-image-preview"></div>
+                <div id="fr-image-preview" style="margin-bottom:8px;min-height:120px;background:var(--beige);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:0.85rem">Aucune photo</div>
+                <button type="button" class="bouton bouton-vert-pale bouton-petit" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">Choisir depuis la médiathèque</button>
+                <input type="hidden" id="fr-image-url">
               </div>
               <div class="form-groupe">
-                <label class="form-label">Photo secondaire</label>
-                <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">Médiathèque</button>
-                <input type="text" class="form-ctrl" id="fr-image-url-noel" style="display:none">
-                <div id="fr-image-preview-noel"></div>
+                <label class="form-label">Photo saisonnière</label>
+                <div id="fr-image-preview-noel" style="margin-bottom:8px;min-height:120px;background:var(--beige);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:0.85rem">Aucune photo</div>
+                <button type="button" class="bouton bouton-vert-pale bouton-petit" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">Choisir depuis la médiathèque</button>
+                <input type="hidden" id="fr-image-url-noel">
               </div>
             </div>
             <div class="form-groupe col-plein" id="zone-ingredients-recette">
@@ -2347,6 +2360,9 @@
         <div class="chargement" id="loading-inci"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div id="inci-accordeons"></div>
       </div>
+	  
+	  
+	  
     <!-- IMPORT RECETTES -->
             <div class="section-admin" id="section-import-recettes">
         <div class="page-entete fade-in">
@@ -2368,84 +2384,7 @@
         </div>
 		
 		
-       <div class="carte-admin cache" id="import-apercu-zone">
-  <div class="carte-admin-entete">Aperçu — vérifier et corriger avant d'importer</div>
-  <div class="form-body">
-    <div class="form-grille">
-      <div class="form-groupe col-demi">
-        <label class="form-label">Nom</label>
-        <input type="text" class="form-ctrl" id="imp-nom">
-      </div>
-      <div class="form-groupe">
-        <label class="form-label">Collection</label>
-        <input type="text" class="form-ctrl" id="imp-collection">
-      </div>
-	  
-	  
-      <div class="form-groupe">
-        <label class="form-label">Ligne</label>
-        <input type="text" class="form-ctrl" id="imp-ligne">
-      </div>
-      <div class="form-groupe">
-        <label class="form-label">Statut</label>
-        <select class="form-ctrl" id="imp-statut">
-          <option value="test">Test</option>
-          <option value="public">Public</option>
-        </select>
-      </div>
-      <div class="form-groupe">
-                <label class="form-label">Rang</label>
-                <input type="text" inputmode="decimal" class="form-ctrl" id="imp-rang">
-              </div>
-              <div class="form-groupe">
-                <label class="form-label">Nb unités</label>
-                <input type="text" inputmode="decimal" class="form-ctrl" id="imp-unites">
-              </div>
-      <div class="form-groupe">
-        <label class="form-label">Cure (jours)</label>
-        <input type="text" inputmode="decimal" class="form-ctrl" id="imp-cure">
-      </div>
-      <div class="form-groupe">
-        <label class="form-label">Surgras</label>
-        <input type="text" class="form-ctrl" id="imp-surgras">
-      </div>
-      <div class="form-groupe">
-        <label class="form-label">Couleur HEX</label>
-        <input type="text" class="form-ctrl" id="imp-couleur-hex" oninput="importApercuCouleur(this)">
-        <div id="imp-couleur-apercu" class="couleur-apercu"></div>
-      </div>
-      <div class="form-groupe col-plein">
-        <label class="form-label">Image principale (URL)</label>
-        <input type="text" class="form-ctrl" id="imp-image-url">
-      </div>
-      <div class="form-groupe col-plein">
-        <label class="form-label">Image Noël (URL)</label>
-        <input type="text" class="form-ctrl" id="imp-image-url-noel">
-      </div>
-      <div class="form-groupe col-plein">
-        <label class="form-label">Version courte</label>
-        <textarea class="form-ctrl" id="imp-desc-courte" rows="2"></textarea>
-      </div>
-      <div class="form-groupe col-plein">
-        <label class="form-label">Version longue</label>
-        <textarea class="form-ctrl" id="imp-desc-longue" rows="4"></textarea>
-      </div>
-      <div class="form-groupe col-plein">
-        <label class="form-label">Notes</label>
-        <textarea class="form-ctrl" id="imp-notes" rows="2"></textarea>
-      </div>
-    </div>
-    <div class="form-groupe col-plein">
-      <label class="form-label">Ingrédients</label>
-      <div id="imp-ingredients"></div>
-    </div>
-  </div>
-  <div class="form-actions">
-    <button class="bouton" onclick="importEnvoyer()">Importer</button>
-    <button class="bouton bouton-contour" onclick="importAnnuler()">Annuler</button>
-  </div>
-</div>
-      </div>
+      
 
     <!-- <!-- PROMOTIONS -->
       <div class="section-admin" id="section-promotions">
