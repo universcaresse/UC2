@@ -332,13 +332,36 @@ main { padding-top: var(--nav-h); }
    BOUTONS
    ═══════════════════════════════════════ */
 .bouton {
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center; gap: 10px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
   font-weight: 500; cursor: pointer; border: none;
   padding: 12px 28px; transition: background 0.2s;
   text-decoration: none; background: var(--primary); color: white;
 }
+.bouton2 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem; 
+  letter-spacing: 0.15em; 
+  text-transform: uppercase;
+  font-weight: 500; 
+  cursor: pointer;
+  padding: 12px 28px; 
+  transition: background 0.2s;
+  text-decoration: none; 
+  background: transparent; 
+  color: var(--primary); 
+  border: 1px solid var(--primary); }
+  
+}
+
 .bouton:disabled { opacity: 0.6; cursor: not-allowed; }
 .bouton svg { width: 16px; height: 16px; transition: opacity 1.5s ease; }
 .bouton.invisible svg { opacity: 0; }
