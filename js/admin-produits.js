@@ -253,8 +253,8 @@ async function afficherProduits() {
           var formatsHTML = (pro.formats && pro.formats.length)
             ? '<div class="carte-formats">' + [].concat(pro.formats).sort(function(a, b) { return parseFloat(a.poids) - parseFloat(b.poids); }).map(function(f) {
                 var qteInv = inv[f.poids + '_' + f.unite] || 0;
-                var invHTML = '<span class="carte-format-inv" style="font-size:0.75em;opacity:0.75;margin-left:4px">(' + qteInv + ' en stock)</span>';
-                return '<div class="carte-format-tag"><span class="carte-format-prix">' + parseFloat(f.prix_vente).toFixed(2).replace('.', ',') + ' $</span><span class="carte-format-sep"></span><span class="carte-format-poids">' + f.poids + ' ' + f.unite + '</span>' + invHTML + '</div>';
+                var invHTML = '<span class="carte-format-prix">(' + qteInv + ' dispo)</span>';
+                return '<div class="carte-format-tag"><span class="carte-format-prix">' + parseFloat(f.prix_vente).toFixed(2).replace('.', ',') + ' $</span><span class="carte-format-sep"></span><span class="carte-format-prix">' + f.poids + ' ' + f.unite + '</span>' + invHTML + '</div>';
               }).join('') + '</div>'
             : '';
 
@@ -302,7 +302,7 @@ function injecterBoutonActualiser() {
   if (!btnNouveau || !btnNouveau.parentNode) return;
   var btn = document.createElement('button');
   btn.id = 'btn-actualiser-produits';
-  btn.className = 'bouton bouton-contour';
+  btn.className = 'bouton2';
   btn.style.marginRight = '8px';
   btn.textContent = '↺ Actualiser';
   btn.onclick = actualiserProduits;

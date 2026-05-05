@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await chargerDonneesInitiales();
 });
 async function chargerDonneesInitiales() {
-const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resPromo, resRegro] = await Promise.all([
+const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resPromo, resRegro, resIngs, resEmb, resStock, resLots, resVL] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getGammes'),
     appelAPI('getFamilles'),
@@ -51,7 +51,12 @@ const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resProm
     appelAPI('getCategoriesUC'),
     appelAPI('getProduitsFormats'),
     appelAPI('getPromotions'),
-    appelAPI('getRegroupements')
+    appelAPI('getRegroupements'),
+    appelAPI('getProduitsIngredients'),
+    appelAPI('getFormatsEmballages'),
+    appelAPI('getStock'),
+    appelAPI('getLots'),
+    appelAPI('getVentesLignes')
   ]);
   if (resCol && resCol.success) {
     donneesCollections = resCol.items || [];
@@ -109,6 +114,32 @@ if (resGam && resGam.success) {
   const statProd  = document.getElementById('admin-stat-produits');
 	if (statCol)  statCol.textContent  = donneesCollections.length;
 	if (statProd && nbPublics > 0) statProd.textContent = nbPublics + '+';
+
+  // Remplir le cache produits dès le démarrage
+  var ingsMap = {};
+  if (resIngs && resIngs.success) {
+    (resIngs.items || []).forEach(function(i) {
+      if (!ingsMap[i.pro_id]) ingsMap[i.pro_id] = [];
+      ingsMap[i.pro_id].push(i);
+    });
+  }
+  prodCache.ingredients = ingsMap;
+
+  var embMap = {};
+  if (resEmb && resEmb.success) {
+    (resEmb.items || []).forEach(function(e) {
+      if (!embMap[e.pro_id]) embMap[e.pro_id] = [];
+      embMap[e.pro_id].push(e);
+    });
+  }
+  prodCache.emballages = embMap;
+
+  prodCache.formats = formatsMap;
+  prodCache.stock = (resStock && resStock.success) ? resStock.items : [];
+  listesDropdown.stock = prodCache.stock;
+  prodCache.lots = (resLots && resLots.success) ? resLots.items : [];
+  prodCache.ventesLignes = (resVL && resVL.success) ? resVL.items : [];
+  prodCache.charge = true;
 }
 // ─── NAVIGATION SIDEBAR ───
 function toggleDropdownAdmin(el) {

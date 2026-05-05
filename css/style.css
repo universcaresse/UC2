@@ -1215,16 +1215,7 @@ tr.cliquable { cursor: pointer; }
   .accueil-droite { overflow: visible; height: auto; }
   .accueil-grande-tuile { height: auto; }
   .accueil-tuile { min-height: 120px; }
-  
-  
-.fr-medias-rangee { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; margin-top: 8px; }
-.fr-media-item { display: flex; flex-direction: column; gap: 6px; }
-.fr-media-zone { width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; color: var(--gris); font-size: 0.85rem; overflow: hidden; }
-.fr-media-zone img { width: 100%; height: 100%; object-fit: cover; }
-.fr-couleur-zone { background: var(--beige); border: 1px solid var(--beige); }
-.fr-hex-saisie { display: flex; align-items: center; gap: 6px; }
-.fr-hex-saisie span { font-size: 1.1rem; color: var(--gris); }
-.fr-hex-saisie .form-ctrl { font-family: monospace; letter-spacing: 0.05em; text-transform: uppercase; width: 120px; }
+
 /* ═══════════════════════════════════════
    ADMIN — FICHE COLLECTION
    ═══════════════════════════════════════ */
