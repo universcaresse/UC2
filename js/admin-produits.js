@@ -254,7 +254,7 @@ async function afficherProduits() {
             ? '<div class="carte-formats">' + [].concat(pro.formats).sort(function(a, b) { return parseFloat(a.poids) - parseFloat(b.poids); }).map(function(f) {
                 var qteInv = inv[f.poids + '_' + f.unite] || 0;
                 var invHTML = '<span class="carte-format-prix">(' + qteInv + ' dispo)</span>';
-                return '<div class="carte-format-tag"><span class="carte-format-prix">' + parseFloat(f.prix_vente).toFixed(2).replace('.', ',') + ' $</span><span class="carte-format-sep"></span><span class="carte-format-poids">' + f.poids + ' ' + f.unite + '</span>' + invHTML + '</div>';
+                return '<div class="carte-format-tag"><span class="carte-format-prix">' + parseFloat(f.prix_vente).toFixed(2).replace('.', ',') + ' $</span><span class="carte-format-sep"></span><span class="carte-format-prix">' + f.poids + ' ' + f.unite + '</span>' + invHTML + '</div>';
               }).join('') + '</div>'
             : '';
 
