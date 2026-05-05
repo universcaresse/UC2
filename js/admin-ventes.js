@@ -390,12 +390,12 @@ function venMettreAJourPromos() {
   // Ajouter les options libres (toujours présentes)
   const optMontant = document.createElement('option');
   optMontant.value = JSON.stringify({ kind: 'montant' });
-  optMontant.textContent = '💵 Montant libre ($)';
+  optMontant.textContent = 'Montant libre ($)';
   sel.appendChild(optMontant);
 
   const optPct = document.createElement('option');
   optPct.value = JSON.stringify({ kind: 'pourcentage' });
-  optPct.textContent = '% Pourcentage libre';
+  optPct.textContent = '% libre';
   sel.appendChild(optPct);
 
   // Restaurer la sélection si encore valide

@@ -302,7 +302,7 @@ function injecterBoutonActualiser() {
   if (!btnNouveau || !btnNouveau.parentNode) return;
   var btn = document.createElement('button');
   btn.id = 'btn-actualiser-produits';
-  btn.className = 'bouton bouton-contour';
+  btn.className = 'bouton2';
   btn.style.marginRight = '8px';
   btn.textContent = '↺ Actualiser';
   btn.onclick = actualiserProduits;
