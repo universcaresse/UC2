@@ -22,11 +22,14 @@ async function chargerCommandes() {
 
   if (loading) loading.classList.add('cache');
 
-  if (!res || !res.success || !res.items.length) {
+ if (!res || !res.success || !res.items.length) {
     toutesCommandes = [];
     if (vide) vide.classList.remove('cache');
+    document.getElementById('contenu-commandes').classList.remove('cache');
+    document.getElementById('filtres-commandes').classList.remove('cache');
+    document.querySelector('#section-commandes .page-entete .bouton')?.classList.remove('cache');
     return;
-  }
+}
 
   toutesCommandes = res.items;
   if (vide) vide.classList.add('cache');
