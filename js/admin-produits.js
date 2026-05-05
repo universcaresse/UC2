@@ -79,11 +79,11 @@ async function chargerCacheProduits() {
     (res[1].items || []).forEach(function(f) {
       if (!formatsMap[f.pro_id]) formatsMap[f.pro_id] = [];
       formatsMap[f.pro_id].push({
-        format_id: f.format_id || '',
+        format_id: f.format_id,
         poids: f.poids,
         unite: f.unite,
         prix_vente: f.prix_vente,
-        nb_unites: f.nb_unites || 0
+        nb_unites: f.nb_unites
       });
     });
   }
@@ -125,14 +125,12 @@ async function chargerCacheProduits() {
 
   prodCache.stock = (res[4] && res[4].success) ? res[4].items : [];
   listesDropdown.stock = prodCache.stock;
-
   prodCache.lots         = (res[5] && res[5].success) ? res[5].items : [];
   prodCache.ventesLignes = (res[6] && res[6].success) ? res[6].items : [];
 
   prodCache.charge = true;
   cacherChargement();
 }
-
 function calculerInventaireProduit(pro_id) {
   var inv = {};
   (prodCache.lots || []).forEach(function(l) {
