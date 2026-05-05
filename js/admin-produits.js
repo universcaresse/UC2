@@ -315,7 +315,7 @@ function peuplerFiltresRecettes() {
   if (!bar) return;
   bar.innerHTML = '<button class="filtre-btn actif" data-col="" onclick="onFiltreCollectionBtn(this, \'\')">Tout</button>';
   donneesCollections.sort(function(a, b) { return (a.rang || 99) - (b.rang || 99); }).forEach(function(col) {
-    bar.innerHTML += '<button class="filtre-btn" data-col="' + col.nom + '" onclick="onFiltreCollectionBtn(this, \'' + col.nom + '\')">' + col.nom + '</button>';
+    bar.innerHTML += '<button class="filtre-btn" data-col="' + col.nom + '" onclick="onFiltreCollectionBtn(this, \'' + col.nom.replace(/'/g, "\\\\'") + '\')">' + col.nom + '</button>';
   });
   var filStat = document.getElementById('filtre-recette-statut');
   var filNom  = document.getElementById('filtre-recette-nom');
@@ -335,7 +335,7 @@ function onFiltreCollectionBtn(btn, colNom) {
       bar.classList.remove('cache');
       bar.innerHTML = '<button class="filtre-btn actif" onclick="onFiltreGammeBtn(this, \'\')">Toutes</button>';
       gammes.sort(function(a, b) { return (a.rang || 99) - (b.rang || 99); }).forEach(function(g) {
-        bar.innerHTML += '<button class="filtre-btn" onclick="onFiltreGammeBtn(this, \'' + g.nom + '\')">' + g.nom + '</button>';
+        bar.innerHTML += '<button class="filtre-btn" onclick="onFiltreGammeBtn(this, \'' + g.nom.replace(/'/g, "\\\\'") + '\')">' + g.nom + '</button>';
       });
     } else {
       bar.classList.add('cache');
