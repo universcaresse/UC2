@@ -24,9 +24,13 @@ async function chargerCommandes() {
 
  if (!res || !res.success || !res.items.length) {
     toutesCommandes = [];
+    const tableau = document.getElementById('tableau-commandes');
+    if (tableau) tableau.innerHTML = '';
     if (vide) vide.classList.remove('cache');
     document.getElementById('contenu-commandes').classList.remove('cache');
     document.getElementById('filtres-commandes').classList.remove('cache');
+    document.getElementById('form-commande').classList.add('cache');
+    document.getElementById('fiche-commande').classList.add('cache');
     document.querySelector('#section-commandes .page-entete .bouton')?.classList.remove('cache');
     return;
 }
