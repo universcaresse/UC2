@@ -1039,7 +1039,7 @@ async function sauvegarderRecette() {
     // Mettre à jour les format_id locaux avec les vrais IDs séquentiels retournés par le backend
     var mapping = res.formatIdMap || {};
     formatsRecette.forEach(function(f) {
-      if (mapping[f.format_id]) {
+      if (mapping[f.format_id] && mapping[f.format_id] !== f.format_id) {
         var ancienId = f.format_id;
         var nouveauId = mapping[ancienId];
         f.format_id = nouveauId;
