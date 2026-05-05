@@ -109,10 +109,6 @@ if (resGam && resGam.success) {
   const statProd  = document.getElementById('admin-stat-produits');
 	if (statCol)  statCol.textContent  = donneesCollections.length;
 	if (statProd && nbPublics > 0) statProd.textContent = nbPublics + '+';
-
-  sLots.items : [];
-  prodCache.ventesLignes = (resVL && resVL.success) ? resVL.items : [];
-  prodCache.charge = true;
 }
 // ─── NAVIGATION SIDEBAR ───
 function toggleDropdownAdmin(el) {
