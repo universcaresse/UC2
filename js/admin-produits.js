@@ -607,18 +607,14 @@ function construireTableauFormats(formats, embItems, stock, coutIngsTotal, CAT_C
     var nbUnites = f.nb_unites || 0;
     var coutIngParUnite = nbUnites > 0 ? coutIngsTotal / nbUnites : 0;
     // Préférer format_id si dispo, sinon fallback sur poids+unite
-    var embsDuFormat = embItems.filter(function(e) {
-      if (f.format_id && e.format_id) return e.format_id === f.format_id;
-      return String(e.poids) === String(f.poids) && e.unite === f.unite;
-    });
+    var embsDuFormat = embItems.filter(function(e) { return e.format_id === f.format_id; });
     var coutContenant = 0, coutEmballage = 0;
     embsDuFormat.forEach(function(e) {
       var s = stock.find(function(st) { return st.ing_id === e.ing_id; });
       var prix = (s && s.prix_par_g_reel) || 0;
-      var montant = (e.nb_par_unite || 1) * prix;
       var ing = (listesDropdown.fullData || []).find(function(d) { return d.ing_id === e.ing_id; });
-      if (ing && ing.cat_id === CAT_CONTENANT) coutContenant += montant;
-      else if (ing && CATS_EMBALLAGE.indexOf(ing.cat_id) >= 0) coutEmballage += montant;
+      if (ing && ing.cat_id === CAT_CONTENANT) coutContenant += prix;
+      else if (ing && CATS_EMBALLAGE.indexOf(ing.cat_id) >= 0) coutEmballage += prix;
     });
     var coutTotal = coutIngParUnite + coutContenant + coutEmballage;
     var marge = (f.prix_vente && coutTotal > 0)
@@ -916,19 +912,13 @@ async function modifierProduit(pro_id) {
   // Charger les emballages indexés par format_id
   emballagesRecette = {};
   formatsRecette.forEach(function(f) {
-    var embsCeFormat = embItems.filter(function(e) {
-      // Préférer format_id si dispo, sinon retomber sur poids+unité
-      if (f.format_id && e.format_id) return e.format_id === f.format_id;
-      return String(e.poids) === String(f.poids) && e.unite === f.unite;
-    });
+    var embsCeFormat = embItems.filter(function(e) { return e.format_id === f.format_id; });
     emballagesRecette[f.format_id] = embsCeFormat.map(function(e) {
       var ing = (listesDropdown.fullData || []).find(function(d) { return d.ing_id === e.ing_id; });
       return {
         ing_id: e.ing_id,
         cat_id: (ing && ing.cat_id) || '',
-        nom: (ing && ing.nom_UC) || '',
-        quantite: e.quantite,
-        nb_par_unite: e.nb_par_unite || 1
+        nom: (ing && ing.nom_UC) || ''
       };
     });
   });
@@ -1048,17 +1038,29 @@ async function sauvegarderRecette() {
     var res = await appelAPIPost('saveProduit', d);
     if (!res || !res.success) return erreur('Erreur à l\'enregistrement.');
 
-    // Sauvegarder les emballages — clé = format_id
+    // Mettre à jour les format_id locaux avec les vrais IDs séquentiels retournés par le backend
+    var mapping = res.formatIdMap || {};
+    formatsRecette.forEach(function(f) {
+      if (mapping[f.format_id]) {
+        var ancienId = f.format_id;
+        var nouveauId = mapping[ancienId];
+        f.format_id = nouveauId;
+        if (emballagesRecette[ancienId]) {
+          emballagesRecette[nouveauId] = emballagesRecette[ancienId];
+          delete emballagesRecette[ancienId];
+        }
+      }
+    });
+
+    // Sauvegarder les emballages — clé = format_id (réel)
     for (var i = 0; i < formatsRecette.length; i++) {
       var f = formatsRecette[i];
       var embs = emballagesRecette[f.format_id] || [];
       await appelAPIPost('saveFormatsEmballages', {
         pro_id: d.pro_id,
         format_id: f.format_id,
-        poids:  f.poids,
-        unite:  f.unite,
         emballages: embs.filter(function(e) { return e.ing_id; }).map(function(e) {
-          return { ing_id: e.ing_id, quantite: e.quantite || 0, nb_par_unite: e.nb_par_unite || 1 };
+          return { ing_id: e.ing_id };
         })
       });
     }
@@ -1129,11 +1131,7 @@ function majCacheApresSauvegarde(d) {
         emballagesPlat.push({
           pro_id: pro_id,
           format_id: format_id,
-          poids: f.poids,
-          unite: f.unite,
-          ing_id: e.ing_id,
-          quantite: e.quantite || 0,
-          nb_par_unite: e.nb_par_unite || 1
+          ing_id: e.ing_id
         });
       }
     });

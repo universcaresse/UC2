@@ -262,7 +262,7 @@ function fabFiltrerFormats() {
     if (!res || !res.success) return;
     (res.items || []).forEach(f => {
       const opt = document.createElement('option');
-      opt.value = JSON.stringify({ poids: f.poids, unite: f.unite, prix: f.prix_vente, nb_unites: f.nb_unites || 0 });
+      opt.value = JSON.stringify({ format_id: f.format_id, poids: f.poids, unite: f.unite, prix: f.prix_vente, nb_unites: f.nb_unites || 0 });
       opt.textContent = f.poids + ' ' + f.unite + (f.nb_unites ? ' — ' + f.nb_unites + ' unités' : '');
       select.appendChild(opt);
     });
@@ -413,6 +413,7 @@ const lot_id = 'LOT-' + String(dernierNumLot + 1).padStart(4, '0');
     nb_unites:          nbUnites,
     date_fabrication:   dateFab,
     date_disponibilite: dateDispo,
+    format_id:          formatVal.format_id || '',
     format_poids:       formatVal.poids || '',
     format_unite:       formatVal.unite || '',
     nb_unites_format:   nbUnitesFormat,

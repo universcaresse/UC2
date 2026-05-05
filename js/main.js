@@ -578,17 +578,6 @@ function construireCatalogue() {
 }
 
 // ─── CARTE PRODUIT ───
-// V2 : p.col_id, p.gam_id, p.nom_gamme, p.nom_collection, p.pro_id
-// Les formats sont dans p.formats (tableau {poids, unite, prix_vente})
-function couleurTexteContraste(hex) {
-  if (!hex || hex.length < 4) return 'carte-infos-clair';
-  const r = parseInt(hex.slice(1,3), 16);
-  const g = parseInt(hex.slice(3,5), 16);
-  const b = parseInt(hex.slice(5,7), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.5 ? 'carte-infos-fonce' : 'carte-infos-clair';
-}
-
 function carteProduit(p) {
   const formats = Array.isArray(p.formats) && p.formats.length ? [...p.formats].sort((a, b) => parseFloat(a.poids) - parseFloat(b.poids)) : [];
   const prix = formats.length
