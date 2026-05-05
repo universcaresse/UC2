@@ -24,7 +24,13 @@ async function chargerRemboursements() {
 
   if (!res || !res.success || !res.items.length) {
     toutesRemboursements = [];
+    const tableau = document.getElementById('tableau-remboursements');
+    if (tableau) tableau.innerHTML = '';
     if (vide) vide.classList.remove('cache');
+    document.getElementById('contenu-remboursements').classList.remove('cache');
+    document.getElementById('filtres-remboursements').classList.remove('cache');
+    document.getElementById('form-remboursement').classList.add('cache');
+    document.querySelector('#section-remboursements .page-entete .bouton')?.classList.remove('cache');
     return;
   }
 
