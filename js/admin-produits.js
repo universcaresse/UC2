@@ -1705,6 +1705,19 @@ async function envoyerExportGraphiste() {
 
   var formatsTexte = formats.map(function(f) { return '- ' + f.poids + ' ' + f.unite + ' : ' + (f.prix_vente || '—') + ' $'; }).join('\n');
 
+  // Construire le texte des emballages par format
+  var embItems = prodCache.emballages[pro.pro_id] || [];
+  var emballagesTexte = formats.map(function(f) {
+    var embs = embItems.filter(function(e) { return e.format_id === f.format_id; });
+    if (!embs.length) return '';
+    var lignes = embs.map(function(e) {
+      var ing = (listesDropdown.fullData || []).find(function(d) { return d.ing_id === e.ing_id; });
+      var catNom = ing ? ((listesDropdown.categoriesMap || {})[ing.cat_id] || '') : '';
+      return '  • ' + (catNom ? catNom + ' — ' : '') + (ing ? ing.nom_UC : e.ing_id);
+    }).join('\n');
+    return 'Format ' + f.poids + ' ' + f.unite + ' :\n' + lignes;
+  }).filter(function(t) { return t; }).join('\n\n');
+
   var data = {
     email: email,
     nom: pro.nom || '',
@@ -1724,6 +1737,7 @@ async function envoyerExportGraphiste() {
     inci_label: inciLabel,
     ingredients_texte: ingsTexte,
     formats_texte: formatsTexte,
+    emballages_texte: emballagesTexte,
     nb_sans_inci: nbSansInci
   };
 
