@@ -1702,7 +1702,7 @@ async function envoyerExportGraphiste() {
 
   var ingsTexte = ings.slice().sort(function(a, b) { return b.quantite_g - a.quantite_g; })
     .map(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return '- ' + i.nom_ingredient + ' | ' + ((o && o.inci) || '⚠ INCI manquant') + ' | ' + i.quantite_g + ' g'; })
-    .join('\n');
+    .join('\n'); 
 
   var formatsTexte = formats.map(function(f) { return '- ' + f.poids + ' ' + f.unite + ' : ' + (f.prix_vente || '—') + ' $'; }).join('\n');
 
@@ -1838,11 +1838,6 @@ async function genererExportPdf() {
   var formats = pro.formats || [];
 
   var inciLabel = ings
-    .filter(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return o && o.inci; })
-    .slice()
-    .sort(function(a, b) { return b.quantite_g - a.quantite_g; })
-    .map(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return o.inci.trim(); })
-    .join(', ');
 
   var ingsListe = ings.slice().sort(function(a, b) { return b.quantite_g - a.quantite_g; })
     .map(function(i) {
