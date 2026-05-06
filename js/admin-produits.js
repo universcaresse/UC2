@@ -1050,18 +1050,20 @@ async function sauvegarderRecette() {
       }
     });
 
-    // Sauvegarder les emballages — clé = format_id (réel)
-    for (var i = 0; i < formatsRecette.length; i++) {
-      var f = formatsRecette[i];
+    // Sauvegarder TOUS les emballages d'un coup (un seul appel) — touche uniquement Produits_Formats_Emballages_v2
+    var tousLesEmballages = [];
+    formatsRecette.forEach(function(f) {
       var embs = emballagesRecette[f.format_id] || [];
-      await appelAPIPost('saveFormatsEmballages', {
-        pro_id: d.pro_id,
-        format_id: f.format_id,
-        emballages: embs.filter(function(e) { return e.ing_id; }).map(function(e) {
-          return { ing_id: e.ing_id };
-        })
+      embs.forEach(function(e) {
+        if (e && e.ing_id && f.format_id) {
+          tousLesEmballages.push({ format_id: f.format_id, ing_id: e.ing_id });
+        }
       });
-    }
+    });
+    await appelAPIPost('saveFormatsEmballages', {
+      pro_id: d.pro_id,
+      emballages: tousLesEmballages
+    });
 
     majCacheApresSauvegarde(d);
     fermerFormProduit();
