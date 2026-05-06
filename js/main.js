@@ -834,9 +834,12 @@ function ouvrirModal(produit) {
 
   const photoModal = (window.modeSaisonnier && produit.image_noel_url) ? produit.image_noel_url : produit.image_url;
   if (photoModal) {
-    hex.style.background = `linear-gradient(145deg, ${couleur}dd, ${couleur}88)`;
-    hex.classList.remove('cache');
+    photo.classList.remove('cache');
     photo.style.background = '';
+    photo.style.flex = '';
+    hex.classList.remove('cache');
+    hex.style.flex = '';
+    hex.style.background = `linear-gradient(145deg, ${couleur}dd, ${couleur}88)`;
     const img = document.createElement('img');
     img.src = photoModal;
     img.onerror = () => img.remove();
