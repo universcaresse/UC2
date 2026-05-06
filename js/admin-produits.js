@@ -926,6 +926,8 @@ async function modifierProduit(pro_id) {
   rafraichirListeFormatsRecette();
   produitsAfficherVue('formulaire');
   window.scrollTo(0, 0);
+  var contenu = document.querySelector('.admin-contenu');
+  if (contenu) contenu.scrollTo(0, 0);
 }
 function modifierRecette(id) { return modifierProduit(id); }
 
