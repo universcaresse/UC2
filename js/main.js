@@ -872,9 +872,18 @@ function ouvrirModal(produit) {
     const ingredients = produit.ingredients || [];
     const avecInci = ingredients.filter(i => i.inci && i.inci.trim());
     if (avecInci.length > 0) {
-      const total = avecInci.reduce((s, i) => s + (parseFloat(i.quantite_g) || 0), 0);
       const tries = [...avecInci].sort((a, b) => (parseFloat(b.quantite_g) || 0) - (parseFloat(a.quantite_g) || 0));
-      inciEl.textContent = 'Ingrédients : ' + tries.map(i => i.inci.trim()).join(', ');
+      const vus = new Set();
+      const inciUniques = [];
+      tries.forEach(i => {
+        const code = i.inci.trim();
+        const cle = code.toLowerCase();
+        if (!vus.has(cle)) {
+          vus.add(cle);
+          inciUniques.push(code);
+        }
+      });
+      inciEl.textContent = 'Ingrédients : ' + inciUniques.join(', ');
     } else {
       inciEl.textContent = '';
     }
