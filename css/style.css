@@ -1179,9 +1179,9 @@ tr.cliquable { cursor: pointer; }
 }
 
 @media (min-width: 600px) and (max-width: 900px) {
-  .page-hero > *:last-child,
-  .section-texte > *:last-child,
-  .contact-grille > *:last-child {
+  #section-accueil .section-texte > *:last-child,
+  .contact-grille > *:last-child,
+  .collection-entete > *:last-child {
     width: 60%;
     margin-left: auto;
   }
