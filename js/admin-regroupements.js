@@ -58,6 +58,22 @@ function fermerFicheRegroupement() {
   document.getElementById('btn-nouveau-regroupement').classList.remove('cache');
 }
 
+function peuplerCategoriesExclues(cochees) {
+  const conteneur = document.getElementById('freg-categories-exclues');
+  if (!conteneur) return;
+  conteneur.innerHTML = '';
+  Object.keys(listesDropdown.categoriesMap || {}).sort((a,b) => (listesDropdown.categoriesMap[a]||'').localeCompare(listesDropdown.categoriesMap[b]||'','fr')).forEach(k => {
+    const label = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = k;
+    if (Array.isArray(cochees) && cochees.indexOf(k) >= 0) cb.checked = true;
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(' ' + listesDropdown.categoriesMap[k]));
+    conteneur.appendChild(label);
+  });
+}
+
 function ouvrirFormRegroupement() {
   fermerFicheRegroupement();
   document.getElementById('form-regroupements-titre').textContent      = 'Nouveau regroupement';
@@ -75,6 +91,7 @@ function ouvrirFormRegroupement() {
   });
   document.getElementById('freg-ing').innerHTML = '<option value="">— Choisir catégorie d\'abord —</option>';
   document.getElementById('freg-ing').disabled  = true;
+  peuplerCategoriesExclues([]);
   peuplerPositionRegroupement(null);
   document.getElementById('contenu-regroupements').classList.add('cache');
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
@@ -144,6 +161,7 @@ function modifierRegroupement(fra_id) {
   });
   selCat.value = fra.cat_id || '';
   peuplerIngredientsRegroupement(fra.cat_id, fra.ing_id);
+  peuplerCategoriesExclues(fra.categories_exclues || []);
   peuplerPositionRegroupement(fra.rang);
   document.getElementById('contenu-regroupements').classList.add('cache');
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
@@ -160,20 +178,28 @@ async function sauvegarderRegroupement() {
   const id     = document.getElementById('freg-id').value;
   const nom    = document.getElementById('freg-nom').value.trim().toUpperCase();
   const ing_id = document.getElementById('freg-ing').value;
-  if (!nom)    { cacherChargement(); afficherMsg('regroupements', 'Le nom est requis.', 'erreur'); return; }
-  if (!ing_id) { cacherChargement(); afficherMsg('regroupements', 'L\'ingrédient est requis.', 'erreur'); return; }
+  const categoriesExclues = Array.from(
+    document.getElementById('freg-categories-exclues').querySelectorAll('input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
+  if (!nom) { cacherChargement(); afficherMsg('regroupements', 'Le nom est requis.', 'erreur'); return; }
+  if (!ing_id && categoriesExclues.length === 0) {
+    cacherChargement();
+    afficherMsg('regroupements', 'Choisir un ingrédient ou au moins une catégorie à exclure.', 'erreur');
+    return;
+  }
   const positionChoisie = parseInt(document.getElementById('freg-position')?.value) || 0;
   const dernierNumFra = donneesRegroupements.length ? Math.max(...donneesRegroupements.map(f => parseInt((f.fra_id || '').replace('FRA-', '')) || 0)) : 0;
   const d = {
-    fra_id:         id || ('FRA-' + String(dernierNumFra + 1).padStart(4, '0')),
-    rang:           positionChoisie + 1,
+    fra_id:             id || ('FRA-' + String(dernierNumFra + 1).padStart(4, '0')),
+    rang:               positionChoisie + 1,
     nom,
-    slogan:         document.getElementById('freg-slogan').value,
-    description:    document.getElementById('freg-desc').value,
-    cat_id:         document.getElementById('freg-cat').value,
+    slogan:             document.getElementById('freg-slogan').value,
+    description:        document.getElementById('freg-desc').value,
+    cat_id:             document.getElementById('freg-cat').value,
     ing_id,
-    photo_url:      document.getElementById('freg-photo-url').value,
-    photo_noel_url: document.getElementById('freg-photo-noel-url').value
+    photo_url:          document.getElementById('freg-photo-url').value,
+    photo_noel_url:     document.getElementById('freg-photo-noel-url').value,
+    categories_exclues: categoriesExclues
   };
   const res = await appelAPIPost('saveRegroupement', d);
   if (res && res.success) {
