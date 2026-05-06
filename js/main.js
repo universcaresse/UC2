@@ -889,7 +889,8 @@ function ouvrirModal(produit) {
         const cle = code.toLowerCase();
         if (!vus.has(cle)) {
           vus.add(cle);
-          inciUniques.push(code);
+          const formate = code.toLowerCase().replace(/^([a-zà-ÿ])/, c => c.toUpperCase());
+          inciUniques.push(formate);
         }
       });
       inciEl.textContent = 'Ingrédients : ' + inciUniques.join(', ');

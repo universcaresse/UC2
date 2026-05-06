@@ -525,9 +525,10 @@ function ouvrirFicheProduit(pro_id) {
         var prixParG = (s2 && s2.prix_par_g_reel) || 0;
         var coutIng = prixParG > 0 ? (i.quantite_g * prixParG).toFixed(2) + ' $' : '⚠';
         var clickAttr = sansInci ? ' onclick="allerVersInciDepuisProduit(\'' + (i.ing_id || '') + '\')" style="cursor:pointer"' : '';
+        var inciFormate = inciCode ? inciCode.toLowerCase().replace(/^([a-zà-ÿ])/, function(c) { return c.toUpperCase(); }) : '';
         return '<div class="fiche-ingredient"' + clickAttr + '>' +
           '<span class="fiche-ing-nom' + (sansInci ? ' fiche-label-manquant' : '') + '">' + (sansInci ? '⚠ ' : '') + i.nom_ingredient + '</span>' +
-          '<span class="fiche-ing-inci">' + inciCode + '</span>' +
+          '<span class="fiche-ing-inci">' + inciFormate + '</span>' +
           '<span class="fiche-ing-qte">' + i.quantite_g + ' g</span>' +
           '<span class="fiche-ing-qte">' + coutIng + '</span>' +
           '</div>';
@@ -679,8 +680,8 @@ function construireListeInciEtiquette(ings) {
   });
 
   var liste = morceaux.map(function(m) {
-    if (m.type === 'inci') return m.valeur;
-    if (notesOlfactives.length) return 'Fragrance (' + notesOlfactives.join(', ') + ')';
+    if (m.type === 'inci') return m.valeur.toLowerCase().replace(/^([a-zà-ÿ])/, function(c) { return c.toUpperCase(); });
+    if (notesOlfactives.length) return 'Fragrance (' + notesOlfactives.join(', ').toLowerCase() + ')';
     return 'Fragrance';
   }).join(', ');
 
