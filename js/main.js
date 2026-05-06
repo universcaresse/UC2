@@ -690,7 +690,16 @@ function afficherPageRegroupements(fraIdActif) {
         </div>
       </div>
       ${(() => {
-        const prods = (donneesCatalogue?.produits || []).filter(p => (p.ingredients || []).some(i => i.ing_id === fra.ing_id));
+        const prods = (donneesCatalogue?.produits || []).filter(p => {
+          const ings = p.ingredients || [];
+          if (fra.ing_id && !ings.some(i => i.ing_id === fra.ing_id)) return false;
+          if (Array.isArray(fra.categories_exclues) && fra.categories_exclues.length > 0) {
+            const aCategorieExclue = ings.some(i => fra.categories_exclues.indexOf(i.cat_id) >= 0);
+            if (aCategorieExclue) return false;
+          }
+          if (!fra.ing_id && (!Array.isArray(fra.categories_exclues) || fra.categories_exclues.length === 0)) return false;
+          return true;
+        });
         const parGamme = {};
         const ordreGammes = [];
         prods.forEach(p => {
