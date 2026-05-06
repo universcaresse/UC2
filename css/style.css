@@ -393,8 +393,8 @@ main { padding-top: var(--nav-h); }
 
 .form-label {
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.80rem; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--gris); display: block; margin-bottom: 8px; font-weight: 500;
+  font-size: 0.90rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--primary); display: block; margin-bottom: 8px; font-weight: 550;
 }
 .form-label span { color: var(--danger); }
 .form-optionnel { font-weight: 300; text-transform: none; letter-spacing: 0; font-size: 0.68rem; color: var(--beige); }
