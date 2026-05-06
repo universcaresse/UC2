@@ -1575,57 +1575,62 @@ function supprimerEmballageFormat(format_id, idx) {
   if (emballagesRecette[format_id]) emballagesRecette[format_id].splice(idx, 1);
   rafraichirListeFormatsRecette();
 }
-
 function rafraichirListeFormatsRecette() {
   var liste = document.getElementById('liste-formats-recette');
   if (!liste) return;
   var labels = document.getElementById('labels-formats-recette');
+  if (labels) labels.classList.add('cache');
+
   if (formatsRecette.length === 0) {
     liste.innerHTML = '';
-    if (labels) labels.classList.add('cache');
     return;
   }
-  if (labels) labels.classList.remove('cache');
-  var catsEmb = ['CAT-015', 'CAT-016', 'CAT-017', 'CAT-014'];
+
+  var catsEmb = ['CAT-014', 'CAT-015', 'CAT-016', 'CAT-017'];
+
   liste.innerHTML = formatsRecette.map(function(f, i) {
     if (!f.format_id) f.format_id = genererFormatId();
     var fid = f.format_id;
     var embs = emballagesRecette[fid] || [];
+
     var lignesEmb = embs.map(function(e, j) {
-      var catEmb = e.cat_id || catsEmb.find(function(c) {
-        return (listesDropdown.fullData || []).find(function(d) { return d.ing_id === e.ing_id && d.cat_id === c; });
-      }) || '';
+      var catEmb = e.cat_id || '';
       var ingsDecat = catEmb ? (listesDropdown.fullData || []).filter(function(d) { return d.cat_id === catEmb; }) : [];
       return '<div class="ingredient-rangee">' +
-        '<select class="form-ctrl" onchange="emballagesRecette[\'' + fid + '\'][' + j + '].cat_id=this.value; rafraichirListeFormatsRecette()">' +
+        '<select class="form-ctrl" onchange="emballagesRecette[\'' + fid + '\'][' + j + '].cat_id=this.value; emballagesRecette[\'' + fid + '\'][' + j + '].ing_id=\'\'; emballagesRecette[\'' + fid + '\'][' + j + '].nom=\'\'; rafraichirListeFormatsRecette()">' +
           '<option value="">— Catégorie —</option>' +
           catsEmb.map(function(c) { return '<option value="' + c + '" ' + (catEmb === c ? 'selected' : '') + '>' + ((listesDropdown.categoriesMap || {})[c] || c) + '</option>'; }).join('') +
         '</select>' +
-        '<select class="form-ctrl" onchange="emballagesRecette[\'' + fid + '\'][' + j + '].ing_id=this.value; emballagesRecette[\'' + fid + '\'][' + j + '].nom=(listesDropdown.fullData.find(function(d){return d.ing_id===this.value;})||{}).nom_UC||\'\'; emballagesRecette[\'' + fid + '\'][' + j + '].nb_par_unite=1;">' +
+        '<select class="form-ctrl" onchange="emballagesRecette[\'' + fid + '\'][' + j + '].ing_id=this.value; emballagesRecette[\'' + fid + '\'][' + j + '].nom=(listesDropdown.fullData.find(function(d){return d.ing_id===this.value;})||{}).nom_UC||\'\';">' +
           '<option value="">— Nom UC —</option>' +
           ingsDecat.map(function(d) { return '<option value="' + d.ing_id + '" ' + (d.ing_id === e.ing_id ? 'selected' : '') + '>' + d.nom_UC + '</option>'; }).join('') +
         '</select>' +
         '<button class="bouton bouton-petit bouton-rouge" onclick="supprimerEmballageFormat(\'' + fid + '\',' + j + ')">✕</button>' +
       '</div>';
     }).join('');
-    return '<div class="ingredient-rangee">' +
-      '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.poids || '') + '" placeholder="Contenu net" onchange="formatsRecette[' + i + '].poids=this.value">' +
-      '<select class="form-ctrl" onchange="formatsRecette[' + i + '].unite=this.value">' +
-        '<option value="g" ' + (f.unite === 'g' ? 'selected' : '') + '>g</option>' +
-        '<option value="ml" ' + (f.unite === 'ml' ? 'selected' : '') + '>ml</option>' +
-      '</select>' +
-      '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.nb_unites || '') + '" placeholder="Nb unités produits" onchange="formatsRecette[' + i + '].nb_unites=parseInt(this.value)||0">' +
-      '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.prix || '') + '" placeholder="Prix $" onchange="formatsRecette[' + i + '].prix=parseFloat(this.value)||0">' +
-      '<button class="bouton bouton-petit bouton-rouge" onclick="supprimerFormatRecette(' + i + ')">✕</button>' +
-    '</div>' +
-    '<div style="margin-top:12px;margin-bottom:4px;padding:6px 8px;background:var(--beige-fonce);border-left:3px solid var(--primary);font-size:0.75rem;color:var(--gris);text-transform:uppercase;letter-spacing:0.08em;font-weight:600">' +
-      'Contenant et emballage par unité' +
-    '</div>' +
-    lignesEmb +
-    '<button type="button" class="bouton bouton-petit bouton-vert-pale" onclick="ajouterEmballageFormat(\'' + fid + '\')">+ Ajouter</button>';
+
+    return '<div class="form-panel visible">' +
+      '<div class="form-panel-header">' +
+        '<span class="form-panel-titre">Format ' + (i + 1) + '</span>' +
+        '<button class="bouton bouton-petit bouton-rouge" onclick="supprimerFormatRecette(' + i + ')">✕</button>' +
+      '</div>' +
+      '<div class="form-body">' +
+        '<div class="ingredient-rangee">' +
+          '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.poids || '') + '" placeholder="Contenu net" onchange="formatsRecette[' + i + '].poids=this.value">' +
+          '<select class="form-ctrl" onchange="formatsRecette[' + i + '].unite=this.value">' +
+            '<option value="g" ' + (f.unite === 'g' ? 'selected' : '') + '>g</option>' +
+            '<option value="ml" ' + (f.unite === 'ml' ? 'selected' : '') + '>ml</option>' +
+          '</select>' +
+          '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.nb_unites || '') + '" placeholder="Nb unités produits" onchange="formatsRecette[' + i + '].nb_unites=parseInt(this.value)||0">' +
+          '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.prix || '') + '" placeholder="Prix $" onchange="formatsRecette[' + i + '].prix=parseFloat(this.value)||0">' +
+        '</div>' +
+        '<div class="section-label">Contenant et emballage par unité</div>' +
+        lignesEmb +
+        '<button type="button" class="bouton bouton-petit bouton-vert-pale" onclick="ajouterEmballageFormat(\'' + fid + '\')">+ Ajouter un emballage</button>' +
+      '</div>' +
+    '</div>';
   }).join('');
 }
-
 // ─── COULEUR HEX (grand carré + champ 6 caractères) ───
 function apercuCouleurRecette(input) {
   if (!input) return;
