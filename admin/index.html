@@ -956,18 +956,18 @@
               <div class="form-groupe">
                 <label class="form-label">Photo principale</label>
                 <div id="fr-image-preview" style="margin-bottom:8px;min-height:120px;display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:0.85rem">Aucune photo</div>
-                <button type="button" class="bouton bouton-vert-pale bouton-petit" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">médiathèque</button>
+                <button type="button" class="bouton" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">médiathèque</button>
                 <input type="hidden" id="fr-image-url">
               </div>
               <div class="form-groupe">
                 <label class="form-label">Photo saisonnière</label>
                 <div id="fr-image-preview-noel" style="margin-bottom:8px;min-height:120px;display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:0.85rem">Aucune photo</div>
-                <button type="button" class="bouton bouton-vert-pale bouton-petit" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">médiathèque</button>
+                <button type="button" class="bouton bouton" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">médiathèque</button>
                 <input type="hidden" id="fr-image-url-noel">
               </div>
               <div class="form-groupe">
                 <label class="form-label">Couleur HEX</label>
-                <div id="fr-couleur-apercu" style="width:130px;height:130px;border:1px solid var(--beige);margin-bottom:8px"></div>
+                <div id="fr-couleur-apercu" style="width:120px;height:120px;border:1px solid var(--beige);margin-bottom:8px"></div>
                 <div style="display:flex;align-items:center;gap:6px">
                   <span style="font-size:1.1rem;color:var(--gris)">#</span>
                   <input type="text" class="form-ctrl" id="fr-couleur-visible" maxlength="6" placeholder="6 caractères" oninput="apercuCouleurRecette(this)" style="font-family:monospace;letter-spacing:0.05em;text-transform:uppercase">
