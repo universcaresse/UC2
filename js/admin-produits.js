@@ -986,7 +986,7 @@ async function sauvegarderRecette() {
 
     var dernierNumPro = donneesProduits.length ? Math.max.apply(null, donneesProduits.map(function(p) { return parseInt((p.pro_id || '').replace('PRO-', '')) || 0; })) : 0;
     var d = {
-      pro_id: id || ('PRO-' + String(dernierNumPro + 1).padStart(4, '0')),
+      pro_id: id || ('PRO-' + String(dernierNumPro + 1).padStart(3, '0')),
       col_id: col_id,
       gam_id: gam_id,
       fam_id: (document.getElementById('fr-famille') || {}).value || '',

@@ -918,14 +918,7 @@
                   <input type="checkbox" id="fr-surgras-na" onchange="appliquerSurgrasNA()"> Pas applicable
                 </label>
               </div>
-              <div class="form-groupe">
-                <label class="form-label">Couleur HEX</label>
-                <div id="fr-couleur-apercu" style="width:100%;aspect-ratio:1;max-width:200px;min-height:120px;background:var(--beige);border-radius:6px;border:1px solid var(--beige-fonce);margin-bottom:8px"></div>
-                <div style="display:flex;align-items:center;gap:6px">
-                  <span style="font-size:1.1rem;color:var(--gris)">#</span>
-                  <input type="text" class="form-ctrl" id="fr-couleur-visible" maxlength="6" placeholder="6 caractères" oninput="apercuCouleurRecette(this)" style="font-family:monospace;letter-spacing:0.05em;text-transform:uppercase">
-                </div>
-              </div>
+              
               <div class="form-groupe">
                 <label class="form-label">Statut</label>
                 <select class="form-ctrl" id="fr-statut">
@@ -959,19 +952,26 @@
                 <textarea class="form-ctrl" id="fr-notes" rows="2"></textarea>
               </div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px">
+           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:8px">
               <div class="form-groupe">
                 <label class="form-label">Photo principale</label>
-                <div id="fr-image-preview" style="margin-bottom:8px;min-height:120px;background:var(--beige);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:0.85rem">Aucune photo</div>
+                <div id="fr-image-preview" style="margin-bottom:8px;min-height:120px;display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:0.85rem">Aucune photo</div>
                 <button type="button" class="bouton bouton-vert-pale bouton-petit" onclick="ouvrirMediatheque('fr-image-url', 'fr-image-preview', 'Recette')">médiathèque</button>
                 <input type="hidden" id="fr-image-url">
               </div>
               <div class="form-groupe">
                 <label class="form-label">Photo saisonnière</label>
-                <div id="fr-image-preview-noel" style="margin-bottom:8px;min-height:120px;background:var(--beige);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:0.85rem">Aucune photo</div>
-                <button type="button" class="bouton bouton-vert-pale bouton-petit" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">
-				médiathèque</button>
+                <div id="fr-image-preview-noel" style="margin-bottom:8px;min-height:120px;display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:0.85rem">Aucune photo</div>
+                <button type="button" class="bouton bouton-vert-pale bouton-petit" onclick="ouvrirMediatheque('fr-image-url-noel', 'fr-image-preview-noel', 'Recette Noël')">médiathèque</button>
                 <input type="hidden" id="fr-image-url-noel">
+              </div>
+              <div class="form-groupe">
+                <label class="form-label">Couleur HEX</label>
+                <div id="fr-couleur-apercu" style="width:100%;aspect-ratio:1;min-height:120px;border:1px solid var(--beige);margin-bottom:8px"></div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="font-size:1.1rem;color:var(--gris)">#</span>
+                  <input type="text" class="form-ctrl" id="fr-couleur-visible" maxlength="6" placeholder="6 caractères" oninput="apercuCouleurRecette(this)" style="font-family:monospace;letter-spacing:0.05em;text-transform:uppercase">
+                </div>
               </div>
             </div>
             <div class="form-groupe col-plein" id="zone-ingredients-recette">
