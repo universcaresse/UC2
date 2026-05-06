@@ -549,6 +549,7 @@ function ouvrirFicheProduit(pro_id) {
     avertissementInciHtml +
     '<div class="fiche-visuel">' +
       (pro.image_url ? '<img src="' + pro.image_url + '" class="fiche-visuel-photo">' : '') +
+      (pro.image_noel_url ? '<img src="' + pro.image_noel_url + '" class="fiche-visuel-photo">' : '') +
       '<div class="fiche-visuel-hex" style="background:' + (pro.couleur_hex || 'var(--beige)') + '"></div>' +
     '</div>' +
     '<div class="fiche-grille">' +
