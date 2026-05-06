@@ -626,11 +626,15 @@
               <option value="">— Choisir —</option>
             </select>
           </div>
-          <div class="form-groupe">
+		  <div class="form-groupe">
             <label class="form-label">Ingrédient</label>
             <select class="form-ctrl" id="freg-ing" disabled>
               <option value="">— Choisir catégorie d'abord —</option>
             </select>
+          </div>
+          <div class="form-groupe col-plein">
+            <label class="form-label">Et/ou catégories à exclure</label>
+            <div id="freg-categories-exclues" class="checkboxes-groupe"></div>
           </div>
           <div class="form-groupe col-plein">
             <label class="form-label">Slogan</label>
@@ -640,28 +644,24 @@
             <label class="form-label">Description</label>
             <textarea class="form-ctrl textarea-auto" id="freg-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
           </div>
-          <div class="form-groupe col-plein">
-            <label class="form-label">Catégories à exclure (optionnel)</label>
-            <div id="freg-categories-exclues" class="checkboxes-groupe"></div>
-          </div>
-          <div class="form-groupe col-plein">
+		  
+		  
+         <div class="form-groupe col-plein">
             <label class="form-label">Photo principale</label>
-            <div class="cloudinary-zone">
-              <input type="text" class="form-ctrl" id="freg-photo-url">
-              <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediaLibrary('freg-photo-url', 'freg-photo-preview')">Choisir une photo</button>
-              <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('freg-photo-url', 'freg-photo-preview', 'Regroupement')">Médiathèque</button>
-            </div>
+            <input type="hidden" id="freg-photo-url">
             <div id="freg-photo-preview"></div>
+            <button type="button" class="bouton bouton-vert-pale bouton-petit" onclick="ouvrirMediatheque('freg-photo-url', 'freg-photo-preview', 'Regroupement')">Médiathèque</button>
           </div>
+		  
+		  
           <div class="form-groupe col-plein">
             <label class="form-label">Photo principale — saisonnière</label>
-            <div class="cloudinary-zone">
-              <input type="text" class="form-ctrl" id="freg-photo-noel-url">
-              <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediaLibrary('freg-photo-noel-url', 'freg-photo-noel-preview')">Choisir une photo</button>
-              <button type="button" class="bouton bouton-vert-pale" onclick="ouvrirMediatheque('freg-photo-noel-url', 'freg-photo-noel-preview', 'Regroupement Noël')">Médiathèque</button>
-            </div>
+            <input type="hidden" id="freg-photo-noel-url">
             <div id="freg-photo-noel-preview"></div>
+            <button type="button" class="bouton bouton-vert-pale bouton-petit" onclick="ouvrirMediatheque('freg-photo-noel-url', 'freg-photo-noel-preview', 'Regroupement Noël')">Médiathèque</button>
           </div>
+		  
+		  
         </div>
       </div>
     </div>
