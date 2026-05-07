@@ -241,6 +241,11 @@ async function validerConnexionAdmin() {
     if (err) err.textContent = 'Mot de passe incorrect.';
   }
 }
+
+function seDeconnecter() {
+  sessionStorage.removeItem('uc_admin');
+  window.location.href = '/admin/login.html';
+}
 function afficherStatsAccueil() {
   const nbPublics = donneesProduits.filter(p => p.statut === 'public').length;
   const statCol   = document.getElementById('admin-stat-collections');

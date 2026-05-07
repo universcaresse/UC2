@@ -211,11 +211,6 @@ async function validerConnexion() {
   }
 }
 
-function seDeconnecter() {
-  adminConnecte = false;
-  sessionStorage.removeItem('uc_admin');
-  window.location.href = '/UC2/admin/';
-}
 
 function afficherModeAdmin() {
   const btnConnexion   = document.getElementById('btn-connexion');
