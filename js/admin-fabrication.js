@@ -258,14 +258,12 @@ function fabFiltrerFormats() {
   const select = document.getElementById('fab-format');
   select.innerHTML = '<option value="">— Choisir un format —</option>';
   if (!pro_id) return;
-  appelAPI('getProduitsFormats', { pro_id }).then(res => {
-    if (!res || !res.success) return;
-    (res.items || []).forEach(f => {
-      const opt = document.createElement('option');
-      opt.value = JSON.stringify({ format_id: f.format_id, poids: f.poids, unite: f.unite, prix: f.prix_vente, nb_unites: f.nb_unites || 0 });
-      opt.textContent = f.poids + ' ' + f.unite + (f.nb_unites ? ' — ' + f.nb_unites + ' unités' : '');
-      select.appendChild(opt);
-    });
+  const formats = (prodCache.formats && prodCache.formats[pro_id]) || [];
+  formats.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = JSON.stringify({ format_id: f.format_id, poids: f.poids, unite: f.unite, prix: f.prix_vente, nb_unites: f.nb_unites || 0 });
+    opt.textContent = f.poids + ' ' + f.unite + (f.nb_unites ? ' — ' + f.nb_unites + ' unités' : '');
+    select.appendChild(opt);
   });
   calculerApercuLot();
 }
