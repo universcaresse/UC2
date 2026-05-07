@@ -1365,6 +1365,7 @@ function restaurerEtatFormulaire() {
 // ─── MODALES NOUVELLE CATÉGORIE / NOUVEL INGRÉDIENT ───
 var _modalNouveauIngIdx = null;
 var _modalNouvelleCatIdx = null;
+var _modalNouveauIngEmballage = null;  // { format_id, idx } pour emballages
 
 function ouvrirModalNouvelleCategorieUC(rangeeIdx) {
   _modalNouvelleCatIdx = rangeeIdx;
@@ -1501,6 +1502,16 @@ async function confirmerModalNouvelIngredient() {
     ingredientsRecette[_modalNouveauIngIdx].ing_id = ing_id;
     rafraichirListeIngredientsRecette();
   }
+  if (_modalNouveauIngEmballage && emballagesRecette[_modalNouveauIngEmballage.format_id]) {
+    var emb = emballagesRecette[_modalNouveauIngEmballage.format_id][_modalNouveauIngEmballage.idx];
+    if (emb) {
+      emb.cat_id = cat_id;
+      emb.ing_id = ing_id;
+      emb.nom = nom;
+      rafraichirListeFormatsRecette();
+    }
+    _modalNouveauIngEmballage = null;
+  }
   _modalNouveauIngIdx = null;
 }
 
@@ -1577,6 +1588,45 @@ function ajouterEmballageFormat(format_id) {
   rafraichirListeFormatsRecette();
 }
 
+function onChangeEmballageNom(format_id, idx, val) {
+  if (val === '__nouvel_ing__') {
+    var emb = emballagesRecette[format_id] && emballagesRecette[format_id][idx];
+    if (!emb || !emb.cat_id) {
+      afficherMsg('recettes', 'Choisir une catégorie d\'abord.', 'erreur');
+      rafraichirListeFormatsRecette();
+      return;
+    }
+    sauvegarderEtatFormulaire();
+    _modalNouveauIngEmballage = { format_id: format_id, idx: idx, cat_id: emb.cat_id };
+    ouvrirModalNouvelIngredientEmballage(emb.cat_id);
+    return;
+  }
+  emballagesRecette[format_id][idx].ing_id = val;
+  emballagesRecette[format_id][idx].nom = ((listesDropdown.fullData || []).find(function(d) { return d.ing_id === val; }) || {}).nom_UC || '';
+  rafraichirListeFormatsRecette();
+}
+
+function ouvrirModalNouvelIngredientEmballage(cat_id) {
+  var modal = document.getElementById('modal-nouvel-ing-produit');
+  if (!modal) {
+    creerModalNouvelIngredient();
+    modal = document.getElementById('modal-nouvel-ing-produit');
+  }
+  var sel = document.getElementById('modal-nouvel-ing-cat');
+  sel.innerHTML = '';
+  Object.keys(listesDropdown.categoriesMap || {}).sort(function(a, b) {
+    var na = listesDropdown.categoriesMap[a]; var nb = listesDropdown.categoriesMap[b];
+    return na.localeCompare(nb, 'fr');
+  }).forEach(function(k) {
+    var opt = document.createElement('option');
+    opt.value = k; opt.textContent = listesDropdown.categoriesMap[k]; sel.appendChild(opt);
+  });
+  sel.value = cat_id;
+  document.getElementById('modal-nouvel-ing-nom').value = '';
+  modal.classList.add('ouvert');
+  setTimeout(function() { document.getElementById('modal-nouvel-ing-nom').focus(); }, 100);
+}
+
 function supprimerEmballageFormat(format_id, idx) {
   if (emballagesRecette[format_id]) emballagesRecette[format_id].splice(idx, 1);
   rafraichirListeFormatsRecette();
@@ -1607,9 +1657,10 @@ function rafraichirListeFormatsRecette() {
           '<option value="">— Catégorie —</option>' +
           catsEmb.map(function(c) { return '<option value="' + c + '" ' + (catEmb === c ? 'selected' : '') + '>' + ((listesDropdown.categoriesMap || {})[c] || c) + '</option>'; }).join('') +
         '</select>' +
-        '<select class="form-ctrl" onchange="emballagesRecette[\'' + fid + '\'][' + j + '].ing_id=this.value; emballagesRecette[\'' + fid + '\'][' + j + '].nom=(listesDropdown.fullData.find(function(d){return d.ing_id===this.value;})||{}).nom_UC||\'\';">' +
+        '<select class="form-ctrl" onchange="onChangeEmballageNom(\'' + fid + '\',' + j + ', this.value)">' +
           '<option value="">— Nom UC —</option>' +
           ingsDecat.map(function(d) { return '<option value="' + d.ing_id + '" ' + (d.ing_id === e.ing_id ? 'selected' : '') + '>' + d.nom_UC + '</option>'; }).join('') +
+          '<option value="__nouvel_ing__">+ Nouvel ingrédient...</option>' +
         '</select>' +
         '<button class="bouton bouton-petit bouton-rouge" onclick="supprimerEmballageFormat(\'' + fid + '\',' + j + ')">✕</button>' +
       '</div>';
