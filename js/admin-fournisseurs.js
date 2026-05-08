@@ -149,15 +149,13 @@ async function supprimerFournisseur(four_id) {
 // ─── CRÉER DEPUIS FACTURE ───
 // Appelé par efCreerFacture() quand four_id === '__nouveau__'
 async function efSauvegarderNouveauFournisseur(nom) {
-  const max = fournisseursDonnees.reduce((acc, f) => { const n = parseInt(f.four_id?.replace('FOUR-', '')) || 0; return n > acc ? n : acc; }, 0);
-const four_id = 'FOUR-' + String(max + 1).padStart(3, '0');
-  const code    = nom.trim().slice(0, 4).toUpperCase();
-  const res     = await appelAPIPost('saveFournisseur', { four_id, nom, code, site_web: '', notes: '' });
-  if (res && res.success) {
-    const nouveau = { four_id, nom, code, site_web: '', notes: '' };
+  const code = nom.trim().slice(0, 4).toUpperCase();
+  const res  = await appelAPIPost('saveFournisseur', { nom, code, site_web: '', notes: '' });
+  if (res && res.success && res.four_id) {
+    const nouveau = { four_id: res.four_id, nom, code, site_web: '', notes: '' };
     ef.fournisseurs.push(nouveau);
     fournisseursDonnees.push(nouveau);
-    return { four_id, code };
+    return { four_id: res.four_id, code };
   }
-  return { four_id, code: '' };
+  return { four_id: '', code: '' };
 }
