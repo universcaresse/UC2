@@ -704,6 +704,11 @@ async function efAjouterLigne() {
     return;
   }
 
+  // Bloquer immédiatement pour éviter les double-clics
+  var btnTest = document.getElementById('ef-btn-ajouter');
+  if (btnTest && btnTest.disabled) return;
+  if (btnTest) btnTest.disabled = true;
+
   var aScraping = ef.factureActive.a_scraping;
 
   var cat_id        = document.getElementById('ef-cat-uc')?.value || '';
@@ -743,21 +748,12 @@ async function efAjouterLigne() {
   var prixTotal   = quantiteNum * prixUnitNum;
   var four_id     = ef.factureActive.four_id;
 
-  var prixParG = 0;
-  if (formatUnite === 'unité') {
-    prixParG = efParseFlt(formatQte) > 0 ? prixUnitNum / efParseFlt(formatQte) : 0;
-  } else {
-    var grammes = efGrammesDuFormat(formatQte, formatUnite, cat_id);
-    prixParG = grammes > 0 ? prixUnitNum / grammes : 0;
-  }
-
   var res = await appelAPIPost('addAchatLigne', {
     ach_id:        ef.factureActive.ach_id,
     ing_id:        ing_id,
     format_qte:    efParseFlt(formatQte),
     format_unite:  formatUnite,
     prix_unitaire: prixUnitNum,
-    prix_par_g:    prixParG,
     quantite:      quantiteNum,
     four_id:       four_id
   });

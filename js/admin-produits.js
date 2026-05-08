@@ -585,15 +585,29 @@ function ouvrirFicheProduit(pro_id) {
     '<div class="fiche-inci-etiquette">' + inciLabelHtml + '</div>' +
     '<div class="fiche-section-titre">Formats disponibles</div>' +
     formatsHtml +
-    '<div class="fiche-section-titre" style="margin-top:24px">Exports</div>' +
-    '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
-      '<button class="bouton bouton-vert-pale" onclick="ouvrirModalExportGraphiste()">📧 Envoyer au graphiste</button>' +
-      '<button class="bouton bouton-vert-pale" onclick="ouvrirModalExportPdf()">📄 Exporter fiche recette (PDF)</button>' +
-    '</div>';
+    '';
 
   // Mettre à jour le bouton Supprimer/Archiver dans la barre d'actions du bas
   var btnSupp = document.querySelector('#fiche-recette .form-body-actions .bouton-rouge');
-  if (btnSupp) btnSupp.textContent = labelBtnSupp;
+  if (btnSupp) {
+    btnSupp.textContent = labelBtnSupp;
+    var conteneurActions = btnSupp.parentElement;
+    if (conteneurActions && !conteneurActions.querySelector('[data-bouton-export]')) {
+      var btnGraphiste = document.createElement('button');
+      btnGraphiste.className = 'bouton bouton-vert-pale';
+      btnGraphiste.dataset.boutonExport = 'graphiste';
+      btnGraphiste.textContent = '📧 Envoyer au graphiste';
+      btnGraphiste.onclick = ouvrirModalExportGraphiste;
+      conteneurActions.appendChild(btnGraphiste);
+
+      var btnPdf = document.createElement('button');
+      btnPdf.className = 'bouton bouton-vert-pale';
+      btnPdf.dataset.boutonExport = 'pdf';
+      btnPdf.textContent = '📄 Exporter fiche recette (PDF)';
+      btnPdf.onclick = ouvrirModalExportPdf;
+      conteneurActions.appendChild(btnPdf);
+    }
+  }
 
   produitsAfficherVue('fiche');
   window.scrollTo(0, 0);
