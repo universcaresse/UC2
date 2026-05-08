@@ -596,14 +596,14 @@ function ouvrirFicheProduit(pro_id) {
       var btnGraphiste = document.createElement('button');
       btnGraphiste.className = 'bouton bouton-vert-pale';
       btnGraphiste.dataset.boutonExport = 'graphiste';
-      btnGraphiste.textContent = '📧 Envoyer au graphiste';
+      btnGraphiste.textContent = 'Pour graphiste';
       btnGraphiste.onclick = ouvrirModalExportGraphiste;
       conteneurActions.appendChild(btnGraphiste);
 
       var btnPdf = document.createElement('button');
       btnPdf.className = 'bouton bouton-vert-pale';
       btnPdf.dataset.boutonExport = 'pdf';
-      btnPdf.textContent = '📄 Exporter fiche recette (PDF)';
+      btnPdf.textContent = 'Fiche recette (PDF)';
       btnPdf.onclick = ouvrirModalExportPdf;
       conteneurActions.appendChild(btnPdf);
     }
