@@ -133,6 +133,7 @@ function filtrerParIngredient() {
         prix_par_g: 0,
         date_dernier: '',
         date_dernier_raw: '',
+        ach_id_dernier: '',
         nb_achats: 0
       };
     }
@@ -143,6 +144,7 @@ function filtrerParIngredient() {
       g.date_dernier = fact.dateAff;
       g.prix_unitaire = l.prix_unitaire;
       g.prix_par_g = l.prix_par_g;
+      g.ach_id_dernier = l.ach_id;
     }
   });
 
@@ -170,7 +172,7 @@ function filtrerParIngredient() {
     + '</tr></thead><tbody>';
   liste.forEach(g => {
     const prixG = g.format_unite === 'unité' ? '—' : (g.prix_par_g ? formaterPrix(g.prix_par_g) + ' /g' : '—');
-    html += '<tr>'
+    html += '<tr class="cliquable" onclick="voirDetailFacture(\'' + g.ach_id_dernier + '\')">'
       + '<td>' + g.fournisseur + '</td>'
       + '<td>' + g.format_qte + ' ' + g.format_unite + '</td>'
       + '<td class="td-prix">' + formaterPrix(g.prix_unitaire) + '</td>'
