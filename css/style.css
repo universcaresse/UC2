@@ -1061,7 +1061,7 @@ tr.cliquable { cursor: pointer; }
     width: 100%;
     padding: 11px 20px;
 	font-family: 'Birthstone', serif;
-	font-size: var(--texte-150);
+
 	letter-spacing: 0.1em;
     background: none;
     border: none;
