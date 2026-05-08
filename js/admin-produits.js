@@ -1735,6 +1735,8 @@ function ouvrirModalExportGraphiste() {
 function fermerModalExportGraphiste() {
   var modal = document.getElementById('modal-export-graphiste');
   if (modal) modal.classList.remove('ouvert');
+  var commentaire = document.getElementById('modal-export-graphiste-commentaire');
+  if (commentaire) commentaire.value = '';
 }
 
 async function envoyerExportGraphiste() {
@@ -1764,6 +1766,11 @@ async function envoyerExportGraphiste() {
     .sort(function(a, b) { return b.quantite_g - a.quantite_g; })
     .map(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return o.inci.trim(); })
     .join(', ');
+    .filter(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return o && o.inci; })
+    .slice()
+    .sort(function(a, b) { return b.quantite_g - a.quantite_g; })
+    .map(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return o.inci.trim(); })
+    .join(', ');
 
   var ingsTexte = ings.slice().sort(function(a, b) { return b.quantite_g - a.quantite_g; })
     .map(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return '- ' + i.nom_ingredient + ' | ' + ((o && o.inci) || '⚠ INCI manquant') + ' | ' + i.quantite_g + ' g'; })
@@ -1784,8 +1791,10 @@ async function envoyerExportGraphiste() {
     return 'Format ' + f.poids + ' ' + f.unite + ' :\n' + lignes;
   }).filter(function(t) { return t; }).join('\n\n');
 
+  var commentaire = (document.getElementById('modal-export-graphiste-commentaire').value || '').trim();
   var data = {
     email: email,
+    commentaire: commentaire,
     nom: pro.nom || '',
     collection: (col && col.nom) || '',
     gamme: (gam && gam.nom) || '',
@@ -1827,10 +1836,14 @@ function creerModalExportGraphiste() {
         '<div class="modal-admin-titre">Envoyer au graphiste</div>' +
         '<button class="btn-fermer-panneau" onclick="fermerModalExportGraphiste()" title="Fermer">✕</button>' +
       '</div>' +
-      '<div class="modal-admin-body">' +
+     '<div class="modal-admin-body">' +
         '<div class="form-groupe">' +
           '<label class="form-label">Adresse courriel destinataire</label>' +
           '<input type="text" class="form-ctrl" id="modal-export-graphiste-email" placeholder="exemple@domaine.com">' +
+        '</div>' +
+        '<div class="form-groupe">' +
+          '<label class="form-label">Commentaire / instructions</label>' +
+          '<textarea class="form-ctrl" id="modal-export-graphiste-commentaire" rows="3" placeholder="Ex: Modifier la photo, ajouter le slogan..."></textarea>' +
         '</div>' +
       '</div>' +
       '<div class="modal-admin-body">' +
