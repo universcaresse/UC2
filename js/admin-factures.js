@@ -1,5 +1,8 @@
 var toutesFactures = [];
 
+var toutesFactures = [];
+var toutesLignesAchats = [];
+
 async function chargerFactures() {
   afficherChargement();
   const loading = document.getElementById('loading-factures');
@@ -9,10 +12,12 @@ async function chargerFactures() {
   if (tableau) tableau.classList.add('cache');
   if (vide)    vide.classList.add('cache');
 
-  // V2 : getAchatsEntete
-  const [resAch, resFour] = await Promise.all([
+  // V2 : getAchatsEntete + toutes les lignes + ingrédients pour le filtre
+  const [resAch, resFour, resLignes, resInci] = await Promise.all([
     appelAPI('getAchatsEntete'),
-    appelAPI('getFournisseurs')
+    appelAPI('getFournisseurs'),
+    appelAPI('getAchatsLignes'),
+    appelAPI('getIngredientsInci')
   ]);
   if (loading) loading.classList.add('cache');
   if (!resAch || !resAch.success) { cacherChargement(); afficherMsg('factures', 'Erreur lors du chargement.', 'erreur'); return; }
@@ -30,6 +35,9 @@ async function chargerFactures() {
     statut:      a.statut
   }));
 
+  toutesLignesAchats = (resLignes && resLignes.success) ? (resLignes.items || []) : [];
+  if (resInci && resInci.success) listesDropdown.fullData = resInci.items || [];
+
   const selFourn    = document.getElementById('filtre-fournisseur');
   const fournisseurs = [...new Set(toutesFactures.map(f => f.fournisseur).filter(Boolean))].sort();
   selFourn.innerHTML = '<option value="">Tous les fournisseurs</option>';
@@ -37,6 +45,23 @@ async function chargerFactures() {
     const o = document.createElement('option');
     o.value = f; o.textContent = f; selFourn.appendChild(o);
   });
+
+  // Peupler le filtre ingrédient avec uniquement les ingrédients réellement achetés
+  const selIng = document.getElementById('filtre-ingredient');
+  if (selIng) {
+    const ingIdsAchetes = [...new Set(toutesLignesAchats.map(l => l.ing_id).filter(Boolean))];
+    const ingredients = ingIdsAchetes
+      .map(id => (listesDropdown.fullData || []).find(d => d.ing_id === id))
+      .filter(Boolean)
+      .sort((a, b) => (a.nom_UC || '').localeCompare(b.nom_UC || '', 'fr'));
+    selIng.innerHTML = '<option value="">Tous les ingrédients</option>';
+    ingredients.forEach(ing => {
+      const o = document.createElement('option');
+      o.value = ing.ing_id;
+      o.textContent = ing.nom_UC || ing.ing_id;
+      selIng.appendChild(o);
+    });
+  }
 
   cacherChargement();
   afficherFactures(toutesFactures);
@@ -62,7 +87,101 @@ function reinitialiserFiltres() {
   document.getElementById('filtre-statut').value       = '';
   document.getElementById('filtre-date-debut').value   = '';
   document.getElementById('filtre-date-fin').value     = '';
+  const selIng = document.getElementById('filtre-ingredient');
+  if (selIng) selIng.value = '';
+  document.getElementById('resume-ingredient')?.classList.add('cache');
   afficherFactures(toutesFactures);
+}
+
+function filtrerParIngredient() {
+  const ing_id  = document.getElementById('filtre-ingredient')?.value || '';
+  const tableau = document.getElementById('tableau-factures');
+  const totalEl = document.getElementById('factures-total');
+  const vide    = document.getElementById('vide-factures');
+  const compte  = document.getElementById('factures-compte');
+  const resume  = document.getElementById('resume-ingredient');
+  if (!resume) return;
+
+  if (!ing_id) {
+    resume.classList.add('cache');
+    resume.innerHTML = '';
+    afficherFactures(toutesFactures);
+    return;
+  }
+
+  // Garder seulement les lignes de factures finalisées pour cet ingrédient
+  const factureMap = {};
+  toutesFactures.forEach(f => { factureMap[f.ach_id] = f; });
+
+  const lignesIng = toutesLignesAchats.filter(l => {
+    if (l.ing_id !== ing_id) return false;
+    const fact = factureMap[l.ach_id];
+    return fact && fact.statut === 'Finalisé';
+  });
+
+  // Regrouper par fournisseur + format
+  const groupes = {};
+  lignesIng.forEach(l => {
+    const fact = factureMap[l.ach_id];
+    const cle = (fact.fournisseur || '—') + '|' + l.format_qte + '|' + l.format_unite;
+    if (!groupes[cle]) {
+      groupes[cle] = {
+        fournisseur: fact.fournisseur,
+        format_qte: l.format_qte,
+        format_unite: l.format_unite,
+        prix_unitaire: 0,
+        prix_par_g: 0,
+        date_dernier: '',
+        date_dernier_raw: '',
+        nb_achats: 0
+      };
+    }
+    const g = groupes[cle];
+    g.nb_achats++;
+    if (fact.dateRaw > g.date_dernier_raw) {
+      g.date_dernier_raw = fact.dateRaw;
+      g.date_dernier = fact.dateAff;
+      g.prix_unitaire = l.prix_unitaire;
+      g.prix_par_g = l.prix_par_g;
+    }
+  });
+
+  const liste = Object.values(groupes).sort((a, b) => (a.fournisseur || '').localeCompare(b.fournisseur || '', 'fr'));
+
+  // Masquer le tableau de factures
+  if (tableau) tableau.classList.add('cache');
+  if (totalEl) totalEl.classList.add('cache');
+  if (vide)    vide.classList.add('cache');
+  if (compte)  compte.textContent = liste.length + ' résultat' + (liste.length > 1 ? 's' : '');
+
+  if (!liste.length) {
+    resume.innerHTML = '<div class="vide"><div class="vide-titre">Aucun achat trouvé</div><div class="vide-desc">Cet ingrédient n\'a pas encore été acheté sur une facture finalisée.</div></div>';
+    resume.classList.remove('cache');
+    return;
+  }
+
+  let html = '<table class="tableau-admin"><thead><tr>'
+    + '<th>Fournisseur</th>'
+    + '<th>Format</th>'
+    + '<th>Prix unitaire</th>'
+    + '<th>Prix au gramme</th>'
+    + '<th>Dernier achat</th>'
+    + '<th>Nb achats</th>'
+    + '</tr></thead><tbody>';
+  liste.forEach(g => {
+    const prixG = g.format_unite === 'unité' ? '—' : (g.prix_par_g ? formaterPrix(g.prix_par_g) + ' /g' : '—');
+    html += '<tr>'
+      + '<td>' + g.fournisseur + '</td>'
+      + '<td>' + g.format_qte + ' ' + g.format_unite + '</td>'
+      + '<td class="td-prix">' + formaterPrix(g.prix_unitaire) + '</td>'
+      + '<td class="td-prix">' + prixG + '</td>'
+      + '<td class="td-date">' + g.date_dernier + '</td>'
+      + '<td>' + g.nb_achats + '</td>'
+      + '</tr>';
+  });
+  html += '</tbody></table>';
+  resume.innerHTML = html;
+  resume.classList.remove('cache');
 }
 
 function afficherFactures(liste) {

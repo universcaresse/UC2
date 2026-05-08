@@ -1396,6 +1396,9 @@
           </select>
           <input class="form-ctrl filtre-select" type="date" id="filtre-date-debut" onchange="filtrerFactures()">
           <input class="form-ctrl filtre-select" type="date" id="filtre-date-fin" onchange="filtrerFactures()">
+          <select class="form-ctrl filtre-select" id="filtre-ingredient" onchange="filtrerParIngredient()">
+            <option value="">Tous les ingrédients</option>
+          </select>
           <span id="factures-compte" class="factures-compte"></span>
           <button class="bouton bouton-petit bouton-contour" onclick="reinitialiserFiltres()" title="Réinitialiser">✕</button>
         </div>
@@ -1413,6 +1416,7 @@
             <tbody id="tbody-factures"></tbody>
           </table>
           <div id="factures-total" class="inv-total cache"></div>
+          <div id="resume-ingredient" class="cache"></div>
         </div>
 		
 		
