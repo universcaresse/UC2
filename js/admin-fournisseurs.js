@@ -94,7 +94,7 @@ async function sauvegarderFournisseur() {
   if (!four_id && !code) code = nom.trim().slice(0, 4).toUpperCase();
 
   const payload = {
-    four_id:  four_id || ('FOUR-' + String(fournisseursDonnees.reduce((acc, f) => { const n = parseInt(f.four_id?.replace('FOUR-', '')) || 0; return n > acc ? n : acc; }, 0) + 1).padStart(3, '0')),
+    four_id:  four_id || '',
     nom,
     code,
     site_web,
