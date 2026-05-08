@@ -1071,6 +1071,7 @@ tr.cliquable { cursor: pointer; }
     cursor: pointer;
     transition: all 0.15s;
     border-left: 3px solid transparent;
+	text-transform: uppercase;
 	
    
   }
