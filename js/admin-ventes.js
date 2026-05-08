@@ -202,9 +202,9 @@ function venFiltrerFormats() {
     .sort((a, b) => parseFloat(a.poids) - parseFloat(b.poids))
     .forEach(f => {
       const lot = venLotsDisponibles.find(l =>
-        l.pro_id === pro_id &&
+        String(l.pro_id) === String(pro_id) &&
         String(l.format_poids) === String(f.poids) &&
-        l.format_unite === f.unite
+        String(l.format_unite) === String(f.unite)
       );
       const nbDispo = lot ? lot.nb_disponible : 0;
       const o = document.createElement('option');
