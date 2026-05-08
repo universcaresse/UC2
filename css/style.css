@@ -1028,7 +1028,6 @@ tr.cliquable { cursor: pointer; }
   .nav-admin-btn {
     background: none;
     border: none;
-	text-transform: none; /* On annule le lowercase */
 	font-variant: small-caps;
     cursor: pointer;
     padding: 8px 14px;
@@ -1048,13 +1047,12 @@ tr.cliquable { cursor: pointer; }
 	font-family: 'Birthstone', serif;
 	font-variant: normal;
 	font-size: var(--texte-160);
-	text-transform: lowercase; !important;
-    padding-top: 8px;
     background: var(--blanc);
     border: 1px solid var(--beige);
     box-shadow: 0 8px 24px rgba(30,28,25,0.08);
     min-width: 180px;
     z-index: 150;
+	text-transform: uppercase;
   }
   .nav-admin-item.ouvert .nav-dropdown { display: block; }
 
