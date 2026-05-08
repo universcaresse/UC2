@@ -60,9 +60,9 @@
    <li class="nav-admin-item">
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">vente <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
-          <button class="nav-dropdown-item" onclick="allerVersNouvelleVente()">nouvelle vente</button>
-          <button class="nav-dropdown-item" onclick="afficherSection('ventes', null)">les ventes</button>
-          <button class="nav-dropdown-item" onclick="afficherSection('commandes', null)">commandes</button>
+           <button class="nav-dropdown-item" onclick="afficherSection('ventes', null)">les ventes</button>
+		   <button class="nav-dropdown-item" onclick="allerVersNouvelleVente()">nouvelle vente</button>
+                   <button class="nav-dropdown-item" onclick="afficherSection('commandes', null)">commandes</button>
           <button class="nav-dropdown-item" onclick="afficherSection('remboursements', null)">remboursements</button>
           <button class="nav-dropdown-item" onclick="afficherSection('fabrication', null)">inventaire</button>
 		  <button class="nav-dropdown-item bientot">corrections Inventaire</button></div>
@@ -145,8 +145,8 @@
       <div class="sidebar-sep"></div>
       <div class="sidebar-groupe">
         <div class="sidebar-titre">vente</div>
-        <button class="sidebar-lien" onclick="allerVersNouvelleVente()">nouvelle vente</button>
         <button class="sidebar-lien" onclick="afficherSection('ventes', this)">les ventes</button>
+		<button class="sidebar-lien" onclick="allerVersNouvelleVente()">nouvelle vente</button>
         <button class="sidebar-lien" onclick="afficherSection('commandes', this)">commandes</button>
         <button class="sidebar-lien" onclick="afficherSection('remboursements', this)">remboursements</button>
         <button class="sidebar-lien" onclick="afficherSection('fabrication', this)">inventaire</button>
