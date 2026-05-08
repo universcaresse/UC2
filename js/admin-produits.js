@@ -1760,12 +1760,7 @@ async function envoyerExportGraphiste() {
     if (!o || !o.inci) nbSansInci++;
   });
 
-  var inciLabel = ings
-    .filter(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return o && o.inci; })
-    .slice()
-    .sort(function(a, b) { return b.quantite_g - a.quantite_g; })
-    .map(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return o.inci.trim(); })
-    .join(', ');
+var inciLabel = ings
     .filter(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return o && o.inci; })
     .slice()
     .sort(function(a, b) { return b.quantite_g - a.quantite_g; })
@@ -1916,6 +1911,11 @@ async function genererExportPdf() {
   var formats = pro.formats || [];
 
   var inciLabel = ings
+    .filter(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return o && o.inci; })
+    .slice()
+    .sort(function(a, b) { return b.quantite_g - a.quantite_g; })
+    .map(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return o.inci.trim(); })
+    .join(', ');
 
   var ingsListe = ings.slice().sort(function(a, b) { return b.quantite_g - a.quantite_g; })
     .map(function(i) {
