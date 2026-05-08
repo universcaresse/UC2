@@ -634,9 +634,9 @@ async function convertirCommandeEnVente(cmd_id) {
   (resLignes.items || []).forEach(l => {
     const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
     const lot = venLotsDisponibles.find(x =>
-      x.pro_id === l.pro_id &&
+      String(x.pro_id) === String(l.pro_id) &&
       String(x.format_poids) === String(l.format_poids) &&
-      x.format_unite === l.format_unite
+      String(x.format_unite) === String(l.format_unite)
     );
     venPanier.push({
       pro_id: l.pro_id,
