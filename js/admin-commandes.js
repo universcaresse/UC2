@@ -44,8 +44,11 @@ async function chargerCommandes() {
 // NOUVELLE COMMANDE — OUVERTURE
 // ═══════════════════════════════════════
 function ouvrirFormCommande() {
+  // Reset complet de l'état
   cmdLignes = [];
   cmdModeEdition = false;
+  cmdIdEnCours = null;
+  cmdNumeroAffiche = '';
 
   // Générer un nouveau numéro
   const dernierNum = toutesCommandes.length
@@ -56,7 +59,7 @@ function ouvrirFormCommande() {
 
   document.getElementById('form-commande-titre').textContent = 'Nouvelle commande ' + cmdNumeroAffiche;
 
-  // Vider les champs client
+  // Vider tous les champs du formulaire
   document.getElementById('cmd-client').value    = '';
   document.getElementById('cmd-courriel').value  = '';
   document.getElementById('cmd-telephone').value = '';
