@@ -96,7 +96,6 @@ function ouvrirFormCommande() {
   document.getElementById('fiche-commande').classList.add('cache');
   document.getElementById('form-commande').classList.remove('cache');
   document.querySelector('#section-commandes .page-entete .bouton')?.classList.add('cache');
-  document.getElementById('form-commande').classList.remove('cache');
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
@@ -499,7 +498,6 @@ async function voirDetailCommande(cmd_id) {
   document.getElementById('form-commande').classList.add('cache');
   document.getElementById('fiche-commande').classList.remove('cache');
   document.querySelector('#section-commandes .page-entete .bouton')?.classList.add('cache');
-  document.getElementById('form-commande').classList.remove('cache');
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
