@@ -7,12 +7,90 @@ async function chargerFabrication() {
   afficherChargement();
   document.getElementById('loading-fabrication').classList.remove('cache');
   document.getElementById('contenu-fabrication').innerHTML = '';
-  const res = await appelAPI('getLots');
+
+  const [res, resCmdEntete, resCmdLignes, resLotsDispo] = await Promise.all([
+    appelAPI('getLots'),
+    appelAPI('getCommandesEntete'),
+    appelAPI('getCommandesLignes'),
+    appelAPI('getLotsDisponibles')
+  ]);
+
   document.getElementById('loading-fabrication').classList.add('cache');
   if (!res || !res.success) { cacherChargement(); afficherMsg('fabrication', '❌ Erreur de chargement.'); return; }
   _lotsData = res.items || [];
+
+  // Panneau "À produire" basé sur les commandes en attente/prêtes
+  const cmdEntetes = (resCmdEntete && resCmdEntete.success) ? resCmdEntete.items : [];
+  const cmdLignes  = (resCmdLignes && resCmdLignes.success) ? resCmdLignes.items : [];
+  const lotsDispo  = (resLotsDispo && resLotsDispo.success) ? resLotsDispo.items : [];
+  afficherPanneauAProduire(cmdEntetes, cmdLignes, lotsDispo);
+
   cacherChargement();
   afficherTableauFabrication(_lotsData);
+}
+
+function afficherPanneauAProduire(cmdEntetes, cmdLignes, lotsDispo) {
+  var panneau = document.getElementById('panneau-a-produire');
+  if (!panneau) {
+    panneau = document.createElement('div');
+    panneau.id = 'panneau-a-produire';
+    var contenu = document.getElementById('contenu-fabrication');
+    contenu.parentNode.insertBefore(panneau, contenu);
+  }
+
+  var cmdActives = cmdEntetes.filter(function(c) {
+    return c.statut === 'En attente' || c.statut === 'Prête';
+  });
+
+  if (!cmdActives.length) {
+    panneau.innerHTML = '';
+    return;
+  }
+
+  var cmdIds = {};
+  cmdActives.forEach(function(c) { cmdIds[c.cmd_id] = true; });
+
+  var besoins = {};
+  cmdLignes.forEach(function(l) {
+    if (!cmdIds[l.cmd_id]) return;
+    var cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
+    if (!besoins[cle]) {
+      besoins[cle] = { pro_id: l.pro_id, format_poids: l.format_poids, format_unite: l.format_unite, commande: 0 };
+    }
+    besoins[cle].commande += (l.quantite || 0);
+  });
+
+  var lignesHTML = '';
+  var totalManque = 0;
+
+  Object.values(besoins).forEach(function(b) {
+    var pro = donneesProduits.find(function(p) { return p.pro_id === b.pro_id; });
+    var nom = pro ? pro.nom : b.pro_id;
+    var lot = lotsDispo.find(function(l) {
+      return String(l.pro_id) === String(b.pro_id) &&
+             String(l.format_poids) === String(b.format_poids) &&
+             String(l.format_unite) === String(b.format_unite);
+    });
+    var dispo = lot ? lot.nb_disponible : 0;
+    var manque = Math.max(0, b.commande - dispo);
+    totalManque += manque;
+
+    lignesHTML += '<tr>' +
+      '<td>' + nom + '</td>' +
+      '<td>' + b.format_poids + ' ' + b.format_unite + '</td>' +
+      '<td>' + b.commande + '</td>' +
+      '<td>' + dispo + '</td>' +
+      '<td style="color:' + (manque > 0 ? 'var(--rouge)' : 'var(--primary)') + ';font-weight:500">' + (manque > 0 ? manque + ' à produire' : '✅ OK') + '</td>' +
+    '</tr>';
+  });
+
+  panneau.innerHTML = '<div class="carte-admin" style="margin-bottom:16px">' +
+    '<div class="carte-admin-entete">À PRODUIRE <span class="texte-secondaire">' + cmdActives.length + ' commande' + (cmdActives.length > 1 ? 's' : '') + ' en cours</span></div>' +
+    (totalManque > 0
+      ? '<table class="tableau-admin"><thead><tr><th>Produit</th><th>Format</th><th>Commandé</th><th>Disponible</th><th>Statut</th></tr></thead><tbody>' + lignesHTML + '</tbody></table>'
+      : '<div class="texte-secondaire" style="padding:12px 0">Tout le stock est suffisant pour les commandes en cours ✅</div>'
+    ) +
+  '</div>';
 }
 
 function fabToggleAccordeon(el) {
