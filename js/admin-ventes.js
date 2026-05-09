@@ -755,10 +755,10 @@ async function payerParSquare() {
   venProtegerSessionAdmin();
 
   // 3. Construire le lien Square Point of Sale
-  const callbackUrl = window.location.origin + window.location.pathname + '#ventes';
+  const callbackUrl = window.location.origin + window.location.pathname + '?status=ok#ventes';
   const sdkData = {
     amount_money: { amount: totalCents, currency_code: 'CAD' },
-    callback_url: callbackUrl + '?status=ok',
+    callback_url: callbackUrl,
     client_id: squareAppId,
     version: '1.3',
     notes: 'Vente ' + venNumeroAffiche,

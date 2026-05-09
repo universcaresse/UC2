@@ -29,9 +29,10 @@ window.addEventListener('popstate', (e) => {
   }
 });
 document.addEventListener('DOMContentLoaded', async () => {
+  venRestaurerSessionAdmin();
   const session = sessionStorage.getItem('uc_admin');
   if (session !== 'true') {
-    window.location.href = '/UC2/admin/login.html';
+    window.location.href = '/admin/login.html';
     return;
   }
   document.getElementById('ecran-connexion')?.classList.add('cache');
