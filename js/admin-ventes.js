@@ -41,6 +41,9 @@ async function chargerVentes() {
   if (squareStatus) {
     await venTraiterRetourSquare(squareStatus);
     window.history.replaceState({}, '', window.location.pathname);
+  } else if (sessionStorage.getItem('square-pending')) {
+    // square-pending résiduel sans retour de Square : nettoyer
+    sessionStorage.removeItem('square-pending');
   }
 
   // Fermer toute modal résiduelle
@@ -641,6 +644,11 @@ function ouvrirApercuFacture() {
 
 function fermerApercuFacture() {
   document.getElementById('modal-facture-vente').classList.remove('ouvert');
+  venCacherSpinnerSquare();
+  // Réinitialiser le mode reprise pour éviter les comportements bizarres
+  venModeReprise = false;
+  venIdEnCours   = null;
+  venPanier      = [];
 }
 
 function fermerModalApresVente() {
@@ -659,6 +667,11 @@ async function payerParSquare() {
     afficherMsg('ventes', 'Square non configuré (App ID manquant).', 'erreur');
     return;
   }
+
+  // Afficher le spinner Square dans la modal d'aperçu
+  document.getElementById('fv-spinner')?.classList.remove('cache');
+  document.getElementById('fv-boutons-paiement').style.display   = 'none';
+  document.getElementById('fv-boutons-impression').style.display = 'none';
 
   afficherChargement();
 
@@ -760,7 +773,15 @@ async function payerParSquare() {
   window.location.href = lienSquare;
 }
 
+// Désactiver le spinner Square (au retour ou si on annule)
+function venCacherSpinnerSquare() {
+  document.getElementById('fv-spinner')?.classList.add('cache');
+  document.getElementById('fv-boutons-paiement').style.display   = '';
+  document.getElementById('fv-boutons-impression').style.display = '';
+}
+
 async function venTraiterRetourSquare(status) {
+  venCacherSpinnerSquare();
   const pendingRaw = sessionStorage.getItem('square-pending');
   if (!pendingRaw) return;
 
@@ -784,6 +805,22 @@ async function venTraiterRetourSquare(status) {
     });
 
     if (resFin && resFin.success) {
+      // Si cette vente provient d'une conversion de commande, mettre à jour la commande
+      const conversionRaw = sessionStorage.getItem('cmd-en-conversion');
+      if (conversionRaw) {
+        try {
+          const conversion = JSON.parse(conversionRaw);
+          if (conversion && conversion.cmd_id) {
+            await appelAPIPost('updateStatutCommande', {
+              cmd_id: conversion.cmd_id,
+              statut: 'Livrée',
+              ven_id_lien: pending.ven_id
+            });
+          }
+        } catch (e) { /* ignore */ }
+        sessionStorage.removeItem('cmd-en-conversion');
+      }
+
       // Restaurer l'état pour afficher la facture
       venPanier             = pending.panier || [];
       venIdEnCours          = pending.ven_id;
@@ -802,11 +839,39 @@ async function venTraiterRetourSquare(status) {
       afficherMsg('ventes', '❌ Erreur lors de la finalisation.', 'erreur');
     }
   } else {
-    // Paiement annulé/refusé : effacer la vente "En attente Square"
-    await appelAPIPost('deleteAchat', { ach_id: pending.ven_id }); // mauvaise action — on annule plutôt
-    // Correction : on supprime juste les lignes et on remet en zéro
-    await appelAPIPost('resetVenteLignes', { ven_id: pending.ven_id });
-    afficherMsg('ventes', '❌ Paiement Square annulé ou refusé.', 'erreur');
+    // Paiement Square annulé ou refusé : on garde la vente, on la remet "En cours"
+    // pour pouvoir proposer un autre mode de paiement
+    await appelAPIPost('updateStatutVente', {
+      ven_id: pending.ven_id,
+      statut: 'En cours'
+    });
+
+    // Restaurer l'état pour pouvoir réessayer
+    venPanier              = pending.panier || [];
+    venIdEnCours           = pending.ven_id;
+    venNumeroAffiche       = pending.numeroAffiche;
+    venClientSauvegarde    = pending.client || '';
+    venLivraisonSauvegarde = pending.livraison || 0;
+    venModeReprise         = true;
+
+    // Rouvrir le formulaire de vente avec les données
+    document.getElementById('contenu-ventes').classList.add('cache');
+    document.getElementById('filtres-ventes').classList.add('cache');
+    document.getElementById('form-vente').classList.remove('cache');
+    document.getElementById('form-vente').style.display = 'block';
+    document.querySelector('#section-ventes .page-entete .bouton')?.classList.add('cache');
+
+    document.getElementById('ven-client').value    = pending.client || '';
+    document.getElementById('ven-courriel').value  = pending.courriel || '';
+    document.getElementById('ven-telephone').value = pending.telephone || '';
+    document.getElementById('ven-livraison').value = pending.livraison || 0;
+
+    venRafraichirPanier();
+
+    afficherMsg('ventes', '❌ Paiement Square annulé. Choisissez un autre mode de paiement.', 'erreur');
+
+    // Rouvrir la modal d'aperçu avec les 3 options
+    setTimeout(() => ouvrirApercuFacture(), 500);
   }
 }
 
@@ -828,8 +893,14 @@ async function finaliserVente(modePaiement) {
   const livraison  = parseFloat(String(document.getElementById('ven-livraison').value).replace(',', '.')) || 0;
   const infolettre = document.getElementById('ven-infolettre')?.checked ? '1' : '0';
 
-  // Reset ou create
-  if (venModeReprise) {
+  // Détecter si on encaisse une vente "à payer" déjà existante
+  const venteExistante = toutesVentes.find(v => v.ven_id === ven_id);
+  const encaissementAPayer = venteExistante && venteExistante.statut === 'a-payer';
+
+  if (encaissementAPayer) {
+    // On change juste le mode de paiement, on ne touche pas aux lignes ni au stock
+    // (le stock a déjà été décrémenté lors de la finalisation initiale)
+  } else if (venModeReprise) {
     const resReset = await appelAPIPost('resetVenteLignes', { ven_id });
     if (!resReset || !resReset.success) {
       cacherChargement();
@@ -845,17 +916,19 @@ async function finaliserVente(modePaiement) {
     }
   }
 
-  // Lignes
-  for (const l of venPanier) {
-    await appelAPIPost('addVenteLigne', {
-      ven_id,
-      pro_id: l.pro_id,
-      lot_id: l.lot_id,
-      quantite: l.quantite,
-      prix_unitaire: l.prix_unitaire,
-      format_poids: l.poids,
-      format_unite: l.unite
-    });
+  // Lignes (sauf pour un encaissement de vente "à payer")
+  if (!encaissementAPayer) {
+    for (const l of venPanier) {
+      await appelAPIPost('addVenteLigne', {
+        ven_id,
+        pro_id: l.pro_id,
+        lot_id: l.lot_id,
+        quantite: l.quantite,
+        prix_unitaire: l.prix_unitaire,
+        format_poids: l.poids,
+        format_unite: l.unite
+      });
+    }
   }
 
   // Finalisation
@@ -880,6 +953,23 @@ async function finaliserVente(modePaiement) {
     afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur');
     return;
   }
+
+  // Si cette vente provient d'une conversion de commande, mettre à jour la commande
+  const conversionRaw = sessionStorage.getItem('cmd-en-conversion');
+  if (conversionRaw) {
+    try {
+      const conversion = JSON.parse(conversionRaw);
+      if (conversion && conversion.cmd_id) {
+        await appelAPIPost('updateStatutCommande', {
+          cmd_id: conversion.cmd_id,
+          statut: 'Livrée',
+          ven_id_lien: ven_id
+        });
+      }
+    } catch (e) { /* ignore */ }
+    sessionStorage.removeItem('cmd-en-conversion');
+  }
+
   cacherChargement();
 
   // Sauvegarder l'état pour la modal après-vente
@@ -925,9 +1015,9 @@ async function imprimerFacture() {
 
   const numero    = venNumeroAffiche;
   const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
-  const client    = venClientSauvegarde;
-  const courriel  = document.getElementById('apv-courriel').value;
-  const telephone = document.getElementById('apv-telephone').value;
+  const client    = venClientSauvegarde || document.getElementById('ven-client').value;
+  const courriel  = document.getElementById('apv-courriel').value || document.getElementById('ven-courriel').value;
+  const telephone = document.getElementById('apv-telephone').value || document.getElementById('ven-telephone').value;
   const livraison = venLivraisonSauvegarde;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
@@ -1030,14 +1120,14 @@ async function envoyerFactureCourriel() {
   await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
 
-  const courriel = document.getElementById('apv-courriel').value;
+  const courriel = document.getElementById('apv-courriel').value || document.getElementById('ven-courriel').value;
   if (!courriel) {
     cacherChargement();
     afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur');
     return;
   }
 
-  const client    = venClientSauvegarde;
+  const client    = venClientSauvegarde || document.getElementById('ven-client').value;
   const livraison = venLivraisonSauvegarde;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
@@ -1080,7 +1170,7 @@ async function envoyerFactureTexto() {
   await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
 
-  const telephone = document.getElementById('apv-telephone').value;
+  const telephone = document.getElementById('apv-telephone').value || document.getElementById('ven-telephone').value;
   if (!telephone) {
     cacherChargement();
     afficherMsg('ventes', 'Aucun téléphone indiqué pour ce client.', 'erreur');
@@ -1139,14 +1229,10 @@ function filtrerVentes() {
     const okStatut = !statut || v.statut === statut;
     const okClient = !client || (v.client || '').toLowerCase().includes(client);
 
-    // Filtre par produit (cherche dans les lignes — il faut que les lignes soient chargées,
-    // sinon on cherche dans le nom du client comme fallback)
+    // Filtre par produit (utilise le résumé fourni par le backend)
     let okProduit = true;
     if (produit) {
-      // On cherche dans les lignes si elles sont disponibles, sinon on accepte
-      okProduit = (v.lignes || []).some(l => (l.nom || '').toLowerCase().includes(produit));
-      // Si on n'a pas les lignes, on ne filtre pas par produit (on l'ignore)
-      if (!v.lignes) okProduit = true;
+      okProduit = (v.produits_resume || '').toLowerCase().includes(produit);
     }
 
     // Filtre par période — la date est en format dd/MM/yyyy
@@ -1279,8 +1365,9 @@ async function voirDetailVente(ven_id) {
   }
 
   const estFinalisee = v.statut === 'Finalisé' || v.statut === 'Finalisée';
+  const estAPayer    = v.statut === 'a-payer';
   ouvrirApercuFacture();
-  document.getElementById('fv-boutons-paiement').style.display   = estFinalisee ? 'none' : '';
+  document.getElementById('fv-boutons-paiement').style.display   = (estFinalisee && !estAPayer) ? 'none' : '';
   document.getElementById('fv-boutons-impression').style.display = '';
 }
 

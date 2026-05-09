@@ -253,9 +253,11 @@ function cmdRafraichirPanier() {
 }
 
 function cmdCalculerSolde() {
-  const totalPrevu = cmdLignes.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-  const acompte    = parseFloat(String(document.getElementById('cmd-acompte').value).replace(',', '.')) || 0;
-  const solde      = Math.max(0, totalPrevu - acompte);
+  const totalPrevu  = cmdLignes.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const acompteRaw  = String(document.getElementById('cmd-acompte').value).replace(',', '.');
+  const acompteNum  = parseFloat(acompteRaw);
+  const acompte     = (isNaN(acompteNum) || acompteNum < 0) ? 0 : acompteNum;
+  const solde       = Math.max(0, totalPrevu - acompte);
   document.getElementById('cmd-total-prevu').value = formaterPrix(totalPrevu);
   document.getElementById('cmd-solde').value       = formaterPrix(solde);
 }
@@ -289,10 +291,35 @@ async function enregistrerCommande() {
   const solde     = Math.max(0, totalPrevu - acompte);
   const notes     = document.getElementById('cmd-notes').value;
 
-  // Si on est en mode édition d'une commande existante, supprimer d'abord les anciennes lignes
+  // Préparer les lignes au format backend
+  const lignesPayload = cmdLignes.map(l => ({
+    pro_id: l.pro_id,
+    format_poids: l.poids,
+    format_unite: l.unite,
+    quantite: l.quantite,
+    prix_unitaire: l.prix_unitaire
+  }));
+
   if (cmdModeEdition) {
-    await appelAPIPost('resetCommandeLignes', { cmd_id });
+    // Mode édition : tout en une seule opération avec rollback automatique
+    const resUpdate = await appelAPIPost('updateCommandeComplete', {
+      cmd_id,
+      client,
+      courriel,
+      telephone,
+      total_prevu: totalPrevu,
+      acompte,
+      solde,
+      notes,
+      lignes: lignesPayload
+    });
+    if (!resUpdate || !resUpdate.success) {
+      cacherChargement();
+      afficherMsg('commandes', 'Erreur lors de la modification : ' + (resUpdate?.message || ''), 'erreur');
+      return;
+    }
   } else {
+    // Création : entête puis lignes
     const resCreate = await appelAPIPost('createCommande', {
       cmd_id,
       client,
@@ -308,32 +335,16 @@ async function enregistrerCommande() {
       afficherMsg('commandes', 'Erreur lors de la création.', 'erreur');
       return;
     }
-  }
-
-  // Ajouter les lignes
-  for (const l of cmdLignes) {
-    await appelAPIPost('addCommandeLigne', {
-      cmd_id,
-      pro_id: l.pro_id,
-      format_poids: l.poids,
-      format_unite: l.unite,
-      quantite: l.quantite,
-      prix_unitaire: l.prix_unitaire
-    });
-  }
-
-  // En mode édition, mettre à jour l'entête (totaux, acompte, notes, client)
-  if (cmdModeEdition) {
-    await appelAPIPost('updateCommandeEntete', {
-      cmd_id,
-      client,
-      courriel,
-      telephone,
-      total_prevu: totalPrevu,
-      acompte,
-      solde,
-      notes
-    });
+    for (const l of cmdLignes) {
+      await appelAPIPost('addCommandeLigne', {
+        cmd_id,
+        pro_id: l.pro_id,
+        format_poids: l.poids,
+        format_unite: l.unite,
+        quantite: l.quantite,
+        prix_unitaire: l.prix_unitaire
+      });
+    }
   }
 
   cacherChargement();
@@ -358,12 +369,9 @@ function filtrerCommandes() {
         c.client || '',
         c.courriel || '',
         c.telephone || '',
-        c.notes || ''
+        c.notes || '',
+        c.produits_resume || ''
       ];
-      // Ajouter les noms de produits si lignes chargées
-      if (c.lignes) {
-        c.lignes.forEach(l => champs.push(l.nom || ''));
-      }
       okRecherche = champs.some(champ => champ.toLowerCase().includes(recherche));
     }
 
@@ -612,6 +620,9 @@ async function convertirCommandeEnVente(cmd_id) {
 
   const c = resEntete.items.find(x => x.cmd_id === cmd_id);
   if (!c) return;
+
+  // Fermer la fiche commande avant de changer de section
+  fermerFicheCommande();
 
   // Préparer la conversion : aller dans la section Ventes et pré-remplir le panier
   venLotsDisponibles = (resLots && resLots.success) ? resLots.items : [];
