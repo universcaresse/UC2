@@ -1345,23 +1345,29 @@ async function voirDetailVente(ven_id) {
   document.getElementById('apv-infolettre').checked = false;
 
   // Restaurer la promo
-  if (v.promo_id) {
-    venRafraichirPanier();
-    const selPromo = document.getElementById('ven-promotion');
-    if (selPromo) {
+  venRafraichirPanier();
+  const selPromo = document.getElementById('ven-promotion');
+  if (selPromo) {
+    if (v.promo_id) {
       const opts = [...selPromo.options];
       const match = opts.find(o => {
         if (!o.value) return false;
-        try {
-          const d = JSON.parse(o.value);
-          return d.kind === 'programmee' && d.promo_id === v.promo_id;
-        } catch (e) { return false; }
+        try { const d = JSON.parse(o.value); return d.kind === 'programmee' && d.promo_id === v.promo_id; }
+        catch (e) { return false; }
       });
       if (match) selPromo.value = match.value;
-      venAppliquerPromotion();
+    } else if (v.type_promo === 'montant' && v.rabais > 0) {
+      const opts = [...selPromo.options];
+      const match = opts.find(o => { try { return JSON.parse(o.value).kind === 'montant'; } catch(e) { return false; } });
+      if (match) { selPromo.value = match.value; venAppliquerPromotion(); document.getElementById('ven-rabais-libre').value = String(v.rabais).replace('.', ','); }
+    } else if (v.type_promo === 'pourcentage' && v.rabais > 0) {
+      const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+      const pct = sousTotal > 0 ? Math.round((v.rabais / sousTotal) * 100 * 100) / 100 : 0;
+      const opts = [...selPromo.options];
+      const match = opts.find(o => { try { return JSON.parse(o.value).kind === 'pourcentage'; } catch(e) { return false; } });
+      if (match) { selPromo.value = match.value; venAppliquerPromotion(); document.getElementById('ven-rabais-libre').value = String(pct).replace('.', ','); }
     }
-  } else {
-    venRafraichirPanier();
+    venAppliquerPromotion();
   }
 
   const estFinalisee = v.statut === 'Finalisé' || v.statut === 'Finalisée';
