@@ -387,7 +387,7 @@ async function afficherRegroupementsPublic() {
         <div class="collection-tile-overlay"></div>
         <div class="collection-tile-content">
           <span class="collection-tile-name">${(fra.nom || '').toUpperCase()}</span>
-          <span class="collection-tile-slogan">${fra.description || ''}</span>
+          <span class="collection-tile-slogan">${fra.slogan || ''}</span>
         </div>
       </a>`;
   });
