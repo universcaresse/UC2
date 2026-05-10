@@ -41,9 +41,9 @@ async function chargerVentes() {
   if (squareStatus) {
     await venTraiterRetourSquare(squareStatus);
     window.history.replaceState({}, '', window.location.pathname);
-  } else if (sessionStorage.getItem('square-pending')) {
+  } else if (localStorage.getItem('square-pending')) {
     // square-pending résiduel sans retour de Square : nettoyer
-    sessionStorage.removeItem('square-pending');
+    localStorage.removeItem('square-pending');
   }
 
   // Fermer toute modal résiduelle
@@ -750,7 +750,7 @@ async function payerParSquare() {
     type_promo: promoInfo.type,
     nom_promo: venGetNomPromo()
   };
-  sessionStorage.setItem('square-pending', JSON.stringify(pending));
+  localStorage.setItem('square-pending', JSON.stringify(pending));
   // On protège aussi la session admin (Square ouvre une autre app)
   venProtegerSessionAdmin();
 
@@ -782,14 +782,14 @@ function venCacherSpinnerSquare() {
 
 async function venTraiterRetourSquare(status) {
   venCacherSpinnerSquare();
-  const pendingRaw = sessionStorage.getItem('square-pending');
+  const pendingRaw = localStorage.getItem('square-pending');
   if (!pendingRaw) return;
 
   let pending;
   try { pending = JSON.parse(pendingRaw); }
-  catch (e) { sessionStorage.removeItem('square-pending'); return; }
+  catch (e) { localStorage.removeItem('square-pending'); return; }
 
-  sessionStorage.removeItem('square-pending');
+  localStorage.removeItem('square-pending');
 
   if (status === 'ok') {
     // Finaliser la vente
@@ -1409,20 +1409,3 @@ async function allerVersNouvelleVente() {
 
   ouvrirFormVente();
 }
-// ═══════════════════════════════════════
-// SENTINELLE iPhone — détecte le retour de Square
-// même quand Safari ressort la page de sa mémoire (bfcache)
-// ═══════════════════════════════════════
-window.addEventListener('pageshow', function(evt) {
-  // On vérifie s'il y a un retour de Square en attente
-  const params = new URLSearchParams(window.location.search);
-  const squareStatus = params.get('status');
-  const pending = sessionStorage.getItem('square-pending') || localStorage.getItem('uc_admin_persist');
-
-  // Si on a un statut Square dans l'URL OU une vente en attente, on relance le chargement
-  if (squareStatus || pending) {
-    if (typeof chargerVentes === 'function') {
-      chargerVentes();
-    }
-  }
-});
