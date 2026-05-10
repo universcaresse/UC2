@@ -78,12 +78,9 @@ function ouvrirFormVente() {
   venPanier      = [];
   venModeReprise = false;
 
-  // Générer un nouveau numéro
-  const dernierNum = toutesVentes.length
-    ? Math.max(...toutesVentes.map(v => parseInt((v.ven_id || '').replace('VEN-', '')) || 0))
-    : 0;
-  venIdEnCours     = 'VEN-' + String(dernierNum + 1).padStart(4, '0');
-  venNumeroAffiche = String(dernierNum + 1).padStart(4, '0');
+  // Le numéro sera attribué par le serveur lors de la création
+  venIdEnCours     = null;
+  venNumeroAffiche = '—';
 
   // Charger les lots disponibles
   appelAPI('getLotsDisponibles').then(resLots => {
@@ -689,7 +686,7 @@ async function payerParSquare() {
   }
 
   // 1. Sauvegarder la vente avec statut "En attente Square"
-  const ven_id     = venIdEnCours;
+  let ven_id      = venIdEnCours;
   const client     = document.getElementById('ven-client').value;
   const courriel   = document.getElementById('ven-courriel').value;
   const telephone  = document.getElementById('ven-telephone').value;
@@ -703,12 +700,15 @@ async function payerParSquare() {
       return;
     }
   } else {
-    const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: 'square', infolettre });
+    const resCreate = await appelAPIPost('createVente', { client, courriel, telephone, mode_paiement: 'square', infolettre });
     if (!resCreate || !resCreate.success) {
       cacherChargement();
-      afficherMsg('ventes', 'Erreur lors de la création.', 'erreur');
+      afficherMsg('ventes', resCreate?.message || 'Erreur lors de la création.', 'erreur');
       return;
     }
+    ven_id = resCreate.ven_id;
+    venIdEnCours = ven_id;
+    venNumeroAffiche = ven_id.replace('VEN-', '');
   }
 
   for (const l of venPanier) {
@@ -886,7 +886,7 @@ async function finaliserVente(modePaiement) {
 
   afficherChargement();
 
-  const ven_id     = venIdEnCours;
+  let ven_id      = venIdEnCours;
   const client     = document.getElementById('ven-client').value;
   const courriel   = document.getElementById('ven-courriel').value;
   const telephone  = document.getElementById('ven-telephone').value;
@@ -894,7 +894,7 @@ async function finaliserVente(modePaiement) {
   const infolettre = document.getElementById('ven-infolettre')?.checked ? '1' : '0';
 
   // Détecter si on encaisse une vente "à payer" déjà existante
-  const venteExistante = toutesVentes.find(v => v.ven_id === ven_id);
+  const venteExistante = ven_id ? toutesVentes.find(v => v.ven_id === ven_id) : null;
   const encaissementAPayer = venteExistante && venteExistante.statut === 'a-payer';
 
   if (encaissementAPayer) {
@@ -908,12 +908,15 @@ async function finaliserVente(modePaiement) {
       return;
     }
   } else {
-    const resCreate = await appelAPIPost('createVente', { ven_id, client, courriel, telephone, mode_paiement: modePaiement, infolettre });
+    const resCreate = await appelAPIPost('createVente', { client, courriel, telephone, mode_paiement: modePaiement, infolettre });
     if (!resCreate || !resCreate.success) {
       cacherChargement();
-      afficherMsg('ventes', 'Erreur lors de la création.', 'erreur');
+      afficherMsg('ventes', resCreate?.message || 'Erreur lors de la création.', 'erreur');
       return;
     }
+    ven_id = resCreate.ven_id;
+    venIdEnCours = ven_id;
+    venNumeroAffiche = ven_id.replace('VEN-', '');
   }
 
   // Lignes (sauf pour un encaissement de vente "à payer")
