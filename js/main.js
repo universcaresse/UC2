@@ -692,7 +692,16 @@ function afficherPageRegroupements(fraIdActif) {
             const aCategorieExclue = ings.some(i => fra.categories_exclues.indexOf(i.cat_id) >= 0);
             if (aCategorieExclue) return false;
           }
-          if (!fra.ing_id && (!Array.isArray(fra.categories_exclues) || fra.categories_exclues.length === 0)) return false;
+          if (Array.isArray(fra.collections_exclues) && fra.collections_exclues.length > 0) {
+            if (fra.collections_exclues.indexOf(p.col_id) >= 0) return false;
+          }
+          if (Array.isArray(fra.gammes_exclues) && fra.gammes_exclues.length > 0) {
+            if (fra.gammes_exclues.indexOf(p.gam_id) >= 0) return false;
+          }
+          const aExclusion = (Array.isArray(fra.categories_exclues) && fra.categories_exclues.length > 0)
+                          || (Array.isArray(fra.collections_exclues) && fra.collections_exclues.length > 0)
+                          || (Array.isArray(fra.gammes_exclues) && fra.gammes_exclues.length > 0);
+          if (!fra.ing_id && !aExclusion) return false;
           return true;
         });
         const parGamme = {};

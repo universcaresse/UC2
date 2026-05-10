@@ -74,6 +74,38 @@ function peuplerCategoriesExclues(cochees) {
   });
 }
 
+function peuplerCollectionsExclues(cochees) {
+  const conteneur = document.getElementById('freg-collections-exclues');
+  if (!conteneur) return;
+  conteneur.innerHTML = '';
+  (donneesCollections || []).slice().sort((a,b) => (a.nom||'').localeCompare(b.nom||'','fr')).forEach(col => {
+    const label = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = col.col_id;
+    if (Array.isArray(cochees) && cochees.indexOf(col.col_id) >= 0) cb.checked = true;
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(' ' + col.nom));
+    conteneur.appendChild(label);
+  });
+}
+
+function peuplerGammesExclues(cochees) {
+  const conteneur = document.getElementById('freg-gammes-exclues');
+  if (!conteneur) return;
+  conteneur.innerHTML = '';
+  (donneesGammes || []).slice().sort((a,b) => (a.nom||'').localeCompare(b.nom||'','fr')).forEach(gam => {
+    const label = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = gam.gam_id;
+    if (Array.isArray(cochees) && cochees.indexOf(gam.gam_id) >= 0) cb.checked = true;
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(' ' + gam.nom));
+    conteneur.appendChild(label);
+  });
+}
+
 function ouvrirFormRegroupement() {
   fermerFicheRegroupement();
   document.getElementById('form-regroupements-titre').textContent      = 'Nouveau regroupement';
@@ -92,6 +124,8 @@ function ouvrirFormRegroupement() {
   document.getElementById('freg-ing').innerHTML = '<option value="">— Choisir catégorie d\'abord —</option>';
   document.getElementById('freg-ing').disabled  = true;
   peuplerCategoriesExclues([]);
+  peuplerCollectionsExclues([]);
+  peuplerGammesExclues([]);
   peuplerPositionRegroupement(null);
   document.getElementById('contenu-regroupements').classList.add('cache');
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
@@ -162,6 +196,8 @@ function modifierRegroupement(fra_id) {
   selCat.value = fra.cat_id || '';
   peuplerIngredientsRegroupement(fra.cat_id, fra.ing_id);
   peuplerCategoriesExclues(fra.categories_exclues || []);
+  peuplerCollectionsExclues(fra.collections_exclues || []);
+  peuplerGammesExclues(fra.gammes_exclues || []);
   peuplerPositionRegroupement(fra.rang);
   document.getElementById('contenu-regroupements').classList.add('cache');
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
@@ -181,10 +217,16 @@ async function sauvegarderRegroupement() {
   const categoriesExclues = Array.from(
     document.getElementById('freg-categories-exclues').querySelectorAll('input[type="checkbox"]:checked')
   ).map(cb => cb.value);
+  const collectionsExclues = Array.from(
+    document.getElementById('freg-collections-exclues').querySelectorAll('input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
+  const gammesExclues = Array.from(
+    document.getElementById('freg-gammes-exclues').querySelectorAll('input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
   if (!nom) { cacherChargement(); afficherMsg('regroupements', 'Le nom est requis.', 'erreur'); return; }
-  if (!ing_id && categoriesExclues.length === 0) {
+  if (!ing_id && categoriesExclues.length === 0 && collectionsExclues.length === 0 && gammesExclues.length === 0) {
     cacherChargement();
-    afficherMsg('regroupements', 'Choisir un ingrédient ou au moins une catégorie à exclure.', 'erreur');
+    afficherMsg('regroupements', 'Choisir un ingrédient ou au moins une exclusion.', 'erreur');
     return;
   }
   const positionChoisie = parseInt(document.getElementById('freg-position')?.value) || 0;
@@ -197,9 +239,11 @@ async function sauvegarderRegroupement() {
     description:        document.getElementById('freg-desc').value,
     cat_id:             document.getElementById('freg-cat').value,
     ing_id,
-    photo_url:          document.getElementById('freg-photo-url').value,
-    photo_noel_url:     document.getElementById('freg-photo-noel-url').value,
-    categories_exclues: categoriesExclues
+    photo_url:           document.getElementById('freg-photo-url').value,
+    photo_noel_url:      document.getElementById('freg-photo-noel-url').value,
+    categories_exclues:  categoriesExclues,
+    collections_exclues: collectionsExclues,
+    gammes_exclues:      gammesExclues
   };
   const res = await appelAPIPost('saveRegroupement', d);
   if (res && res.success) {
