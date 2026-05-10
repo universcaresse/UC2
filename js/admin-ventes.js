@@ -1409,3 +1409,20 @@ async function allerVersNouvelleVente() {
 
   ouvrirFormVente();
 }
+// ═══════════════════════════════════════
+// SENTINELLE iPhone — détecte le retour de Square
+// même quand Safari ressort la page de sa mémoire (bfcache)
+// ═══════════════════════════════════════
+window.addEventListener('pageshow', function(evt) {
+  // On vérifie s'il y a un retour de Square en attente
+  const params = new URLSearchParams(window.location.search);
+  const squareStatus = params.get('status');
+  const pending = sessionStorage.getItem('square-pending') || localStorage.getItem('uc_admin_persist');
+
+  // Si on a un statut Square dans l'URL OU une vente en attente, on relance le chargement
+  if (squareStatus || pending) {
+    if (typeof chargerVentes === 'function') {
+      chargerVentes();
+    }
+  }
+});
