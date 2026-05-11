@@ -1649,7 +1649,15 @@ function rafraichirListeFormatsRecette() {
   var liste = document.getElementById('liste-formats-recette');
   if (!liste) return;
   var labels = document.getElementById('labels-formats-recette');
-  if (labels) labels.classList.add('cache');
+  if (labels) {
+  labels.classList.remove('cache');
+  labels.innerHTML =
+    '<span class="form-label" style="flex:1">Contenu net</span>' +
+    '<span class="form-label" style="flex:1">Unité</span>' +
+    '<span class="form-label" style="flex:1">Nb unités fabriquées</span>' +
+    '<span class="form-label" style="flex:1">Prix de vente ($)</span>' +
+    '<span style="width:32px"></span>';
+}
 
   if (formatsRecette.length === 0) {
     liste.innerHTML = '';
