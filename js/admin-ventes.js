@@ -37,8 +37,15 @@ async function chargerVentes() {
 
   // Vérifier le retour de Square
   const params = new URLSearchParams(window.location.search);
-  const squareVenId = params.get('square_ven_id');
-  if (squareVenId) window.history.replaceState({}, '', window.location.pathname);
+  const squareStatus = params.get('status');
+  let squareVenId = null;
+  if (squareStatus === 'ok') {
+    const pendingRaw = localStorage.getItem('square-pending');
+    if (pendingRaw) {
+      try { squareVenId = JSON.parse(pendingRaw).ven_id; } catch(e) {} 
+    }
+    window.history.replaceState({}, '', window.location.pathname);
+  }
 
   // Fermer toute modal résiduelle
   document.getElementById('modal-apres-vente')?.classList.remove('ouvert');
