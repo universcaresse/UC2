@@ -544,7 +544,7 @@ function construireCatalogue() {
       }).join('');
       const descFamille = Object.values(parGamme)[0]?.[0]?.desc_famille || '';
       return fam
-        ? `<div class="famille-groupe"><div class="collection-entete-nom">${fam.toUpperCase()}</div>${descFamille ? `<p class="collection-entete-desc">${descFamille}</p>` : ''}<div class="separateur2"></div>${gammesInterne}</div>`
+        ? `<div class="famille-groupe"><div class="famille-groupe-titre">${fam.toUpperCase()}</div>${descFamille ? `<p class="famille-groupe-desc">${descFamille}</p>` : ''}${gammesInterne}</div>`
         : gammesInterne;
     }).join('');
 
