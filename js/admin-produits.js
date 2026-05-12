@@ -1694,8 +1694,15 @@ function rafraichirListeFormatsRecette() {
         '<button class="bouton bouton-petit bouton-rouge" onclick="supprimerFormatRecette(' + i + ')">✕</button>' +
       '</div>' +
       '<div class="form-body">' +
-        '<div class="ingredient-rangee">' +
-          '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.poids || '') + '" placeholder="Contenu net" onchange="formatsRecette[' + i + '].poids=this.value" oninput="this.value=this.value.replace(/[^0-9.]/g,\'\')">' +
+      '<div class="ingredient-rangee" style="margin-bottom:4px">' +
+  '<span class="form-label" style="flex:1">Contenu net</span>' +
+  '<span class="form-label" style="flex:1">Unité</span>' +
+  '<span class="form-label" style="flex:1">Nb unités fabriquées</span>' +
+  '<span class="form-label" style="flex:1">Prix de vente ($)</span>' +
+  '<span style="width:32px"></span>' +
+'</div>' +
+'<div class="ingredient-rangee">' +
+  '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.poids || '') + '" placeholder="Contenu net" onchange="formatsRecette[' + i + '].poids=this.value">' +
           '<select class="form-ctrl" onchange="formatsRecette[' + i + '].unite=this.value">' +
             '<option value="g" ' + (f.unite === 'g' ? 'selected' : '') + '>g</option>' +
             '<option value="ml" ' + (f.unite === 'ml' ? 'selected' : '') + '>ml</option>' +
