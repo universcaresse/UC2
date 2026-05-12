@@ -703,7 +703,7 @@ async function payerParSquare() {
 
   venProtegerSessionAdmin();
 
-  const callbackUrl = window.location.origin + window.location.pathname + '?square_ven_id=' + ven_id + '#ventes';
+  const callbackUrl = window.location.origin + window.location.pathname + '?status=ok#ventes';
   const sdkData = {
     amount_money: { amount: totalCents, currency_code: 'CAD' },
     callback_url: callbackUrl,
