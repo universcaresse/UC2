@@ -1697,7 +1697,7 @@ function rafraichirListeFormatsRecette() {
       '<div class="ingredient-rangee" style="margin-bottom:4px">' +
   '<span class="form-label" style="flex:1">Contenu net</span>' +
   '<span class="form-label" style="flex:1">Unité</span>' +
-  '<span class="form-label" style="flex:1">Nb unités fabriquées</span>' +
+  '<span class="form-label" style="flex:1">Nb unités produites</span>' +
   '<span class="form-label" style="flex:1">Prix de vente ($)</span>' +
   '<span style="width:32px"></span>' +
 '</div>' +
