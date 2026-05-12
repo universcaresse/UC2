@@ -39,8 +39,10 @@ async function chargerVentes() {
   const params = new URLSearchParams(window.location.search);
   const squareStatus = params.get('status');
   if (squareStatus) {
-    await venTraiterRetourSquare(squareStatus);
+    localStorage.setItem('square-retour', squareStatus);
     window.history.replaceState({}, '', window.location.pathname);
+    window.close();
+    return;
   } else if (localStorage.getItem('square-pending')) {
     // square-pending résiduel sans retour de Square : nettoyer
     localStorage.removeItem('square-pending');
@@ -1409,3 +1411,10 @@ async function allerVersNouvelleVente() {
 
   ouvrirFormVente();
 }
+
+window.addEventListener('storage', async function(e) {
+  if (e.key === 'square-retour' && e.newValue) {
+    localStorage.removeItem('square-retour');
+    await venTraiterRetourSquare(e.newValue);
+  }
+});
