@@ -230,8 +230,9 @@ async function sauvegarderCollection() {
   // Collection V2
   const positionChoisie = parseInt(document.getElementById('fc-position')?.value) || 0;
   const rangCalcule = positionChoisie + 1;
+  const dernierNumCol = donneesCollections.length ? Math.max(...donneesCollections.map(c => parseInt((c.col_id || '').replace('COL-', '')) || 0)) : 0;
   const d = {
-    col_id:      rowIndex || ('COL-' + Date.now()),
+    col_id:      rowIndex || ('COL-' + String(dernierNumCol + 1).padStart(4, '0')),
     rang:        rangCalcule,
     nom:         document.getElementById('fc-collection').value.toUpperCase(),
     slogan:      document.getElementById('fc-slogan').value,

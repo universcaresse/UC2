@@ -30,7 +30,16 @@ var prodCache = {
 
 // ─── HELPERS ───
 function genererFormatId() {
-  return 'FMT-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+  var tousLesIds = [];
+  Object.values(prodCache.formats || {}).forEach(function(fmts) {
+    fmts.forEach(function(f) { if (f.format_id) tousLesIds.push(f.format_id); });
+  });
+  (formatsRecette || []).forEach(function(f) { if (f.format_id) tousLesIds.push(f.format_id); });
+  var dernierNum = tousLesIds.reduce(function(max, id) {
+    var n = parseInt((id || '').replace('FMT-', '')) || 0;
+    return n > max ? n : max;
+  }, 0);
+  return 'FMT-' + String(dernierNum + 1).padStart(4, '0');
 }
 
 // ─── VUES ───
@@ -313,7 +322,7 @@ function peuplerFiltresRecettes() {
   if (!bar) return;
   bar.innerHTML = '<button class="filtre-btn actif" data-col="" onclick="onFiltreCollectionBtn(this, \'\')">Tout</button>';
   donneesCollections.sort(function(a, b) { return (a.rang || 99) - (b.rang || 99); }).forEach(function(col) {
-    bar.innerHTML += '<button class="filtre-btn" data-col="' + col.nom + '" onclick="onFiltreCollectionBtn(this, \'' + col.nom.replace(/'/g, "\\'") + '\')">' + col.nom + '</button>';
+    bar.innerHTML += '<button class="filtre-btn" data-col="' + col.col_id + '" onclick="onFiltreCollectionBtn(this, \'' + col.col_id + '\')">' + col.nom + '</button>';
   });
   var filStat = document.getElementById('filtre-recette-statut');
   var filNom  = document.getElementById('filtre-recette-nom');
@@ -321,19 +330,19 @@ function peuplerFiltresRecettes() {
   if (filNom)  filNom.classList.remove('cache');
 }
 
-function onFiltreCollectionBtn(btn, colNom) {
+function onFiltreCollectionBtn(btn, col_id) {
   document.querySelectorAll('#filtre-recette-collection-bar .filtre-btn').forEach(function(b) { b.classList.remove('actif'); });
   btn.classList.add('actif');
   var bar = document.getElementById('filtre-recette-ligne-bar');
   bar.innerHTML = '';
-  if (colNom) {
-    var col = donneesCollections.find(function(c) { return c.nom === colNom; });
+  if (col_id) {
+    var col = donneesCollections.find(function(c) { return c.col_id === col_id; });
     var gammes = col ? donneesGammes.filter(function(g) { return g.col_id === col.col_id; }) : [];
     if (gammes.length > 1) {
       bar.classList.remove('cache');
-      bar.innerHTML = '<button class="filtre-btn actif" onclick="onFiltreGammeBtn(this, \'\')">Toutes</button>';
+      bar.innerHTML = '<button class="filtre-btn actif" data-gam="" onclick="onFiltreGammeBtn(this, \'\')">Toutes</button>';
       gammes.sort(function(a, b) { return (a.rang || 99) - (b.rang || 99); }).forEach(function(g) {
-        bar.innerHTML += '<button class="filtre-btn" onclick="onFiltreGammeBtn(this, \'' + g.nom.replace(/'/g, "\\'") + '\')">' + g.nom + '</button>';
+        bar.innerHTML += '<button class="filtre-btn" data-gam="' + g.gam_id + '" onclick="onFiltreGammeBtn(this, \'' + g.gam_id + '\')">' + g.nom + '</button>';
       });
     } else {
       bar.classList.add('cache');
@@ -344,11 +353,9 @@ function onFiltreCollectionBtn(btn, colNom) {
   filtrerRecettes();
 }
 
-function onFiltreGammeBtn(btn, gamNom) {
+function onFiltreGammeBtn(btn, gam_id) {
   document.querySelectorAll('#filtre-recette-ligne-bar .filtre-btn').forEach(function(b) { b.classList.remove('actif'); });
   btn.classList.add('actif');
-  var fil = document.getElementById('filtre-recette-ligne');
-  if (fil) fil.value = gamNom;
   filtrerRecettes();
 }
 
@@ -373,9 +380,9 @@ function onFiltreCollection() {
 
 function filtrerRecettes() {
   var colBtn = document.querySelector('#filtre-recette-collection-bar .filtre-btn.actif');
-  var col    = colBtn ? colBtn.dataset.col : '';
+  var col_id = colBtn ? colBtn.dataset.col : '';
   var gamBtn = document.querySelector('#filtre-recette-ligne-bar .filtre-btn.actif');
-  var gamme  = (gamBtn && gamBtn.textContent.trim() !== 'Toutes') ? gamBtn.textContent.trim() : '';
+  var gam_id = gamBtn ? (gamBtn.dataset.gam || '') : '';
   var elStat = document.getElementById('filtre-recette-statut');
   var elNom  = document.getElementById('filtre-recette-nom');
   var statut = elStat ? elStat.value : '';
@@ -386,10 +393,8 @@ function filtrerRecettes() {
   cartes.forEach(function(carte) {
     var pro = donneesProduits.find(function(p) { return p.pro_id === carte.dataset.proId; });
     if (!pro) return;
-    var colObj = donneesCollections.find(function(c) { return c.col_id === pro.col_id; });
-    var gamObj = donneesGammes.find(function(g) { return g.gam_id === pro.gam_id; });
-    var ok = (!col    || (colObj && colObj.nom) === col)
-          && (!gamme  || (gamObj && gamObj.nom) === gamme)
+    var ok = (!col_id || pro.col_id === col_id)
+          && (!gam_id || pro.gam_id === gam_id)
           && (!statut || (pro.statut || 'test') === statut)
           && (!nom    || pro.nom.toLowerCase().includes(nom));
     carte.classList.toggle('cache', !ok);
