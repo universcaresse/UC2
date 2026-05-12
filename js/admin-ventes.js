@@ -37,16 +37,8 @@ async function chargerVentes() {
 
   // Vérifier le retour de Square
   const params = new URLSearchParams(window.location.search);
-  const squareStatus = params.get('status');
-  if (squareStatus) {
-    localStorage.setItem('square-retour', squareStatus);
-    window.history.replaceState({}, '', window.location.pathname);
-    window.close();
-    return;
-  } else if (localStorage.getItem('square-pending')) {
-    // square-pending résiduel sans retour de Square : nettoyer
-    localStorage.removeItem('square-pending');
-  }
+  const squareVenId = params.get('square_ven_id');
+  if (squareVenId) window.history.replaceState({}, '', window.location.pathname);
 
   // Fermer toute modal résiduelle
   document.getElementById('modal-apres-vente')?.classList.remove('ouvert');
@@ -71,6 +63,7 @@ async function chargerVentes() {
   }
   toutesVentes = res.items;
   afficherTableauVentes(toutesVentes);
+  if (squareVenId) await voirDetailVente(squareVenId);
 }
 
 // ═══════════════════════════════════════
@@ -652,112 +645,65 @@ function fermerApercuFacture() {
 
 function fermerModalApresVente() {
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
+  document.getElementById('modal-facture-vente').classList.remove('ouvert');
+  fermerFormVente();
+  chargerVentes();
 }
 
 // ═══════════════════════════════════════
 // PAIEMENT PAR SQUARE
 // ═══════════════════════════════════════
+
 async function payerParSquare() {
-  if (!venPanier.length) {
-    afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur');
-    return;
-  }
-  if (!squareAppId) {
-    afficherMsg('ventes', 'Square non configuré (App ID manquant).', 'erreur');
-    return;
-  }
+  if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
+  if (!squareAppId) { afficherMsg('ventes', 'Square non configuré.', 'erreur'); return; }
 
-  // Afficher le spinner Square dans la modal d'aperçu
   document.getElementById('fv-spinner')?.classList.remove('cache');
-  document.getElementById('fv-boutons-paiement').style.display   = 'none';
+  document.getElementById('fv-boutons-paiement').style.display = 'none';
   document.getElementById('fv-boutons-impression').style.display = 'none';
-
   afficherChargement();
 
-  // Calcul du total
-  const livraison = parseFloat(String(document.getElementById('ven-livraison').value).replace(',', '.')) || 0;
-  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-  const rabais    = venCalculerRabais();
-  const total     = Math.max(0, sousTotal + livraison - rabais);
-  const totalCents = Math.round(total * 100);
-
-  if (totalCents <= 0) {
-    cacherChargement();
-    afficherMsg('ventes', 'Total invalide pour Square.', 'erreur');
-    return;
-  }
-
-  // 1. Sauvegarder la vente avec statut "En attente Square"
-  let ven_id      = venIdEnCours;
   const client     = document.getElementById('ven-client').value;
   const courriel   = document.getElementById('ven-courriel').value;
   const telephone  = document.getElementById('ven-telephone').value;
   const infolettre = document.getElementById('ven-infolettre')?.checked ? '1' : '0';
+  const livraison  = parseFloat(String(document.getElementById('ven-livraison').value).replace(',', '.')) || 0;
+  const sousTotal  = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais     = venCalculerRabais();
+  const total      = Math.max(0, sousTotal + livraison - rabais);
+  const totalCents = Math.round(total * 100);
+
+  if (totalCents <= 0) { cacherChargement(); afficherMsg('ventes', 'Total invalide.', 'erreur'); return; }
+
+  let ven_id = venIdEnCours;
 
   if (venModeReprise) {
     const resReset = await appelAPIPost('resetVenteLignes', { ven_id });
-    if (!resReset || !resReset.success) {
-      cacherChargement();
-      afficherMsg('ventes', 'Erreur lors de la réinitialisation.', 'erreur');
-      return;
-    }
+    if (!resReset || !resReset.success) { cacherChargement(); afficherMsg('ventes', 'Erreur.', 'erreur'); return; }
   } else {
     const resCreate = await appelAPIPost('createVente', { client, courriel, telephone, mode_paiement: 'square', infolettre });
-    if (!resCreate || !resCreate.success) {
-      cacherChargement();
-      afficherMsg('ventes', resCreate?.message || 'Erreur lors de la création.', 'erreur');
-      return;
-    }
+    if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', resCreate?.message || 'Erreur.', 'erreur'); return; }
     ven_id = resCreate.ven_id;
     venIdEnCours = ven_id;
     venNumeroAffiche = ven_id.replace('VEN-', '');
   }
 
   for (const l of venPanier) {
-    await appelAPIPost('addVenteLigne', {
-      ven_id,
-      pro_id: l.pro_id,
-      lot_id: l.lot_id,
-      quantite: l.quantite,
-      prix_unitaire: l.prix_unitaire,
-      format_poids: l.poids,
-      format_unite: l.unite
-    });
+    await appelAPIPost('addVenteLigne', { ven_id, pro_id: l.pro_id, lot_id: l.lot_id, quantite: l.quantite, prix_unitaire: l.prix_unitaire, format_poids: l.poids, format_unite: l.unite });
   }
 
   const promoInfo = venGetTypePromo();
+  await appelAPIPost('updateStatutVente', { ven_id, statut: 'En attente Square', courriel, telephone, infolettre, mode_paiement: 'square' });
 
-  // Marquer la vente comme "En attente Square" (pas finalisée tant que retour OK)
-  await appelAPIPost('updateStatutVente', {
-    ven_id,
-    statut: 'En attente Square',
-    courriel,
-    telephone,
-    infolettre,
-    mode_paiement: 'square'
-  });
+  localStorage.setItem('square-pending', JSON.stringify({
+    ven_id, livraison, promo_id: promoInfo.promo_id, type_promo: promoInfo.type,
+    rabais, total_net: total, nom_promo: venGetNomPromo(),
+    panier: venPanier, client, courriel, telephone, numeroAffiche: venNumeroAffiche
+  }));
 
-  // 2. Sauvegarder l'état pour pouvoir reprendre au retour
-  const pending = {
-    ven_id,
-    numeroAffiche: venNumeroAffiche,
-    panier: venPanier,
-    client,
-    courriel,
-    telephone,
-    livraison,
-    rabais,
-    total_net: total,
-    promo_id: promoInfo.promo_id,
-    type_promo: promoInfo.type,
-    nom_promo: venGetNomPromo()
-  };
-  localStorage.setItem('square-pending', JSON.stringify(pending));
-  // On protège aussi la session admin (Square ouvre une autre app)
   venProtegerSessionAdmin();
 
-  // 3. Construire le lien Square Point of Sale
-  const callbackUrl = window.location.origin + window.location.pathname + '?status=ok#ventes';
+  const callbackUrl = window.location.origin + window.location.pathname + '?square_ven_id=' + ven_id + '#ventes';
   const sdkData = {
     amount_money: { amount: totalCents, currency_code: 'CAD' },
     callback_url: callbackUrl,
@@ -767,13 +713,16 @@ async function payerParSquare() {
     options: { supported_tender_types: ['CREDIT_CARD'] }
   };
 
-  const lienSquare = 'square-commerce-v1://payment/create?data=' + encodeURIComponent(JSON.stringify(sdkData));
-
   cacherChargement();
-
-  // 4. Ouvrir Square
-  window.location.href = lienSquare;
+  window.location.href = 'square-commerce-v1://payment/create?data=' + encodeURIComponent(JSON.stringify(sdkData));
 }
+
+// Désactiver le spinner Square (au retour ou si on annule)
+
+
+
+
+
 
 // Désactiver le spinner Square (au retour ou si on annule)
 function venCacherSpinnerSquare() {
@@ -1375,11 +1324,81 @@ async function voirDetailVente(ven_id) {
     venAppliquerPromotion();
   }
 
-  const estFinalisee = v.statut === 'Finalisé' || v.statut === 'Finalisée';
-  const estAPayer    = v.statut === 'a-payer';
+  const estFinalisee     = v.statut === 'Finalisé' || v.statut === 'Finalisée';
+  const estAPayer        = v.statut === 'a-payer';
+  const estAttenteSquare = v.statut === 'En attente Square';
   ouvrirApercuFacture();
-  document.getElementById('fv-boutons-paiement').style.display   = (estFinalisee && !estAPayer) ? 'none' : '';
-  document.getElementById('fv-boutons-impression').style.display = '';
+
+  document.getElementById('btn-confirmer-square')?.remove();
+  if (estAttenteSquare) {
+    const btnDiv = document.getElementById('fv-boutons-paiement');
+    const btn = document.createElement('button');
+    btn.id = 'btn-confirmer-square';
+    btn.className = 'bouton bouton-primaire';
+    btn.textContent = '✅ Confirmer paiement Square';
+    btn.onclick = () => confirmerPaiementSquare(ven_id);
+    btnDiv.innerHTML = '';
+    btnDiv.appendChild(btn);
+    btnDiv.style.display = '';
+    document.getElementById('fv-boutons-impression').style.display = 'none';
+  } else {
+    document.getElementById('fv-boutons-paiement').style.display   = (estFinalisee && !estAPayer) ? 'none' : '';
+    document.getElementById('fv-boutons-impression').style.display = '';
+  }
+}
+
+// ═══════════════════════════════════════
+// CONFIRMATION PAIEMENT SQUARE
+// ═══════════════════════════════════════
+async function confirmerPaiementSquare(ven_id) {
+  afficherChargement();
+  const pendingRaw = localStorage.getItem('square-pending');
+  let pending = null;
+  if (pendingRaw) { try { pending = JSON.parse(pendingRaw); } catch(e) {} }
+  if (!pending || pending.ven_id !== ven_id) {
+    const v = toutesVentes.find(x => x.ven_id === ven_id);
+    pending = {
+      ven_id,
+      livraison: v?.livraison || 0,
+      promo_id: v?.promo_id || '',
+      type_promo: v?.type_promo || '',
+      rabais: v?.rabais || 0,
+      total_net: v?.total_net || v?.total || 0,
+      panier: venPanier,
+      client: v?.client || '',
+      courriel: v?.courriel || '',
+      telephone: v?.telephone || '',
+      numeroAffiche: ven_id.replace('VEN-', '')
+    };
+  }
+  const resFin = await appelAPIPost('finaliserVente', {
+    ven_id: pending.ven_id,
+    livraison: pending.livraison,
+    promo_id: pending.promo_id || '',
+    type_promo: pending.type_promo || '',
+    rabais: pending.rabais,
+    total_net: pending.total_net,
+    mode_paiement: 'square',
+    statut: 'Finalisé'
+  });
+  localStorage.removeItem('square-pending');
+  cacherChargement();
+  if (resFin && resFin.success) {
+    venIdEnCours           = pending.ven_id;
+    venNumeroAffiche       = pending.numeroAffiche;
+    venPanier              = pending.panier || [];
+    venClientSauvegarde    = pending.client || '';
+    venLivraisonSauvegarde = pending.livraison || 0;
+    document.getElementById('modal-facture-vente').classList.remove('ouvert');
+    document.getElementById('apv-courriel').value     = pending.courriel || '';
+    document.getElementById('apv-telephone').value    = pending.telephone || '';
+    document.getElementById('apv-infolettre').checked = false;
+    document.getElementById('modal-apres-vente').classList.add('ouvert');
+    afficherMsg('ventes', '✅ Paiement Square confirmé. Vente finalisée.');
+    chargerVentes();
+  } else {
+    afficherMsg('ventes', '❌ Erreur lors de la finalisation.', 'erreur');
+  }
 }
 
 // ═══════════════════════════════════════
@@ -1412,9 +1431,3 @@ async function allerVersNouvelleVente() {
   ouvrirFormVente();
 }
 
-window.addEventListener('storage', async function(e) {
-  if (e.key === 'square-retour' && e.newValue) {
-    localStorage.removeItem('square-retour');
-    await venTraiterRetourSquare(e.newValue);
-  }
-});
