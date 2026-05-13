@@ -143,7 +143,7 @@ function fermerFormVente() {
   document.getElementById('form-vente').classList.add('cache');
   document.getElementById('filtres-ventes').classList.remove('cache');
   document.getElementById('contenu-ventes').classList.remove('cache');
-  document.querySelector('#section-ventes .page-entete .bouton')?.classList.remove('cache');
+  document.querySelector('#section-ventes .page-entete')?.classList.remove('cache');
   venPanier      = [];
   venIdEnCours   = null;
   venModeReprise = false;
@@ -163,7 +163,7 @@ function venAfficherCollections() {
   document.getElementById('ven-grille').innerHTML = donneesCollections
     .slice().sort((a, b) => (a.rang||99) - (b.rang||99))
     .map(c => `<button class="ven-tile ven-tile-col"
-        style="--col-hex:${c.couleur || '#5a8a3a'}"
+        style="--col-hex:${c.couleur_hex || '#5a8a3a'}"
         onclick="venSelectionnerCollection('${c.col_id}')">
       ${c.nom}
     </button>`).join('');
@@ -190,6 +190,7 @@ function venAfficherGammes() {
     .filter(g => g.col_id === venColSelectionnee?.col_id)
     .sort((a, b) => (a.rang||99) - (b.rang||99))
     .map(g => `<button class="ven-tile ven-tile-gam"
+        style="--col-hex:${g.couleur_hex || '#5a8a3a'}"
         onclick="venSelectionnerGamme('${g.gam_id}')">
       ${g.nom}
     </button>`).join('');
@@ -233,7 +234,7 @@ function venAfficherProduits() {
           <span class="ven-fmt-stock">${dispo} dispo</span>
         </button>`;
       }).join('');
-    return `<div class="ven-tile ven-tile-pro">
+    return `<div class="ven-tile ven-tile-pro" style="--col-hex:${p.couleur_hex || '#5a8a3a'}">
       <div class="ven-tile-pro-nom">${p.nom}</div>
       <div class="ven-tile-formats">${btnsFmt}</div>
     </div>`;
@@ -412,6 +413,7 @@ function venAjouterLigne() {
   venRafraichirPanier();
   venCacherStickyBar();
   document.querySelectorAll('.ven-format-btn').forEach(b => b.classList.remove('ven-format-actif'));
+  venResetEtape('collection');
 }
 
 function venResetSaisie() {
@@ -944,7 +946,7 @@ async function venTraiterRetourSquare(status) {
     document.getElementById('filtres-ventes').classList.add('cache');
     document.getElementById('form-vente').classList.remove('cache');
     document.getElementById('form-vente').style.display = 'block';
-    document.querySelector('#section-ventes .page-entete .bouton')?.classList.add('cache');
+    document.querySelector('#section-ventes .page-entete')?.classList.add('cache');
 
     document.getElementById('ven-client').value    = pending.client || '';
     document.getElementById('ven-courriel').value  = pending.courriel || '';

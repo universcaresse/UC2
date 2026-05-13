@@ -1664,8 +1664,11 @@ tr.cliquable { cursor: pointer; }
 }
 .ven-tile-gam {
   aspect-ratio: 1/1;
-  background: var(--primary-06);
-  color: var(--primary);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--col-hex, var(--primary)) 85%, #000 15%),
+    color-mix(in srgb, var(--col-hex, var(--primary)) 65%, #000 25%));
+  color: white;
+
   font-family: 'DM Sans', sans-serif;
   font-size: 0.78rem;
   font-weight: 500;
@@ -1688,10 +1691,13 @@ tr.cliquable { cursor: pointer; }
   font-family: 'DM Sans', sans-serif;
   font-size: 0.72rem;
   font-weight: 500;
-  color: var(--gris-fonce);
+  color: white;
   padding: 7px 7px 3px;
   line-height: 1.2;
   flex-shrink: 0;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--col-hex, var(--primary)) 85%, #000 15%),
+    color-mix(in srgb, var(--col-hex, var(--primary)) 65%, #000 25%));
 }
 .ven-tile-formats {
   flex: 1;
