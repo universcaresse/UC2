@@ -5,10 +5,6 @@
 
 // ─── ÉTAT GLOBAL ───
 var venPanier             = [];
-var venEtape              = 'collection';
-var venColSelectionnee    = null;
-var venGammeSelectionnee  = null;
-var venProduitMap         = {};
 var venIdEnCours          = null;
 var venNumeroAffiche      = '';
 var venLotsDisponibles    = [];
@@ -94,7 +90,25 @@ function ouvrirFormVente() {
   });
 
   // Remplir les collections
-  document.getElementById('ven-quantite').value = '1';
+  const selCol = document.getElementById('ven-collection');
+  selCol.innerHTML = '<option value="">— Collection —</option>';
+  donneesCollections
+    .slice()
+    .sort((a, b) => (a.rang || 99) - (b.rang || 99))
+    .forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.col_id;
+      o.textContent = c.nom;
+      selCol.appendChild(o);
+    });
+
+  // Vider les autres champs
+  document.getElementById('ven-gamme').innerHTML       = '<option value="">— Gamme —</option>';
+  document.getElementById('ven-produit').innerHTML     = '<option value="">— Produit —</option>';
+  document.getElementById('ven-format').innerHTML      = '<option value="">— Format —</option>';
+  document.getElementById('ven-quantite').value        = '1';
+  document.getElementById('ven-prix').value            = '';
+  document.getElementById('ven-total-ligne').value     = '';
   document.getElementById('ven-client').value          = '';
   document.getElementById('ven-courriel').value        = '';
   document.getElementById('ven-telephone').value       = '';
@@ -119,14 +133,6 @@ function ouvrirFormVente() {
     telInput.dataset.formatBound = '1';
   }
 
-  venEtape              = 'collection';
-  venColSelectionnee    = null;
-  venGammeSelectionnee  = null;
-  venProduitSelectionne = null;
-  venFormatSelectionne  = null;
-  venProduitMap         = {};
-  venCacherStickyBar();
-  venAfficherEtape();
   venRafraichirPanier();
 
   // Afficher le formulaire
@@ -152,152 +158,6 @@ function fermerFormVente() {
 // ═══════════════════════════════════════
 // CASCADE COLLECTION → GAMME → PRODUIT → FORMAT
 // ═══════════════════════════════════════
-function venAfficherEtape() {
-  if      (venEtape === 'collection') venAfficherCollections();
-  else if (venEtape === 'gamme')      venAfficherGammes();
-  else if (venEtape === 'produit')    venAfficherProduits();
-  venMettreAJourBreadcrumb();
-}
-
-function venAfficherCollections() {
-  document.getElementById('ven-grille').innerHTML = donneesCollections
-    .slice().sort((a, b) => (a.rang||99) - (b.rang||99))
-    .map(c => `<button class="ven-tile ven-tile-col"
-        style="--col-hex:${c.couleur || '#5a8a3a'}"
-        onclick="venSelectionnerCollection('${c.col_id}')">
-      ${c.nom}
-    </button>`).join('');
-}
-
-function venSelectionnerCollection(col_id) {
-  const col = donneesCollections.find(c => c.col_id === col_id);
-  venColSelectionnee   = col ? { col_id, nom: col.nom } : null;
-  venGammeSelectionnee = null;
-  venFormatSelectionne = null;
-  venCacherStickyBar();
-  const gammes = donneesGammes.filter(g => g.col_id === col_id);
-  if (gammes.length === 1) {
-    venGammeSelectionnee = { gam_id: gammes[0].gam_id, nom: gammes[0].nom };
-    venEtape = 'produit';
-  } else {
-    venEtape = 'gamme';
-  }
-  venAfficherEtape();
-}
-
-function venAfficherGammes() {
-  document.getElementById('ven-grille').innerHTML = donneesGammes
-    .filter(g => g.col_id === venColSelectionnee?.col_id)
-    .sort((a, b) => (a.rang||99) - (b.rang||99))
-    .map(g => `<button class="ven-tile ven-tile-gam"
-        onclick="venSelectionnerGamme('${g.gam_id}')">
-      ${g.nom}
-    </button>`).join('');
-}
-
-function venSelectionnerGamme(gam_id) {
-  const gam = donneesGammes.find(g => g.gam_id === gam_id);
-  venGammeSelectionnee = gam ? { gam_id, nom: gam.nom } : null;
-  venFormatSelectionne = null;
-  venCacherStickyBar();
-  venEtape = 'produit';
-  venAfficherEtape();
-}
-
-function venAfficherProduits() {
-  venProduitMap = {};
-  const produits = donneesProduits
-    .filter(p => p.statut !== 'archive'
-              && p.col_id === venColSelectionnee?.col_id
-              && (!venGammeSelectionnee || p.gam_id === venGammeSelectionnee.gam_id))
-    .sort((a, b) => (a.nom||'').localeCompare(b.nom||''));
-
-  document.getElementById('ven-grille').innerHTML = produits.map(p => {
-    venProduitMap[p.pro_id] = p;
-    const btnsFmt = (p.formats||[])
-      .slice().sort((a,b) => parseFloat(a.poids)-parseFloat(b.poids))
-      .map(f => {
-        const lot   = venLotsDisponibles.find(l =>
-          String(l.pro_id) === String(p.pro_id) &&
-          String(l.format_poids) === String(f.poids) &&
-          String(l.format_unite) === String(f.unite));
-        const dispo = lot ? lot.nb_disponible : 0;
-        const cls   = dispo === 0 ? 'ven-stock-zero' : dispo <= 2 ? 'ven-stock-bas' : '';
-        return `<button class="ven-format-btn ${cls}" ${dispo===0?'disabled':''}
-            data-proid="${p.pro_id}" data-poids="${f.poids}"
-            data-unite="${f.unite}" data-prix="${f.prix_vente||0}"
-            data-lotid="${lot?.lot_id||''}" data-dispo="${dispo}"
-            onclick="venSelectionnerFormat(this)">
-          <span class="ven-fmt-poids">${f.poids} ${f.unite}</span>
-          <span class="ven-fmt-prix">${formaterPrix(f.prix_vente||0)}</span>
-          <span class="ven-fmt-stock">${dispo} dispo</span>
-        </button>`;
-      }).join('');
-    return `<div class="ven-tile ven-tile-pro">
-      <div class="ven-tile-pro-nom">${p.nom}</div>
-      <div class="ven-tile-formats">${btnsFmt}</div>
-    </div>`;
-  }).join('');
-}
-
-function venSelectionnerFormat(btn) {
-  const pro = venProduitMap[btn.dataset.proid];
-  document.querySelectorAll('.ven-format-btn').forEach(b => b.classList.remove('ven-format-actif'));
-  btn.classList.add('ven-format-actif');
-  venProduitSelectionne = { pro_id: btn.dataset.proid, nom: pro?.nom || '' };
-  venFormatSelectionne  = {
-    poids: btn.dataset.poids, unite: btn.dataset.unite,
-    prix_vente: parseFloat(btn.dataset.prix) || 0,
-    lot_id: btn.dataset.lotid, nb_disponible: parseInt(btn.dataset.dispo) || 0
-  };
-  document.getElementById('ven-quantite').value = '1';
-  venAfficherStickyBar();
-}
-
-function venAfficherStickyBar() {
-  const f = venFormatSelectionne, p = venProduitSelectionne;
-  document.getElementById('ven-sticky-info').textContent = `${p.nom} — ${f.poids} ${f.unite}`;
-  venMettreAJourPrixAffiche();
-  document.getElementById('ven-sticky-bar').classList.remove('cache');
-}
-
-function venCacherStickyBar() {
-  document.getElementById('ven-sticky-bar')?.classList.add('cache');
-  venFormatSelectionne  = null;
-  venProduitSelectionne = null;
-}
-
-function venMettreAJourPrixAffiche() {
-  if (!venFormatSelectionne) return;
-  const qte = parseInt(document.getElementById('ven-quantite').value) || 1;
-  document.getElementById('ven-sticky-prix').textContent =
-    formaterPrix(venFormatSelectionne.prix_vente * qte);
-}
-
-function venMettreAJourBreadcrumb() {
-  let html = '';
-  if (venColSelectionnee) {
-    html += `<button class="ven-badge" onclick="venResetEtape('collection')">${venColSelectionnee.nom} ✕</button>`;
-  }
-  if (venGammeSelectionnee && venEtape === 'produit') {
-    const nb = donneesGammes.filter(g => g.col_id === venColSelectionnee?.col_id).length;
-    if (nb > 1) {
-      html += `<button class="ven-badge" onclick="venResetEtape('gamme')">${venGammeSelectionnee.nom} ✕</button>`;
-    }
-  }
-  document.getElementById('ven-breadcrumb').innerHTML = html;
-}
-
-function venResetEtape(niveau) {
-  venCacherStickyBar();
-  if (niveau === 'collection') {
-    venColSelectionnee = null; venGammeSelectionnee = null; venEtape = 'collection';
-  } else {
-    venGammeSelectionnee = null; venEtape = 'gamme';
-  }
-  venAfficherEtape();
-}
-
 function venFiltrerGammes() {
   const col_id = document.getElementById('ven-collection').value;
   const sel    = document.getElementById('ven-gamme');
@@ -383,35 +243,48 @@ function venMettreAJourPrix() {
 
 function venChangerQte(delta) {
   const input = document.getElementById('ven-quantite');
-  input.value = Math.max(1, (parseInt(input.value)||1) + delta);
-  venMettreAJourPrixAffiche();
+  const val   = parseInt(input.value) || 1;
+  input.value = Math.max(1, val + delta);
+  venMettreAJourPrix();
 }
 
 // ═══════════════════════════════════════
 // AJOUTER UNE LIGNE AU PANIER
 // ═══════════════════════════════════════
 function venAjouterLigne() {
-  if (!venProduitSelectionne || !venFormatSelectionne) {
+  const pro_id    = document.getElementById('ven-produit').value;
+  const formatVal = document.getElementById('ven-format').value;
+  const qte       = parseInt(document.getElementById('ven-quantite').value) || 1;
+
+  if (!pro_id || !formatVal) {
     afficherMsg('ventes', 'Choisir un produit et un format.', 'erreur');
     return;
   }
-  const qte = parseInt(document.getElementById('ven-quantite').value) || 1;
-  if (qte > venFormatSelectionne.nb_disponible) {
-    afficherMsg('ventes', `Stock insuffisant — ${venFormatSelectionne.nb_disponible} disponible(s).`, 'erreur');
+
+  const format = JSON.parse(formatVal);
+  if (qte > format.nb_disponible) {
+    afficherMsg('ventes', `Stock insuffisant — ${format.nb_disponible} disponible(s).`, 'erreur');
     return;
   }
+
+  const pro           = donneesProduits.find(p => p.pro_id === pro_id);
+  const formatProduit = (pro?.formats || []).find(f =>
+    String(f.poids) === String(format.poids) && f.unite === format.unite
+  );
+  const prix = parseFloat(String(formatProduit?.prix_vente || 0).replace(',', '.')) || 0;
+
   venPanier.push({
-    pro_id: venProduitSelectionne.pro_id,
-    lot_id: venFormatSelectionne.lot_id,
-    nom:    venProduitSelectionne.nom,
-    poids:  venFormatSelectionne.poids,
-    unite:  venFormatSelectionne.unite,
-    quantite:      qte,
-    prix_unitaire: venFormatSelectionne.prix_vente
+    pro_id,
+    lot_id: format.lot_id,
+    nom: pro?.nom || '',
+    poids: format.poids,
+    unite: format.unite,
+    quantite: qte,
+    prix_unitaire: prix
   });
+
   venRafraichirPanier();
-  venCacherStickyBar();
-  document.querySelectorAll('.ven-format-btn').forEach(b => b.classList.remove('ven-format-actif'));
+  venResetSaisie();
 }
 
 function venResetSaisie() {
@@ -701,9 +574,9 @@ function ouvrirApercuFacture() {
 
   let html = `
     <div style="font-family:'DM Sans',sans-serif;color:var(--gris-fonce)">
-      <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--beige)">
-        <div style="font-weight:500;font-size:0.95rem;color:var(--gris-fonce)">Facture ${venNumeroAffiche}</div>
-        <div style="font-size:0.78rem;color:var(--gris);margin-top:4px">${date}</div>
+      <div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--beige)">
+        <div style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--primary)">Univers Caresse</div>
+        <div style="font-size:0.75rem;color:var(--gris);letter-spacing:0.1em;margin-top:4px">${date}</div>
       </div>`;
 
   if (client || courriel || telephone) {

@@ -1608,54 +1608,31 @@
 
         <!-- FORMULAIRE VENTE -->
         <div id="form-vente" class="cache">
-          <div class="form-panel">
-            <div class="form-panel-header">
-              <span class="form-panel-titre">Nouvelle vente</span>
-              <button class="btn-fermer-panneau" onclick="fermerFormVente()">✕</button>
-            </div>
+
+          <!-- TOPBAR -->
+          <div class="ven-topbar">
+            <button class="ven-close-btn" onclick="fermerFormVente()">✕</button>
           </div>
 
-          <!-- SÉLECTION PRODUIT -->
-          <div class="form-panel">
-            <div class="form-body">
-              <div class="form-grille">
-                <div class="form-groupe col-plein">
-                  <select class="form-ctrl" id="ven-collection" onchange="venFiltrerGammes()">
-                    <option value="">— Collection —</option>
-                  </select>
-                </div>
-                <div class="form-groupe col-plein">
-                  <select class="form-ctrl" id="ven-gamme" onchange="venFiltrerProduits()">
-                    <option value="">— Gamme (toutes) —</option>
-                  </select>
-                </div>
-                <div class="form-groupe col-plein">
-                  <select class="form-ctrl" id="ven-produit" onchange="venFiltrerFormats()">
-                    <option value="">— Produit —</option>
-                  </select>
-                </div>
-                <div class="form-groupe col-plein">
-                  <select class="form-ctrl" id="ven-format" onchange="venMettreAJourPrix()">
-                    <option value="">— Format —</option>
-                  </select>
-                </div>
-                <div class="form-groupe col-plein">
-                  <div class="ven-qte-ligne">
-                    <button class="bouton bouton-petit" onclick="venChangerQte(-1)">−</button>
-                    <input type="number" class="form-ctrl" id="ven-quantite" min="1" value="1" inputmode="numeric" oninput="venMettreAJourPrix()">
-                    <button class="bouton bouton-petit" onclick="venChangerQte(1)">+</button>
-                  </div>
-                </div>
-                <div class="form-groupe col-demi">
-                  <input type="text" class="form-ctrl" id="ven-prix" placeholder="Prix unitaire" readonly>
-                </div>
-                <div class="form-groupe col-demi">
-                  <input type="text" class="form-ctrl" id="ven-total-ligne" placeholder="Total" readonly>
-                </div>
-                <div class="form-groupe col-plein">
-                  <button class="bouton bouton-plein-largeur" onclick="venAjouterLigne()">Ajouter au panier</button>
-                </div>
-              </div>
+          <!-- BREADCRUMB -->
+          <div class="ven-breadcrumb" id="ven-breadcrumb"></div>
+
+          <!-- CASCADE -->
+          <div class="ven-cascade-zone">
+            <div class="ven-grille3" id="ven-grille"></div>
+          </div>
+
+          <!-- STICKY BAS -->
+          <div class="ven-sticky-bar cache" id="ven-sticky-bar">
+            <div class="ven-sticky-info" id="ven-sticky-info"></div>
+            <div class="ven-sticky-controls">
+              <button class="ven-qte-btn" onclick="venChangerQte(-1)">−</button>
+              <input type="number" id="ven-quantite" class="ven-qte-champ"
+                     value="1" min="1" inputmode="numeric"
+                     oninput="venMettreAJourPrixAffiche()">
+              <button class="ven-qte-btn" onclick="venChangerQte(1)">+</button>
+              <div class="ven-sticky-prix" id="ven-sticky-prix"></div>
+              <button class="bouton" onclick="venAjouterLigne()">Ajouter</button>
             </div>
           </div>
 
@@ -3452,6 +3429,8 @@
   <button class="bouton bouton-plein-largeur" onclick="finaliserVente('argent')">Comptant</button>
    <div class="separateur1"></div>
   <button class="bouton bouton-plein-largeur" onclick="finaliserVente('plus-tard')">Payer plus tard</button>
+<div class="separateur1"></div>
+<button class="bouton bouton-plein-largeur" onclick="finaliserVente('square-manuel')">Square manuel</button>
 </div>
 <div class="separateur2"></div>
 <div id="fv-boutons-impression">
