@@ -90,6 +90,12 @@
   </style>
 </head>
 <body>
+  <div class="overlay" id="overlay">
+    <div class="spinner-grand">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="overlay-texte">Connexion en cours…</div>
+  </div>
   <div class="wrap">
     <p class="admin-label">Administration</p>
     <img src="../Images/Divers/Logofinal.png" alt="Univers Caresse" class="logo">
@@ -106,6 +112,10 @@
       window.location.href = '/admin/';
     }
     async function valider() {
+      const btn = document.querySelector('.btn');
+      if (btn.disabled) return;
+      btn.disabled = true;
+      document.getElementById('overlay').classList.add('visible');
       const mdp = document.getElementById('input-mdp').value;
       const res = await fetch('https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec', {
         method: 'POST',
@@ -121,6 +131,8 @@
         document.getElementById('erreur-mdp').textContent = 'Mot de passe incorrect.';
         document.getElementById('input-mdp').value = '';
         document.getElementById('input-mdp').focus();
+        btn.disabled = false;
+        document.getElementById('overlay').classList.remove('visible');
       }
     }
     document.getElementById('input-mdp').addEventListener('keydown', e => {
