@@ -75,6 +75,18 @@
     .btn:hover { background: #4a6e2e; }
     
     .erreur { margin-top: 12px; color: #c44536; font-size: 0.85rem; min-height: 20px; text-align: center; font-weight: 400; }
+
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(255,253,245,0.92); z-index: 99; align-items: center; justify-content: center; flex-direction: column; gap: 20px; }
+    .overlay.visible { display: flex; }
+    .overlay-texte { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: #8b8680; letter-spacing: 0.1em; }
+    .spinner-grand { position: relative; width: 60px; height: 60px; }
+    .spinner-grand span { position: absolute; bottom: 0; left: 50%; border-radius: 50%; border: 2px solid #5a8a3a; opacity: 0; animation: flotter-login var(--dur) ease-in infinite; animation-delay: var(--delay); }
+    .spinner-grand span:nth-child(1) { width:14px; height:14px; --tx:-18px; --drift:6px;  --dur:2.8s; --delay:0s;   }
+    .spinner-grand span:nth-child(2) { width:20px; height:20px; --tx:10px;  --drift:-8px; --dur:3.2s; --delay:0.5s; }
+    .spinner-grand span:nth-child(3) { width:10px; height:10px; --tx:-4px;  --drift:5px;  --dur:2.5s; --delay:1.0s; }
+    .spinner-grand span:nth-child(4) { width:16px; height:16px; --tx:24px;  --drift:-6px; --dur:3.5s; --delay:1.5s; }
+    .spinner-grand span:nth-child(5) { width:12px; height:12px; --tx:-24px; --drift:7px;  --dur:2.9s; --delay:2.0s; }
+    @keyframes flotter-login { 0% { transform:translateX(var(--tx)) translateY(0) scale(0.4); opacity:0; } 10% { opacity:1; } 80% { opacity:0.6; } 100% { transform:translateX(calc(var(--tx) + var(--drift))) translateY(-70px) scale(1.05); opacity:0; } }
   </style>
 </head>
 <body>
