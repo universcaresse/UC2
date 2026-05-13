@@ -1686,6 +1686,9 @@ tr.cliquable { cursor: pointer; }
   flex-direction: column;
   height: 140px;
   cursor: default;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--col-hex, var(--primary)) 85%, #000 15%),
+    color-mix(in srgb, var(--col-hex, var(--primary)) 65%, #000 25%));
 }
 .ven-tile-pro-nom {
   font-family: 'DM Sans', sans-serif;
@@ -1695,9 +1698,6 @@ tr.cliquable { cursor: pointer; }
   padding: 7px 7px 3px;
   line-height: 1.2;
   flex-shrink: 0;
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--col-hex, var(--primary)) 85%, #000 15%),
-    color-mix(in srgb, var(--col-hex, var(--primary)) 65%, #000 25%));
 }
 .ven-tile-formats {
   flex: 1;
@@ -1714,8 +1714,8 @@ tr.cliquable { cursor: pointer; }
   grid-template-rows: auto auto;
   gap: 0 4px;
   padding: 5px 7px;
-  background: var(--primary-04);
-  border: 1px solid transparent;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
   cursor: pointer;
   text-align: left;
   transition: all 0.12s;
@@ -1730,9 +1730,9 @@ tr.cliquable { cursor: pointer; }
 .ven-format-btn.ven-format-actif .ven-fmt-poids,
 .ven-format-btn.ven-format-actif .ven-fmt-prix,
 .ven-format-btn.ven-format-actif .ven-fmt-stock { color: white; }
-.ven-fmt-poids { font-size: 0.70rem; font-weight: 500; color: var(--gris-fonce); grid-column: 1; grid-row: 1; }
-.ven-fmt-prix  { font-size: 0.70rem; color: var(--primary); font-weight: 500; grid-column: 2; grid-row: 1; text-align: right; }
-.ven-fmt-stock { font-size: 0.62rem; color: var(--gris); grid-column: 1 / -1; grid-row: 2; }
+.ven-fmt-poids { font-size: 0.70rem; font-weight: 500; color: white; grid-column: 1; grid-row: 1; }
+.ven-fmt-prix  { font-size: 0.70rem; color: white; font-weight: 500; grid-column: 2; grid-row: 1; text-align: right; }
+.ven-fmt-stock { font-size: 0.62rem; color: rgba(255,255,255,0.75); grid-column: 1 / -1; grid-row: 2; }
 .ven-stock-bas .ven-fmt-stock  { color: var(--accent); }
 .ven-stock-zero .ven-fmt-stock { color: var(--danger); }
 .ven-sticky-bar {
