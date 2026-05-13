@@ -1598,7 +1598,7 @@ tr.cliquable { cursor: pointer; }
 
 .ven-topbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   padding: 12px 16px 0;
 }
 .ven-close-btn {
@@ -1795,7 +1795,7 @@ tr.cliquable { cursor: pointer; }
     width: 100%;
     max-width: 100%;
     max-height: 95vh;
-    border-radius: 16px 16px 0 0;
+   
   }
   .form-actions-vertical .bouton {
     padding: 18px;

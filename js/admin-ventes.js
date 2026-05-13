@@ -134,7 +134,7 @@ function ouvrirFormVente() {
   document.getElementById('filtres-ventes').classList.add('cache');
   document.getElementById('form-vente').classList.remove('cache');
   document.getElementById('form-vente').style.display = 'block';
-  document.querySelector('#section-ventes .page-entete .bouton')?.classList.add('cache');
+  document.querySelector('#section-ventes .page-entete')?.classList.add('cache');
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
@@ -157,6 +157,7 @@ function venAfficherEtape() {
   else if (venEtape === 'gamme')      venAfficherGammes();
   else if (venEtape === 'produit')    venAfficherProduits();
   venMettreAJourBreadcrumb();
+  document.querySelector('.admin-contenu')?.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function venAfficherCollections() {
@@ -703,10 +704,7 @@ function ouvrirApercuFacture() {
 
   let html = `
     <div style="font-family:'DM Sans',sans-serif;color:var(--gris-fonce)">
-      <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--beige)">
-        <div style="font-weight:500;font-size:0.95rem;color:var(--gris-fonce)">Facture ${venNumeroAffiche}</div>
-        <div style="font-size:0.78rem;color:var(--gris);margin-top:4px">${date}</div>
-      </div>`;
+      `;
 
   if (client || courriel || telephone) {
     html += `<div style="margin-bottom:16px;font-size:0.85rem;color:var(--gris)">`;
@@ -755,7 +753,7 @@ function ouvrirApercuFacture() {
   </div>`;
 
   document.getElementById('modal-fv-contenu').innerHTML = html;
-  document.getElementById('modal-fv-numero').textContent = venNumeroAffiche;
+  document.getElementById('modal-fv-numero').textContent = (venNumeroAffiche && venNumeroAffiche !== '—' ? 'Facture ' + venNumeroAffiche : 'Nouvelle vente') + ' · ' + date;
 
   // Boutons selon le contexte
   const btnSquare = document.getElementById('btn-payer-square');
@@ -1544,7 +1542,7 @@ async function allerVersNouvelleVente() {
   afficherSection('ventes', null);
   document.getElementById('contenu-ventes').classList.add('cache');
   document.getElementById('filtres-ventes').classList.add('cache');
-  document.querySelector('#section-ventes .page-entete .bouton')?.classList.add('cache');
+  document.querySelector('#section-ventes .page-entete')?.classList.add('cache');
 
   const [resPro, resFmt, resLots] = await Promise.all([
     appelAPI('getProduits'),
