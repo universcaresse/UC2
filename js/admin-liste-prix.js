@@ -165,8 +165,7 @@ async function ouvrirListePrix() {
     '  margin: 0.55in 0.5in 0.5in;\n' +
     '}\n' +
 
-    '* { margin:0; padding:0; box-sizing:border-box; }\n' +
-
+   '* { margin:0; padding:0; box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }\n' +
     'body {\n' +
     '  font-family: "DM Sans", sans-serif;\n' +
     '  font-weight: 300;\n' +
