@@ -27,7 +27,7 @@ async function ouvrirListePrix() {
       parCollection[colId] = {
         nom:    (col && col.nom)    || '—',
         rang:   (col && col.rang)   || 99,
-        hex:    (col && col.couleur_hex) || pro.couleur_hex || '#5a8a3a',
+        hex:    (col && col.couleur_hex ? col.couleur_hex : (pro.couleur_hex || '#5a8a3a')),
         gammes: {}
       };
       ordreCollections.push(colId);
@@ -43,6 +43,7 @@ async function ouvrirListePrix() {
     if (!colData.gammes[gamId]) {
       colData.gammes[gamId] = {
         nom:     (gam && gam.nom) || '',
+        hex:     (gam && gam.couleur_hex) || col.hex,
         familles: {}
       };
     }
@@ -78,8 +79,8 @@ async function ouvrirListePrix() {
 
     gammesTriees.forEach(function(gam) {
       contenuHTML += '<div class="bloc-gamme">';
-      if (gam.nom) {
-        contenuHTML += '<div class="gamme-titre">' + gam.nom + '</div>';
+     if (gam.nom) {
+        contenuHTML += '<div class="gamme-titre" style="color:' + gam.hex + ';border-left-color:' + gam.hex + '">' + gam.nom + '</div>';
       }
 
       // Familles triées alphabétiquement
@@ -143,7 +144,7 @@ async function ouvrirListePrix() {
     '  font-weight: 300;\n' +
     '  color: #3d3b39;\n' +
     '  background: white;\n' +
-    '  font-size: 8pt;\n' +
+    '   font-size: 10pt;\n' +
     '  line-height: 1.4;\n' +
     '}\n' +
 
@@ -152,7 +153,7 @@ async function ouvrirListePrix() {
     '  display: block; margin: 0 auto 20pt;\n' +
     '  padding: 9pt 26pt;\n' +
     '  background: #5a8a3a; color: white; border: none;\n' +
-    '  font-family: "DM Sans", sans-serif; font-size: 8pt;\n' +
+    '  font-family: "DM Sans", sans-serif;  font-size: 10pt;\n' +
     '  letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;\n' +
     '}\n' +
 
@@ -178,7 +179,7 @@ async function ouvrirListePrix() {
 
     /* 2 colonnes */
     '.colonnes {\n' +
-    '  columns: 2;\n' +
+    '  columns: 3;\n' +
     '  column-gap: 18pt;\n' +
     '}\n' +
 
@@ -204,9 +205,8 @@ async function ouvrirListePrix() {
     '.gamme-titre {\n' +
     '  font-family: "Playfair Display", serif;\n' +
     '  font-size: 8.5pt; font-weight: 600;\n' +
-    '  color: #5a8a3a;\n' +
     '  padding-left: 5pt;\n' +
-    '  border-left: 2pt solid #d4a445;\n' +
+    '  border-left: 2pt solid;\n' +
     '  margin-bottom: 3pt;\n' +
     '  break-inside: avoid; break-after: avoid;\n' +
     '}\n' +
