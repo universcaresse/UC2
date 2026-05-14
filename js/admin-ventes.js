@@ -80,6 +80,8 @@ async function chargerVentes() {
 // NOUVELLE VENTE — OUVERTURE
 // ═══════════════════════════════════════
 function ouvrirFormVente() {
+  document.getElementById('modal-apres-vente')?.classList.remove('ouvert');
+  document.getElementById('modal-facture-vente')?.classList.remove('ouvert');
   venPanier      = [];
   venModeReprise = false;
 
@@ -780,6 +782,10 @@ function fermerApercuFacture() {
 function fermerModalApresVente() {
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
   document.getElementById('modal-facture-vente').classList.remove('ouvert');
+  venPanier        = [];
+  venIdEnCours     = null;
+  venNumeroAffiche = '';
+  venModeReprise   = false;
   fermerFormVente();
   chargerVentes();
 }
@@ -1077,11 +1083,13 @@ async function finaliserVente(modePaiement) {
 
   chargerVentes();
 
-  // Modal après-vente
+  // Modal après-vente — ouvert AVANT chargerVentes
   document.getElementById('apv-courriel').value     = courriel;
   document.getElementById('apv-telephone').value    = telephone;
   document.getElementById('apv-infolettre').checked = infolettre === '1';
   document.getElementById('modal-apres-vente').classList.add('ouvert');
+
+  chargerVentes();
 }
 
 // ═══════════════════════════════════════
@@ -1099,7 +1107,6 @@ async function sauvegarderCoordonnees() {
 async function imprimerFacture() {
   afficherChargement();
   await sauvegarderCoordonnees();
-  document.getElementById('modal-apres-vente').classList.remove('ouvert');
 
   const numero    = venNumeroAffiche;
   const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -1201,6 +1208,7 @@ async function imprimerFacture() {
   fenetre.focus();
   cacherChargement();
   setTimeout(() => fenetre.print(), 800);
+  document.getElementById('modal-apres-vente').classList.remove('ouvert');
 }
 
 async function envoyerFactureCourriel() {
@@ -1212,9 +1220,8 @@ async function envoyerFactureCourriel() {
     return;
   }
   document.getElementById('apv-courriel').style.border = '';
-  afficherChargement();
+ afficherChargement();
   await sauvegarderCoordonnees();
-  document.getElementById('modal-apres-vente').classList.remove('ouvert');
 
   const client    = venClientSauvegarde || document.getElementById('ven-client').value;
   const livraison = venLivraisonSauvegarde;
@@ -1252,6 +1259,7 @@ async function envoyerFactureCourriel() {
   } else {
     afficherMsg('ventes', '❌ Erreur : ' + (res?.message || 'inconnue'), 'erreur');
   }
+  document.getElementById('modal-apres-vente').classList.remove('ouvert');
 }
 
 async function envoyerFactureTexto() {
@@ -1263,9 +1271,8 @@ async function envoyerFactureTexto() {
     return;
   }
   document.getElementById('apv-telephone').style.border = '';
-  afficherChargement();
+ afficherChargement();
   await sauvegarderCoordonnees();
-  document.getElementById('modal-apres-vente').classList.remove('ouvert');
 
   const livraison = venLivraisonSauvegarde;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
@@ -1303,6 +1310,7 @@ async function envoyerFactureTexto() {
 
   cacherChargement();
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
+  document.getElementById('modal-apres-vente').classList.remove('ouvert');
 }
 
 // ═══════════════════════════════════════
