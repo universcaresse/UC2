@@ -100,7 +100,7 @@ function ouvrirFormVente() {
   document.getElementById('ven-telephone').value       = '';
   document.getElementById('ven-livraison').value       = '0';
   document.getElementById('ven-sous-total').value      = '';
-  document.getElementById('ven-total').value           = '';
+  // ven-total retiré du formulaire — affiché dans le modal seulement
   const infolettre = document.getElementById('ven-infolettre');
   if (infolettre) infolettre.checked = false;
 
