@@ -87,6 +87,7 @@
 		<button class="nav-dropdown-item" onclick="afficherSection('contenu-site', null)">contenu du site</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('redaction', this)">rédaction</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('catalogue-builder', null)">catalogue PDF</button>
+<button class="nav-dropdown-item" onclick="ouvrirListePrix()">liste de prix</button>
 		<button class="nav-dropdown-item" onclick="exporterTextes()">exporter textes</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('mediatheque', null)">médiathèque</button>
 		
@@ -162,6 +163,7 @@
         <button class="sidebar-lien" onclick="afficherSection('contenu-site', this)">contenu du site</button>
 		<button class="sidebar-lien" onclick="afficherSection('redaction', this)">rédaction</button>
 		<button class="sidebar-lien" onclick="afficherSection('catalogue-builder', null)">catalogue PDF</button>
+		<button class="sidebar-lien" onclick="ouvrirListePrix()">liste de prix</button>
         <button class="sidebar-lien" onclick="exporterTextes()">exporter textes</button>
         <button class="sidebar-lien" onclick="afficherSection('mediatheque', this)">médiathèque</button>
      
@@ -3438,7 +3440,7 @@
 </div>
 <div class="separateur2"></div>
 <div id="fv-boutons-impression" class="fv-boutons-impression">
-  <button class="bouton fv-btn-imprimer" onclick="imprimerFacture()">Imprimer / PDF</button>
+  <button class="bouton fv-btn-imprimer" onclick="imprimerFacture()">Imprimer</button>
   <button class="bouton fv-btn-courriel" onclick="envoyerFactureCourriel()">Courriel</button>
   <button class="bouton fv-btn-texto" onclick="envoyerFactureTexto()">Texto</button>
 </div>
@@ -3552,6 +3554,7 @@
 <script src="../js/admin-achats.js"></script>
 <script src="../js/admin-fournisseurs.js"></script>
 <script src="../js/catalogue-builder.js"></script>
+<script src="../js/admin-liste-prix.js"></script>
 
 <!-- MODALE FICHE PRODUIT -->
 <div class="modal-admin-overlay" id="modal-cb-fiche" style="display:none">
