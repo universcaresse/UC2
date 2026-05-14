@@ -1647,13 +1647,17 @@
                 <div class="form-groupe col-plein">
                   <input type="text" class="form-ctrl" id="ven-sous-total" placeholder="Sous-total" readonly>
                 </div>
-                <div class="form-groupe col-plein">
-                  <input type="text" inputmode="decimal" class="form-ctrl" id="ven-livraison" placeholder="Livraison $ (0 si aucune)" value="0" oninput="venCalculerTotal()">
-                </div>
-                <div class="form-groupe col-plein">
-                  <input type="text" class="form-ctrl" id="ven-total" placeholder="Total" readonly>
-                </div>
               </div>
+            </div>
+          </div>
+
+          <!-- LIVRAISON -->
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <span class="form-panel-titre">Livraison</span>
+            </div>
+            <div class="form-body">
+              <input type="text" inputmode="decimal" class="form-ctrl" id="ven-livraison" placeholder="Livraison $ (0 si aucune)" oninput="venCalculerTotal()">
             </div>
           </div>
 

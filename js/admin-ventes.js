@@ -1193,7 +1193,7 @@ async function imprimerFacture() {
   </div>
   <div class="merci">
     <div class="merci-texte">Merci pour votre achat !</div>
-    <div class="boutique">universcaresse.ca &nbsp;·&nbsp; universcaresse@gmail.com</div>
+    <div class="boutique">universcaresse.ca &nbsp;·&nbsp; universcaresse@outlook.com</div>
   </div>
 </div>
 </body></html>`);
@@ -1204,16 +1204,17 @@ async function imprimerFacture() {
 }
 
 async function envoyerFactureCourriel() {
+  const courriel = document.getElementById('apv-courriel').value || document.getElementById('ven-courriel').value;
+  if (!courriel) {
+    document.getElementById('apv-courriel').style.border = '2px solid var(--danger)';
+    document.getElementById('apv-courriel').placeholder = 'Courriel requis pour envoyer par courriel';
+    document.getElementById('apv-courriel').focus();
+    return;
+  }
+  document.getElementById('apv-courriel').style.border = '';
   afficherChargement();
   await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
-
-  const courriel = document.getElementById('apv-courriel').value || document.getElementById('ven-courriel').value;
-  if (!courriel) {
-    cacherChargement();
-    afficherMsg('ventes', 'Aucun courriel indiqué pour ce client.', 'erreur');
-    return;
-  }
 
   const client    = venClientSauvegarde || document.getElementById('ven-client').value;
   const livraison = venLivraisonSauvegarde;
@@ -1254,16 +1255,17 @@ async function envoyerFactureCourriel() {
 }
 
 async function envoyerFactureTexto() {
+  const telephone = document.getElementById('apv-telephone').value || document.getElementById('ven-telephone').value;
+  if (!telephone) {
+    document.getElementById('apv-telephone').style.border = '2px solid var(--danger)';
+    document.getElementById('apv-telephone').placeholder = 'Téléphone requis pour envoyer par texto';
+    document.getElementById('apv-telephone').focus();
+    return;
+  }
+  document.getElementById('apv-telephone').style.border = '';
   afficherChargement();
   await sauvegarderCoordonnees();
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
-
-  const telephone = document.getElementById('apv-telephone').value || document.getElementById('ven-telephone').value;
-  if (!telephone) {
-    cacherChargement();
-    afficherMsg('ventes', 'Aucun téléphone indiqué pour ce client.', 'erreur');
-    return;
-  }
 
   const livraison = venLivraisonSauvegarde;
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
@@ -1297,7 +1299,7 @@ async function envoyerFactureTexto() {
   texte += `${sep}\n`;
   texte += `total : ${formaterPrix(total)}\n\n`;
   texte += `Merci pour votre achat !\n`;
-  texte += `universcaresse.ca\nuniverscaresse@gmail.com\n`;
+  texte += `universcaresse.ca\universcaresse@outlook.com\n`;
 
   cacherChargement();
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
