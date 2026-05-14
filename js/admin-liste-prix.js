@@ -34,7 +34,6 @@ async function ouvrirListePrix() {
     }
 
     var colData = parCollection[colId];
-
     if (!colData.gammes[gamId]) {
       colData.gammes[gamId] = {
         nom:      (gam && gam.nom) || '',
@@ -118,7 +117,38 @@ async function ouvrirListePrix() {
     // On utilise une grille CSS 3 colonnes à l'intérieur du bloc collection
     contenuHTML += '<div class="bloc-collection">';
     contenuHTML += '<div class="collection-bandeau" style="background:' + col.hex + '">' + col.nom.toUpperCase() + '</div>';
-    contenuHTML += '<div class="collection-colonnes">' + blocsHTML + '</div>';
+    var gammesPleineLargeur = '';
+    gammesTriees.forEach(function(gam) {
+      var famillesTriees2 = Object.values(gam.familles).sort(function(a, b) {
+        return (a.nom || '').localeCompare(b.nom || '', 'fr');
+      });
+      var blocsGamme = '';
+      famillesTriees2.forEach(function(fam) {
+        fam.produits.forEach(function(pro) {
+          var formats = (prodCache.formats[pro.pro_id] || pro.formats || [])
+            .slice()
+            .sort(function(a, b) { return parseFloat(a.poids) - parseFloat(b.poids); });
+          var couleurBordure = pro.couleur_hex || col.hex;
+          var blocProduit = '<div class="bloc-produit">';
+          blocProduit += '<div class="produit-nom" style="border-left-color:' + couleurBordure + '">' + (pro.nom || '—') + '</div>';
+          formats.forEach(function(f) {
+            var prix = parseFloat(f.prix_vente).toFixed(2).replace('.', ',') + ' $';
+            blocProduit += '<div class="produit-format"><span class="format-poids">' + f.poids + '&nbsp;' + f.unite + '</span><span class="format-tirets"></span><span class="format-prix">' + prix + '</span></div>';
+          });
+          blocProduit += '</div>';
+          blocsGamme += blocProduit;
+        });
+      });
+      if (gam.nom) {
+        gammesPleineLargeur += '<div class="gamme-bloc">';
+        gammesPleineLargeur += '<div class="gamme-titre" style="color:' + gam.hex + ';border-left-color:' + gam.hex + '">' + gam.nom + '</div>';
+        gammesPleineLargeur += '<div class="collection-colonnes">' + blocsGamme + '</div>';
+        gammesPleineLargeur += '</div>';
+      } else {
+        gammesPleineLargeur += '<div class="collection-colonnes">' + blocsGamme + '</div>';
+      }
+    });
+    contenuHTML += gammesPleineLargeur;
     contenuHTML += '</div>';
   });
 
@@ -194,12 +224,17 @@ async function ouvrirListePrix() {
     '}\n' +
 
     /* Gamme */
+    '.gamme-bloc {\n' +
+    '  margin-bottom: 8pt;\n' +
+    '  break-inside: avoid;\n' +
+    '}\n' +
     '.gamme-titre {\n' +
     '  font-family: "Playfair Display", serif;\n' +
     '  font-size: 8pt; font-weight: 600;\n' +
-    '  padding-left: 5pt;\n' +
-    '  border-left: 2pt solid;\n' +
-    '  margin-bottom: 3pt;\n' +
+    '  padding: 3pt 7pt;\n' +
+    '  border-left: 3pt solid;\n' +
+    '  margin-bottom: 4pt;\n' +
+    '  width: 100%;\n' +
     '  break-inside: avoid; break-after: avoid;\n' +
     '}\n' +
 
