@@ -25,32 +25,27 @@ async function ouvrirListePrix() {
 
     if (!parCollection[colId]) {
       parCollection[colId] = {
-        nom:    (col && col.nom)    || '—',
-        rang:   (col && col.rang)   || 99,
-        hex:    (col && col.couleur_hex ? col.couleur_hex : (pro.couleur_hex || '#5a8a3a')),
+        nom:   (col && col.nom)  || '—',
+        rang:  (col && col.rang) || 99,
+        hex:   (col && col.couleur_hex) ? col.couleur_hex : (pro.couleur_hex || '#5a8a3a'),
         gammes: {}
       };
       ordreCollections.push(colId);
     }
 
-    // Utiliser le hex du premier produit si la collection n'en a pas
     var colData = parCollection[colId];
-    if (!colData.hexConfirme && pro.couleur_hex) {
-      colData.hex = pro.couleur_hex;
-      colData.hexConfirme = true;
-    }
 
     if (!colData.gammes[gamId]) {
       colData.gammes[gamId] = {
-        nom:     (gam && gam.nom) || '',
-        hex:     (gam && gam.couleur_hex) || col.hex,
+        nom:      (gam && gam.nom) || '',
+        hex:      (gam && gam.couleur_hex) || colData.hex,
         familles: {}
       };
     }
     var gamData = colData.gammes[gamId];
     if (!gamData.familles[famId]) {
       gamData.familles[famId] = {
-        nom:     (fam && fam.nom) || '',
+        nom:      (fam && fam.nom) || '',
         produits: []
       };
     }
@@ -69,59 +64,62 @@ async function ouvrirListePrix() {
   ordreCollections.forEach(function(colId) {
     var col = parCollection[colId];
 
-    contenuHTML += '<div class="bloc-collection">';
-    contenuHTML += '<div class="collection-bandeau" style="background:' + col.hex + '">' + col.nom.toUpperCase() + '</div>';
+    // Construire la liste à plat de tous les blocs produit de cette collection
+    var blocsHTML = '';
 
-    // Gammes triées alphabétiquement
     var gammesTriees = Object.values(col.gammes).sort(function(a, b) {
       return (a.nom || '').localeCompare(b.nom || '', 'fr');
     });
 
     gammesTriees.forEach(function(gam) {
-      contenuHTML += '<div class="bloc-gamme">';
-     if (gam.nom) {
-        contenuHTML += '<div class="gamme-titre" style="color:' + gam.hex + ';border-left-color:' + gam.hex + '">' + gam.nom + '</div>';
-      }
-
-      // Familles triées alphabétiquement
       var famillesTriees = Object.values(gam.familles).sort(function(a, b) {
         return (a.nom || '').localeCompare(b.nom || '', 'fr');
       });
 
       famillesTriees.forEach(function(fam) {
-        contenuHTML += '<div class="bloc-famille">';
+        // Titre gamme (affiché une fois par famille)
+        var enteteHTML = '';
+        if (gam.nom) {
+          enteteHTML += '<div class="gamme-titre" style="color:' + gam.hex + ';border-left-color:' + gam.hex + '">' + gam.nom + '</div>';
+        }
         if (fam.nom) {
-          contenuHTML += '<div class="famille-titre">' + fam.nom + '</div>';
+          enteteHTML += '<div class="famille-titre">' + fam.nom + '</div>';
         }
 
-        fam.produits.forEach(function(pro) {
+        fam.produits.forEach(function(pro, idx) {
           var formats = (prodCache.formats[pro.pro_id] || pro.formats || [])
             .slice()
             .sort(function(a, b) { return parseFloat(a.poids) - parseFloat(b.poids); });
 
           var couleurBordure = pro.couleur_hex || col.hex;
 
-          contenuHTML += '<div class="bloc-produit">';
-          contenuHTML += '<div class="produit-nom" style="border-left-color:' + couleurBordure + '">' + (pro.nom || '—') + '</div>';
+          var blocProduit = '<div class="bloc-produit">';
+          // N'afficher l'en-tête gamme/famille qu'avant le premier produit de chaque famille
+          if (idx === 0) blocProduit = '<div class="bloc-produit avec-entete">' + enteteHTML;
+
+          blocProduit += '<div class="produit-nom" style="border-left-color:' + couleurBordure + '">' + (pro.nom || '—') + '</div>';
 
           formats.forEach(function(f) {
             var prix = parseFloat(f.prix_vente).toFixed(2).replace('.', ',') + ' $';
-            contenuHTML += '<div class="produit-format">';
-            contenuHTML += '<span class="format-poids">' + f.poids + '&nbsp;' + f.unite + '</span>';
-            contenuHTML += '<span class="format-prix">' + prix + '</span>';
-            contenuHTML += '</div>';
+            blocProduit += '<div class="produit-format">';
+            blocProduit += '<span class="format-poids">' + f.poids + '&nbsp;' + f.unite + '</span>';
+            blocProduit += '<span class="format-tirets"></span>';
+            blocProduit += '<span class="format-prix">' + prix + '</span>';
+            blocProduit += '</div>';
           });
 
-          contenuHTML += '</div>'; // .bloc-produit
+          blocProduit += '</div>';
+          blocsHTML += blocProduit;
         });
-
-        contenuHTML += '</div>'; // .bloc-famille
       });
-
-      contenuHTML += '</div>'; // .bloc-gamme
     });
 
-    contenuHTML += '</div>'; // .bloc-collection
+    // Diviser les blocs en 3 colonnes égales
+    // On utilise une grille CSS 3 colonnes à l'intérieur du bloc collection
+    contenuHTML += '<div class="bloc-collection">';
+    contenuHTML += '<div class="collection-bandeau" style="background:' + col.hex + '">' + col.nom.toUpperCase() + '</div>';
+    contenuHTML += '<div class="collection-colonnes">' + blocsHTML + '</div>';
+    contenuHTML += '</div>';
   });
 
   // ── Document complet ──
@@ -144,20 +142,18 @@ async function ouvrirListePrix() {
     '  font-weight: 300;\n' +
     '  color: #3d3b39;\n' +
     '  background: white;\n' +
-    '   font-size: 10pt;\n' +
+    '  font-size: 9pt;\n' +
     '  line-height: 1.4;\n' +
     '}\n' +
 
-    /* Bouton impression */
     '.btn-imprimer {\n' +
     '  display: block; margin: 0 auto 20pt;\n' +
     '  padding: 9pt 26pt;\n' +
     '  background: #5a8a3a; color: white; border: none;\n' +
-    '  font-family: "DM Sans", sans-serif;  font-size: 10pt;\n' +
+    '  font-family: "DM Sans", sans-serif; font-size: 9pt;\n' +
     '  letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;\n' +
     '}\n' +
 
-    /* En-tête */
     '.entete {\n' +
     '  text-align: center;\n' +
     '  padding-bottom: 14pt;\n' +
@@ -165,7 +161,7 @@ async function ouvrirListePrix() {
     '  border-bottom: 1.5pt solid #f2e4cf;\n' +
     '  break-inside: avoid;\n' +
     '}\n' +
-    '.entete-logo { height: 220pt; margin-bottom: 6pt; }\n' +
+    '.entete-logo { height: 180pt; margin-bottom: 6pt; }\n' +
     '.entete-titre {\n' +
     '  font-family: "Playfair Display", serif;\n' +
     '  font-size: 16pt; font-weight: 400;\n' +
@@ -173,38 +169,34 @@ async function ouvrirListePrix() {
     '  margin-bottom: 3pt;\n' +
     '}\n' +
     '.entete-date {\n' +
-    '  font-size: 6.5pt; letter-spacing: 0.18em;\n' +
+    '  font-size: 7pt; letter-spacing: 0.18em;\n' +
     '  text-transform: uppercase; color: #8b8680;\n' +
     '}\n' +
 
-    /* 2 colonnes */
-    '.colonnes {\n' +
-    '  columns: 3;\n' +
-    '  column-gap: 18pt;\n' +
-    '}\n' +
-
-    /* Collection */
+    /* Collection — pleine largeur, éviter coupure */
     '.bloc-collection {\n' +
-    '  break-inside: avoid-column;\n' +
-    '  margin-bottom: 10pt;\n' +
+    '  break-inside: avoid;\n' +
+    '  margin-bottom: 16pt;\n' +
     '}\n' +
     '.collection-bandeau {\n' +
     '  color: white;\n' +
-    '  font-size: 7pt; font-weight: 500;\n' +
+    '  font-size: 8pt; font-weight: 500;\n' +
     '  letter-spacing: 0.22em; text-transform: uppercase;\n' +
-    '  padding: 4.5pt 7pt;\n' +
-    '  margin-bottom: 5pt;\n' +
-    '  break-inside: avoid; break-after: avoid;\n' +
+    '  padding: 5pt 8pt;\n' +
+    '  margin-bottom: 6pt;\n' +
+    '  width: 100%;\n' +
+    '}\n' +
+
+    /* 3 colonnes à l'intérieur de chaque collection */
+    '.collection-colonnes {\n' +
+    '  columns: 3;\n' +
+    '  column-gap: 14pt;\n' +
     '}\n' +
 
     /* Gamme */
-    '.bloc-gamme {\n' +
-    '  break-inside: avoid;\n' +
-    '  margin-bottom: 5pt;\n' +
-    '}\n' +
     '.gamme-titre {\n' +
     '  font-family: "Playfair Display", serif;\n' +
-    '  font-size: 8.5pt; font-weight: 600;\n' +
+    '  font-size: 8pt; font-weight: 600;\n' +
     '  padding-left: 5pt;\n' +
     '  border-left: 2pt solid;\n' +
     '  margin-bottom: 3pt;\n' +
@@ -212,10 +204,6 @@ async function ouvrirListePrix() {
     '}\n' +
 
     /* Famille */
-    '.bloc-famille {\n' +
-    '  break-inside: avoid;\n' +
-    '  margin-bottom: 3pt;\n' +
-    '}\n' +
     '.famille-titre {\n' +
     '  font-size: 6pt; font-weight: 500;\n' +
     '  letter-spacing: 0.16em; text-transform: uppercase;\n' +
@@ -229,26 +217,34 @@ async function ouvrirListePrix() {
     /* Produit */
     '.bloc-produit {\n' +
     '  break-inside: avoid;\n' +
-    '  padding: 1.5pt 0 1.5pt 9pt;\n' +
-    '  margin-bottom: 1pt;\n' +
+    '  padding: 1.5pt 0 1.5pt 0;\n' +
+    '  margin-bottom: 2pt;\n' +
+    '}\n' +
+    '.bloc-produit.avec-entete {\n' +
+    '  margin-top: 4pt;\n' +
     '}\n' +
     '.produit-nom {\n' +
     '  font-size: 7.5pt; font-weight: 500;\n' +
     '  color: #3d3b39;\n' +
-    '  border-left: 2pt solid #5a8a3a;\n' +
+    '  border-left: 2pt solid;\n' +
     '  padding-left: 4pt;\n' +
     '  margin-bottom: 1pt;\n' +
     '}\n' +
     '.produit-format {\n' +
     '  display: flex;\n' +
-    '  justify-content: space-between;\n' +
+    '  align-items: baseline;\n' +
     '  padding-left: 6pt;\n' +
     '  font-size: 7pt;\n' +
     '  color: #8b8680;\n' +
+    '  gap: 2pt;\n' +
     '}\n' +
-    '.format-prix { font-weight: 400; color: #3d3b39; }\n' +
+    '.format-tirets {\n' +
+    '  flex: 1;\n' +
+    '  border-bottom: 0.5pt dotted #c8c4c0;\n' +
+    '  margin-bottom: 2pt;\n' +
+    '}\n' +
+    '.format-prix { font-weight: 400; color: #3d3b39; white-space: nowrap; }\n' +
 
-    /* Pied de page */
     '.pied-de-page {\n' +
     '  text-align: center;\n' +
     '  font-size: 6.5pt; letter-spacing: 0.1em;\n' +
@@ -272,7 +268,7 @@ async function ouvrirListePrix() {
     '  <div class="entete-date">En vigueur au ' + today + '</div>\n' +
     '</div>\n\n' +
 
-    '<div class="colonnes">\n' + contenuHTML + '</div>\n\n' +
+    contenuHTML +
 
     '<div class="pied-de-page">Univers Caresse &nbsp;&middot;&nbsp; Prix en vigueur au ' + today + '</div>\n\n' +
 
