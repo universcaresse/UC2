@@ -1299,7 +1299,7 @@ async function envoyerFactureTexto() {
   texte += `${sep}\n`;
   texte += `total : ${formaterPrix(total)}\n\n`;
   texte += `Merci pour votre achat !\n`;
-  texte += `universcaresse.ca\universcaresse@outlook.com\n`;
+  texte += `universcaresse.ca — universcaresse@outlook.com\n`;
 
   cacherChargement();
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
