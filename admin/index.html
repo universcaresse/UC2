@@ -1610,9 +1610,9 @@
         <div id="form-vente" class="cache">
 
           <!-- TOPBAR -->
-          <div class="ven-topbar">
-            <button class="ven-close-btn" onclick="fermerFormVente()">✕</button>
-          </div>
+        <div class="ven-topbar">
+    <button class="bouton bouton-rouge" onclick="fermerFormVente()">Annuler la vente</button>
+  </div>
 
           <!-- BREADCRUMB -->
           <div class="ven-breadcrumb" id="ven-breadcrumb"></div>
@@ -3430,14 +3430,17 @@
   <button class="bouton bouton-plein-largeur" onclick="finaliserVente('plus-tard')">Payer plus tard</button>
 <div class="separateur1"></div>
 <button class="bouton bouton-plein-largeur" onclick="finaliserVente('square-manuel')">Square manuel</button>
+<div id="fv-boutons-paiement" class="fv-boutons-paiement">
+  <button class="bouton bouton-plein-largeur fv-btn-square" id="btn-payer-square" onclick="payerParSquare()">Payer par Square</button>
+  <button class="bouton bouton-plein-largeur fv-btn-comptant" onclick="finaliserVente('argent')">Comptant</button>
+  <button class="bouton bouton-plein-largeur fv-btn-plus-tard" onclick="finaliserVente('plus-tard')">Payer plus tard</button>
+  <button class="bouton bouton-plein-largeur fv-btn-square-manuel" onclick="finaliserVente('square-manuel')">Square manuel</button>
 </div>
 <div class="separateur2"></div>
-<div id="fv-boutons-impression">
-  <button class="bouton bouton-plein-largeur" onclick="imprimerFacture()">Imprimer / PDF</button>
-   <div class="separateur1"></div>
-  <button class="bouton bouton-plein-largeur" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
-   <div class="separateur1"></div>
-  <button class="bouton bouton-plein-largeur" onclick="envoyerFactureTexto()">Envoyer par texto</button>
+<div id="fv-boutons-impression" class="fv-boutons-impression">
+  <button class="bouton fv-btn-imprimer" onclick="imprimerFacture()">Imprimer / PDF</button>
+  <button class="bouton fv-btn-courriel" onclick="envoyerFactureCourriel()">Courriel</button>
+  <button class="bouton fv-btn-texto" onclick="envoyerFactureTexto()">Texto</button>
 </div>
 
 </div>
@@ -3464,11 +3467,11 @@
       </div>
     </div>
     <div class="modal-admin-body">
-      <div class="form-actions-vertical">
-        <button class="bouton bouton-plein-largeur" onclick="envoyerFactureTexto()">Envoyer par texto</button>
-        <button class="bouton bouton-plein-largeur" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
-        <button class="bouton bouton-plein-largeur" onclick="imprimerFacture()">Imprimer / PDF</button>
-       <button class="bouton bouton-contour bouton-plein-largeur" onclick="fermerModalApresVente()">Ne pas envoyer</button>
+      <div class="apv-boutons">
+        <button class="bouton bouton-plein-largeur fv-btn-texto" onclick="envoyerFactureTexto()">Envoyer par texto</button>
+        <button class="bouton bouton-plein-largeur fv-btn-courriel" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
+        <button class="bouton bouton-plein-largeur fv-btn-imprimer" onclick="imprimerFacture()">Imprimer / PDF</button>
+        <button class="bouton bouton-plein-largeur fv-btn-ne-pas-envoyer" onclick="fermerModalApresVente()">Ne pas envoyer</button>
       </div>
     </div>
   </div>
