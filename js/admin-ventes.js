@@ -678,7 +678,8 @@ function venCalculerTotal() {
   const rabais    = venCalculerRabais();
   const total     = sousTotal + livraison - rabais;
   document.getElementById('ven-sous-total').value = formaterPrix(sousTotal);
-  document.getElementById('ven-total').value      = formaterPrix(Math.max(0, total));
+  const elTotal = document.getElementById('ven-total');
+  if (elTotal) elTotal.value = formaterPrix(Math.max(0, total));
 }
 
 // ═══════════════════════════════════════
