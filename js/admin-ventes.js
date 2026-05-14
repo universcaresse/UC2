@@ -52,7 +52,6 @@ async function chargerVentes() {
   }
 
   // Fermer toute modal résiduelle
-  document.getElementById('modal-apres-vente')?.classList.remove('ouvert');
   document.getElementById('modal-facture-vente')?.classList.remove('ouvert');
 
   // Charger l'App ID Square si pas encore fait
