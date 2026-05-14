@@ -141,7 +141,7 @@ async function ouvrirListePrix() {
       });
       if (gam.nom) {
         gammesPleineLargeur += '<div class="gamme-bloc">';
-        gammesPleineLargeur += '<div class="gamme-titre" style="color:' + gam.hex + ';border-left-color:' + gam.hex + '">' + gam.nom + '</div>';
+        gammesPleineLargeur += '<div class="gamme-titre" style="background:' + gam.hex + '">' + gam.nom + '</div>';
         gammesPleineLargeur += '<div class="collection-colonnes">' + blocsGamme + '</div>';
         gammesPleineLargeur += '</div>';
       } else {
@@ -228,11 +228,12 @@ async function ouvrirListePrix() {
     '  margin-bottom: 8pt;\n' +
     '  break-inside: avoid;\n' +
     '}\n' +
-    '.gamme-titre {\n' +
+ '.gamme-titre {\n' +
     '  font-family: "Playfair Display", serif;\n' +
-    '  font-size: 8pt; font-weight: 600;\n' +
+    '  font-size: 7.5pt; font-weight: 500;\n' +
+    '  letter-spacing: 0.14em;\n' +
+    '  color: white;\n' +
     '  padding: 3pt 7pt;\n' +
-    '  border-left: 3pt solid;\n' +
     '  margin-bottom: 4pt;\n' +
     '  width: 100%;\n' +
     '  break-inside: avoid; break-after: avoid;\n' +
