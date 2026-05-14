@@ -98,7 +98,7 @@ function ouvrirFormVente() {
   document.getElementById('ven-client').value          = '';
   document.getElementById('ven-courriel').value        = '';
   document.getElementById('ven-telephone').value       = '';
-  document.getElementById('ven-livraison').value       = '0';
+  document.getElementById('ven-livraison').value       = '';
   document.getElementById('ven-sous-total').value      = '';
   // ven-total retiré du formulaire — affiché dans le modal seulement
   const infolettre = document.getElementById('ven-infolettre');
