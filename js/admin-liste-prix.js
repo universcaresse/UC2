@@ -164,7 +164,7 @@ async function ouvrirListePrix() {
     '  border-bottom: 1.5pt solid #f2e4cf;\n' +
     '  break-inside: avoid;\n' +
     '}\n' +
-    '.entete-logo { height: 48pt; margin-bottom: 6pt; }\n' +
+    '.entete-logo { height: 220pt; margin-bottom: 6pt; }\n' +
     '.entete-titre {\n' +
     '  font-family: "Playfair Display", serif;\n' +
     '  font-size: 16pt; font-weight: 400;\n' +
