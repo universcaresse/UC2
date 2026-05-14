@@ -1193,7 +1193,7 @@ async function imprimerFacture() {
   </div>
   <div class="merci">
     <div class="merci-texte">Merci pour votre achat !</div>
-    <div class="boutique">universcaresse.ca &nbsp;·&nbsp; universcaresse@outlook.com</div>
+    <div class="boutique">universcaresse.ca — universcaresse@outlook.com</div>
   </div>
 </div>
 </body></html>`);
