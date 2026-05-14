@@ -1081,8 +1081,6 @@ async function finaliserVente(modePaiement) {
   venIdEnCours     = idSauvegarde;
   venNumeroAffiche = numeroSauvegarde;
 
-  chargerVentes();
-
   // Modal après-vente — ouvert AVANT chargerVentes
   document.getElementById('apv-courriel').value     = courriel;
   document.getElementById('apv-telephone').value    = telephone;
