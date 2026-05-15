@@ -298,7 +298,7 @@ async function ouvrirListePrix() {
     '<button class="btn-imprimer" onclick="window.print()">Imprimer</button>\n\n' +
 
     '<div class="entete">\n' +
-    '  <img src="../Images/Divers/Logofinal.png" class="entete-logo" alt="Univers Caresse">\n' +
+ 
     '  <div class="entete-titre">Liste de prix</div>\n' +
     '  <div class="entete-date">En vigueur au ' + today + '</div>\n' +
     '</div>\n\n' +
