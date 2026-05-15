@@ -1073,8 +1073,11 @@ async function finaliserVente(modePaiement) {
   venClientSauvegarde     = client;
   venLivraisonSauvegarde  = livraison;
 
+  alert('AVANT fermerApercuFacture');
   fermerApercuFacture();
+  alert('APRES fermerApercuFacture, AVANT fermerFormVente');
   fermerFormVente();
+  alert('APRES fermerFormVente');
 
   // Restaurer après fermeture
   venPanier        = panierSauvegarde;
