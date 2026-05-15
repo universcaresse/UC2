@@ -203,8 +203,7 @@ async function ouvrirListePrix() {
     '}\n' +
 
     /* Collection — pleine largeur, éviter coupure */
-    '.bloc-collection {\n' +
-    '  break-inside: avoid;\n' +
+	'.bloc-collection {\n' +
     '  margin-bottom: 16pt;\n' +
     '}\n' +
     '.collection-bandeau {\n' +
@@ -298,7 +297,7 @@ async function ouvrirListePrix() {
     '<button class="btn-imprimer" onclick="window.print()">Imprimer</button>\n\n' +
 
     '<div class="entete">\n' +
- 
+   '\n' +
     '  <div class="entete-titre">Liste de prix</div>\n' +
     '  <div class="entete-date">En vigueur au ' + today + '</div>\n' +
     '</div>\n\n' +
