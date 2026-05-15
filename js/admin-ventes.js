@@ -1073,11 +1073,8 @@ async function finaliserVente(modePaiement) {
   venClientSauvegarde     = client;
   venLivraisonSauvegarde  = livraison;
 
-  alert('AVANT fermerApercuFacture');
   fermerApercuFacture();
-  alert('APRES fermerApercuFacture, AVANT fermerFormVente');
   fermerFormVente();
-  alert('APRES fermerFormVente');
 
   // Restaurer après fermeture
   venPanier        = panierSauvegarde;
@@ -1089,9 +1086,9 @@ async function finaliserVente(modePaiement) {
   document.getElementById('apv-telephone').value    = telephone;
   document.getElementById('apv-infolettre').checked = infolettre === '1';
 
- document.getElementById('modal-apres-vente').classList.add('ouvert');
+  document.getElementById('modal-apres-vente').classList.add('ouvert');
 
-  alert('TEST : la modale devrait être visible derrière cette alerte');
+  chargerVentes();
 }
 
 
