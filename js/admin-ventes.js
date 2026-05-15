@@ -1085,9 +1085,11 @@ async function finaliserVente(modePaiement) {
   document.getElementById('apv-courriel').value     = courriel;
   document.getElementById('apv-telephone').value    = telephone;
   document.getElementById('apv-infolettre').checked = infolettre === '1';
-  document.getElementById('modal-apres-vente').classList.add('ouvert');
 
   chargerVentes();
+
+  document.getElementById('modal-apres-vente').classList.add('ouvert');
+}
 }
 
 // ═══════════════════════════════════════
