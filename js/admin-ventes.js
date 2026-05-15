@@ -1219,6 +1219,7 @@ async function envoyerFactureCourriel() {
   venEnvoiCourrielEnCours = true;
   const courriel = document.getElementById('apv-courriel').value || document.getElementById('ven-courriel').value;
   if (!courriel) {
+    venEnvoiCourrielEnCours = false;
     document.getElementById('apv-courriel').style.border = '2px solid var(--danger)';
     document.getElementById('apv-courriel').placeholder = 'Courriel requis pour envoyer par courriel';
     document.getElementById('apv-courriel').focus();
