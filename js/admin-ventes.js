@@ -780,6 +780,7 @@ function fermerApercuFacture() {
 }
 
 function fermerModalApresVente() {
+  document.body.appendChild(document.getElementById('modal-apres-vente'));
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
   document.getElementById('modal-facture-vente').classList.remove('ouvert');
   venPanier        = [];
@@ -1086,6 +1087,7 @@ async function finaliserVente(modePaiement) {
   document.getElementById('apv-telephone').value    = telephone;
   document.getElementById('apv-infolettre').checked = infolettre === '1';
 
+  document.body.appendChild(document.getElementById('modal-apres-vente'));
   document.getElementById('modal-apres-vente').classList.add('ouvert');
 
   chargerVentes();
