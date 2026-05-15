@@ -1406,6 +1406,7 @@ function afficherTableauVentes(items) {
 // ═══════════════════════════════════════
 async function voirDetailVente(ven_id) {
   venModeReprise = false;
+  venEnvoiCourrielEnCours = false;
 
   const [resEntete, resLignes] = await Promise.all([
     appelAPI('getVentesEntete'),
