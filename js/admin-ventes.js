@@ -1086,9 +1086,15 @@ async function finaliserVente(modePaiement) {
   document.getElementById('apv-telephone').value    = telephone;
   document.getElementById('apv-infolettre').checked = infolettre === '1';
 
+  alert('TEST 1 : avant chargerVentes');
+
   chargerVentes();
 
+  alert('TEST 2 : avant ouverture modale');
+
   document.getElementById('modal-apres-vente').classList.add('ouvert');
+
+  alert('TEST 3 : modale devrait être ouverte');
 }
 
 
