@@ -1379,8 +1379,7 @@ function afficherTableauVentes(items) {
   }
   if (vide) vide.classList.add('cache');
 
-  const toISO = d => { const p=(d||'').split('/'); return p.length===3?p[2]+'-'+p[1]+'-'+p[0]:''; };
-  const itemsTries = [...items].sort((a,b) => toISO(b.date).localeCompare(toISO(a.date)));
+  const itemsTries = [...items].sort((a,b) => (parseInt((b.ven_id||'').replace('VEN-',''))||0) - (parseInt((a.ven_id||'').replace('VEN-',''))||0));
   let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody>';
   itemsTries.forEach(v => {
     const estAPayer = v.statut === 'a-payer';
