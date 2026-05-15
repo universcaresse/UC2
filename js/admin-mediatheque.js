@@ -68,6 +68,7 @@ async function ouvrirMediatheque(champId, previewId, categorie) {
   _mediathequeChampId   = champId;
   _mediathequePreviewId = previewId;
   const overlay = document.getElementById('modal-mediatheque');
+  if (overlay.parentElement !== document.body) document.body.appendChild(overlay);
   overlay.classList.add('ouvert');
   if (!_mediathequeDonnees) {
     document.getElementById('mediatheque-chargement').classList.remove('cache');
