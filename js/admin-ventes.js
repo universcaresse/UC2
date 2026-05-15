@@ -13,6 +13,7 @@ var venIdEnCours          = null;
 var venNumeroAffiche      = '';
 var venLotsDisponibles    = [];
 var venModeReprise        = false;
+var venEnvoiCourrielEnCours = false;
 var venClientSauvegarde   = '';
 var venLivraisonSauvegarde = 0;
 var toutesVentes          = [];
@@ -1214,6 +1215,8 @@ async function imprimerFacture() {
 }
 
 async function envoyerFactureCourriel() {
+  if (venEnvoiCourrielEnCours) return;
+  venEnvoiCourrielEnCours = true;
   const courriel = document.getElementById('apv-courriel').value || document.getElementById('ven-courriel').value;
   if (!courriel) {
     document.getElementById('apv-courriel').style.border = '2px solid var(--danger)';
@@ -1261,6 +1264,7 @@ async function envoyerFactureCourriel() {
   } else {
     afficherMsg('ventes', '❌ Erreur : ' + (res?.message || 'inconnue'), 'erreur');
   }
+  venEnvoiCourrielEnCours = false;
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
 }
 
@@ -1375,8 +1379,10 @@ function afficherTableauVentes(items) {
   }
   if (vide) vide.classList.add('cache');
 
+  const toISO = d => { const p=(d||'').split('/'); return p.length===3?p[2]+'-'+p[1]+'-'+p[0]:''; };
+  const itemsTries = [...items].sort((a,b) => toISO(b.date).localeCompare(toISO(a.date)));
   let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>Date</th><th>Client</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody>';
-  items.forEach(v => {
+  itemsTries.forEach(v => {
     const estAPayer = v.statut === 'a-payer';
     const estAttenteSquare = v.statut === 'En attente Square';
     let statutAffiche = v.statut;
