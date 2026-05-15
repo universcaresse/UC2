@@ -1220,9 +1220,14 @@ async function envoyerFactureCourriel() {
   const courriel = document.getElementById('apv-courriel').value || document.getElementById('ven-courriel').value;
   if (!courriel) {
     venEnvoiCourrielEnCours = false;
-    document.getElementById('apv-courriel').style.border = '2px solid var(--danger)';
-    document.getElementById('apv-courriel').placeholder = 'Courriel requis pour envoyer par courriel';
-    document.getElementById('apv-courriel').focus();
+    const apresVenteOuvert = document.getElementById('modal-apres-vente').classList.contains('ouvert');
+    if (apresVenteOuvert) {
+      document.getElementById('apv-courriel').style.border = '2px solid var(--danger)';
+      document.getElementById('apv-courriel').placeholder = 'Courriel requis';
+      document.getElementById('apv-courriel').focus();
+    } else {
+      afficherMsg('ventes', 'Aucun courriel enregistré pour cette vente.', 'erreur');
+    }
     return;
   }
   document.getElementById('apv-courriel').style.border = '';
