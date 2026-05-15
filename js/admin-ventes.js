@@ -1381,7 +1381,7 @@ function afficherTableauVentes(items) {
 
   const toISO = d => { const p=(d||'').split('/'); return p.length===3?p[2]+'-'+p[1]+'-'+p[0]:''; };
   const itemsTries = [...items].sort((a,b) => toISO(b.date).localeCompare(toISO(a.date)));
-  let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>Date</th><th>Client</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody>';
+  let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody>';
   itemsTries.forEach(v => {
     const estAPayer = v.statut === 'a-payer';
     const estAttenteSquare = v.statut === 'En attente Square';
@@ -1389,6 +1389,7 @@ function afficherTableauVentes(items) {
     if (estAPayer)        statutAffiche = '<span class="badge-statut-cours">À payer</span>';
     if (estAttenteSquare) statutAffiche = '<span class="badge-statut-cours">En attente Square</span>';
     html += `<tr class="cliquable" onclick="voirDetailVente('${v.ven_id}')">
+      <td>${v.ven_id.replace('VEN-', '')}</td>
       <td>${v.date}</td>
       <td>${v.client || '—'}</td>
       <td>${v.mode_paiement || '—'}</td>
