@@ -1090,7 +1090,7 @@ async function finaliserVente(modePaiement) {
 
   document.getElementById('modal-apres-vente').classList.add('ouvert');
 }
-}
+
 
 // ═══════════════════════════════════════
 // APRÈS-VENTE — IMPRESSION / ENVOI
