@@ -1639,9 +1639,10 @@ tr.cliquable { cursor: pointer; }
 }
 .ven-grille3 {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
   gap: 8px;
 }
+
 .ven-tile {
   border: 1px solid var(--beige);
   background: white;
@@ -1687,7 +1688,7 @@ tr.cliquable { cursor: pointer; }
 .ven-tile-pro {
   display: flex;
   flex-direction: column;
-  height: 140px;
+  height: 180px;
   cursor: default;
   background: linear-gradient(135deg,
     color-mix(in srgb, var(--col-hex, var(--primary)) 85%, #000 15%),
