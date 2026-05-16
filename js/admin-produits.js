@@ -277,7 +277,7 @@ async function afficherProduits() {
               '<div class="carte-couleur">' +
                 (pro.image_url
                   ? '<img src="' + pro.image_url + '" alt="' + pro.nom + '" onerror="this.style.display=\'none\'">'
-                  : '<div class="carte-photo-placeholder"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1778893350/plume_lmp6vs.svg" alt="Photo à venir" style="width:40px;opacity:0.4"><br>Photo à venir</div>') +
+                  : '<div class="carte-photo-placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1778893350/plume_lmp6vs.svg" alt="" style="width:28px;opacity:0.35">Photo à venir</div>') +
                 '<div class="recette-couleur-overlay"></div>' +
                 '<div class="carte-couleur-dot"></div>' +
               '</div>' +
