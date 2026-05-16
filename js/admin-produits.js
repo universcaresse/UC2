@@ -277,7 +277,7 @@ async function afficherProduits() {
               '<div class="carte-couleur">' +
                 (pro.image_url
                   ? '<img src="' + pro.image_url + '" alt="' + pro.nom + '" onerror="this.style.display=\'none\'">'
-                  : '<div class="carte-photo-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Photo à venir</div>') +
+                  : '<div class="carte-photo-placeholder"><img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1778893350/plume_lmp6vs.svg" alt="Photo à venir" style="width:40px;opacity:0.4"><br>Photo à venir</div>') +
                 '<div class="recette-couleur-overlay"></div>' +
                 '<div class="carte-couleur-dot"></div>' +
               '</div>' +
