@@ -1400,9 +1400,11 @@ function afficherTableauVentes(items) {
       <td>${v.mode_paiement || '—'}</td>
       <td>${formaterPrix(v.total_net || v.total)}</td>
       <td>${statutAffiche}</td>
-    </tr>`;
+    </tr>
+    ${v.produits_resume ? `<tr class="cliquable ven-resume-row" onclick="voirDetailVente('${v.ven_id}')"><td colspan="6" class="ven-resume-produits">${v.produits_resume}</td></tr>` : ''}`;
   });
-  html += '</tbody></table></div>';
+  const totalFiltré = items.reduce((s, v) => s + (v.total_net || v.total || 0), 0);
+html += `</tbody><tfoot><tr><td colspan="4"><strong>Total (${items.length} ventes)</strong></td><td colspan="2"><strong>${formaterPrix(totalFiltré)}</strong></td></tr></tfoot></table></div>`;
   if (tableau) tableau.innerHTML = html;
 }
 
