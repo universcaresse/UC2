@@ -596,9 +596,7 @@ function carteProduit(p) {
         <div class="carte-couleur">
           ${image}
           ${photoUrl ? `<div class="recette-couleur-overlay"></div>` : ''}
-          ${!photoUrl ? `<div class="carte-photo-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            Photo à venir</div>` : ''}
+          ${!photoUrl ? `<div class="carte-photo-placeholder" style="display:flex;align-items:center;justify-content:center;height:100%;background-image:url(https://res.cloudinary.com/dfasrauyy/image/upload/v1778893350/plume_lmp6vs.svg);background-repeat:no-repeat;background-position:center;background-size:100px"><span style="font-size:0.8rem;letter-spacing:0.1em;opacity:0.5">Photo à venir</span></div>` : ''}
           <div class="carte-couleur-dot"></div>
         </div>
       </div>
