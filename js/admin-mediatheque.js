@@ -100,15 +100,19 @@ function filtrerMediatheque() {
   const nom  = (document.getElementById('mediatheque-filtre-nom').value || '').toLowerCase();
   const items = (_mediathequeDonnees || []).filter(i =>
     (!cat || i.categorie === cat) && (!nom || i.nom.toLowerCase().includes(nom))
-  );
+  ).sort((a, b) => (a.nom || '').localeCompare(b.nom || '', 'fr'));
   const grille = document.getElementById('mediatheque-grille');
   grille.className = 'collections-grille';
   if (!items.length) { grille.innerHTML = '<p class="vide-desc">Aucune photo</p>'; return; }
   grille.innerHTML = items.map(i => `
     <div class="collection-carte" onclick="selectionnerPhotoMediatheque('${i.url}', '${i.nom}')">
-      <div class="carte-visuel"><img src="${i.url}" alt="${i.nom}" onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:cover;"></div>
-      <div class="fiche-label">${i.nom}</div>
-      <div class="texte-secondaire">${i.categorie}</div>
+      <div class="collection-carte-bg" style="background:#888"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);"></div>
+      <img src="${i.url}" alt="${i.nom}" onerror="this.style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+      <div class="collection-carte-contenu" style="background:rgba(0,0,0,0.5);width:100%;padding:8px 12px;border-radius:0 0 8px 8px;">
+        <span class="collection-carte-nom">${i.categorie}</span>
+        <span class="collection-carte-slogan">${i.nom}</span>
+      </div>
     </div>`).join('');
 }
 
