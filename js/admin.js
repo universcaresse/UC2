@@ -29,7 +29,6 @@ window.addEventListener('popstate', (e) => {
   }
 });
 document.addEventListener('DOMContentLoaded', async () => {
-  venRestaurerSessionAdmin();
   const session = sessionStorage.getItem('uc_admin');
   if (session !== 'true') {
     window.location.href = '/admin/login.html';

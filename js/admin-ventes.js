@@ -17,41 +17,14 @@ var venEnvoiCourrielEnCours = false;
 var venClientSauvegarde   = '';
 var venLivraisonSauvegarde = 0;
 var toutesVentes          = [];
+var venBlocageClic        = false;
 
-// ─── PERSISTANCE SESSION ADMIN POUR SQUARE ───
-// Square ouvre une autre app. Au retour, sessionStorage est perdu sur certains
-// navigateurs iOS. On bascule sur localStorage avant d'ouvrir Square.
-function venProtegerSessionAdmin() {
-  if (sessionStorage.getItem('uc_admin') === 'true') {
-    localStorage.setItem('uc_admin_persist', 'true');
-  }
-}
-function venRestaurerSessionAdmin() {
-  if (localStorage.getItem('uc_admin_persist') === 'true') {
-    sessionStorage.setItem('uc_admin', 'true');
-    localStorage.removeItem('uc_admin_persist');
-  }
-}
+
 
 // ═══════════════════════════════════════
 // CHARGEMENT DE LA PAGE VENTES
 // ═══════════════════════════════════════
 async function chargerVentes() {
-  // Restaurer la session admin si on revient de Square
-  venRestaurerSessionAdmin();
-
-  // Vérifier le retour de Square
-  const params = new URLSearchParams(window.location.search);
-  const squareStatus = params.get('status');
-  let squareVenId = null;
-  if (squareStatus === 'ok') {
-    const pendingRaw = localStorage.getItem('square-pending');
-    if (pendingRaw) {
-      try { squareVenId = JSON.parse(pendingRaw).ven_id; } catch(e) {} 
-    }
-    window.history.replaceState({}, '', window.location.pathname);
-  }
-
   // Fermer toute modal résiduelle
   document.getElementById('modal-facture-vente')?.classList.remove('ouvert');
 
@@ -74,7 +47,6 @@ async function chargerVentes() {
   }
   toutesVentes = res.items;
   afficherTableauVentes(toutesVentes);
-  if (squareVenId) await voirDetailVente(squareVenId);
 }
 
 // ═══════════════════════════════════════
@@ -209,6 +181,8 @@ function venSelectionnerGamme(gam_id) {
 }
 
 function venAfficherProduits() {
+  venBlocageClic = true;
+  setTimeout(function() { venBlocageClic = false; }, 300);
   venProduitMap = {};
   const produits = donneesProduits
     .filter(p => p.statut !== 'archive'
@@ -245,6 +219,12 @@ function venAfficherProduits() {
 }
 
 function venSelectionnerFormat(btn) {
+  if (venBlocageClic) return;
+  if (btn.classList.contains('ven-format-actif')) {
+    btn.classList.remove('ven-format-actif');
+    venCacherStickyBar();
+    return;
+  }
   const pro = venProduitMap[btn.dataset.proid];
   document.querySelectorAll('.ven-format-btn').forEach(b => b.classList.remove('ven-format-actif'));
   btn.classList.add('ven-format-actif');
@@ -258,11 +238,11 @@ function venSelectionnerFormat(btn) {
   venAfficherStickyBar();
 }
 
-function venAfficherStickyBar() {
-  const f = venFormatSelectionne, p = venProduitSelectionne;
-  document.getElementById('ven-sticky-info').textContent = `${p.nom} — ${f.poids} ${f.unite}`;
-  venMettreAJourPrixAffiche();
-  document.getElementById('ven-sticky-bar').classList.remove('cache');
+function venCacherStickyBar() {
+  document.getElementById('ven-sticky-bar')?.classList.add('cache');
+  document.querySelector('.ven-cascade-zone')?.classList.remove('avec-sticky');
+  venFormatSelectionne  = null;
+  venProduitSelectionne = null;
 }
 
 function venCacherStickyBar() {
@@ -654,6 +634,12 @@ function venGetTypePromo() {
   if (data.kind === 'pourcentage')  return { type: 'pourcentage',  promo_id: '' };
   return { type: '', promo_id: '' };
 }
+function venGetNomGamme(pro_id) {
+  const pro = donneesProduits.find(p => p.pro_id === pro_id);
+  if (!pro) return '';
+  const gam = donneesGammes.find(g => g.gam_id === pro.gam_id);
+  return gam ? gam.nom : '';
+}
 
 function venGetNomPromo() {
   const sel = document.getElementById('ven-promotion');
@@ -727,8 +713,10 @@ function ouvrirApercuFacture() {
     <tbody>`;
 
   venPanier.forEach(l => {
+    const nomGamme = venGetNomGamme(l.pro_id);
     html += `<tr style="border-bottom:1px solid var(--beige)">
       <td style="padding:10px 0">
+        ${nomGamme ? `<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:2px">${nomGamme}</div>` : ''}
         <div>${l.nom} — ${l.poids} ${l.unite}</div>
         <div style="display:flex;gap:16px;margin-top:4px;color:var(--gris);font-size:0.8rem">
           <span>Qté : ${l.quantite}</span>
@@ -774,10 +762,6 @@ function ouvrirApercuFacture() {
 function fermerApercuFacture() {
   document.getElementById('modal-facture-vente').classList.remove('ouvert');
   venCacherSpinnerSquare();
-  // Réinitialiser le mode reprise pour éviter les comportements bizarres
-  venModeReprise = false;
-  venIdEnCours   = null;
-  venPanier      = [];
 }
 
 function fermerModalApresVente() {
@@ -796,176 +780,64 @@ function fermerModalApresVente() {
 // PAIEMENT PAR SQUARE
 // ═══════════════════════════════════════
 
+
 async function payerParSquare() {
   if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
   if (!squareAppId) { afficherMsg('ventes', 'Square non configuré.', 'erreur'); return; }
 
-  document.getElementById('fv-spinner')?.classList.remove('cache');
-  document.getElementById('fv-boutons-paiement').style.display = 'none';
-  document.getElementById('fv-boutons-impression').style.display = 'none';
-  afficherChargement();
-
-  const client     = document.getElementById('ven-client').value;
-  const courriel   = document.getElementById('ven-courriel').value;
-  const telephone  = document.getElementById('ven-telephone').value;
-  const infolettre = document.getElementById('ven-infolettre')?.checked ? '1' : '0';
-  const livraison  = parseFloat(String(document.getElementById('ven-livraison').value).replace(',', '.')) || 0;
   const sousTotal  = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const livraison  = parseFloat(String(document.getElementById('ven-livraison').value).replace(',', '.')) || 0;
   const rabais     = venCalculerRabais();
   const total      = Math.max(0, sousTotal + livraison - rabais);
   const totalCents = Math.round(total * 100);
 
-  if (totalCents <= 0) { cacherChargement(); afficherMsg('ventes', 'Total invalide.', 'erreur'); return; }
+  if (totalCents <= 0) { afficherMsg('ventes', 'Total invalide.', 'erreur'); return; }
 
-  let ven_id = venIdEnCours;
-
-  if (venModeReprise) {
-    const resReset = await appelAPIPost('resetVenteLignes', { ven_id });
-    if (!resReset || !resReset.success) { cacherChargement(); afficherMsg('ventes', 'Erreur.', 'erreur'); return; }
-  } else {
-    const resCreate = await appelAPIPost('createVente', { client, courriel, telephone, mode_paiement: 'square', infolettre });
-    if (!resCreate || !resCreate.success) { cacherChargement(); afficherMsg('ventes', resCreate?.message || 'Erreur.', 'erreur'); return; }
-    ven_id = resCreate.ven_id;
-    venIdEnCours = ven_id;
-    venNumeroAffiche = ven_id.replace('VEN-', '');
-  }
-
-  for (const l of venPanier) {
-    await appelAPIPost('addVenteLigne', { ven_id, pro_id: l.pro_id, lot_id: l.lot_id, quantite: l.quantite, prix_unitaire: l.prix_unitaire, format_poids: l.poids, format_unite: l.unite });
-  }
-
-  const promoInfo = venGetTypePromo();
-  await appelAPIPost('updateStatutVente', { ven_id, statut: 'En attente Square', courriel, telephone, infolettre, mode_paiement: 'square' });
-
-  localStorage.setItem('square-pending', JSON.stringify({
-    ven_id, livraison, promo_id: promoInfo.promo_id, type_promo: promoInfo.type,
-    rabais, total_net: total, nom_promo: venGetNomPromo(),
-    panier: venPanier, client, courriel, telephone, numeroAffiche: venNumeroAffiche
-  }));
-
-  venProtegerSessionAdmin();
-
-  const callbackUrl = window.location.origin + window.location.pathname + '?status=ok#ventes';
   const sdkData = {
     amount_money: { amount: totalCents, currency_code: 'CAD' },
-    callback_url: callbackUrl,
     client_id: squareAppId,
     version: '1.3',
-    notes: 'Vente ' + venNumeroAffiche,
+    notes: 'Vente Univers Caresse',
     options: { supported_tender_types: ['CREDIT_CARD'] }
   };
 
-  cacherChargement();
+  document.getElementById('modal-square-confirmation').classList.add('ouvert');
+  window.location.href = 'square-commerce-v1://payment/create?data=' + encodeURIComponent(JSON.stringify(sdkData));
+}
+async function payerParSquare() {
+  if (!venPanier.length) { afficherMsg('ventes', 'Aucun article dans le panier.', 'erreur'); return; }
+  if (!squareAppId) { afficherMsg('ventes', 'Square non configuré.', 'erreur'); return; }
+
+  const sousTotal  = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const livraison  = parseFloat(String(document.getElementById('ven-livraison').value).replace(',', '.')) || 0;
+  const rabais     = venCalculerRabais();
+  const total      = Math.max(0, sousTotal + livraison - rabais);
+  const totalCents = Math.round(total * 100);
+
+  if (totalCents <= 0) { afficherMsg('ventes', 'Total invalide.', 'erreur'); return; }
+
+  const sdkData = {
+    amount_money: { amount: totalCents, currency_code: 'CAD' },
+    client_id: squareAppId,
+    version: '1.3',
+    notes: 'Vente Univers Caresse',
+    options: { supported_tender_types: ['CREDIT_CARD'] }
+  };
+
+  document.getElementById('modal-square-confirmation').classList.add('ouvert');
   window.location.href = 'square-commerce-v1://payment/create?data=' + encodeURIComponent(JSON.stringify(sdkData));
 }
 
-// Désactiver le spinner Square (au retour ou si on annule)
-
-
-
-
-
-
-// Désactiver le spinner Square (au retour ou si on annule)
-function venCacherSpinnerSquare() {
-  document.getElementById('fv-spinner')?.classList.add('cache');
-  document.getElementById('fv-boutons-paiement').style.display   = '';
-  document.getElementById('fv-boutons-impression').style.display = '';
+async function confirmerPaiementSquareManuel(reponse) {
+  document.getElementById('modal-square-confirmation').classList.remove('ouvert');
+  if (reponse === 'non') return;
+  await finaliserVente('square');
 }
 
-async function venTraiterRetourSquare(status) {
-  venCacherSpinnerSquare();
-  const pendingRaw = localStorage.getItem('square-pending');
-  if (!pendingRaw) return;
 
-  let pending;
-  try { pending = JSON.parse(pendingRaw); }
-  catch (e) { localStorage.removeItem('square-pending'); return; }
-
-  localStorage.removeItem('square-pending');
-
-  if (status === 'ok') {
-    // Finaliser la vente
-    const resFin = await appelAPIPost('finaliserVente', {
-      ven_id: pending.ven_id,
-      livraison: pending.livraison,
-      promo_id: pending.promo_id || '',
-      type_promo: pending.type_promo || '',
-      rabais: pending.rabais,
-      total_net: pending.total_net,
-      mode_paiement: 'square',
-      statut: 'Finalisé'
-    });
-
-    if (resFin && resFin.success) {
-      // Si cette vente provient d'une conversion de commande, mettre à jour la commande
-      const conversionRaw = sessionStorage.getItem('cmd-en-conversion');
-      if (conversionRaw) {
-        try {
-          const conversion = JSON.parse(conversionRaw);
-          if (conversion && conversion.cmd_id) {
-            await appelAPIPost('updateStatutCommande', {
-              cmd_id: conversion.cmd_id,
-              statut: 'Livrée',
-              ven_id_lien: pending.ven_id
-            });
-          }
-        } catch (e) { /* ignore */ }
-        sessionStorage.removeItem('cmd-en-conversion');
-      }
-
-      // Restaurer l'état pour afficher la facture
-      venPanier             = pending.panier || [];
-      venIdEnCours          = pending.ven_id;
-      venNumeroAffiche      = pending.numeroAffiche;
-      venClientSauvegarde   = pending.client || '';
-      venLivraisonSauvegarde = pending.livraison || 0;
-
-      // Afficher modal après-vente
-      document.getElementById('apv-courriel').value     = pending.courriel || '';
-      document.getElementById('apv-telephone').value    = pending.telephone || '';
-      document.getElementById('apv-infolettre').checked = false;
-      document.getElementById('modal-apres-vente').classList.add('ouvert');
-
-      afficherMsg('ventes', '✅ Paiement Square reçu. Vente finalisée.');
-    } else {
-      afficherMsg('ventes', '❌ Erreur lors de la finalisation.', 'erreur');
-    }
-  } else {
-    // Paiement Square annulé ou refusé : on garde la vente, on la remet "En cours"
-    // pour pouvoir proposer un autre mode de paiement
-    await appelAPIPost('updateStatutVente', {
-      ven_id: pending.ven_id,
-      statut: 'En cours'
-    });
-
-    // Restaurer l'état pour pouvoir réessayer
-    venPanier              = pending.panier || [];
-    venIdEnCours           = pending.ven_id;
-    venNumeroAffiche       = pending.numeroAffiche;
-    venClientSauvegarde    = pending.client || '';
-    venLivraisonSauvegarde = pending.livraison || 0;
-    venModeReprise         = true;
-
-    // Rouvrir le formulaire de vente avec les données
-    document.getElementById('contenu-ventes').classList.add('cache');
-    document.getElementById('filtres-ventes').classList.add('cache');
-    document.getElementById('form-vente').classList.remove('cache');
-    document.getElementById('form-vente').style.display = 'block';
-    document.querySelector('#section-ventes .page-entete')?.classList.add('cache');
-
-    document.getElementById('ven-client').value    = pending.client || '';
-    document.getElementById('ven-courriel').value  = pending.courriel || '';
-    document.getElementById('ven-telephone').value = pending.telephone || '';
-    document.getElementById('ven-livraison').value = pending.livraison || 0;
-
-    venRafraichirPanier();
-
-    afficherMsg('ventes', '❌ Paiement Square annulé. Choisissez un autre mode de paiement.', 'erreur');
-
-    // Rouvrir la modal d'aperçu avec les 3 options
-    setTimeout(() => ouvrirApercuFacture(), 500);
-  }
+function venCacherSpinnerSquare() {
+  document.getElementById('fv-boutons-paiement').style.display   = '';
+  document.getElementById('fv-boutons-impression').style.display = '';
 }
 
 // ═══════════════════════════════════════
@@ -1122,15 +994,19 @@ async function imprimerFacture() {
   const total     = Math.max(0, sousTotal + livraison - rabais);
   const nomPromo  = venGetNomPromo();
 
-  let lignesHTML = venPanier.map(l => `
+  let lignesHTML = venPanier.map(l => {
+    const nomGamme = venGetNomGamme(l.pro_id);
+    return `
     <tr>
       <td style="padding:12px 0;border-bottom:1px solid #f2e4cf">
+        ${nomGamme ? `<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#d4a445;margin-bottom:3px">${nomGamme}</div>` : ''}
         <div style="font-weight:400;color:#3d3b39">${l.nom}</div>
         <div style="font-size:0.78rem;color:#8b8680;margin-top:2px">${l.poids} ${l.unite} &nbsp;·&nbsp; ${formaterPrix(l.prix_unitaire)} / unité</div>
       </td>
       <td style="padding:12px 0;border-bottom:1px solid #f2e4cf;text-align:center;color:#8b8680;font-size:0.85rem">${l.quantite}</td>
       <td style="padding:12px 0;border-bottom:1px solid #f2e4cf;text-align:right;font-family:'Playfair Display',serif;color:#5a8a3a">${formaterPrix(l.prix_unitaire * l.quantite)}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 
   const fenetre = window.open('', '_blank');
   fenetre.document.write(`<!DOCTYPE html>
@@ -1243,6 +1119,7 @@ async function envoyerFactureCourriel() {
   const nomPromo  = venGetNomPromo();
   const lignes    = venPanier.map(l => ({
     nom: l.nom,
+    gamme: venGetNomGamme(l.pro_id),
     poids: l.poids,
     unite: l.unite,
     quantite: l.quantite,
@@ -1308,6 +1185,8 @@ async function envoyerFactureTexto() {
   texte += `UNIVERS CARESSE\nsavonnerie artisanale\n\n`;
   texte += `${sep}\n`;
   panierGroupé.forEach(l => {
+    const nomGamme = venGetNomGamme(l.pro_id);
+    if (nomGamme) texte += `${nomGamme}\n`;
     texte += `${l.nom}\n`;
     texte += `${l.quantite} x ${formaterPrix(l.prix_unitaire)} = ${formaterPrix(l.prix_unitaire * l.quantite)}\n`;
   });

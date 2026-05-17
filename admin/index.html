@@ -3449,7 +3449,20 @@
     </div>
   </div>
 </div>
-
+<div class="modal-admin-overlay" id="modal-square-confirmation">
+  <div class="modal-admin" style="max-width:400px">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Paiement Square complété?</div>
+    </div>
+    <div class="modal-admin-body">
+      <p style="text-align:center;font-family:'DM Sans',sans-serif;color:var(--gris);margin-bottom:20px">Confirmer manuellement le résultat du paiement Square</p>
+      <div class="form-actions-vertical">
+        <button class="bouton bouton-plein-largeur fv-btn-comptant" onclick="confirmerPaiementSquareManuel('oui')">OUI — paiement reçu</button>
+        <button class="bouton bouton-plein-largeur bouton-rouge" onclick="confirmerPaiementSquareManuel('non')">NON — annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal-admin-overlay" id="modal-apres-vente">
   <div class="modal-admin" style="max-width:400px">
     <div class="modal-admin-header">
