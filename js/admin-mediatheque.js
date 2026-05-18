@@ -24,7 +24,7 @@ async function chargerMediatheque() {
   const cats = [...new Set(res.items.map(i => i.categorie).filter(Boolean))].sort();
   const div  = document.getElementById('med-filtres-boutons');
   div.innerHTML = `<button class="bouton bouton-petit actif" onclick="medFiltrerCat('', this)">Toutes</button>` +
-    cats.map(c => `<button class="bouton-fermer" onclick="medFiltrerCat('${c}', this)">${c}</button>`).join('');
+    cats.map(c => `<button class="bouton-fermer-vert" onclick="medFiltrerCat('${c}', this)">${c}</button>`).join('');
   medFiltrer();
 }
 
