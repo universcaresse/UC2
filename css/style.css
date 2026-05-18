@@ -573,7 +573,7 @@ select.form-control, select.form-ctrl { cursor: pointer; }
 /* ═══════════════════════════════════════
    FOOTER
    ═══════════════════════════════════════ */
-footer { background: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779040739/11Divers/couverture.jpg') center center / cover no-repeat; color: var(--blanc-pur-75); padding: 28px var(--padding-page); display: flex; justify-content: space-between; align-items: center; font-family: 'DM Sans', sans-serif; font-size: var(--texte-82); letter-spacing: 0.06em; position: relative; }
+footer { background: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779040737/11Divers/fond.png') center center / cover no-repeat; color: var(--blanc-pur-75); padding: 28px var(--padding-page); display: flex; justify-content: space-between; align-items: center; font-family: 'DM Sans', sans-serif; font-size: var(--texte-82); letter-spacing: 0.06em; position: relative; }
 
 
 footer::before {
@@ -605,9 +605,9 @@ footer > * { position: relative; z-index: 1; }
 .mosaic-item:first-child { grid-row: span 2; }
 .mosaic-soap { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; color: rgba(255,255,255,0.9); text-transform: uppercase; position: relative; overflow: hidden; transition: transform 0.6s; opacity: 0.82; }
 .mosaic-soap:hover { transform: scale(1.03); }
-.mosaic-soap-accent  { background: linear-gradient(var(--accent-60), var(--accent-60)), url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779040739/11Divers/couverture.jpg') center center / cover no-repeat; height: 100%; }
-.mosaic-soap-primary { background: linear-gradient(var(--primary-60), var(--primary-60)), url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779040739/11Divers/couverture.jpg') center center / cover no-repeat; height: 100%; }
-.mosaic-soap-gris    { background: linear-gradient(var(--gris-60), var(--gris-60)), url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779040739/11Divers/couverture.jpg') center center / cover no-repeat; height: 100%; }
+.mosaic-soap-accent  { background: linear-gradient(var(--accent-60), var(--accent-60)), url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779040737/11Divers/fond.png') center center / cover no-repeat; height: 100%; }
+.mosaic-soap-primary { background: linear-gradient(var(--primary-60), var(--primary-60)), url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779040737/11Divers/fond.png') center center / cover no-repeat; height: 100%; }
+.mosaic-soap-gris    { background: linear-gradient(var(--gris-60), var(--gris-60)), url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779040737/11Divers/fond.png') center center / cover no-repeat; height: 100%; }
 .mosaic-soap-label { position: relative; z-index: 1; text-align: center; }
 .mosaic-soap-name { font-size: 0.85rem; font-weight: 500; display: block; }
 .mosaic-soap-col { font-size: 0.62rem; opacity: 0.75; letter-spacing: 0.12em; }
@@ -822,7 +822,7 @@ footer > * { position: relative; z-index: 1; }
 .accueil-logo { max-width: 220px; width: 60%; height: auto; margin-bottom: 8px; }
 .accueil-bonjour { font-family: 'Birthstone', cursive; font-size: 2.5rem; color: var(--accent); line-height: 1; align-self: center; letter-spacing: 0.05em; }
 .accueil-chantal { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary); font-weight: 400; line-height: 1; margin-bottom: 0; align-self: center; }
-.accueil-droite { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 100%; background: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779040739/11Divers/couverture.jpg') center center / cover no-repeat; gap: 16px; padding: 16px; box-sizing: border-box; overflow: hidden; }
+.accueil-droite { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 100%; background: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779040737/11Divers/fond.png') center center / cover no-repeat; gap: 16px; padding: 16px; box-sizing: border-box; overflow: hidden; }
 .accueil-grande-tuile { display: flex; flex-direction: row; align-items: stretch; height: 100%; gap: 2px; min-height: 0; }
 .accueil-grande-tuile-vert       { background: var(--primary-70); }
 .accueil-grande-tuile-jaune      { background: var(--accent-70); }
