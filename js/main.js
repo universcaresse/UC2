@@ -654,10 +654,11 @@ function afficherPageRegroupements(fraIdActif) {
   body.innerHTML = '';
   filtresBar.innerHTML = '<button class="filtre-btn" data-filtre="tout" onclick="filtrerRegroupements(\'tout\')">Tous</button>';
 
-  const res = window._regroupementsData;
-  if (!res || !res.length) { body.innerHTML = '<div class="vide"><p>Aucun regroupement.</p></div>'; return; }
+  const infoRegroupements = (donneesCatalogue && donneesCatalogue.infoRegroupements) || {};
+  const liste = Object.values(infoRegroupements);
+  if (!liste.length) { body.innerHTML = '<div class="vide"><p>Aucun regroupement.</p></div>'; return; }
 
-  res.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(fra => {
+  liste.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(fra => {
     const couleurs = couleurCollection(fra.nom, fra.couleur_hex);
     const btn = document.createElement('button');
     btn.className = 'filtre-btn';
@@ -665,6 +666,69 @@ function afficherPageRegroupements(fraIdActif) {
     btn.dataset.filtre = fra.fra_id;
     btn.onclick = () => filtrerRegroupements(fra.fra_id);
     filtresBar.appendChild(btn);
+
+    // Filtrer les produits selon le mode de l'univers
+    let prods;
+    if (fra.mode === 'manuel') {
+      const proIds = Array.isArray(fra.pro_ids) ? fra.pro_ids.map(String) : [];
+      prods = (donneesCatalogue?.produits || []).filter(p => proIds.indexOf(String(p.pro_id)) >= 0);
+    } else {
+      prods = (donneesCatalogue?.produits || []).filter(p => {
+        const ings = p.ingredients || [];
+        if (fra.ing_id && !ings.some(i => i.ing_id === fra.ing_id)) return false;
+        if (Array.isArray(fra.categories_exclues) && fra.categories_exclues.length > 0) {
+          const aCategorieExclue = ings.some(i => fra.categories_exclues.indexOf(i.cat_id) >= 0);
+          if (aCategorieExclue) return false;
+        }
+        if (Array.isArray(fra.collections_exclues) && fra.collections_exclues.length > 0) {
+          if (fra.collections_exclues.indexOf(p.col_id) >= 0) return false;
+        }
+        if (Array.isArray(fra.gammes_exclues) && fra.gammes_exclues.length > 0) {
+          if (fra.gammes_exclues.indexOf(p.gam_id) >= 0) return false;
+        }
+        const aExclusion = (Array.isArray(fra.categories_exclues) && fra.categories_exclues.length > 0)
+                        || (Array.isArray(fra.collections_exclues) && fra.collections_exclues.length > 0)
+                        || (Array.isArray(fra.gammes_exclues) && fra.gammes_exclues.length > 0);
+        if (!fra.ing_id && !aExclusion) return false;
+        return true;
+      });
+    }
+
+    // Organiser : sans-famille d'abord (sans entête), puis par famille → gamme
+    const sansFamille = [];
+    const parFamille = {};
+    const ordreFamilles = [];
+    prods.forEach(p => {
+      if (!p.fam_id || !p.nom_famille) {
+        sansFamille.push(p);
+        return;
+      }
+      const cle = p.fam_id;
+      if (!parFamille[cle]) {
+        parFamille[cle] = { nom: p.nom_famille, rang: p.rang_famille || 99, parGamme: {}, ordreGammes: [] };
+        ordreFamilles.push(cle);
+      }
+      const g = p.nom_gamme || '';
+      if (!parFamille[cle].parGamme[g]) {
+        parFamille[cle].parGamme[g] = [];
+        parFamille[cle].ordreGammes.push(g);
+      }
+      parFamille[cle].parGamme[g].push(p);
+    });
+    ordreFamilles.sort((a, b) => (parFamille[a].rang || 99) - (parFamille[b].rang || 99));
+
+    let contenuProduits = '';
+    if (sansFamille.length) {
+      contenuProduits += `<div class="ligne-groupe"><div class="produits-grille">${sansFamille.map(p => carteProduit(p)).join('')}</div></div>`;
+    }
+    ordreFamilles.forEach(famKey => {
+      const fam = parFamille[famKey];
+      contenuProduits += `<div class="famille-groupe"><div class="famille-groupe-titre">${(fam.nom || '').toUpperCase()}</div>`;
+      fam.ordreGammes.forEach(g => {
+        contenuProduits += `<div class="ligne-groupe">${g ? `<div class="ligne-groupe-entete"><div class="ligne-groupe-nom">${g.toUpperCase()}</div></div>` : ''}<div class="produits-grille">${fam.parGamme[g].map(p => carteProduit(p)).join('')}</div></div>`;
+      });
+      contenuProduits += `</div>`;
+    });
 
     const section = document.createElement('div');
     section.className = 'collection-section';
@@ -682,39 +746,7 @@ function afficherPageRegroupements(fraIdActif) {
           </div>
         </div>
       </div>
-      ${(() => {
-        const prods = (donneesCatalogue?.produits || []).filter(p => {
-          const ings = p.ingredients || [];
-          if (fra.ing_id && !ings.some(i => i.ing_id === fra.ing_id)) return false;
-          if (Array.isArray(fra.categories_exclues) && fra.categories_exclues.length > 0) {
-            const aCategorieExclue = ings.some(i => fra.categories_exclues.indexOf(i.cat_id) >= 0);
-            if (aCategorieExclue) return false;
-          }
-          if (Array.isArray(fra.collections_exclues) && fra.collections_exclues.length > 0) {
-            if (fra.collections_exclues.indexOf(p.col_id) >= 0) return false;
-          }
-          if (Array.isArray(fra.gammes_exclues) && fra.gammes_exclues.length > 0) {
-            if (fra.gammes_exclues.indexOf(p.gam_id) >= 0) return false;
-          }
-          const aExclusion = (Array.isArray(fra.categories_exclues) && fra.categories_exclues.length > 0)
-                          || (Array.isArray(fra.collections_exclues) && fra.collections_exclues.length > 0)
-                          || (Array.isArray(fra.gammes_exclues) && fra.gammes_exclues.length > 0);
-          if (!fra.ing_id && !aExclusion) return false;
-          return true;
-        });
-        const parGamme = {};
-        const ordreGammes = [];
-        prods.forEach(p => {
-          const g = p.nom_gamme || '';
-          if (!parGamme[g]) { parGamme[g] = []; ordreGammes.push(g); }
-          parGamme[g].push(p);
-        });
-        return ordreGammes.map(g => `
-          <div class="ligne-groupe">
-            ${g ? `<div class="ligne-groupe-entete"><div class="ligne-groupe-nom">${g.toUpperCase()}</div></div>` : ''}
-            <div class="produits-grille">${parGamme[g].map(p => carteProduit(p)).join('')}</div>
-          </div>`).join('');
-      })()}`;
+      ${contenuProduits}`;
     body.appendChild(section);
     if (scrollObserver) {
       section.querySelectorAll('.fade-in, .fade-in-doux').forEach(el => scrollObserver.observe(el));
@@ -722,7 +754,6 @@ function afficherPageRegroupements(fraIdActif) {
     section.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
   });
 }
-
 function filtrerRegroupements(fra_id) {
   document.querySelectorAll('#regroupements-filtres .filtre-btn').forEach(b => b.classList.remove('actif'));
   const btn = fra_id === 'tout'
