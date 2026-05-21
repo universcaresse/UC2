@@ -146,8 +146,8 @@ function peuplerFiltresCategoriesMediatheque() {
   const items = (_mediathequeDonnees || []).filter(i => (i.categorie || '').toLowerCase().startsWith('images/'));
   const niveaux2 = [...new Set(items.map(i => i.categorie.split('/')[1]).filter(Boolean))].sort();
   const divN2 = document.getElementById('med-modal-filtres-n2');
-  divN2.innerHTML = `<button class="bouton bouton-petit${!_medModalNiveau2 ? ' actif' : ' bouton-vert-pale'}" onclick="medModalFiltrerN2('')">Toutes</button>` +
-    niveaux2.map(n2 => `<button class="bouton bouton-petit${_medModalNiveau2 === n2 ? ' actif' : ' bouton-vert-pale'}" onclick="medModalFiltrerN2('${n2}')">${n2}</button>`).join('');
+  divN2.innerHTML = `<button class="bouton-filtre${!_medModalNiveau2 ? ' actif' : ''}" onclick="medModalFiltrerN2('')">Toutes</button>` +
+    niveaux2.map(n2 => `<button class="bouton-filtre${_medModalNiveau2 === n2 ? ' actif' : ''}" onclick="medModalFiltrerN2('${n2}')">${n2}</button>`).join('');
 }
 
 function medModalFiltrerN2(n2) {
@@ -163,7 +163,7 @@ function medModalFiltrerN3(n3) {
 
 function filtrerMediatheque() {
   // Mise à jour boutons niveau 2 actifs
-  document.querySelectorAll('#med-modal-filtres-n2 .bouton').forEach(b => {
+  document.querySelectorAll('#med-modal-filtres-n2 .bouton-filtre').forEach(b => {
     const onclick = b.getAttribute('onclick') || '';
     const match = onclick.match(/medModalFiltrerN2\('([^']*)'\)/);
     const val = match ? match[1] : null;
@@ -185,8 +185,8 @@ function filtrerMediatheque() {
       .map(i => i.categorie.split('/')[2])
       .filter(Boolean))].sort();
     if (sousCats.length) {
-      zoneN3.innerHTML = `<button class="bouton bouton-petit${!_medModalNiveau3 ? ' actif' : ' bouton-vert-pale'}" onclick="medModalFiltrerN3('')">Tout ${_medModalNiveau2}</button>` +
-        sousCats.map(n3 => `<button class="bouton bouton-petit${_medModalNiveau3 === n3 ? ' actif' : ' bouton-vert-pale'}" onclick="medModalFiltrerN3('${n3}')">${n3}</button>`).join('');
+      zoneN3.innerHTML = `<button class="bouton-filtre${!_medModalNiveau3 ? ' actif' : ''}" onclick="medModalFiltrerN3('')">Tout ${_medModalNiveau2}</button>` +
+        sousCats.map(n3 => `<button class="bouton-filtre${_medModalNiveau3 === n3 ? ' actif' : ''}" onclick="medModalFiltrerN3('${n3}')">${n3}</button>`).join('');
     } else {
       zoneN3.innerHTML = '';
     }

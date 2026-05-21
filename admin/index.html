@@ -3014,17 +3014,18 @@
 		<div class="page-entete fade-in">
 			<div class="page-entete-gauche">
 				<div class="page-entete-eyebrow">Photos disponibles dans le sélecteur</div>
-					<div class="page-entete-titre">Médiathèque</div>
+				<div class="page-entete-titre">Médiathèque</div>
 			</div>
-			<div class="form-actions">
 			
-<button class="bouton-filtre" onclick="mediathequeSyncCloudinary()">↺ Cloudinary → Sheet</button>
+			<div class="form-actions">
+				<button class="bouton" onclick="mediathequeSyncCloudinary()">↺ Cloudinary → Sheet</button>
 			</div>
 		</div>
-  <div class="msg-zone" id="msg-mediatheque"></div>
-    <div class="filtres-bar">
-  <div id="med-filtres-boutons" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
-  <span class="texte-secondaire" id="med-compteur"></span>
+		
+		<div class="msg-zone" id="msg-mediatheque"></div>
+			<div class="filtres-bar">
+			<div id="med-filtres-boutons" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+			<span class="texte-secondaire" id="med-compteur"></span>
 </div>
   <div class="chargement cache" id="med-chargement"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
   <div id="med-grille" class="collections-grille"></div>
