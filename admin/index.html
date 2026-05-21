@@ -620,6 +620,19 @@
               <option value="0">En premier</option>
             </select>
           </div>
+          <div class="form-groupe col-plein">
+            <label class="form-label">Mode</label>
+            <select class="form-ctrl" id="freg-mode" onchange="onChangeModeRegroupement()">
+              <option value="auto">Automatique (par ingrédient vedette)</option>
+              <option value="manuel">Manuel (choix dans la fiche produit)</option>
+            </select>
+          </div>
+		  
+		  
+		  
+		  
+		  
+         <div id="freg-bloc-auto" style="display:contents">
           <div class="form-groupe">
             <label class="form-label">Catégorie UC</label>
             <select class="form-ctrl" id="freg-cat" onchange="onCatRegroupementChange()">
@@ -644,6 +657,12 @@
             <label class="form-label">Gammes à exclure</label>
             <div id="freg-gammes-exclues" class="checkboxes-groupe"></div>
           </div>
+          </div>
+		  
+		  
+		  
+		  
+		  
           <div class="form-groupe col-plein">
             <label class="form-label">Slogan</label>
             <input type="text" class="form-ctrl" id="freg-slogan">
@@ -915,6 +934,10 @@
               <div class="form-groupe col-plein">
                 <label class="form-label">Collections secondaires</label>
                 <div id="fr-collections-secondaires" class="checkboxes-groupe"></div>
+              </div>
+              <div class="form-groupe col-plein">
+                <label class="form-label">Univers manuels</label>
+                <div id="fr-regroupements-manuels" class="checkboxes-groupe"></div>
               </div>
               <div class="form-groupe">
                 <label class="form-label">Cure (jours)</label>

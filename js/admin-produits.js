@@ -80,7 +80,8 @@ async function chargerCacheProduits() {
     appelAPI('getFormatsEmballages'),
     appelAPI('getStock'),
     appelAPI('getLots'),
-    appelAPI('getVentesLignes')
+    appelAPI('getVentesLignes'),
+    appelAPI('getRegroupementsProduits')
   ]);
 
   var formatsMap = {};
@@ -136,6 +137,7 @@ async function chargerCacheProduits() {
   listesDropdown.stock = prodCache.stock;
   prodCache.lots         = (res[5] && res[5].success) ? res[5].items : [];
   prodCache.ventesLignes = (res[6] && res[6].success) ? res[6].items : [];
+  prodCache.regroupementsProduits = (res[7] && res[7].success) ? res[7].items : [];
 
   prodCache.charge = true;
   cacherChargement();
@@ -454,6 +456,20 @@ async function chargerCollectionsPourSelecteur() {
       label.appendChild(cb);
       label.appendChild(document.createTextNode(col.nom));
       selSec.appendChild(label);
+    });
+  }
+  var selUni = document.getElementById('fr-regroupements-manuels');
+  if (selUni) {
+    selUni.innerHTML = '';
+    (donneesRegroupements || []).filter(function(fra) { return fra.mode === 'manuel'; }).sort(function(a, b) {
+      return (a.nom || '').localeCompare(b.nom || '', 'fr');
+    }).forEach(function(fra) {
+      var label = document.createElement('label');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.value = fra.fra_id; cb.id = 'uni-' + fra.fra_id;
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(' ' + fra.nom));
+      selUni.appendChild(label);
     });
   }
 }
@@ -906,6 +922,15 @@ async function modifierProduit(pro_id) {
       cb.checked = Array.isArray(pro.collections_secondaires) && pro.collections_secondaires.indexOf(cb.value) >= 0;
     });
   }
+  var selUni = document.getElementById('fr-regroupements-manuels');
+  if (selUni) {
+    var fraIdsDuProduit = (prodCache.regroupementsProduits || [])
+      .filter(function(l) { return String(l.pro_id) === String(pro_id); })
+      .map(function(l) { return String(l.fra_id); });
+    Array.from(selUni.querySelectorAll('input[type="checkbox"]')).forEach(function(cb) {
+      cb.checked = fraIdsDuProduit.indexOf(cb.value) >= 0;
+    });
+  }
 
   ingredientsRecette = ings.map(function(i) {
     return {
@@ -1083,9 +1108,25 @@ async function sauvegarderRecette() {
         }
       });
     });
-    await appelAPIPost('saveFormatsEmballages', {
+   await appelAPIPost('saveFormatsEmballages', {
       pro_id: d.pro_id,
       emballages: tousLesEmballages
+    });
+
+    // Sauvegarder les univers manuels cochés pour ce produit
+    var fraIdsCoches = Array.from(
+      (document.getElementById('fr-regroupements-manuels') || { querySelectorAll: function() { return []; } }).querySelectorAll('input[type="checkbox"]:checked')
+    ).map(function(cb) { return cb.value; });
+    await appelAPIPost('saveProduitRegroupements', {
+      pro_id: d.pro_id,
+      fra_ids: fraIdsCoches
+    });
+    // Mettre à jour le cache local
+    prodCache.regroupementsProduits = (prodCache.regroupementsProduits || []).filter(function(l) {
+      return String(l.pro_id) !== String(d.pro_id);
+    });
+    fraIdsCoches.forEach(function(fra_id) {
+      prodCache.regroupementsProduits.push({ fra_id: fra_id, pro_id: d.pro_id });
     });
 
     majCacheApresSauvegarde(d);

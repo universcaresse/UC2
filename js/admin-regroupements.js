@@ -106,6 +106,17 @@ function peuplerGammesExclues(cochees) {
   });
 }
 
+function onChangeModeRegroupement() {
+  var mode = (document.getElementById('freg-mode') || {}).value || 'auto';
+  var blocAuto = document.getElementById('freg-bloc-auto');
+  if (!blocAuto) return;
+  if (mode === 'manuel') {
+    blocAuto.style.display = 'none';
+  } else {
+    blocAuto.style.display = 'contents';
+  }
+}
+
 function ouvrirFormRegroupement() {
   fermerFicheRegroupement();
   document.getElementById('form-regroupements-titre').textContent      = 'Nouveau regroupement';
@@ -127,6 +138,8 @@ function ouvrirFormRegroupement() {
   peuplerCollectionsExclues([]);
   peuplerGammesExclues([]);
   peuplerPositionRegroupement(null);
+  if (document.getElementById('freg-mode')) document.getElementById('freg-mode').value = 'auto';
+  onChangeModeRegroupement();
   document.getElementById('contenu-regroupements').classList.add('cache');
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
   document.getElementById('form-regroupements').classList.remove('cache');
@@ -199,6 +212,8 @@ function modifierRegroupement(fra_id) {
   peuplerCollectionsExclues(fra.collections_exclues || []);
   peuplerGammesExclues(fra.gammes_exclues || []);
   peuplerPositionRegroupement(fra.rang);
+  if (document.getElementById('freg-mode')) document.getElementById('freg-mode').value = fra.mode || 'auto';
+  onChangeModeRegroupement();
   document.getElementById('contenu-regroupements').classList.add('cache');
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
   document.getElementById('form-regroupements').classList.remove('cache');
@@ -223,8 +238,9 @@ async function sauvegarderRegroupement() {
   const gammesExclues = Array.from(
     document.getElementById('freg-gammes-exclues').querySelectorAll('input[type="checkbox"]:checked')
   ).map(cb => cb.value);
+  const mode = (document.getElementById('freg-mode') || {}).value || 'auto';
   if (!nom) { cacherChargement(); afficherMsg('regroupements', 'Le nom est requis.', 'erreur'); return; }
-  if (!ing_id && categoriesExclues.length === 0 && collectionsExclues.length === 0 && gammesExclues.length === 0) {
+  if (mode === 'auto' && !ing_id && categoriesExclues.length === 0 && collectionsExclues.length === 0 && gammesExclues.length === 0) {
     cacherChargement();
     afficherMsg('regroupements', 'Choisir un ingrédient ou au moins une exclusion.', 'erreur');
     return;
@@ -243,7 +259,8 @@ async function sauvegarderRegroupement() {
     photo_noel_url:      document.getElementById('freg-photo-noel-url').value,
     categories_exclues:  categoriesExclues,
     collections_exclues: collectionsExclues,
-    gammes_exclues:      gammesExclues
+    gammes_exclues:      gammesExclues,
+    mode
   };
   const res = await appelAPIPost('saveRegroupement', d);
   if (res && res.success) {
