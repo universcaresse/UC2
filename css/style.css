@@ -1925,11 +1925,14 @@ tr:has(+ .ven-resume-row) td {
 
 /* Actif — vert + soulignement doré visible */
 .navigation-lien.actif,
-.navigation-lien.active {
-  color: var(--primary);
+.navigation-lien.active,
+.nav-links a.navigation-lien.active {
+  color: var(--primary) !important;
 }
 
 .navigation-lien.actif::after,
 .navigation-lien.active::after {
   transform: scaleX(1);
 }
+
+
