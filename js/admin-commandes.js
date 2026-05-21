@@ -60,9 +60,10 @@ function ouvrirFormCommande() {
   document.getElementById('form-commande-titre').textContent = 'Nouvelle commande ' + cmdNumeroAffiche;
 
   // Vider tous les champs du formulaire
-  document.getElementById('cmd-client').value    = '';
-  document.getElementById('cmd-courriel').value  = '';
-  document.getElementById('cmd-telephone').value = '';
+  document.getElementById('cmd-client').value      = '';
+  document.getElementById('cmd-courriel').value    = '';
+  document.getElementById('cmd-telephone').value   = '';
+  document.getElementById('cmd-code-postal').value = '';
 
   // Remplir les collections
   const selCol = document.getElementById('cmd-collection');
@@ -266,18 +267,15 @@ function cmdCalculerSolde() {
 // ENREGISTRER LA COMMANDE
 // ═══════════════════════════════════════
 async function enregistrerCommande() {
-  const client    = document.getElementById('cmd-client').value.trim();
-  const courriel  = document.getElementById('cmd-courriel').value.trim();
-  const telephone = document.getElementById('cmd-telephone').value.trim();
+  const client      = document.getElementById('cmd-client').value.trim();
+  const courriel    = document.getElementById('cmd-courriel').value.trim();
+  const telephone   = document.getElementById('cmd-telephone').value.trim();
+  const code_postal = document.getElementById('cmd-code-postal').value.trim();
 
-  if (!client) {
-    afficherMsg('commandes', 'Le nom du client est obligatoire.', 'erreur');
-    return;
-  }
-  if (!courriel && !telephone) {
-    afficherMsg('commandes', 'Au moins un courriel ou un téléphone est requis.', 'erreur');
-    return;
-  }
+  if (!client)      { afficherMsg('commandes', 'Le nom du client est obligatoire.', 'erreur'); return; }
+  if (!courriel)    { afficherMsg('commandes', 'Le courriel est obligatoire.', 'erreur'); return; }
+  if (!telephone)   { afficherMsg('commandes', 'Le téléphone est obligatoire.', 'erreur'); return; }
+  if (!code_postal) { afficherMsg('commandes', 'Le code postal est obligatoire.', 'erreur'); return; }
   if (!cmdLignes.length) {
     afficherMsg('commandes', 'Aucun item dans la commande.', 'erreur');
     return;
@@ -307,6 +305,7 @@ async function enregistrerCommande() {
       client,
       courriel,
       telephone,
+      code_postal,
       total_prevu: totalPrevu,
       acompte,
       solde,
@@ -325,6 +324,7 @@ async function enregistrerCommande() {
       client,
       courriel,
       telephone,
+      code_postal,
       total_prevu: totalPrevu,
       acompte,
       solde,
@@ -449,6 +449,7 @@ async function voirDetailCommande(cmd_id) {
       <div>${c.client || '—'}</div>
       ${c.courriel ? `<div class="texte-secondaire">${c.courriel}</div>` : ''}
       ${c.telephone ? `<div class="texte-secondaire">${c.telephone}</div>` : ''}
+      ${c.code_postal ? `<div class="texte-secondaire">${c.code_postal}</div>` : ''}
     </div>
     <div style="margin-bottom:16px">
       <div class="form-label">Date de la commande</div>
@@ -544,11 +545,12 @@ async function modifierCommande(cmd_id) {
   document.getElementById('form-commande-titre').textContent = 'Modifier commande ' + cmdNumeroAffiche;
 
   // Remplir les champs
-  document.getElementById('cmd-client').value    = c.client || '';
-  document.getElementById('cmd-courriel').value  = c.courriel || '';
-  document.getElementById('cmd-telephone').value = c.telephone || '';
-  document.getElementById('cmd-acompte').value   = c.acompte || 0;
-  document.getElementById('cmd-notes').value     = c.notes || '';
+  document.getElementById('cmd-client').value      = c.client || '';
+  document.getElementById('cmd-courriel').value    = c.courriel || '';
+  document.getElementById('cmd-telephone').value   = c.telephone || '';
+  document.getElementById('cmd-code-postal').value = c.code_postal || '';
+  document.getElementById('cmd-acompte').value     = c.acompte || 0;
+  document.getElementById('cmd-notes').value       = c.notes || '';
 
   // Remplir le panier
   cmdLignes = (resLignes.items || []).map(l => ({

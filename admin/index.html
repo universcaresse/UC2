@@ -1971,10 +1971,13 @@
             <input type="text" class="form-ctrl" id="cmd-client" placeholder="Nom *">
           </div>
           <div class="form-groupe col-plein">
-            <input type="text" inputmode="email" class="form-ctrl" id="cmd-courriel" placeholder="Courriel (au moins un des deux)">
+            <input type="text" inputmode="email" class="form-ctrl" id="cmd-courriel" placeholder="Courriel *">
           </div>
           <div class="form-groupe col-plein">
-            <input type="text" inputmode="tel" class="form-ctrl" id="cmd-telephone" placeholder="Téléphone (au moins un des deux)">
+            <input type="text" inputmode="tel" class="form-ctrl" id="cmd-telephone" placeholder="Téléphone *">
+          </div>
+          <div class="form-groupe col-plein">
+            <input type="text" class="form-ctrl" id="cmd-code-postal" placeholder="Code postal *" maxlength="7" oninput="this.value=this.value.toUpperCase()">
           </div>
         </div>
       </div>
@@ -3018,7 +3021,7 @@
 			</div>
 			
 			<div class="form-actions">
-				<button class="bouton" onclick="mediathequeSyncCloudinary()">↺ Cloudinary → Sheet</button>
+				<button class="bouton" onclick="mediathequeSyncCloudinary()">↺ Cloudinary</button>
 			</div>
 		</div>
 		
