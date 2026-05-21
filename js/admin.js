@@ -320,11 +320,15 @@ function stringToColor(str) {
 function confirmerAction(message, callback) {
   document.getElementById('modal-confirm-message').textContent = message;
   document.getElementById('modal-confirm-btn').onclick = () => { fermerModalConfirm(); callback(); };
-  document.getElementById('modal-confirm').classList.add('ouvert');
+  const m = document.getElementById('modal-confirm');
+  m.classList.add('ouvert');
+  m.style.display = 'flex';
 }
 
 function fermerModalConfirm() {
-  document.getElementById('modal-confirm').classList.remove('ouvert');
+  const m = document.getElementById('modal-confirm');
+  m.classList.remove('ouvert');
+  m.style.display = '';
 }
 
 // CONFIG et appelAPI/appelAPIPost définis dans main.js
