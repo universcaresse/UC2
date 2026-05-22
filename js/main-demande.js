@@ -103,7 +103,12 @@ function demandeVider() {
 
 // ─── RAFRAÎCHIR L'AFFICHAGE (étoffé aux étapes suivantes) ───
 function demandeRafraichirAffichage() {
-  // Sera étendu pour mettre à jour la bulle compteur, les cartes, la modal de liste, etc.
+  if (!DEMANDE_ACTIVE) return;
+  // Marquer les cartes dont au moins un format est choisi (cœur rouge)
+  document.querySelectorAll('.carte-produit[data-pro-id]').forEach(carte => {
+    const coche = demandeContientProduit(carte.dataset.proId);
+    carte.classList.toggle('demande-coche', coche);
+  });
 }
 
 // ─── CASES À COCHER DANS LA MODAL PRODUIT (étape 2) ───

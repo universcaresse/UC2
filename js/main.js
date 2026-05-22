@@ -579,6 +579,8 @@ function construireCatalogue() {
     filtrer(collectionEnAttente);
     collectionEnAttente = null;
   }
+
+  if (typeof demandeRafraichirAffichage === 'function') demandeRafraichirAffichage();
 }
 
 // ─── CARTE PRODUIT ───
@@ -591,7 +593,7 @@ function carteProduit(p) {
   const image    = photoUrl ? `<img src="${photoUrl}" alt="${p.nom}" onerror="this.style.display='none'">` : '';
   const couleur  = p.couleur_hex || '#c44536';
   return `
-    <div class="carte-produit" data-produit="${btoa(unescape(encodeURIComponent(JSON.stringify(p))))}" onclick="ouvrirModalFromCard(this)" style="--col-hex: ${couleur};">
+    <div class="carte-produit" data-produit="${btoa(unescape(encodeURIComponent(JSON.stringify(p))))}" data-pro-id="${p.pro_id}" onclick="ouvrirModalFromCard(this)" style="--col-hex: ${couleur};">
       <div class="carte-visuel">
         <div class="carte-couleur">
           ${image}
@@ -753,6 +755,8 @@ function afficherPageRegroupements(fraIdActif) {
     }
     section.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
   });
+
+  if (typeof demandeRafraichirAffichage === 'function') demandeRafraichirAffichage();
 }
 function filtrerRegroupements(fra_id) {
   document.querySelectorAll('#regroupements-filtres .filtre-btn').forEach(b => b.classList.remove('actif'));

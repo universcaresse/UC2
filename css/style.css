@@ -761,6 +761,8 @@ footer > * { position: relative; z-index: 1; }
 .carte-produit:hover .carte-couleur { transform: scale(1.04); }
 .carte-couleur img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
 .carte-couleur-dot { position: absolute; top: 12px; right: 12px; width: 24px; height: 24px; border-radius: 50%; background: var(--col-hex); border: 2px solid var(--blanc-pur-50); }
+.carte-produit.demande-coche .carte-couleur-dot { background: transparent; border-color: transparent; display: flex; align-items: center; justify-content: center; }
+.carte-produit.demande-coche .carte-couleur-dot::after { content: '♥'; font-size: 22px; line-height: 1; color: var(--danger); text-shadow: 0 0 2px var(--blanc), 0 0 3px var(--blanc); }
 
 .carte-infos { padding: 16px 16px 18px; background: color-mix(in srgb, var(--col-hex) 90%, transparent); }
 .carte-photo-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: rgba(255,255,255,0.5); font-family: 'DM Sans', sans-serif; font-size: var(--texte-70); letter-spacing: 0.1em; text-transform: uppercase; }
