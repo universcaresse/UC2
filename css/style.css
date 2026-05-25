@@ -533,6 +533,12 @@ select.form-control, select.form-ctrl { cursor: pointer; }
 .demande-modal-pied { display: flex; align-items: center; justify-content: space-between; padding-top: 20px; margin-top: 8px; }
 .demande-modal-total-label { font-family: 'DM Sans', sans-serif; font-size: var(--texte-75); letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); }
 .demande-modal-total { font-family: 'Playfair Display', serif; font-size: var(--texte-175); color: var(--primary); }
+.demande-continuer { width: 100%; margin-top: 20px; }
+.demande-retour { background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: var(--texte-82); color: var(--gris); padding: 0 0 16px; }
+.demande-retour:hover { color: var(--primary); }
+.demande-form-intro { font-family: 'DM Sans', sans-serif; font-size: var(--texte-85); line-height: 1.7; color: var(--gris); margin-bottom: 24px; }
+.demande-form-erreur { font-family: 'DM Sans', sans-serif; font-size: var(--texte-82); color: var(--danger); margin-bottom: 16px; }
+.demande-form-envoyer { width: 100%; margin-top: 8px; }
 .modal-contenu { padding: 40px 32px; overflow-y: auto; display: flex; flex-direction: column; }
 .modal-inci { margin-top: auto; padding-top: 32px; font-family: 'DM Sans', sans-serif; font-size: var(--texte-75); line-height: 1.8; color: var(--gris); font-weight: 300; text-align: justify; border-top: 1px solid var(--beige); }
 .modal-collection { font-family: 'DM Sans', sans-serif; font-size: var(--texte-75); letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
