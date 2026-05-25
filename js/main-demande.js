@@ -36,7 +36,7 @@ function demandeCle(pro_id, format_poids, format_unite) {
 }
 
 // ─── AJOUTER UN ITEM ───
-function demandeAjouter(pro_id, format_poids, format_unite, nom_produit, prix_unitaire) {
+function demandeAjouter(pro_id, format_poids, format_unite, nom_produit, prix_unitaire, image_url, nom_collection) {
   const cle = demandeCle(pro_id, format_poids, format_unite);
   const existant = demandeListe.find(i => demandeCle(i.pro_id, i.format_poids, i.format_unite) === cle);
   if (existant) {
@@ -48,6 +48,8 @@ function demandeAjouter(pro_id, format_poids, format_unite, nom_produit, prix_un
       format_unite,
       nom_produit,
       prix_unitaire,
+      image_url,
+      nom_collection,
       quantite: 1
     });
   }
@@ -174,7 +176,7 @@ function demandeInjecterCasesModal(produit) {
       coeur.textContent = coche ? '♥' : '♡';
       coeur.classList.toggle('coche', coche);
       if (coche) {
-        demandeAjouter(produit.pro_id, poids, unite, produit.nom, prix);
+        demandeAjouter(produit.pro_id, poids, unite, produit.nom, prix, produit.image_url, produit.nom_collection);
       } else {
         demandeRetirer(produit.pro_id, poids, unite);
       }
@@ -188,6 +190,97 @@ function demandeInjecterCasesModal(produit) {
   hex.insertBefore(bloc, prixFormatEl || null);
 }
 
+// ─── MODAL DE LA LISTE (étape 5) ───
+function demandeCreerModalListe() {
+  if (document.getElementById('demande-modal')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'demande-modal';
+  overlay.className = 'modal-overlay demande-modal-overlay';
+  overlay.innerHTML =
+    '<div class="demande-modal">' +
+      '<button class="demande-modal-fermer" type="button" aria-label="Fermer">✕</button>' +
+      '<h2 class="demande-modal-titre">Produits qui vous intéressent</h2>' +
+      '<div class="demande-modal-liste" id="demande-modal-liste"></div>' +
+      '<div class="demande-modal-pied">' +
+        '<span class="demande-modal-total-label">Total estimé</span>' +
+        '<span class="demande-modal-total" id="demande-modal-total"></span>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay || e.target.closest('.demande-modal-fermer')) {
+      demandeFermerModalListe();
+      return;
+    }
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const ligne = btn.closest('[data-cle]');
+    if (!ligne) return;
+    const pro_id = ligne.dataset.proId;
+    const poids  = ligne.dataset.poids;
+    const unite  = ligne.dataset.unite;
+    const action = btn.dataset.action;
+    if (action === 'moins')        demandeChangerQuantite(pro_id, poids, unite, -1);
+    else if (action === 'plus')    demandeChangerQuantite(pro_id, poids, unite, 1);
+    else if (action === 'retirer') demandeRetirer(pro_id, poids, unite);
+    if (demandeNombreItems() < 1) demandeFermerModalListe();
+    else demandeRendreListe();
+  });
+}
+
+function demandeOuvrirModalListe() {
+  const overlay = document.getElementById('demande-modal');
+  if (!overlay) return;
+  demandeRendreListe();
+  overlay.classList.add('ouvert');
+  document.body.style.overflow = 'hidden';
+}
+
+function demandeFermerModalListe() {
+  const overlay = document.getElementById('demande-modal');
+  if (!overlay) return;
+  overlay.classList.remove('ouvert');
+  document.body.style.overflow = '';
+}
+
+function demandeRendreListe() {
+  const conteneur = document.getElementById('demande-modal-liste');
+  const totalEl = document.getElementById('demande-modal-total');
+  if (!conteneur) return;
+  if (!demandeListe.length) {
+    conteneur.innerHTML = '<p class="demande-modal-vide">Aucun produit choisi pour le moment.</p>';
+    if (totalEl) totalEl.textContent = '';
+    return;
+  }
+  conteneur.innerHTML = demandeListe.map(i => {
+    const cle = demandeCle(i.pro_id, i.format_poids, i.format_unite);
+    const sousTotal = (i.prix_unitaire || 0) * (i.quantite || 1);
+    const prix = (typeof formaterPrix === 'function') ? formaterPrix(sousTotal) : sousTotal.toFixed(2).replace('.', ',') + ' $';
+    const photo = i.image_url
+      ? '<img src="' + i.image_url + '" alt="" class="demande-item-photo">'
+      : '<div class="demande-item-photo demande-item-photo-vide"></div>';
+    return '<div class="demande-item" data-cle="' + cle + '" data-pro-id="' + i.pro_id + '" data-poids="' + i.format_poids + '" data-unite="' + i.format_unite + '">' +
+        photo +
+        '<div class="demande-item-infos">' +
+          (i.nom_collection ? '<span class="demande-item-collection">' + i.nom_collection + '</span>' : '') +
+          '<span class="demande-item-nom">' + (i.nom_produit || '') + '</span>' +
+          '<span class="demande-item-format">' + i.format_poids + ' ' + i.format_unite + '</span>' +
+        '</div>' +
+        '<div class="demande-item-droite">' +
+          '<div class="demande-item-qte">' +
+            '<button type="button" data-action="moins" aria-label="Enlever un">−</button>' +
+            '<span class="demande-item-qte-nb">' + (i.quantite || 1) + '</span>' +
+            '<button type="button" data-action="plus" aria-label="Ajouter un">+</button>' +
+          '</div>' +
+          '<span class="demande-item-soustotal">' + prix + '</span>' +
+          '<button type="button" class="demande-item-retirer" data-action="retirer">Retirer</button>' +
+        '</div>' +
+      '</div>';
+  }).join('');
+  if (totalEl) totalEl.textContent = (typeof formaterPrix === 'function') ? formaterPrix(demandeSousTotal()) : demandeSousTotal().toFixed(2).replace('.', ',') + ' $';
+}
+
 // ─── INITIALISATION ───
 document.addEventListener('DOMContentLoaded', () => {
   if (!DEMANDE_ACTIVE) return;
@@ -196,6 +289,8 @@ document.addEventListener('DOMContentLoaded', () => {
   bulle.id = 'demande-bulle';
   bulle.className = 'demande-bulle cache';
   bulle.innerHTML = '<span class="demande-bulle-nb"></span>';
+  bulle.addEventListener('click', demandeOuvrirModalListe);
   document.body.appendChild(bulle);
+  demandeCreerModalListe();
   demandeRafraichirAffichage();
 });
