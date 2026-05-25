@@ -989,6 +989,15 @@ if (ctaSpan) setTimeout(() => { ctaSpan.classList.add('visible'); }, 50);
     set('contenu-valeur-04-desc', c.valeur_04_desc);
     set('contenu-citation-texte', c.citation_texte);
     set('contenu-citation-source', c.citation_source);
+	set('procurer-marche', c.procurer_marche_texte);
+const elMarche = document.getElementById('procurer-marche');
+if (elMarche) {
+  if (String(c.procurer_marche_actif) === '1' && c.procurer_marche_texte) {
+    elMarche.classList.remove('cache');
+  } else {
+    elMarche.classList.add('cache');
+  }
+}
     [1,2,3,4,5].forEach(n => {
       const nn = String(n).padStart(2,'0');
       set(`contenu-bas-engagement-${nn}-titre`, c[`bas_engagement_${nn}_titre`]);

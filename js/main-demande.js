@@ -223,7 +223,7 @@ function demandeCreerModalListe() {
       '<div id="demande-vue-merci" class="cache">' +
         '<h2 class="demande-modal-titre">Demande envoyée !</h2>' +
         '<p class="demande-form-intro">Merci ! Nous avons bien reçu votre liste et nous reviendrons vers vous très bientôt pour confirmer les délais, les coûts et la disponibilité.</p>' +
-        '<p class="demande-form-intro">Surveillez votre boîte de réception — et pensez à vérifier vos pourriels, au cas où.</p>' +
+        '<p class="demande-form-intro">Surveillez votre boîte de réception et pensez à vérifier vos pourriels, au cas où.</p>' +
         '<button type="button" class="bouton bouton-grand demande-continuer" data-action="fermer">Fermer</button>' +
       '</div>' +
     '</div>';
