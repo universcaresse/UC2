@@ -378,6 +378,8 @@ async function afficherRegroupementsPublic() {
   window._regroupementsData = res.items;
   const countEl = document.getElementById('regroupements-count');
   if (countEl) countEl.textContent = res.items.length + ' univers';
+  const statUnivers = document.getElementById('hero-stat-univers');
+  if (statUnivers) statUnivers.textContent = res.items.length;
   strip.innerHTML = '';
   res.items.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(fra => {
     const couleurs = couleurCollection(fra.nom, fra.couleur_hex);
