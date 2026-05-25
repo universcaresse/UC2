@@ -603,8 +603,12 @@ footer > * { position: relative; z-index: 1; }
 
 /* ═══════════════════════════════════════
    HERO ACCUEIL PUBLIC
-   ═══════════════════════════════════════ */
-.hero { min-height: calc(100vh - var(--nav-h)); display: grid; grid-template-columns: 1fr 1fr; }
+   ═══════════════════════════════════════ 
+.hero { min-height: calc(100vh - var(--nav-h)); display: grid; grid-template-columns: 1fr 1fr; }*/
+.hero { min-height: calc(100vh - var(--nav-h)); height: calc(100vh - var(--nav-h)); display: grid; grid-template-columns: 1fr 1fr; }
+
+
+
 .hero-left { display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; padding: 24px 64px 80px 80px; position: relative; }
 .hero-left::after { display: none; }
 .hero-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; font-weight: 500; min-height: 1.2rem; }
