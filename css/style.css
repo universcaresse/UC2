@@ -603,9 +603,9 @@ footer > * { position: relative; z-index: 1; }
 
 /* ═══════════════════════════════════════
    HERO ACCUEIL PUBLIC
-   ═══════════════════════════════════════ 
-.hero { min-height: calc(100vh - var(--nav-h)); display: grid; grid-template-columns: 1fr 1fr; }*/
-.hero { min-height: calc(100vh - var(--nav-h)); height: calc(100vh - var(--nav-h)); display: grid; grid-template-columns: 1fr 1fr; }
+   ═══════════════════════════════════════ */
+.hero { min-height: calc(100vh - var(--nav-h)); display: grid; grid-template-columns: 1fr 1fr; }
+
 
 
 
