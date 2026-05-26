@@ -55,12 +55,13 @@ function ouvrirFicheRegroupement(fra_id) {
     produitsDuRegroupement = donneesProduits.filter(p => proIdsLies.indexOf(String(p.pro_id)) >= 0);
   } else {
     produitsDuRegroupement = donneesProduits.filter(p => {
-      const aIng = fra.ing_id ? (p.ingredients || []).some(i => i.ing_id === fra.ing_id) : true;
+      const ingsProduit = (prodCache.ingredients && prodCache.ingredients[p.pro_id]) || [];
+      const aIng = fra.ing_id ? ingsProduit.some(i => i.ing_id === fra.ing_id) : true;
       if (!aIng) return false;
       if ((fra.collections_exclues || []).indexOf(p.col_id) >= 0) return false;
       if ((fra.gammes_exclues || []).indexOf(p.gam_id) >= 0) return false;
       const aCatExclue = (fra.categories_exclues || []).some(catId =>
-        (p.ingredients || []).some(i => {
+        ingsProduit.some(i => {
           const ing = (listesDropdown.fullData || []).find(d => d.ing_id === i.ing_id);
           return ing && ing.cat_id === catId;
         })
