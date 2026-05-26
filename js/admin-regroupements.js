@@ -17,6 +17,7 @@ function afficherRegroupements() {
       <div class="collection-carte-lignes-haut"></div>
       <div class="collection-carte-contenu">
         <span class="collection-carte-nom">${(fra.nom || '').toUpperCase()}</span>
+          <span class="collection-carte-slogan">${fra.slogan || ''}</span>
         </div>
     </div>`;
   });
@@ -29,6 +30,7 @@ function ouvrirFicheRegroupement(fra_id) {
   if (!fra) { console.log('Regroupement introuvable:', fra_id, donneesRegroupements); return; }
   document.getElementById('fiche-regroupement-titre').textContent      = (fra.nom || '').toUpperCase();
   document.getElementById('fiche-regroupement-desc').textContent       = fra.description || '—';
+  document.getElementById('fiche-regroupement-slogan').textContent     = fra.slogan || '—';
   const ing = (listesDropdown.fullData || []).find(d => d.ing_id === fra.ing_id);
   document.getElementById('fiche-regroupement-ingredient').textContent = ing ? ing.nom_UC : fra.ing_id;
   const produitsDuRegroupement = donneesProduits.filter(p =>
