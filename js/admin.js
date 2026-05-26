@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await chargerDonneesInitiales();
 });
 async function chargerDonneesInitiales() {
-const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resPromo, resRegro, resIngs, resEmb, resStock, resLots, resVL] = await Promise.all([
+const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resPromo, resRegro, resIngs, resEmb, resStock, resLots, resVL, resRegPro] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getGammes'),
     appelAPI('getFamilles'),
@@ -56,7 +56,8 @@ const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resProm
     appelAPI('getFormatsEmballages'),
     appelAPI('getStock'),
     appelAPI('getLots'),
-    appelAPI('getVentesLignes')
+    appelAPI('getVentesLignes'),
+    appelAPI('getRegroupementsProduits')
   ]);
   if (resCol && resCol.success) {
     donneesCollections = resCol.items || [];
@@ -139,6 +140,7 @@ if (resGam && resGam.success) {
   listesDropdown.stock = prodCache.stock;
   prodCache.lots = (resLots && resLots.success) ? resLots.items : [];
   prodCache.ventesLignes = (resVL && resVL.success) ? resVL.items : [];
+  prodCache.regroupementsProduits = (resRegPro && resRegPro.success) ? resRegPro.items : [];
   prodCache.charge = true;
 }
 // ─── NAVIGATION SIDEBAR ───
