@@ -389,7 +389,7 @@ main { padding-top: var(--nav-h); }
 .hero-stat-num { opacity: 0; transition: opacity 1.5s ease; }
 .hero-stat-num.visible { opacity: 1; }
 
-.btn-fermer-panneau { background: transparent; border: none; cursor: pointer; font-size: 1.4rem; color: var(--blanc); line-height: 1; padding: 4px 8px; align-self: flex-end; margin-left: auto; }
+.btn-fermer-panneau { background: transparent; border: none; cursor: pointer; font-size: 1.6rem; color: var(--gris); line-height: 1; padding: 8px 12px; align-self: center; margin-left: auto; }
 .btn-fermer-panneau-vert { background: transparent; border: none; cursor: pointer; font-size: 1.4rem; color: var(--primary); line-height: 1; padding: 8px 8px; align-self: flex-end; margin-left: auto; }
 
 .btn-edit { background: var(--primary-08); color: var(--primary); padding: 6px 14px; font-size: 0.68rem; font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border: none; cursor: pointer; transition: background 0.2s; }
@@ -906,8 +906,8 @@ footer > * { position: relative; z-index: 1; }
    ═══════════════════════════════════════ */
 .form-panel { display: none; background: white; border: 1px solid var(--beige); margin-bottom: 32px; overflow: hidden; position: relative; }
 .form-panel.visible { display: block; }
-.form-panel-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--boite); background: var(--boite); display: flex; align-items: center; gap: 16px; position: relative; }
-.form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 400; color: var(--blanc); flex: 1; }
+.form-panel-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--beige); background: var(--blanc); display: flex; align-items: center; gap: 16px; position: relative; }
+.form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 400; color: var(--gris-fonce); flex: 1; }
 .form-body { padding: 28px 28px 28px; }
 .form-body .form-actions { padding-top: 28px; padding-bottom: 28px; }
 .form-body-actions { border-top: 1px solid var(--beige); background: var(--boite); padding: 20px 20px 20px; }
@@ -1285,7 +1285,7 @@ tr.cliquable { cursor: pointer; }
   margin-bottom: 0;
 }
 .fiche-bandeau .form-panel-titre { color: var(--blanc); font-size: 1.3rem; display: block; }
-.fiche-slogan { color: var(--blanc); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; display: block; margin-top: 6px; }
+.fiche-slogan { color: var(--accent); font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; display: block; margin-top: 6px; }
 .fiche-desc { font-family: 'DM Sans', sans-serif; font-size: 1rem; color: var(--gris); line-height: 1.7; margin-bottom: 24px; }
 .fiche-inci-etiquette { margin-bottom: 24px; }
 .inci-label-texte { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; line-height: 1.8; color: var(--gris-fonce); padding: 16px; background: var(--primary-06); border-left: 3px solid var(--primary); }
