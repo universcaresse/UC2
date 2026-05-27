@@ -250,7 +250,7 @@ nav.scrolled { box-shadow: none; }
 
 .nav-links { display: flex; gap: 32px; list-style: none; margin-left: auto; }
 .nav-links a, .nav-admin-btn {
-  font-family: 'Birthstone', serif;
+  font-family: 'Birthstone', cursive;
   font-size: var(--texte-160);
   letter-spacing: 0.1em;
   font-variant: normal;
@@ -856,11 +856,11 @@ footer > * { position: relative; z-index: 1; }
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(30,28,25,0.4); z-index: 89; top: var(--nav-h); }
 .sidebar-overlay.visible { display: block; }
 .sidebar-groupe { margin-bottom: 4px; }
-.sidebar-titre { font-family: 'DM Sans', sans-serif; font-size: 0.80rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gris); padding: 14px 24px 6px; font-weight: 500; font-variant: small-caps;}
-.sidebar-lien { display: block; padding: 9px 24px; font-family: 'DM Sans', sans-serif; font-size: 0.90rem; font-weight: 300; color: var(--gris); text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: right; transition: all 0.15s; border-left: 3px solid transparent;text-transform: uppercase }
+.sidebar-titre { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); padding: 14px 24px 6px; font-weight: 500; }
+.sidebar-lien { display: block; padding: 9px 24px; font-family: 'Birthstone', cursive; font-size: 1.40rem; font-weight: 400; color: var(--primary); text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: right; transition: all 0.15s; border-left: 3px solid transparent; }
 .sidebar-lien:hover { background: rgba(90,138,58,0.05); color: var(--primary); }
 .sidebar-lien.actif { background: rgba(90,138,58,0.08); color: var(--primary); border-left-color: var(--primary); font-weight: 500; }
-.sidebar-lien.bientot { color: var(--beige); cursor: default; font-style: italic; }
+.sidebar-lien.bientot { color: var(--beige); cursor: default; font-style: italic; font-size: 1.20rem; }
 .sidebar-lien.bientot:hover { background: none; color: var(--beige); }
 
 .sidebar-sep { height: 1px; background: var(--beige); margin: 10px 24px; }
@@ -1088,7 +1088,6 @@ tr.cliquable { cursor: pointer; }
   .nav-admin-btn {
     background: none;
     border: none;
-	font-variant: small-caps;
     cursor: pointer;
     padding: 8px 14px;
     display: flex;
@@ -1104,15 +1103,11 @@ tr.cliquable { cursor: pointer; }
     position: absolute;
     top: 100%;
     left: 0;
-	font-family: 'Birthstone', serif;
-	font-variant: normal;
-	font-size: var(--texte-160);
     background: var(--blanc);
     border: 1px solid var(--beige);
     box-shadow: 0 8px 24px rgba(30,28,25,0.08);
     min-width: 180px;
     z-index: 150;
-	text-transform: uppercase;
   }
   .nav-admin-item.ouvert .nav-dropdown { display: block; }
 
@@ -1120,18 +1115,18 @@ tr.cliquable { cursor: pointer; }
     display: block;
     width: 100%;
     padding: 11px 20px;
-	font-family: 'Birthstone', serif;
-
-	letter-spacing: 0.1em;
+    font-family: 'Birthstone', cursive;
+    font-size: var(--texte-160);
+    letter-spacing: 0.1em;
+    text-transform: lowercase;
+    color: var(--primary);
+    font-weight: 450;
     background: none;
     border: none;
     text-align: left;
     cursor: pointer;
     transition: all 0.15s;
     border-left: 3px solid transparent;
-	text-transform: uppercase;
-	
-   
   }
   .nav-dropdown-item:hover {
     background: rgba(90,138,58,0.05);
@@ -1142,6 +1137,7 @@ tr.cliquable { cursor: pointer; }
     color: var(--beige);
     cursor: default;
     font-style: italic;
+    font-size: 1.20rem;
   } 
   .nav-dropdown-item.bientot:hover {
     background: none;
