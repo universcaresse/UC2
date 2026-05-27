@@ -1931,7 +1931,7 @@ tr:has(+ .ven-resume-row) td {
    Remplace form-panel-header et form-body-actions
    ═══════════════════════════════════════ */
 .bandeau {
-  padding: 12px 28px;
+  padding: 8px 28px;
   border: 1px solid var(--beige);
   background: var(--blanc);
   display: flex;
