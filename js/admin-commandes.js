@@ -953,7 +953,6 @@ function textoProposition(cmd_id) {
   let texte = 'Bonjour ' + (c.client || '') + ',\n\n';
   texte += 'Votre proposition de commande Univers Caresse vient de vous être envoyée par courriel.\n';
   texte += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
-  if (c.lien_square) texte += 'Pour payer : ' + c.lien_square + '\n\n';
   texte += 'Merci !\nUnivers Caresse';
 
   window.open('sms:' + telephone + '?body=' + encodeURIComponent(texte));
