@@ -1073,11 +1073,10 @@
         </div>
 
         <!-- EN-TÊTE FACTURE — une ligne -->
-        <div class="form-panel visible" id="ef-panel-entete">
-          <div class="form-panel-header">
+       <div class="conteneur" id="ef-panel-entete">
+          <div class="bandeau">
             <span class="form-panel-titre">Informations de la facture</span>
           </div>
-          <div class="form-body">
             <div style="display:grid; grid-template-columns:2fr 1.5fr 80px 1.6fr 100px auto; gap:12px 16px; align-items:end;">
 
               <div class="form-groupe">
@@ -1171,8 +1170,7 @@
           <div id="msg-ef-items" class="msg-zone" style="margin-top:8px"></div>
 
           <!-- Totaux + Finaliser — une ligne -->
-          <div class="form-panel visible" style="margin-top:24px">
-            <div class="form-body">
+          <div class="conteneur">
               <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr auto; gap:12px 16px; align-items:end;">
 
                 <div class="form-groupe">
@@ -1206,8 +1204,7 @@
                 </div>
 
               </div>
-              <div id="msg-ef-final" class="msg-zone" style="margin-top:8px"></div>
-            </div>
+              <div id="msg-ef-final" class="msg-zone"></div>
           </div>
 
         </div><!-- fin ef-zone-items -->
@@ -1504,16 +1501,13 @@
         <!-- FORMULAIRE NOUVEAU LOT -->
 		
 		<div id="form-fabrication" class="cache" data-mode="">
-          <div class="form-panel">
-            <div class="form-panel-header">
-              <div class="fiche-bandeau">
-                <span class="form-panel-titre">Nouveau lot</span>
-              </div>
-              <button class="btn-fermer-panneau" onclick="fermerFormFabrication()">✕</button>
+          <div class="bandeau">
+            <div class="fiche-bandeau">
+              <span class="form-panel-titre">Nouveau lot</span>
             </div>
+            <button class="btn-fermer-panneau" onclick="fermerFormFabrication()">✕</button>
           </div>
-          <div class="form-panel">
-            <div class="form-body">
+          <div class="conteneur">
               <div class="form-grille">
 
                 <div class="form-groupe col-plein">
@@ -1606,7 +1600,7 @@
               </div>
             </div>
           </div>
-          <div class="form-panel bandeau">
+          <div class="bandeau">
             <div class="bandeau-actions">
               <button class="bouton bouton-contour" onclick="fermerFormFabrication()">Annuler</button>
               <button class="bouton" onclick="sauvegarderLot()">Confirmer</button>
@@ -1660,55 +1654,48 @@
           </div>
 
           <!-- PANIER -->
-          <div class="form-panel" id="ven-panier-panel">
-            <div class="form-panel-header">
-              <span class="form-panel-titre">Panier</span>
-            </div>
-            <div class="form-body">
+          <div class="bandeau" id="ven-panier-panel">
+            <span class="form-panel-titre">Panier</span>
+          </div>
+          <div class="conteneur">
               <div id="ven-panier-liste"></div>
-              <div class="form-grille" style="margin-top:16px">
+              <div class="form-grille">
                 <div class="form-groupe col-plein">
                   <input type="text" class="form-ctrl" id="ven-sous-total" placeholder="Sous-total" readonly>
                 </div>
               </div>
-            </div>
           </div>
 
           <!-- LIVRAISON -->
-          <div class="form-panel">
-            <div class="form-panel-header">
-              <span class="form-panel-titre">Livraison</span>
-            </div>
-            <div class="form-body">
+          <div class="bandeau">
+            <span class="form-panel-titre">Livraison</span>
+          </div>
+          <div class="conteneur">
               <input type="text" inputmode="decimal" class="form-ctrl" id="ven-livraison" placeholder="Livraison $ (0 si aucune)" oninput="venCalculerTotal()">
-            </div>
           </div>
 
           <!-- PROMOTION / RABAIS -->
-          <div class="form-panel visible">
-            <div class="form-panel-header">
-              <span class="form-panel-titre">Promotion / Rabais</span>
-            </div>
-            <div class="form-body">
+          <div class="bandeau">
+            <span class="form-panel-titre">Promotion / Rabais</span>
+          </div>
+          <div class="conteneur">
               <div class="form-groupe">
                 <select class="form-ctrl" id="ven-promotion" onchange="venAppliquerPromotion()">
                   <option value="">— Aucune —</option>
                 </select>
               </div>
-              <div class="form-groupe" id="ven-rabais-libre-zone" style="display:none;margin-top:12px">
+              <div class="form-groupe" id="ven-rabais-libre-zone" style="display:none">
                 <label class="form-label" id="ven-rabais-libre-label">Rabais</label>
                 <input type="text" inputmode="decimal" class="form-ctrl" id="ven-rabais-libre" placeholder="" oninput="venCalculerTotal()">
               </div>
-              <div id="ven-promo-info" style="display:none;margin-top:12px;padding:12px;background:var(--primary-06);border-left:3px solid var(--primary);font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--gris-fonce)"></div>
-            </div>
+              <div id="ven-promo-info" style="display:none"></div>
           </div>
 
           <!-- CLIENT -->
-          <div class="form-panel">
-            <div class="form-panel-header">
-              <span class="form-panel-titre">Client (optionnel)</span>
-            </div>
-            <div class="form-body">
+          <div class="bandeau">
+            <span class="form-panel-titre">Client (optionnel)</span>
+          </div>
+          <div class="conteneur">
               <div class="form-grille">
                 <div class="form-groupe col-plein">
                   <input type="text" class="form-ctrl" id="ven-client" placeholder="Nom">
@@ -1723,12 +1710,10 @@
                   <label class="form-label"><input type="checkbox" id="ven-infolettre"> Autorisation infolettre</label>
                 </div>
               </div>
-            </div>
           </div>
 
-          <div class="form-panel form-body-actions">
+          <div class="bandeau">
             <div class="bandeau-actions">
-            
               <button class="bouton bouton-plein-largeur" onclick="ouvrirApercuFacture()">Voir la facture</button>
             </div>
           </div>
@@ -1773,19 +1758,16 @@
 
   <!-- FORMULAIRE REMBOURSEMENT -->
   <div id="form-remboursement" class="cache">
-    <div class="form-panel">
-      <div class="form-panel-header">
+    <div class="bandeau">
         <span class="form-panel-titre">Nouveau remboursement</span>
         <button class="btn-fermer-panneau" onclick="fermerFormRemboursement()">✕</button>
-      </div>
     </div>
 
     <!-- TYPE DE REMBOURSEMENT -->
-    <div class="form-panel">
-      <div class="form-panel-header">
+    <div class="bandeau">
         <span class="form-panel-titre">Type de remboursement</span>
-      </div>
-      <div class="form-body">
+    </div>
+    <div class="conteneur">
         <div class="form-groupe">
           <select class="form-ctrl" id="rem-type" onchange="remChangerType()">
             <option value="">— Choisir —</option>
@@ -1793,15 +1775,14 @@
             <option value="sans-retour">Sans retour (juste un montant)</option>
           </select>
         </div>
-      </div>
     </div>
 
     <!-- SAISIE PRODUIT (avec retour) -->
-    <div id="rem-saisie-produit" class="form-panel cache">
-      <div class="form-panel-header">
+    <div id="rem-saisie-produit" class="cache">
+    <div class="bandeau">
         <span class="form-panel-titre">Produit retourné</span>
-      </div>
-      <div class="form-body">
+    </div>
+    <div class="conteneur">
         <div class="form-grille">
           <div class="form-groupe col-plein">
             <select class="form-ctrl" id="rem-collection" onchange="remFiltrerGammes()">
@@ -1846,11 +1827,11 @@
     </div>
 
     <!-- SAISIE LIBRE (sans retour) -->
-    <div id="rem-saisie-libre" class="form-panel cache">
-      <div class="form-panel-header">
+    <div id="rem-saisie-libre" class="cache">
+    <div class="bandeau">
         <span class="form-panel-titre">Montant à rembourser</span>
-      </div>
-      <div class="form-body">
+    </div>
+    <div class="conteneur">
         <div class="form-grille">
           <div class="form-groupe col-plein">
             <input type="text" class="form-ctrl" id="rem-libre-description" placeholder="Description (raison du remboursement)">
@@ -1866,11 +1847,11 @@
     </div>
 
     <!-- LISTE DES LIGNES -->
-    <div class="form-panel cache" id="rem-liste-panel">
-      <div class="form-panel-header">
+    <div id="rem-liste-panel" class="cache">
+    <div class="bandeau">
         <span class="form-panel-titre">Lignes du remboursement</span>
-      </div>
-      <div class="form-body">
+    </div>
+    <div class="conteneur">
         <div id="rem-liste"></div>
         <div class="form-grille" style="margin-top:16px">
           <div class="form-groupe col-plein">
@@ -1881,11 +1862,11 @@
     </div>
 
     <!-- CLIENT -->
-    <div class="form-panel cache" id="rem-client-panel">
-      <div class="form-panel-header">
+    <div id="rem-client-panel" class="cache">
+    <div class="bandeau">
         <span class="form-panel-titre">Client (optionnel)</span>
-      </div>
-      <div class="form-body">
+    </div>
+    <div class="conteneur">
         <div class="form-grille">
           <div class="form-groupe col-plein">
             <input type="text" class="form-ctrl" id="rem-client" placeholder="Nom">
@@ -1901,16 +1882,16 @@
     </div>
 
     <!-- MODE DE REMBOURSEMENT -->
-    <div class="form-panel cache" id="rem-paiement-panel">
-      <div class="form-panel-header">
+    <div id="rem-paiement-panel" class="cache">
+    <div class="bandeau">
         <span class="form-panel-titre">Mode de remboursement</span>
-      </div>
-      <div class="form-body form-body-actions">
-        <div class="form-actions-vertical">
+    </div>
+    <div class="bandeau">
+        <div class="bandeau-actions">
           <button class="bouton bouton-plein-largeur" onclick="finaliserRemboursement('comptant')">Comptant</button>
           <button class="bouton bouton-plein-largeur" onclick="finaliserRemboursement('credit')">Crédit (carte)</button>
         </div>
-      </div>
+    </div>
     </div>
   </div>
 
@@ -1951,19 +1932,16 @@
 
   <!-- FORMULAIRE COMMANDE -->
   <div id="form-commande" class="cache">
-    <div class="form-panel">
-      <div class="form-panel-header">
+    <div class="bandeau">
         <span class="form-panel-titre" id="form-commande-titre">Nouvelle commande</span>
         <button class="btn-fermer-panneau" onclick="fermerFormCommande()">✕</button>
-      </div>
     </div>
 
     <!-- CLIENT (obligatoire) -->
-    <div class="form-panel">
-      <div class="form-panel-header">
+   <div class="bandeau">
         <span class="form-panel-titre">Client (obligatoire)</span>
-      </div>
-      <div class="form-body">
+    </div>
+    <div class="conteneur">
         <div class="form-grille">
           <div class="form-groupe col-plein">
             <input type="text" class="form-ctrl" id="cmd-client" placeholder="Nom *">
@@ -1978,15 +1956,13 @@
             <input type="text" class="form-ctrl" id="cmd-code-postal" placeholder="Code postal *" maxlength="7" oninput="this.value=this.value.toUpperCase()">
           </div>
         </div>
-      </div>
     </div>
 
     <!-- SAISIE PRODUITS -->
-    <div class="form-panel">
-      <div class="form-panel-header">
+    <div class="bandeau">
         <span class="form-panel-titre">Produits commandés</span>
-      </div>
-      <div class="form-body">
+    </div>
+    <div class="conteneur">
         <div class="form-grille">
           <div class="form-groupe col-plein">
             <select class="form-ctrl" id="cmd-collection" onchange="cmdFiltrerGammes()">
@@ -2029,11 +2005,10 @@
     </div>
 
     <!-- LISTE DES LIGNES -->
-    <div class="form-panel" id="cmd-panier-panel">
-      <div class="form-panel-header">
+    <div class="bandeau">
         <span class="form-panel-titre">Items de la commande</span>
-      </div>
-      <div class="form-body">
+    </div>
+    <div class="conteneur" id="cmd-panier-panel">
         <div id="cmd-panier-liste"></div>
         <div class="form-grille" style="margin-top:16px">
           <div class="form-groupe col-plein">
@@ -2052,18 +2027,16 @@
     </div>
 
     <!-- NOTES -->
-    <div class="form-panel">
-      <div class="form-panel-header">
+    <div class="bandeau">
         <span class="form-panel-titre">Notes</span>
-      </div>
-      <div class="form-body">
+    </div>
+    <div class="conteneur">
         <div class="form-groupe">
           <textarea class="form-ctrl" id="cmd-notes" rows="3" placeholder="Date prévue, demande spéciale, etc."></textarea>
         </div>
-      </div>
     </div>
 
-    <div class="form-panel form-body-actions">
+    <div class="bandeau">
       <div class="bandeau-actions">
         <button class="bouton bouton-contour" onclick="fermerFormCommande()">Annuler</button>
         <button class="bouton" onclick="enregistrerCommande()">Enregistrer la commande</button>
@@ -2073,64 +2046,45 @@
 
   <!-- FICHE DÉTAIL COMMANDE -->
   <div id="fiche-commande" class="cache">
-    <div class="form-panel">
-      <div class="form-panel-header">
+    <div class="bandeau">
         <span class="form-panel-titre" id="fiche-commande-titre">Commande</span>
         <button class="btn-fermer-panneau" onclick="fermerFicheCommande()">✕</button>
-      </div>
     </div>
-    <div class="form-panel">
-      <div class="form-body" id="fiche-commande-contenu"></div>
-    </div>
-    <div class="form-panel form-body-actions">
-      <div class="form-actions" id="fiche-commande-actions"></div>
+    <div class="conteneur" id="fiche-commande-contenu"></div>
+    <div class="bandeau">
+      <div class="bandeau-actions" id="fiche-commande-actions"></div>
     </div>
   </div>
 
   <!-- FORMULAIRE COMPLÉTER LA COMMANDE -->
   <div id="form-completer-commande" class="cache">
-    <div class="form-panel">
-      <div class="form-panel-header">
+    <div class="bandeau">
         <span class="form-panel-titre" id="form-completer-titre">Compléter la commande</span>
         <button class="btn-fermer-panneau" onclick="fermerFormCompleter()">✕</button>
-      </div>
     </div>
-
-    <div class="form-panel">
-      <div class="form-panel-header">
+    <div class="bandeau">
         <span class="form-panel-titre">Récapitulatif</span>
-      </div>
-      <div class="form-body" id="form-completer-recap"></div>
     </div>
-
-    <div class="form-panel">
-      <div class="form-panel-header">
+    <div class="conteneur" id="form-completer-recap"></div>
+    <div class="bandeau">
         <span class="form-panel-titre">Frais de livraison</span>
-      </div>
-      <div class="form-body">
+    </div>
+    <div class="conteneur">
         <input type="text" inputmode="decimal" class="form-ctrl" id="completer-livraison" placeholder="0,00 $ (0 si aucune)">
-      </div>
     </div>
-
-    <div class="form-panel">
-      <div class="form-panel-header">
+    <div class="bandeau">
         <span class="form-panel-titre">Note au client</span>
-      </div>
-      <div class="form-body">
+    </div>
+    <div class="conteneur">
         <textarea class="form-ctrl" id="completer-note" rows="4" placeholder="Message personnalisé qui accompagnera la proposition…"></textarea>
-      </div>
     </div>
-
-    <div class="form-panel">
-      <div class="form-panel-header">
+    <div class="bandeau">
         <span class="form-panel-titre">Lien de paiement Square</span>
-      </div>
-      <div class="form-body">
-        <input type="text" class="form-ctrl" id="completer-square" placeholder="Coller le lien Square ici">
-      </div>
     </div>
-
-    <div class="form-panel form-body-actions">
+    <div class="conteneur">
+        <input type="text" class="form-ctrl" id="completer-square" placeholder="Coller le lien Square ici">
+    </div>
+    <div class="bandeau">
       <div class="bandeau-actions">
         <button class="bouton bouton-contour" onclick="fermerFormCompleter()">Annuler</button>
         <button class="bouton bouton-or" onclick="envoyerProposition()">Envoyer au client</button>
