@@ -830,6 +830,15 @@ async function envoyerProposition() {
   const square    = document.getElementById('completer-square').value;
   const livraisonNum = parseFloat(String(livraison).replace(',', '.')) || 0;
 
+  // Ouvrir le texto tout de suite — doit partir du clic direct, avant les envois
+  if (telephone) {
+    let texteSms = 'Bonjour ' + (client || '') + ',\n\n';
+    texteSms += 'Votre proposition de commande Univers Caresse vient de vous être envoyée par courriel.\n';
+    texteSms += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
+    texteSms += 'Merci !\nUnivers Caresse';
+    window.open('sms:' + telephone + '?body=' + encodeURIComponent(texteSms));
+  }
+
   afficherChargement();
 
   const dateProposition = new Date().toLocaleDateString('fr-CA');
