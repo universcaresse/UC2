@@ -2228,6 +2228,12 @@ tr:has(+ .ven-resume-row) td {
   margin-bottom: 4px;
 }
 
+.bandeau-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .bandeau .fiche-bandeau {
   padding: 0;
   margin: 0;
@@ -2237,4 +2243,14 @@ tr:has(+ .ven-resume-row) td {
   flex: 1;
 }
 
+/* ═══════════════════════════════════════
+   CONTENEUR — bloc de contenu
+   (remplace form-panel + form-body)
+   ═══════════════════════════════════════ */
 
+.conteneur {
+  background: white;
+  border: 1px solid var(--beige);
+  padding: 28px;
+  margin-bottom: 0;
+}
