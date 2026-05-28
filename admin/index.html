@@ -263,7 +263,7 @@
 	 </div>
 	  
      <!-- COLLECTIONS — Liste, fiche et formulaire -->
-       <div class="section-admin" id="section-collections">
+     <div class="section-admin visible" id="section-collections">
         <div class="page-entete fade-in">
           <div>
             <div class="page-entete-eyebrow">Gérer les collections</div>
@@ -275,7 +275,7 @@
 		
 		
       <!-- COLLECTIONS — Fiche d'une collection -->
-       <div id="fiche-collection" class="cache">
+       <div id="fiche-collection">
 	   <div class="bandeau">
               <div class="fiche-bandeau" id="fiche-collection-bandeau">
                 <span class="form-panel-titre" id="fiche-collection-titre"></span>
@@ -284,16 +284,17 @@
               <button class="btn-fermer-panneau" onclick="fermerFicheCollection()" title="Fermer">✕</button>
             </div>
           
-          <div class="conteneur">
+          <div class="form-panel">
+            <div class="form-body">
               <div id="fiche-collection-extras"></div>
               <p class="fiche-desc" id="fiche-collection-desc"></p>
               <div class="section-label">Gammes de produits</div>
               <div id="fiche-collection-lignes"></div>
             </div>
-          <div class="bandeau">
-			<div class="bandeau-actions">
+          </div>
+          <div class="form-panel bandeau">
+			<div class="form-actions">
 			<button class="bouton" id="fiche-collection-modifier">Modifier cette collection</button>
-			
 			<button class="bouton bouton-rouge" id="btn-supprimer-collection">Supprimer cette collection</button>
               
             </div>
@@ -315,7 +316,8 @@
               <button class="btn-fermer-panneau" onclick="fermerFicheLigne()" title="Fermer">✕</button>
             </div>
         
-          <div class="conteneur">
+          <div class="form-panel">
+            <div class="form-body">
               <div class="form-grille">
                 <div class="form-groupe">
                   <label class="form-label">Collection</label>
@@ -331,8 +333,9 @@
                 <div id="fiche-ligne-ingredients"></div>
               </div>
             </div>
-          <div class="bandeau">
-            <div class="bandeau-actions">
+          </div>
+          <div class="form-panel bandeau">
+            <div class="form-actions">
               <button class="bouton" id="fiche-ligne-modifier">Modifier cette gamme</button>
               <button class="bouton bouton-rouge" id="btn-supprimer-ligne-fiche">Supprimer cette gamme</button>
             </div>
@@ -352,7 +355,8 @@
               <button class="btn-fermer-panneau" onclick="fermerFormCollection()" title="Fermer">✕</button>
             </div>
           
-          <div class="conteneur">
+          <div class="form-panel">
+            <div class="form-body">
             <input type="hidden" id="fc-rowIndex">
             <input type="hidden" id="fc-mode" value="collection">
             <div id="fc-bloc-collection">
@@ -394,14 +398,14 @@
             </div>
             <div id="fc-bloc-ligne" class="cache"></div>
           </div>
-          <div class="bandeau">
-            <div class="bandeau-actions">
+          </div>
+          <div class="form-panel bandeau">
+            <div class="form-actions">
               <button class="bouton" onclick="sauvegarderCollection()">Enregistrer</button>
               <button class="bouton bouton-contour" onclick="fermerFormCollection()">Annuler</button>
             </div>
           </div>
         </div>
-		
 		
 		
 		
@@ -418,7 +422,9 @@
           <div class="vide-titre">Aucune collection</div>
           <div class="vide-desc">Créez votre première entrée</div>
         </div>
-      </div>
+        </div>
+  
+       
 
      <!-- FAMILLES -->
       <div class="section-admin" id="section-familles">
@@ -448,20 +454,27 @@
               <button class="btn-fermer-panneau" onclick="fermerFicheFamille()" title="Fermer">✕</button>
             </div>
         
-          <div class="conteneur">
+          <div class="form-panel">
+            <div class="form-body">
               <div id="fiche-famille-extras"></div>
               <p class="fiche-desc" id="fiche-famille-desc"></p>
               <div class="section-label">Collection</div>
               <div class="form-valeur" id="fiche-famille-collection"></div>
             </div>
-          <div class="bandeau">
-            <div class="bandeau-actions">
+          </div>
+          <div class="form-panel bandeau">
+            <div class="form-actions">
               <button class="bouton" id="fiche-famille-modifier">Modifier cette famille</button>
               <button class="bouton bouton-rouge" id="btn-supprimer-famille">Supprimer cette famille</button>
             </div>
           </div>
         </div>
-
+		
+		
+		
+		
+		
+		
         <!-- FAMILLES  -->
         <div id="form-familles" class="cache">
          
@@ -472,7 +485,8 @@
               <button class="btn-fermer-panneau" onclick="fermerFormFamille()" title="Fermer">✕</button>
             </div>
           
-          <div class="conteneur">
+          <div class="form-panel">
+            <div class="form-body">
               <input type="hidden" id="ff-id">
               <input type="hidden" id="ff-rang">
               <div class="form-grille">
@@ -505,8 +519,9 @@
                
               </div>
             </div>
-          <div class="bandeau">
-            <div class="bandeau-actions">
+          </div>
+          <div class="form-panel bandeau">
+            <div class="form-actions">
               <button class="bouton" onclick="sauvegarderFamille()">Enregistrer</button>
               <button class="bouton bouton-contour" onclick="fermerFormFamille()">Annuler</button>
             </div>
@@ -550,7 +565,8 @@
       
     </div>
 	
-    <div class="conteneur">
+    <div class="form-panel visible">
+      <div class="form-body">
         <div id="fiche-regroupement-extras"></div>
         <p class="fiche-desc" id="fiche-regroupement-desc"></p>
         <div class="section-label">Mode</div>
@@ -568,8 +584,9 @@
         <div class="section-label">Produits associés</div>
         <p class="texte-secondaire" id="fiche-regroupement-produits"></p>
       </div>
-   <div class="bandeau">
-      <div class="bandeau-actions">
+    </div>
+    <div class="form-panel bandeau visible">
+      <div class="form-actions">
         <button class="bouton" id="fiche-regroupement-modifier">Modifier cet univers</button>
         <button class="bouton bouton-rouge" id="btn-supprimer-regroupement">Supprimer cet univers</button>
       </div>
@@ -586,7 +603,8 @@
         <button class="btn-fermer-panneau" onclick="fermerFormRegroupement()" title="Fermer">✕</button>
       </div>
    
-    <div class="conteneur">
+    <div class="form-panel">
+      <div class="form-body">
         <input type="hidden" id="freg-id">
         <div class="form-grille">
           <div class="form-groupe col-demi">
@@ -671,8 +689,8 @@
         </div>
       </div>
     </div>
-    <div class="bandeau">
-      <div class="bandeau-actions">
+    <div class="form-panel bandeau">
+      <div class="form-actions">
         <button class="bouton" onclick="sauvegarderRegroupement()">Enregistrer</button>
         <button class="bouton bouton-contour" onclick="fermerFormRegroupement()">Annuler</button>
       </div>
@@ -719,7 +737,8 @@
               <button class="btn-fermer-panneau" onclick="fermerFicheGamme2()" title="Fermer">✕</button>
             </div>
          
-         <div class="conteneur">
+          <div class="form-panel">
+            <div class="form-body">
               <div id="fiche-gamme-extras"></div>
               <p class="fiche-desc" id="fiche-gamme-desc"></p>
               <div class="fiche-label section-label">Collection</div>
@@ -729,8 +748,9 @@
               <div class="section-label">Produits</div>
               <p class="texte-secondaire" id="fiche-gamme-produits"></p>
             </div>
-          <div class="bandeau">
-            <div class="bandeau-actions">
+          </div>
+          <div class="form-panel bandeau">
+            <div class="form-actions">
               <button class="bouton" id="fiche-gamme-modifier">Modifier la gamme</button>
               <button class="bouton bouton-rouge" id="btn-supprimer-gamme">Supprimer la gamme</button>
             </div>
@@ -748,7 +768,8 @@
               <button class="btn-fermer-panneau" onclick="fermerFormGamme2()" title="Fermer">✕</button>
             </div>
          
-          <div class="conteneur">
+          <div class="form-panel">
+            <div class="form-body">
               <input type="hidden" id="fg-id">
               <div class="form-grille">
                 <div class="form-groupe col-demi">
@@ -796,25 +817,26 @@
               </div>
             </div>
           </div>
-          <div class="bandeau">
-            <div class="bandeau-actions">
+          <div class="form-panel bandeau">
+            <div class="form-actions">
               <button class="bouton" onclick="sauvegarderGamme2()">Enregistrer</button>
-          
-		
-	<button class="bouton bouton-contour" onclick="fermerFormGamme2()">Annuler</button>
+              <button class="bouton bouton-contour" onclick="fermerFormGamme2()">Annuler</button>
             </div>
           </div>
         </div>
-
-       <div class="chargement" id="loading-gammes">		
+		
+		
+        <!-- GAMMES -->
+        <div class="chargement" id="loading-gammes">
+		
 		<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div id="contenu-gammes"></div>
         <div class="vide cache" id="vide-gammes">
           <div class="vide-titre">Aucune gamme</div>
           <div class="vide-desc">Créez votre première gamme</div>
         </div>
-        </div>
       </div>
+
 
 
 
@@ -873,7 +895,7 @@
 		  
 		  
           <div class="form-panel bandeau">
-            <div class="bandeau-actions">
+            <div class="form-actions">
   <button class="bouton bouton-contour" onclick="fermerFicheProduit()">Fermer</button>
   <button class="bouton" onclick="basculerModeEditionRecette()">Modifier</button>
   <button class="bouton bouton-rouge" onclick="supprimerRecetteActive()">Supprimer</button>
@@ -1019,8 +1041,9 @@
               <button type="button" class="bouton bouton-vert-pale btn-ajouter-ingredient" onclick="ajouterFormatRecette()">+ Ajouter un format</button>
             </div>
           </div>
-          <div class="bandeau">
-            <div class="bandeau-actions">
+          </div>
+          <div class="form-panel bandeau">
+            <div class="form-actions">
               <button class="bouton" onclick="sauvegarderRecette()">Enregistrer</button>
               <button class="bouton bouton-contour" onclick="fermerFormRecette()">Annuler</button>
             </div>
@@ -1059,17 +1082,18 @@
             <div class="facture-active-titre" style="color:var(--gris-fonce)">Facture en cours</div>
             <div class="facture-active-info" id="ef-bandeau-reprise-texte"></div>
           </div>
-          <div class="bandeau-actions">
+          <div class="form-actions">
             <button class="bouton bouton-petit bouton-contour" onclick="efAnnulerFactureEnCours()">Annuler</button>
             <button class="bouton bouton-petit" onclick="efReprendreFacture()">Reprendre</button>
           </div>
         </div>
 
         <!-- EN-TÊTE FACTURE — une ligne -->
-       <div class="conteneur" id="ef-panel-entete">
-          <div class="bandeau">
+        <div class="form-panel visible" id="ef-panel-entete">
+          <div class="form-panel-header">
             <span class="form-panel-titre">Informations de la facture</span>
           </div>
+          <div class="form-body">
             <div style="display:grid; grid-template-columns:2fr 1.5fr 80px 1.6fr 100px auto; gap:12px 16px; align-items:end;">
 
               <div class="form-groupe">
@@ -1163,7 +1187,8 @@
           <div id="msg-ef-items" class="msg-zone" style="margin-top:8px"></div>
 
           <!-- Totaux + Finaliser — une ligne -->
-          <div class="conteneur">
+          <div class="form-panel visible" style="margin-top:24px">
+            <div class="form-body">
               <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr auto; gap:12px 16px; align-items:end;">
 
                 <div class="form-groupe">
@@ -1197,7 +1222,8 @@
                 </div>
 
               </div>
-              <div id="msg-ef-final" class="msg-zone"></div>
+              <div id="msg-ef-final" class="msg-zone" style="margin-top:8px"></div>
+            </div>
           </div>
 
         </div><!-- fin ef-zone-items -->
@@ -1233,7 +1259,7 @@
       </div>
     </div>
     <div class="modal-admin-body">
-      <div class="bandeau-actions">
+      <div class="form-actions">
              <button class="bouton bouton-petit" onclick="efConfirmerModalFormat()">Confirmer</button>
 			 <button class="bouton bouton-petit" onclick="efFermerModalFormat()">Annuler</button>
   
@@ -1258,7 +1284,7 @@
       </div>
     </div>
     <div class="modal-admin-body">
-      <div class="bandeau-actions">
+      <div class="form-actions">
             <button class="bouton bouton-petit" id="btn-ef-confirmer-ingredient" onclick="efConfirmerModalIngredient()">Confirmer</button>
 			<button class="bouton bouton-petit" onclick="efFermerModalIngredient()">Annuler</button>
    
@@ -1280,7 +1306,7 @@
       </div>
     </div>
     <div class="modal-admin-body">
-      <div class="bandeau-actions">
+      <div class="form-actions">
         <button class="bouton bouton-petit" onclick="efConfirmerModalNouvelleCatUC()">Confirmer</button>
 		<button class="bouton bouton-petit" onclick="efFermerModalNouvelleCatUC()">Annuler</button>
         
@@ -1302,7 +1328,7 @@
       </div>
     </div>
     <div class="modal-admin-body">
-      <div class="bandeau-actions">
+      <div class="form-actions">
         <button class="bouton bouton-petit bouton-contour" onclick="efFermerModalCatFourn()">Annuler</button>
         <button class="bouton bouton-petit" onclick="efConfirmerModalCatFourn()">Confirmer</button>
       </div>
@@ -1323,7 +1349,7 @@
       </div>
     </div>
     <div class="modal-admin-body">
-      <div class="bandeau-actions">
+      <div class="form-actions">
         <button class="bouton bouton-petit bouton-contour" onclick="efFermerModalNomFourn()">Annuler</button>
         <button class="bouton bouton-petit" onclick="efConfirmerModalNomFourn()">Confirmer</button>
       </div>
@@ -1381,7 +1407,7 @@
       </div>
     </div>
     <div class="modal-admin-body">
-      <div class="bandeau-actions">
+      <div class="form-actions">
         <button class="bouton bouton-rouge cache" id="btn-four-supprimer" onclick="supprimerFournisseurDepuisModal()">Supprimer</button>
         <button class="bouton bouton-contour" onclick="fermerModalFournisseur()">Annuler</button>
         <button class="bouton" id="btn-four-sauvegarder" onclick="sauvegarderFournisseur()">Enregistrer</button>
@@ -1494,13 +1520,16 @@
         <!-- FORMULAIRE NOUVEAU LOT -->
 		
 		<div id="form-fabrication" class="cache" data-mode="">
-          <div class="bandeau">
-            <div class="fiche-bandeau">
-              <span class="form-panel-titre">Nouveau lot</span>
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <div class="fiche-bandeau">
+                <span class="form-panel-titre">Nouveau lot</span>
+              </div>
+              <button class="btn-fermer-panneau" onclick="fermerFormFabrication()">✕</button>
             </div>
-            <button class="btn-fermer-panneau" onclick="fermerFormFabrication()">✕</button>
           </div>
-          <div class="conteneur">
+          <div class="form-panel">
+            <div class="form-body">
               <div class="form-grille">
 
                 <div class="form-groupe col-plein">
@@ -1593,8 +1622,8 @@
               </div>
             </div>
           </div>
-          <div class="bandeau">
-            <div class="bandeau-actions">
+          <div class="form-panel bandeau">
+            <div class="form-actions">
               <button class="bouton bouton-contour" onclick="fermerFormFabrication()">Annuler</button>
               <button class="bouton" onclick="sauvegarderLot()">Confirmer</button>
             </div>
@@ -1647,48 +1676,55 @@
           </div>
 
           <!-- PANIER -->
-          <div class="bandeau" id="ven-panier-panel">
-            <span class="form-panel-titre">Panier</span>
-          </div>
-          <div class="conteneur">
+          <div class="form-panel" id="ven-panier-panel">
+            <div class="form-panel-header">
+              <span class="form-panel-titre">Panier</span>
+            </div>
+            <div class="form-body">
               <div id="ven-panier-liste"></div>
-              <div class="form-grille">
+              <div class="form-grille" style="margin-top:16px">
                 <div class="form-groupe col-plein">
                   <input type="text" class="form-ctrl" id="ven-sous-total" placeholder="Sous-total" readonly>
                 </div>
               </div>
+            </div>
           </div>
 
           <!-- LIVRAISON -->
-          <div class="bandeau">
-            <span class="form-panel-titre">Livraison</span>
-          </div>
-          <div class="conteneur">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <span class="form-panel-titre">Livraison</span>
+            </div>
+            <div class="form-body">
               <input type="text" inputmode="decimal" class="form-ctrl" id="ven-livraison" placeholder="Livraison $ (0 si aucune)" oninput="venCalculerTotal()">
+            </div>
           </div>
 
           <!-- PROMOTION / RABAIS -->
-          <div class="bandeau">
-            <span class="form-panel-titre">Promotion / Rabais</span>
-          </div>
-          <div class="conteneur">
+          <div class="form-panel visible">
+            <div class="form-panel-header">
+              <span class="form-panel-titre">Promotion / Rabais</span>
+            </div>
+            <div class="form-body">
               <div class="form-groupe">
                 <select class="form-ctrl" id="ven-promotion" onchange="venAppliquerPromotion()">
                   <option value="">— Aucune —</option>
                 </select>
               </div>
-              <div class="form-groupe" id="ven-rabais-libre-zone" style="display:none">
+              <div class="form-groupe" id="ven-rabais-libre-zone" style="display:none;margin-top:12px">
                 <label class="form-label" id="ven-rabais-libre-label">Rabais</label>
                 <input type="text" inputmode="decimal" class="form-ctrl" id="ven-rabais-libre" placeholder="" oninput="venCalculerTotal()">
               </div>
-              <div id="ven-promo-info" style="display:none"></div>
+              <div id="ven-promo-info" style="display:none;margin-top:12px;padding:12px;background:var(--primary-06);border-left:3px solid var(--primary);font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--gris-fonce)"></div>
+            </div>
           </div>
 
           <!-- CLIENT -->
-          <div class="bandeau">
-            <span class="form-panel-titre">Client (optionnel)</span>
-          </div>
-          <div class="conteneur">
+          <div class="form-panel">
+            <div class="form-panel-header">
+              <span class="form-panel-titre">Client (optionnel)</span>
+            </div>
+            <div class="form-body">
               <div class="form-grille">
                 <div class="form-groupe col-plein">
                   <input type="text" class="form-ctrl" id="ven-client" placeholder="Nom">
@@ -1703,10 +1739,12 @@
                   <label class="form-label"><input type="checkbox" id="ven-infolettre"> Autorisation infolettre</label>
                 </div>
               </div>
+            </div>
           </div>
 
-          <div class="bandeau">
-            <div class="bandeau-actions">
+          <div class="form-panel form-body-actions">
+            <div class="form-actions">
+            
               <button class="bouton bouton-plein-largeur" onclick="ouvrirApercuFacture()">Voir la facture</button>
             </div>
           </div>
@@ -1751,16 +1789,19 @@
 
   <!-- FORMULAIRE REMBOURSEMENT -->
   <div id="form-remboursement" class="cache">
-    <div class="bandeau">
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Nouveau remboursement</span>
         <button class="btn-fermer-panneau" onclick="fermerFormRemboursement()">✕</button>
+      </div>
     </div>
 
     <!-- TYPE DE REMBOURSEMENT -->
-    <div class="bandeau">
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Type de remboursement</span>
-    </div>
-    <div class="conteneur">
+      </div>
+      <div class="form-body">
         <div class="form-groupe">
           <select class="form-ctrl" id="rem-type" onchange="remChangerType()">
             <option value="">— Choisir —</option>
@@ -1768,14 +1809,15 @@
             <option value="sans-retour">Sans retour (juste un montant)</option>
           </select>
         </div>
+      </div>
     </div>
 
     <!-- SAISIE PRODUIT (avec retour) -->
-    <div id="rem-saisie-produit" class="cache">
-    <div class="bandeau">
+    <div id="rem-saisie-produit" class="form-panel cache">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Produit retourné</span>
-    </div>
-    <div class="conteneur">
+      </div>
+      <div class="form-body">
         <div class="form-grille">
           <div class="form-groupe col-plein">
             <select class="form-ctrl" id="rem-collection" onchange="remFiltrerGammes()">
@@ -1820,11 +1862,11 @@
     </div>
 
     <!-- SAISIE LIBRE (sans retour) -->
-    <div id="rem-saisie-libre" class="cache">
-    <div class="bandeau">
+    <div id="rem-saisie-libre" class="form-panel cache">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Montant à rembourser</span>
-    </div>
-    <div class="conteneur">
+      </div>
+      <div class="form-body">
         <div class="form-grille">
           <div class="form-groupe col-plein">
             <input type="text" class="form-ctrl" id="rem-libre-description" placeholder="Description (raison du remboursement)">
@@ -1840,11 +1882,11 @@
     </div>
 
     <!-- LISTE DES LIGNES -->
-    <div id="rem-liste-panel" class="cache">
-    <div class="bandeau">
+    <div class="form-panel cache" id="rem-liste-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Lignes du remboursement</span>
-    </div>
-    <div class="conteneur">
+      </div>
+      <div class="form-body">
         <div id="rem-liste"></div>
         <div class="form-grille" style="margin-top:16px">
           <div class="form-groupe col-plein">
@@ -1855,11 +1897,11 @@
     </div>
 
     <!-- CLIENT -->
-    <div id="rem-client-panel" class="cache">
-    <div class="bandeau">
+    <div class="form-panel cache" id="rem-client-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Client (optionnel)</span>
-    </div>
-    <div class="conteneur">
+      </div>
+      <div class="form-body">
         <div class="form-grille">
           <div class="form-groupe col-plein">
             <input type="text" class="form-ctrl" id="rem-client" placeholder="Nom">
@@ -1875,16 +1917,16 @@
     </div>
 
     <!-- MODE DE REMBOURSEMENT -->
-    <div id="rem-paiement-panel" class="cache">
-    <div class="bandeau">
+    <div class="form-panel cache" id="rem-paiement-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Mode de remboursement</span>
-    </div>
-    <div class="bandeau">
-        <div class="bandeau-actions">
+      </div>
+      <div class="form-body form-body-actions">
+        <div class="form-actions-vertical">
           <button class="bouton bouton-plein-largeur" onclick="finaliserRemboursement('comptant')">Comptant</button>
           <button class="bouton bouton-plein-largeur" onclick="finaliserRemboursement('credit')">Crédit (carte)</button>
         </div>
-    </div>
+      </div>
     </div>
   </div>
 
@@ -1925,16 +1967,19 @@
 
   <!-- FORMULAIRE COMMANDE -->
   <div id="form-commande" class="cache">
-    <div class="bandeau">
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre" id="form-commande-titre">Nouvelle commande</span>
         <button class="btn-fermer-panneau" onclick="fermerFormCommande()">✕</button>
+      </div>
     </div>
 
     <!-- CLIENT (obligatoire) -->
-   <div class="bandeau">
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Client (obligatoire)</span>
-    </div>
-    <div class="conteneur">
+      </div>
+      <div class="form-body">
         <div class="form-grille">
           <div class="form-groupe col-plein">
             <input type="text" class="form-ctrl" id="cmd-client" placeholder="Nom *">
@@ -1949,13 +1994,15 @@
             <input type="text" class="form-ctrl" id="cmd-code-postal" placeholder="Code postal *" maxlength="7" oninput="this.value=this.value.toUpperCase()">
           </div>
         </div>
+      </div>
     </div>
 
     <!-- SAISIE PRODUITS -->
-    <div class="bandeau">
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Produits commandés</span>
-    </div>
-    <div class="conteneur">
+      </div>
+      <div class="form-body">
         <div class="form-grille">
           <div class="form-groupe col-plein">
             <select class="form-ctrl" id="cmd-collection" onchange="cmdFiltrerGammes()">
@@ -1995,12 +2042,14 @@
           </div>
         </div>
       </div>
+    </div>
 
     <!-- LISTE DES LIGNES -->
-    <div class="bandeau">
+    <div class="form-panel" id="cmd-panier-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Items de la commande</span>
-    </div>
-    <div class="conteneur" id="cmd-panier-panel">
+      </div>
+      <div class="form-body">
         <div id="cmd-panier-liste"></div>
         <div class="form-grille" style="margin-top:16px">
           <div class="form-groupe col-plein">
@@ -2019,17 +2068,19 @@
     </div>
 
     <!-- NOTES -->
-    <div class="bandeau">
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Notes</span>
-    </div>
-    <div class="conteneur">
+      </div>
+      <div class="form-body">
         <div class="form-groupe">
           <textarea class="form-ctrl" id="cmd-notes" rows="3" placeholder="Date prévue, demande spéciale, etc."></textarea>
         </div>
+      </div>
     </div>
 
-    <div class="bandeau">
-      <div class="bandeau-actions">
+    <div class="form-panel form-body-actions">
+      <div class="form-actions">
         <button class="bouton bouton-contour" onclick="fermerFormCommande()">Annuler</button>
         <button class="bouton" onclick="enregistrerCommande()">Enregistrer la commande</button>
       </div>
@@ -2038,46 +2089,65 @@
 
   <!-- FICHE DÉTAIL COMMANDE -->
   <div id="fiche-commande" class="cache">
-    <div class="bandeau">
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre" id="fiche-commande-titre">Commande</span>
         <button class="btn-fermer-panneau" onclick="fermerFicheCommande()">✕</button>
+      </div>
     </div>
-    <div class="conteneur" id="fiche-commande-contenu"></div>
-    <div class="bandeau">
-      <div class="bandeau-actions" id="fiche-commande-actions"></div>
+    <div class="form-panel">
+      <div class="form-body" id="fiche-commande-contenu"></div>
+    </div>
+    <div class="form-panel form-body-actions">
+      <div class="form-actions" id="fiche-commande-actions"></div>
     </div>
   </div>
 
   <!-- FORMULAIRE COMPLÉTER LA COMMANDE -->
   <div id="form-completer-commande" class="cache">
-    <div class="bandeau">
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre" id="form-completer-titre">Compléter la commande</span>
         <button class="btn-fermer-panneau" onclick="fermerFormCompleter()">✕</button>
+      </div>
     </div>
-    <div class="bandeau">
+
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Récapitulatif</span>
+      </div>
+      <div class="form-body" id="form-completer-recap"></div>
     </div>
-    <div class="conteneur" id="form-completer-recap"></div>
-    <div class="bandeau">
+
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Frais de livraison</span>
-    </div>
-    <div class="conteneur">
+      </div>
+      <div class="form-body">
         <input type="text" inputmode="decimal" class="form-ctrl" id="completer-livraison" placeholder="0,00 $ (0 si aucune)">
+      </div>
     </div>
-    <div class="bandeau">
+
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Note au client</span>
-    </div>
-    <div class="conteneur">
+      </div>
+      <div class="form-body">
         <textarea class="form-ctrl" id="completer-note" rows="4" placeholder="Message personnalisé qui accompagnera la proposition…"></textarea>
+      </div>
     </div>
-    <div class="bandeau">
+
+    <div class="form-panel">
+      <div class="form-panel-header">
         <span class="form-panel-titre">Lien de paiement Square</span>
-    </div>
-    <div class="conteneur">
+      </div>
+      <div class="form-body">
         <input type="text" class="form-ctrl" id="completer-square" placeholder="Coller le lien Square ici">
+      </div>
     </div>
-    <div class="bandeau">
-      <div class="bandeau-actions">
+
+    <div class="form-panel form-body-actions">
+      <div class="form-actions">
         <button class="bouton bouton-contour" onclick="fermerFormCompleter()">Annuler</button>
         <button class="bouton bouton-or" onclick="envoyerProposition()">Envoyer au client</button>
       </div>
@@ -2133,7 +2203,7 @@
             <div class="page-entete-eyebrow">Textes affichés sur le site public</div>
             <div class="page-entete-titre">Contenu <em>du site</em></div>
           </div>
-          <div class="bandeau-actions">
+          <div class="form-actions">
             <button class="bouton" onclick="sauvegarderContenuSite()">Enregistrer</button>
             
           </div>
@@ -2458,7 +2528,7 @@
             </div>
           </div>
           <div class="form-panel visible form-body-actions">
-            <div class="bandeau-actions">
+            <div class="form-actions">
               <button class="bouton bouton-rouge cache" id="fp-btn-supprimer" onclick="supprimerPromotionActive()">Supprimer</button>
               <button class="bouton bouton-contour" onclick="fermerFormPromotion()">Annuler</button>
               <button class="bouton" onclick="sauvegarderPromotion()">Enregistrer</button>
@@ -2517,7 +2587,7 @@
               </div>
             </div>
             <hr class="separateur">
-            <div class="bandeau-actions">
+            <div class="form-actions">
               <button class="bouton" onclick="sauvegarderDensite()">Enregistrer</button>
               <button class="bouton bouton-vert-pale" onclick="fermerFormDensite()">Annuler</button>
             </div>
@@ -3032,7 +3102,7 @@
 				<div class="page-entete-titre">Médiathèque</div>
 			</div>
 			
-			<div class="bandeau-actions">
+			<div class="form-actions">
 				<button class="bouton" onclick="mediathequeSyncCloudinary()">↺ Cloudinary</button>
 			</div>
 		</div>
@@ -3052,7 +3122,7 @@
       <div class="page-entete-eyebrow">Mise en page du catalogue imprimable</div>
       <div class="page-entete-titre">Catalogue <em>PDF</em></div>
     </div>
-    <div class="bandeau-actions">
+    <div class="form-actions">
       <button class="bouton bouton-contour" onclick="cbOuvrirVueLecture()">👁 Vue lecture</button>
       
       <button class="bouton bouton-contour" onclick="cbImprimerMaison()">🖨 Imprimer maison</button>
@@ -3312,7 +3382,7 @@
       </div>
     </div>
     <div class="modal-admin-body">
-      <div class="bandeau-actions">
+      <div class="form-actions">
         <button class="bouton bouton-contour" onclick="document.getElementById('modal-cb-nouvelle-page').style.display='none'">Annuler</button>
         <button class="bouton" onclick="cbConfirmerNouvellePage()">OK</button>
       </div>
@@ -3379,7 +3449,7 @@
       </div>
     </div>
     <div class="modal-admin-body">
-      <div class="bandeau-actions">
+      <div class="form-actions">
         <button class="bouton bouton-petit bouton-contour" onclick="fermerModalIfNouvelIngredient()">Annuler</button>
         <button class="bouton bouton-petit" onclick="modalIfConfirmer()">Confirmer</button>
       </div>
@@ -3422,7 +3492,7 @@
         <div id="modal-inci-statut" class="form-valeur cache"></div>
       </div>
       <div class="modal-admin-body">
-        <div class="bandeau-actions">
+        <div class="form-actions">
           <button class="bouton bouton-petit bouton-contour" onclick="fermerModalAjouterInci()">Annuler</button>
           <button class="bouton bouton-petit" id="modal-inci-btn-go" onclick="modalInciGo()">Go</button>
         </div>
@@ -3558,7 +3628,7 @@
         </div>
       </div>
       <div class="modal-admin-body">
-        <div class="bandeau-actions">
+        <div class="form-actions">
           <button class="bouton bouton-petit bouton-contour" onclick="fermerModalNomUC()">Annuler</button>
           <button class="bouton bouton-petit" onclick="confirmerModalNomUC()">Ajouter</button>
         </div>
@@ -3582,7 +3652,7 @@
       <div class="chargement cache" id="mediatheque-chargement"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
     </div>
     <div class="modal-admin-body">
-      <div class="bandeau-actions">
+      <div class="form-actions">
         <button class="bouton bouton-petit bouton-contour" onclick="fermerModalMediatheque()">Annuler</button>
       </div>
     </div>
@@ -3650,7 +3720,7 @@
       </div>
     </div>
     <div class="modal-admin-body">
-      <div class="bandeau-actions">
+      <div class="form-actions">
         <button class="bouton bouton-petit bouton-contour" onclick="cbFermerFicheProduit()">Annuler</button>
         <button class="bouton bouton-petit" onclick="cbGenererFicheProduit()">Générer</button>
       </div>
