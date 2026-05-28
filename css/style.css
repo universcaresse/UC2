@@ -688,7 +688,7 @@ footer > * { position: relative; z-index: 1; }
 /* ═══════════════════════════════════════
    EN-TÊTE DE PAGE
    ═══════════════════════════════════════ */
-.page-entete { padding: 10px 0 48px; display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; min-height: 120px; }
+.page-entete { padding: 10px 0 24px; display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; min-height: 120px; }
 .page-entete-gauche { max-width: 100%; }
 .page-entete-eyebrow { font-family: 'DM Sans', sans-serif; font-size: var(--texte-75); letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; font-weight: 500; }
 .page-entete-titre { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 3.5vw, 3.2rem); font-weight: 400; line-height: 1.1; color: var(--gris-fonce); }
@@ -1118,6 +1118,8 @@ tr.cliquable { cursor: pointer; }
     box-shadow: 0 8px 24px rgba(30,28,25,0.08);
     min-width: 180px;
     z-index: 150;
+    max-height: calc(100vh - var(--nav-h) - 16px);
+    overflow-y: auto;
   }
   .nav-admin-item.ouvert .nav-dropdown { display: block; }
 
