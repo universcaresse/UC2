@@ -865,15 +865,46 @@ async function envoyerProposition() {
     cmd_id: cmdCompleterIdEnCours
   });
 
+  if (!resStock || !resStock.success) {
+    cacherChargement();
+    afficherMsg('commandes', '❌ ' + (resStock?.message || 'Erreur lors de la sortie du stock.'), 'erreur');
+    return;
+  }
+
+  // Envoi du courriel de proposition au client
+  const lignesCourriel = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
+    const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
+    return {
+      nom: pro ? pro.nom : l.pro_id,
+      poids: l.format_poids,
+      unite: l.format_unite,
+      quantite: l.quantite,
+      prix_unitaire: formaterPrix(l.prix_unitaire),
+      prix_total: formaterPrix(l.prix_unitaire * l.quantite)
+    };
+  });
+
+  const resCourriel = await appelAPIPost('envoyerProposition', {
+    courriel: c.courriel,
+    client: c.client,
+    numero: c.cmd_id,
+    note: note,
+    lien_square: square,
+    lignes: lignesCourriel,
+    sous_total: formaterPrix(c.total_prevu || 0),
+    livraison: livraisonNum > 0 ? formaterPrix(livraisonNum) : 0,
+    total: formaterPrix(totalAvec)
+  });
+
   cacherChargement();
 
-  if (resStock && resStock.success) {
-    afficherMsg('commandes', '✅ Proposition prête, stock sorti.');
-    fermerFormCompleter();
-    chargerCommandes();
+  if (resCourriel && resCourriel.success) {
+    afficherMsg('commandes', '✅ Proposition envoyée au client, stock sorti.');
   } else {
-    afficherMsg('commandes', '❌ ' + (resStock?.message || 'Erreur lors de la sortie du stock.'), 'erreur');
+    afficherMsg('commandes', '⚠️ Stock sorti, mais le courriel n\'est pas parti : ' + (resCourriel?.message || 'erreur') + '. Corrige le courriel et renvoie.', 'erreur');
   }
+  fermerFormCompleter();
+  chargerCommandes();
 }
 
 async function paiementRecu(cmd_id) {
