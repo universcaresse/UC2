@@ -585,6 +585,7 @@ async function voirDetailCommande(cmd_id) {
   }
   if (c.statut === 'En attente de paiement') {
     actionsHTML += `<button class="bouton bouton-or" onclick="paiementRecu('${c.cmd_id}')">Paiement reçu</button>`;
+    actionsHTML += `<button class="bouton bouton-contour" onclick="textoProposition('${c.cmd_id}')">Texto au client</button>`;
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
   }
   if (c.statut === 'À expédier') {
@@ -924,4 +925,27 @@ async function paiementRecu(cmd_id) {
       afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
     }
   });
+}
+
+// ═══════════════════════════════════════
+// COUCOU TEXTO — propose au client de vérifier ses courriels
+// Ouvre l'app Messages, pré-remplie (envoi manuel)
+// ═══════════════════════════════════════
+function textoProposition(cmd_id) {
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  if (!c) return;
+
+  const telephone = c.telephone || '';
+  if (!telephone) {
+    afficherMsg('commandes', 'Aucun téléphone pour cette commande.', 'erreur');
+    return;
+  }
+
+  let texte = 'Bonjour ' + (c.client || '') + ',\n\n';
+  texte += 'Votre proposition de commande Univers Caresse vient de vous être envoyée par courriel.\n';
+  texte += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
+  if (c.lien_square) texte += 'Pour payer : ' + c.lien_square + '\n\n';
+  texte += 'Merci !\nUnivers Caresse';
+
+  window.open('sms:' + telephone + '?body=' + encodeURIComponent(texte));
 }
