@@ -688,7 +688,7 @@ footer > * { position: relative; z-index: 1; }
 /* ═══════════════════════════════════════
    EN-TÊTE DE PAGE
    ═══════════════════════════════════════ */
-.page-entete { padding: 10px 0 48px; border-bottom: 1px solid var(--beige); display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; min-height: 120px; }
+.page-entete { padding: 10px 0 48px; display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; min-height: 120px; }
 .page-entete-gauche { max-width: 100%; }
 .page-entete-eyebrow { font-family: 'DM Sans', sans-serif; font-size: var(--texte-75); letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; font-weight: 500; }
 .page-entete-titre { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 3.5vw, 3.2rem); font-weight: 400; line-height: 1.1; color: var(--gris-fonce); }
@@ -949,7 +949,11 @@ tr.cliquable { cursor: pointer; }
    ADMIN — CARTES COLLECTIONS
    ═══════════════════════════════════════ */
 .collections-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 3px; margin-top: 32px; margin-bottom: 32px; }
-.collection-carte { position: relative; aspect-ratio: 3/4; overflow: hidden; background: var(--beige); }
+
+
+
+
+/*.collection-carte { position: relative; aspect-ratio: 3/4; overflow: hidden; background: var(--beige); }
 .collection-carte-bg { position: absolute; inset: 0; transition: transform 0.5s ease; }
 .collection-carte:hover .collection-carte-bg { transform: scale(1.04); }
 .collection-carte-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(30,28,25,0.75) 0%, rgba(30,28,25,0.1) 55%, transparent 100%); }
@@ -963,6 +967,12 @@ tr.cliquable { cursor: pointer; }
 .carte-btn-edit:hover { background: white; }
 .carte-btn-suppr { background: rgba(196,69,54,0.88); color: white; }
 .carte-btn-suppr:hover { background: var(--danger); }
+.collection-carte-lignes { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.collection-carte-lignes-haut { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; z-index: 1; }
+.collection-carte-ligne-tag { font-family: 'DM Sans', sans-serif; font-size: 0.62rem; letter-spacing: 0.08em; color: #fff; background: rgba(0,0,0,0.3); padding: 2px 8px; display: block; width: fit-content;}*/
+
+
+
 .collection-lignes-liste { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
 .collection-ligne-item { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); padding: 6px 10px; border-radius: 2px; }
 .collection-ligne-nom { color: white; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; flex: 1; }
@@ -1306,9 +1316,7 @@ tr.cliquable { cursor: pointer; }
 .fiche-ligne-nom { font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; color: var(--gris-fonce); display: block; }
 .fiche-ligne-format { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; color: var(--gris); display: block; margin-top: 2px; }
 .fiche-ligne-desc { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; color: var(--gris); margin-top: 6px; line-height: 1.6; }
-.collection-carte-lignes { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
-.collection-carte-lignes-haut { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; z-index: 1; }
-.collection-carte-ligne-tag { font-family: 'DM Sans', sans-serif; font-size: 0.62rem; letter-spacing: 0.08em; color: #fff; background: rgba(0,0,0,0.3); padding: 2px 8px; display: block; width: fit-content;}
+
 .section-label { font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 550; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--beige); margin-top: 24px; }
 .section-texte-photo-16-9 { width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden; margin-top: 32px; }
 .section-texte-photo-3-4 { width: 100%; aspect-ratio: 3/4; position: relative; overflow: hidden; margin-top: 32px; }
@@ -1923,7 +1931,284 @@ tr:has(+ .ven-resume-row) td {
 
 
 
+/* ═══════════════════════════════════════
+   CARTE — utilisée partout (collections,
+   gammes, familles, regroupements, produits
+   public et admin)
+   ═══════════════════════════════════════ */
 
+/* — Conteneur de base — */
+.carte {
+  position: relative;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--col-hex, var(--beige));
+}
+
+/* — Fond (couleur ou image) — */
+.carte-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.carte:hover .carte-bg {
+  transform: scale(1.04);
+}
+
+/* — Overlay dégradé bas — */
+.carte-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(30,28,25,0.75) 0%,
+    rgba(30,28,25,0.1) 55%,
+    transparent 100%
+  );
+}
+
+/* — Contenu texte en bas — */
+.carte-contenu {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 18px;
+}
+.carte-titre {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: white;
+  display: block;
+  margin-bottom: 4px;
+}
+.carte-slogan {
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--texte-70);
+  color: rgba(255,255,255,0.7);
+  display: block;
+  letter-spacing: 0.04em;
+  font-weight: 300;
+}
+
+/* — Boutons admin (edit / suppr) — */
+.carte-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.carte:hover .carte-actions {
+  opacity: 1;
+}
+.carte-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--texte-70);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+.carte-btn-edit {
+  background: rgba(255,255,255,0.88);
+  color: var(--primary);
+}
+.carte-btn-edit:hover { background: white; }
+.carte-btn-suppr {
+  background: rgba(196,69,54,0.88);
+  color: white;
+}
+.carte-btn-suppr:hover { background: var(--danger); }
+
+/* — Visuel (zone image/couleur) — */
+.carte-visuel {
+  aspect-ratio: 1;
+  position: relative;
+  overflow: hidden;
+}
+.carte-couleur {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.5s;
+  position: relative;
+  background: var(--col-hex);
+}
+.carte:hover .carte-couleur {
+  transform: scale(1.04);
+}
+.carte-couleur img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+}
+
+/* — Point couleur (catalogue public) — */
+.carte-couleur-dot {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--col-hex);
+  border: 2px solid var(--blanc-pur-50);
+}
+.carte.demande-coche .carte-couleur-dot {
+  background: transparent;
+  border-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carte.demande-coche .carte-couleur-dot::after {
+  content: '♥';
+  font-size: 32px;
+  line-height: 1;
+  color: var(--danger);
+  text-shadow: 0 0 2px var(--blanc), 0 0 3px var(--blanc);
+}
+
+/* — Photo placeholder — */
+.carte-photo-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: rgba(255,255,255,0.5);
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--texte-70);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.carte-photo-placeholder svg {
+  width: 26px;
+  height: 26px;
+  opacity: 0.4;
+}
+
+/* — Infos bas (catalogue public) — */
+.carte-infos {
+  padding: 16px 16px 18px;
+  background: color-mix(in srgb, var(--col-hex) 90%, transparent);
+}
+.carte-infos.carte-infos-clair .carte-collection-badge { color: var(--blanc-pur-75); }
+.carte-infos.carte-infos-clair .carte-nom   { color: var(--blanc); }
+.carte-infos.carte-infos-clair .carte-ligne { color: var(--blanc-pur-70); }
+.carte-infos.carte-infos-clair .carte-prix  { color: var(--blanc); }
+.carte-infos.carte-infos-clair .carte-bas   { border-top-color: var(--blanc); }
+.carte-infos.carte-infos-clair .carte-format-prix { color: var(--blanc); }
+.carte-infos.carte-infos-clair .carte-format-inv  { color: var(--blanc); }
+.carte-infos.carte-infos-fonce .carte-collection-badge { color: rgba(0,0,0,0.55); }
+.carte-infos.carte-infos-fonce .carte-nom   { color: rgba(0,0,0,0.85); }
+.carte-infos.carte-infos-fonce .carte-ligne { color: rgba(0,0,0,0.55); }
+.carte-infos.carte-infos-fonce .carte-prix  { color: rgba(0,0,0,0.85); }
+.carte-infos.carte-infos-fonce .carte-bas   { border-top-color: rgba(0,0,0,0.85); }
+
+/* — Étiquettes et prix — */
+.carte-collection-badge {
+  display: inline-block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--texte-70);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.carte-nom {
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--texte-105);
+  font-weight: 500;
+  color: var(--gris-fonce);
+  margin-bottom: 4px;
+  line-height: 1.2;
+  min-height: 2.52rem;
+}
+.carte-ligne {
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--texte-75);
+  color: var(--gris);
+  margin-bottom: 12px;
+  font-weight: 300;
+}
+.carte-bas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid var(--beige);
+}
+.carte-statut-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--texte-70);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  font-weight: 500;
+  background: rgba(255,255,255,0.85);
+  color: var(--primary);
+}
+.carte-statut-badge.test {
+  background: var(--danger);
+  color: white;
+  font-size: 0.75rem;
+  padding: 5px 14px;
+}
+.carte-prix { width: 100%; }
+.carte-formats {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+.carte-format-tag {
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 4px 2px;
+  font-family: 'DM Sans', sans-serif;
+  color: inherit;
+}
+.carte-format-prix {
+  font-weight: 300;
+  font-size: var(--texte-75);
+  letter-spacing: 0.02em;
+}
+.carte-format-sep { display: none; }
+.carte-format-poids {
+  font-weight: 300;
+  font-size: var(--texte-70);
+  opacity: 0.7;
+  letter-spacing: 0.04em;
+}
 
 
 /* ═══════════════════════════════════════

@@ -37,13 +37,11 @@ function afficherGammes() {
     gammesDeLaCol.forEach(gam => {
       const couleurs = couleurCollection(gam.nom, gam.couleur_hex);
       html += `
-        <div class="collection-carte" onclick="ouvrirFicheGamme2('${gam.gam_id}')">
-          <div class="collection-carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
-          <div class="collection-carte-overlay"></div>
-          <div class="collection-carte-lignes-haut"></div>
-          <div class="collection-carte-contenu">
-            <span class="collection-carte-nom">${(gam.nom || '').toUpperCase()}</span>
-            <span class="collection-carte-slogan"></span>
+        <div class="carte" onclick="ouvrirFicheGamme2('${gam.gam_id}')">
+          <div class="carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
+          <div class="carte-overlay"></div>
+          <div class="carte-contenu">
+            <span class="carte-titre">${(gam.nom || '').toUpperCase()}</span>
           </div>
         </div>`;
     });

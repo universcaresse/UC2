@@ -38,13 +38,12 @@ function afficherCollections() {
     const couleurs = couleurCollection(col.nom, col.couleur_hex);
     // Gammes de cette collection
     html += `
-      <div class="collection-carte" onclick="ouvrirFicheCollection('${col.col_id}')">
-        <div class="collection-carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
-        <div class="collection-carte-overlay"></div>
-        <div class="collection-carte-lignes-haut"></div>
-        <div class="collection-carte-contenu">
-          <span class="collection-carte-nom">${(col.nom || '').toUpperCase()}</span>
-          <span class="collection-carte-slogan">${col.slogan || ''}</span>
+      <div class="carte" onclick="ouvrirFicheCollection('${col.col_id}')">
+        <div class="carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
+        <div class="carte-overlay"></div>
+        <div class="carte-contenu">
+          <span class="carte-titre">${(col.nom || '').toUpperCase()}</span>
+          <span class="carte-slogan">${col.slogan || ''}</span>
         </div>
       </div>`;
   });

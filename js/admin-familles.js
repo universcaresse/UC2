@@ -28,13 +28,12 @@ function afficherFamilles() {
     const col     = donneesCollections.find(c => c.col_id === fam.col_id);
     const couleurs = couleurCollection(fam.nom, fam.couleur_hex);
     html += `
-      <div class="collection-carte" onclick="ouvrirFicheFamille('${fam.fam_id}')">
-        <div class="collection-carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
-        <div class="collection-carte-overlay"></div>
-        <div class="collection-carte-lignes-haut"><span class="collection-carte-ligne-tag">${(col?.nom || '—').toUpperCase()}</span></div>
-        <div class="collection-carte-contenu">
-          <span class="collection-carte-nom">${(fam.nom || '').toUpperCase()}</span>
-        
+      <div class="carte" onclick="ouvrirFicheFamille('${fam.fam_id}')">
+        <div class="carte-bg" style="background:linear-gradient(145deg,${couleurs[0]},${couleurs[1]});"></div>
+        <div class="carte-overlay"></div>
+        <div class="carte-contenu">
+          <span class="carte-titre">${(fam.nom || '').toUpperCase()}</span>
+          <span class="carte-slogan">${(col?.nom || '').toUpperCase()}</span>
         </div>
       </div>`;
   });
