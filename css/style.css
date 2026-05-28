@@ -1938,7 +1938,9 @@ tr:has(+ .ven-resume-row) td {
   align-items: center;
   gap: 16px;
   position: relative;
+  margin-bottom: 4px;
 }
+
 .bandeau .fiche-bandeau {
   padding: 0;
   margin: 0;
@@ -1947,3 +1949,5 @@ tr:has(+ .ven-resume-row) td {
   gap: 2px;
   flex: 1;
 }
+
+
