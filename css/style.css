@@ -983,7 +983,7 @@ tr.cliquable { cursor: pointer; }
 .collection-ligne-nom { color: white; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; flex: 1; }
 .collection-ligne-format { color: rgba(255,255,255,0.7); font-family: 'DM Sans', sans-serif; font-size: 0.75rem; }
 .collection-ligne-actions { display: flex; gap: 4px; margin-left: 8px; }
-.photo-preview { width: 180px; height: 180px; object-fit: cover;  display: block; margin-top: 8px; }
+.photo-preview { width: 180px; height: 180px; object-fit: cover;  display: block; margin-top: 8px; } 
 
 .couleur-apercu { width: 32px; height: 32px; border: 1px solid var(--beige); display: inline-block; vertical-align: middle; margin-left: 8px; background: var(--beige); }
 .btn-ajouter-ingredient { margin-top: 8px; }
