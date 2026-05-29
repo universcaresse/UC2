@@ -916,6 +916,8 @@ footer > * { position: relative; z-index: 1; }
 #fiche-collection .form-panel { display: block; margin-bottom: 0; }
 #fiche-gamme:not(.cache), #fiche-famille:not(.cache), #fiche-regroupement:not(.cache), #fiche-recette:not(.cache) { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
 #fiche-gamme .form-panel, #fiche-famille .form-panel, #fiche-regroupement .form-panel, #fiche-recette .form-panel { margin-bottom: 0; }
+#form-collections:not(.cache), #form-gammes:not(.cache), #form-familles:not(.cache), #form-regroupements:not(.cache), #form-recettes:not(.cache) { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+#form-collections .form-panel, #form-gammes .form-panel, #form-familles .form-panel, #form-regroupements .form-panel, #form-recettes .form-panel { margin-bottom: 0; }
 .ligne-rouge { background-color: var(--color-background-danger, #fff0f0); }
 .ligne-rouge td { color: var(--color-text-danger, #a32d2d); }
 
