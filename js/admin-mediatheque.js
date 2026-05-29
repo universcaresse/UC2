@@ -81,13 +81,13 @@ function medFiltrer() {
   grille.innerHTML = items.map(i => {
     const catAffichee = i.categorie.replace(/^images\//i, '');
     return `
-    <div class="collection-carte" onclick="medOuvrirPhoto('${i.url}', '${i.nom}')">
-      <div class="collection-carte-bg" style="background:#888"></div>
+    <div class="carte" onclick="medOuvrirPhoto('${i.url}', '${i.nom}')">
+      <div class="carte-bg" style="background:#888"></div>
       <div style="position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);"></div>
       <img src="${i.url}" alt="${i.nom}" onerror="this.style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
-      <div class="collection-carte-contenu" style="background:rgba(0,0,0,0.5);width:100%;padding:8px 12px;border-radius:0 0 8px 8px;">
-        <span class="collection-carte-nom">${catAffichee}</span>
-        <span class="collection-carte-slogan">${i.nom}</span>
+      <div class="carte-contenu" style="background:rgba(0,0,0,0.5);width:100%;padding:8px 12px;border-radius:0 0 8px 8px;">
+        <span class="carte-titre">${catAffichee}</span>
+        <span class="carte-slogan">${i.nom}</span>
       </div>
     </div>`;
   }).join('');
@@ -212,13 +212,13 @@ function filtrerMediatheque() {
   grille.innerHTML = items.map(i => {
     const catAffichee = i.categorie.replace(/^images\//i, '');
     return `
-    <div class="collection-carte" onclick="selectionnerPhotoMediatheque('${i.url}', '${i.nom}')">
-      <div class="collection-carte-bg" style="background:#888"></div>
+    <div class="carte" onclick="selectionnerPhotoMediatheque('${i.url}', '${i.nom}')">
+      <div class="carte-bg" style="background:#888"></div>
       <div style="position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);"></div>
       <img src="${i.url}" alt="${i.nom}" onerror="this.style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
-      <div class="collection-carte-contenu" style="background:rgba(0,0,0,0.5);width:100%;padding:8px 12px;border-radius:0 0 8px 8px;">
-        <span class="collection-carte-nom">${catAffichee}</span>
-        <span class="collection-carte-slogan">${i.nom}</span>
+      <div class="carte-contenu" style="background:rgba(0,0,0,0.5);width:100%;padding:8px 12px;border-radius:0 0 8px 8px;">
+        <span class="carte-titre">${catAffichee}</span>
+        <span class="carte-slogan">${i.nom}</span>
       </div>
     </div>`;
   }).join('');
