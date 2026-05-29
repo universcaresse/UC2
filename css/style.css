@@ -1314,8 +1314,9 @@ tr.cliquable { cursor: pointer; }
 .fiche-extras-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .fiche-couleur { width: 80px; height: 80px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; font-size: 1.5rem; font-weight: 700; color: rgba(255,255,255,0.8); }
 .fiche-photo img { width: 80px; height: 80px; object-fit: cover;  }
+
 .fiche-ligne-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 20px; margin-bottom: 10px; border-left: 3px solid var(--primary); background: var(--primary-04); cursor: pointer; transition: background 0.2s, transform 0.2s; }
-.fiche-ligne-item:hover { background: var(--primary-08); transform: translateX(4px); }
+
 .fiche-ligne-item:last-child { border-bottom: none; }
 .fiche-ligne-info { flex: 1; }
 .fiche-ligne-nom { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 600; color: var(--primary); display: block; letter-spacing: 0.02em; }
