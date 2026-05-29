@@ -113,8 +113,10 @@ if (resGam && resGam.success) {
   const nbPublics = donneesProduits.filter(p => p.statut === 'public').length;
   const statCol   = document.getElementById('admin-stat-collections');
   const statProd  = document.getElementById('admin-stat-produits');
+  const statUniv  = document.getElementById('hero-stat-univers');
 	if (statCol)  statCol.textContent  = donneesCollections.length;
 	if (statProd && nbPublics > 0) statProd.textContent = nbPublics + '+';
+	if (statUniv) statUniv.textContent = (donneesRegroupements || []).length;
 
   // Remplir le cache produits dès le démarrage
   var ingsMap = {};
@@ -252,8 +254,10 @@ function afficherStatsAccueil() {
   const nbPublics = donneesProduits.filter(p => p.statut === 'public').length;
   const statCol   = document.getElementById('admin-stat-collections');
   const statProd  = document.getElementById('admin-stat-produits');
+  const statUniv  = document.getElementById('hero-stat-univers');
   if (statCol)  statCol.textContent  = donneesCollections.length;
   if (statProd && nbPublics > 0) statProd.textContent = nbPublics + '+';
+  if (statUniv) statUniv.textContent = (donneesRegroupements || []).length;
 }
 // ─── BURGER MOBILE ───
 function initBurgerAdmin() {
