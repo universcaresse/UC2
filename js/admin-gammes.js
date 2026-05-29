@@ -183,7 +183,8 @@ function peuplerPositionGamme(col_id, rangActuel) {
   const selPos = document.getElementById('fg-position');
   if (!selPos) return;
   selPos.innerHTML = '<option value="0">En premier</option>';
-  if (!col_id) return;
+  selPos.onchange = majApercuRangGamme;
+  if (!col_id) { majApercuRangGamme(); return; }
   donneesGammes.filter(g => g.col_id === col_id)
     .sort((a, b) => (a.rang || 99) - (b.rang || 99))
     .forEach(g => {
@@ -193,6 +194,18 @@ function peuplerPositionGamme(col_id, rangActuel) {
       if (rangActuel && g.rang === rangActuel - 1) o.selected = true;
       selPos.appendChild(o);
     });
+  majApercuRangGamme();
+}
+
+function majApercuRangGamme() {
+  const apercu = document.getElementById('fg-rang-apercu');
+  const selPos = document.getElementById('fg-position');
+  if (!apercu || !selPos) return;
+  const position = parseInt(selPos.value) || 0;
+  const col = donneesCollections.find(c => c.col_id === document.getElementById('fg-collection').value);
+  const couleurs = couleurCollection(col ? col.nom : '', col ? col.couleur_hex : '');
+  apercu.style.background = `linear-gradient(145deg, ${couleurs[0]}, ${couleurs[1]})`;
+  apercu.innerHTML = `<span class="fiche-visuel-rang">${position + 1}</span>`;
 }
 
 function fermerFormGamme2() {

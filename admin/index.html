@@ -782,6 +782,19 @@
           <div class="form-panel">
             <div class="form-body">
               <input type="hidden" id="fg-id">
+              <div class="fiche-visuel">
+                <div class="form-groupe">
+                  <div id="fg-photo-preview" class="fiche-visuel-photo"></div>
+                  <button type="button" class="bouton" onclick="ouvrirMediatheque('fg-photo-url', 'fg-photo-preview', 'Gamme')">Médiathèque</button>
+                </div>
+                <div class="form-groupe">
+                  <div id="fg-photo-noel-preview" class="fiche-visuel-photo"></div>
+                  <button type="button" class="bouton" onclick="ouvrirMediatheque('fg-photo-noel-url', 'fg-photo-noel-preview', 'Gamme Noël')">Médiathèque</button>
+                </div>
+                <div class="form-groupe">
+                  <div id="fg-rang-apercu" class="fiche-visuel-hex"></div>
+                </div>
+              </div>
               <div class="form-grille">
                 <div class="form-groupe col-demi">
                   <label class="form-label">gamme</label>
@@ -808,18 +821,8 @@
                   <label class="form-label">Description</label>
                   <textarea class="form-ctrl textarea-auto" id="fg-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
                 </div>
-                <div class="form-groupe col-plein">
-                  <label class="form-label">Photo principale</label>
-                  <input type="hidden" id="fg-photo-url">
-                  <div id="fg-photo-preview"></div>
-                  <button type="button" class="bouton bouton-vert-pale bouton-petit" onclick="ouvrirMediatheque('fg-photo-url', 'fg-photo-preview', 'Gamme')">Médiathèque</button>
-                </div>
-                <div class="form-groupe col-plein">
-                  <label class="form-label">Photo principale — saisonnière</label>
-                  <input type="hidden" id="fg-photo-noel-url">
-                  <div id="fg-photo-noel-preview"></div>
-                  <button type="button" class="bouton bouton-vert-pale bouton-petit" onclick="ouvrirMediatheque('fg-photo-noel-url', 'fg-photo-noel-preview', 'Gamme Noël')">Médiathèque</button>
-                </div>
+                <input type="hidden" id="fg-photo-url">
+                <input type="hidden" id="fg-photo-noel-url">>
                 <div class="form-groupe col-plein">
                   <label class="form-label">Ingrédients de base</label>
                   <div id="liste-ingredients-base"></div>
