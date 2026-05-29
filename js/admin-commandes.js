@@ -921,19 +921,31 @@ async function envoyerProposition() {
   chargerCommandes();
 }
 
-async function paiementRecu(cmd_id) {
-  confirmerAction('Confirmer le paiement reçu ? La facture sera créée et la commande passera à « À expédier ».', async () => {
-    afficherChargement();
-    const res = await appelAPIPost('creerVenteDepuisCommande', { cmd_id, mode_paiement: 'square' });
-    cacherChargement();
-    if (res && res.success) {
-      afficherMsg('commandes', '✅ Paiement confirmé. Facture ' + res.ven_id + ' créée.');
-      fermerFicheCommande();
-      chargerCommandes();
-    } else {
-      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
-    }
-  });
+var cmdPaiementIdEnCours = null;
+
+function paiementRecu(cmd_id) {
+  cmdPaiementIdEnCours = cmd_id;
+  document.getElementById('modal-mode-paiement-cmd').classList.add('ouvert');
+}
+
+function fermerModalModePaiementCmd() {
+  document.getElementById('modal-mode-paiement-cmd').classList.remove('ouvert');
+}
+
+async function confirmerPaiementCommande(mode_paiement) {
+  fermerModalModePaiementCmd();
+  const cmd_id = cmdPaiementIdEnCours;
+  if (!cmd_id) return;
+  afficherChargement();
+  const res = await appelAPIPost('creerVenteDepuisCommande', { cmd_id, mode_paiement });
+  cacherChargement();
+  if (res && res.success) {
+    afficherMsg('commandes', '✅ Paiement confirmé. Facture ' + res.ven_id + ' créée.');
+    fermerFicheCommande();
+    chargerCommandes();
+  } else {
+    afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+  }
 }
 
 // ═══════════════════════════════════════

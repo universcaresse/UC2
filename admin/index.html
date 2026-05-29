@@ -3595,6 +3595,21 @@
     </div>
   </div>
 </div>
+<div class="modal-admin-overlay" id="modal-mode-paiement-cmd">
+  <div class="modal-admin" style="max-width:400px">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Comment la cliente a-t-elle payé?</div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions-vertical">
+        <button class="bouton bouton-plein-largeur fv-btn-square" onclick="confirmerPaiementCommande('square')">Square (carte)</button>
+        <button class="bouton bouton-plein-largeur fv-btn-plus-tard" onclick="confirmerPaiementCommande('interac')">Virement Interac</button>
+        <button class="bouton bouton-plein-largeur fv-btn-comptant" onclick="confirmerPaiementCommande('argent')">Comptant</button>
+        <button class="bouton bouton-plein-largeur bouton-contour" onclick="fermerModalModePaiementCmd()">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal-admin-overlay" id="modal-square-confirmation">
   <div class="modal-admin" style="max-width:400px">
     <div class="modal-admin-header">
