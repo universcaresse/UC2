@@ -2216,9 +2216,8 @@ tr:has(+ .ven-resume-row) td {
   letter-spacing: 0.04em;
 }
 
-
 /* ═══════════════════════════════════════
-   BANDEAU — style unifié panneau admin
+   BANDEAU a effacer quand BANDEAUx seran en fonction—— style unifié panneau admin
    Remplace form-panel-header et form-body-actions
    ═══════════════════════════════════════ */
 .bandeau {
@@ -2239,4 +2238,257 @@ tr:has(+ .ven-resume-row) td {
   flex-direction: column;
   gap: 2px;
   flex: 1;
+}
+
+
+
+/* ════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+   Du générique et ses variantes
+   ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════
+   BOUTONS — base + variantes
+   ═══════════════════════════════════════ */
+.boutons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  padding: 10px 28px;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+.boutons-vert {
+  background: var(--primary);
+  color: white;
+}
+.boutons-contour {
+  background: transparent;
+  color: var(--gris);
+  border: 1px solid var(--gris);
+}
+.boutons-rouge {
+  background: var(--danger);
+  color: white;
+}
+.boutons-accent {
+  background: var(--accent);
+  color: white;
+}
+.boutons-gris {
+  background: var(--gris);
+  color: white;
+}
+
+.boutons-fermer {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.6rem;
+  color: var(--gris);
+  padding: 8px 12px;
+}
+
+/* ═══════════════════════════════════════
+   BANDEAU — haut (titre + slogan + ✕) et bas (boutons)
+   ═══════════════════════════════════════ */
+.bandeau {
+  padding: 8px 28px;
+  border: 1px solid var(--beige);
+  background: var(--blanc);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  margin-bottom: 4px;
+}
+.bandeau .fiches-bandeau {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.fiches-titre {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--gris-fonce);
+  display: block;
+}
+.fiches-slogan {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--accent);
+  display: block;
+  margin-top: 6px;
+}
+.fiches-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+
+/* ═══════════════════════════════════════
+   FICHES — bloc central
+   ═══════════════════════════════════════ */
+.fiches-central {
+  background: white;
+  border: 1px solid var(--beige);
+  margin-bottom: 4px;
+}
+.fiches-central-corps {
+  padding: 14px 28px 28px;
+}
+
+/* ═══════════════════════════════════════
+   FICHES — contenu du bloc central
+   ═══════════════════════════════════════ */
+.fiches-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  color: var(--gris);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.fiches-section-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 550;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--beige);
+  margin-top: 24px;
+}
+.fiches-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  margin-bottom: 10px;
+  border-left: 3px solid var(--primary);
+  background: var(--primary-04);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.fiches-item:hover {
+  background: var(--primary-08);
+  transform: translateX(4px);
+}
+.fiches-item-nom {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--primary);
+  display: block;
+  letter-spacing: 0.02em;
+}
+.fiches-item-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: var(--gris);
+  margin-top: 6px;
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════
+   FICHES — formulaire (modification)
+   ═══════════════════════════════════════ */
+.fiches-grille {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 24px;
+}
+.fiches-champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fiches-champ-plein {
+  grid-column: 1 / -1;
+}
+.fiches-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.90rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 550;
+}
+.fiches-ctrl {
+  width: 100%;
+  padding: 8px 14px 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 300;
+  border: 1px solid var(--beige);
+  background: white;
+  color: var(--gris-fonce);
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.fiches-ctrl:focus {
+  border-color: var(--primary);
+}
+textarea.fiches-ctrl {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════
+   FICHES — générique consultation + modification
+   collections, gammes, familles, univers
+   ═══════════════════════════════════════ */
+
+.fiches-visuel {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: flex-start;
+}
+.fiches-visuel-photo {
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+  overflow: hidden;
+  object-fit: cover;
+}
+.fiches-visuel-photo img {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+.fiches-visuel-hex {
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fiches-visuel-rang {
+  font-family: 'Playfair Display', serif;
+  font-size: 80px;
+  color: var(--blanc);
+  font-weight: 300;
+  transform: translateY(-8px);
 }
