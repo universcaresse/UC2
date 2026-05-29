@@ -914,6 +914,8 @@ footer > * { position: relative; z-index: 1; }
 #fiche-collection { display: none; }
 #fiche-collection.visible { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
 #fiche-collection .form-panel { display: block; margin-bottom: 0; }
+#fiche-gamme:not(.cache), #fiche-famille:not(.cache), #fiche-regroupement:not(.cache) { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+#fiche-gamme .form-panel, #fiche-famille .form-panel, #fiche-regroupement .form-panel { margin-bottom: 0; }
 .ligne-rouge { background-color: var(--color-background-danger, #fff0f0); }
 .ligne-rouge td { color: var(--color-text-danger, #a32d2d); }
 
