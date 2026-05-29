@@ -995,7 +995,7 @@ tr.cliquable { cursor: pointer; }
 .filtre-select { width: auto; min-width: 180px; }
 .filtre-recherche { width: auto; min-width: 200px; }
 .fiche-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.fiche-visuel { display: flex; gap: 16px; margin-bottom: 24px; align-items: stretch; }
+.fiche-visuel { display: flex; gap: 16px; margin-bottom: 24px; align-items: flex-start; }
 .fiche-visuel-photo { width: 180px; height: 180px; object-fit: cover; flex-shrink: 0; }
 .fiche-visuel-hex { width: 180px; height: 180px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 .fiche-visuel-rang { font-family: 'Playfair Display', serif; font-size: 80px; color: var(--blanc); font-weight: 300; transform: translateY(-6px);  }
