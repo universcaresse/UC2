@@ -256,7 +256,7 @@ function afficherStatsAccueil() {
   const statProd  = document.getElementById('admin-stat-produits');
   const statUniv  = document.getElementById('hero-stat-univers');
   if (statCol)  statCol.textContent  = donneesCollections.length;
-  if (statProd && nbPublics > 0) statProd.textContent = nbPublics + '+';
+  if (statProd && nbPublics > 0) statProd.textContent = nbPublics;
   if (statUniv) statUniv.textContent = (donneesRegroupements || []).length;
 }
 // ─── BURGER MOBILE ───
