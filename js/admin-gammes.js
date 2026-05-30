@@ -60,11 +60,11 @@ function ouvrirFicheGamme2(gam_id) {
   document.getElementById('fiche-gamme-desc').textContent       = gam.description || '—';
 
   let wrapHtml = '';
-  if (gam.photo_url)      wrapHtml += `<img src="${gam.photo_url}" class="fiche-visuel-photo">`;
-  if (gam.photo_noel_url) wrapHtml += `<img src="${gam.photo_noel_url}" class="fiche-visuel-photo">`;
-  if (gam.couleur_hex)    wrapHtml += `<div class="fiche-visuel-hex" style="background:${gam.couleur_hex}"></div>`;
+  if (gam.photo_url)      wrapHtml += `<img src="${gam.photo_url}" class="fiches-visuel-photo">`;
+  if (gam.photo_noel_url) wrapHtml += `<img src="${gam.photo_noel_url}" class="fiches-visuel-photo">`;
+  if (gam.couleur_hex)    wrapHtml += `<div class="fiches-visuel-hex" style="background:${gam.couleur_hex}"></div>`;
   const ficheExtras = document.getElementById('fiche-gamme-extras');
-  if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class="fiche-visuel">${wrapHtml}</div>` : '';
+  if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class="fiches-visuel">${wrapHtml}</div>` : '';
 
   const produitsGamme = donneesProduits.filter(p => p.gam_id === gam_id);
   const elProduits = document.getElementById('fiche-gamme-produits');
@@ -128,7 +128,7 @@ function ouvrirFormGamme(col_id) {
 
 async function sauvegarderGamme2() {
   afficherChargement();
-  const btnSauvegarder = document.querySelector('#form-gammes .form-body-actions .bouton');
+  const btnSauvegarder = document.querySelector('#form-gammes .bandeau .boutons-vert');
   if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = '<span class="spinner"></span> Sauvegarde…'; }
   const rowIndex = document.getElementById('fg-id').value;
   const col_id   = document.getElementById('fg-collection').value;
@@ -205,7 +205,7 @@ function majApercuRangGamme() {
   const col = donneesCollections.find(c => c.col_id === document.getElementById('fg-collection').value);
   const couleurs = couleurCollection(col ? col.nom : '', col ? col.couleur_hex : '');
   apercu.style.background = `linear-gradient(145deg, ${couleurs[0]}, ${couleurs[1]})`;
-  apercu.innerHTML = `<span class="fiche-visuel-rang">${position + 1}</span>`;
+  apercu.innerHTML = `<span class="fiches-visuel-rang">${position + 1}</span>`;
 }
 
 function fermerFormGamme2() {
@@ -291,9 +291,9 @@ document.getElementById('btn-nouvelle-gamme').classList.add('cache');
    document.getElementById('fg-photo-url').value   = gam.photo_url || '';
    document.getElementById('fg-photo-noel-url').value = gam.photo_noel_url || '';
    const previewG = document.getElementById('fg-photo-preview');
-   if (previewG) previewG.innerHTML = gam.photo_url ? `<img src="${gam.photo_url}" class="photo-preview">` : '';
+   if (previewG) previewG.innerHTML = gam.photo_url ? `<img src="${gam.photo_url}">` : '';
    const previewGN = document.getElementById('fg-photo-noel-preview');
-   if (previewGN) previewGN.innerHTML = gam.photo_noel_url ? `<img src="${gam.photo_noel_url}" class="photo-preview">` : '';
+   if (previewGN) previewGN.innerHTML = gam.photo_noel_url ? `<img src="${gam.photo_noel_url}">` : '';
  
 document.getElementById('fg-desc').value        = gam.description || '';
   if (document.getElementById('fg-couleur-hex')) (document.getElementById('fg-couleur-hex') || {}).value = gam.couleur_hex || '';

@@ -747,30 +747,30 @@
        <div id="fiche-gamme" class="cache">
        
             <div class="bandeau">
-              <div class="fiche-bandeau">
-                <span class="form-panel-titre" id="fiche-gamme-titre"></span>
-                <span class="fiche-slogan" id="fiche-gamme-slogan"></span>
+              <div class="fiches-bandeau">
+                <span class="fiches-titre" id="fiche-gamme-titre"></span>
+                <span class="fiches-slogan" id="fiche-gamme-slogan"></span>
               </div>
-              <button class="btn-fermer-panneau" onclick="fermerFicheGamme2()" title="Fermer">✕</button>
+              <button class="boutons-fermer" onclick="fermerFicheGamme2()" title="Fermer">✕</button>
             </div>
          
-          <div class="form-panel">
-            <div class="form-body">
+          <div class="fiches-central">
+            <div class="fiches-central-corps">
               <div id="fiche-gamme-extras"></div>
-              <p class="fiche-desc" id="fiche-gamme-desc"></p>
-              <div class="fiche-label section-label">Collection</div>
+              <p class="fiches-desc" id="fiche-gamme-desc"></p>
+              <div class="fiches-section-label">Collection</div>
               <div class="form-valeur" id="fiche-gamme-collection"></div>
-              <div class="section-label">Ingrédients de base</div>
+              <div class="fiches-section-label">Ingrédients de base</div>
               <div id="fiche-gamme-ingredients"></div>
-              <div class="section-label">Produits</div>
+              <div class="fiches-section-label">Produits</div>
               <p class="texte-secondaire" id="fiche-gamme-produits"></p>
             </div>
           </div>
-          <div class="form-panel bandeau">
-            <div class="form-actions">
-              <button class="bouton bouton-contour" onclick="fermerFicheGamme2()">Fermer</button>
-              <button class="bouton" id="fiche-gamme-modifier">Modifier la gamme</button>
-              <button class="bouton bouton-rouge" id="btn-supprimer-gamme">Supprimer la gamme</button>
+          <div class="bandeau">
+            <div class="fiches-actions">
+              <button class="boutons boutons-contour" onclick="fermerFicheGamme2()">Fermer</button>
+              <button class="boutons boutons-vert" id="fiche-gamme-modifier">Modifier la gamme</button>
+              <button class="boutons boutons-rouge" id="btn-supprimer-gamme">Supprimer la gamme</button>
             </div>
           </div>
         </div>
@@ -780,67 +780,67 @@
        <div id="form-gammes" class="cache">
          
             <div class="bandeau">
-              <div class="fiche-bandeau" id="form-gammes-bandeau">
-                <span class="form-panel-titre" id="form-gammes-titre">Nouvelle gamme</span>
+              <div class="fiches-bandeau" id="form-gammes-bandeau">
+                <span class="fiches-titre" id="form-gammes-titre">Nouvelle gamme</span>
               </div>
-              <button class="btn-fermer-panneau" onclick="fermerFormGamme2()" title="Fermer">✕</button>
+              <button class="boutons-fermer" onclick="fermerFormGamme2()" title="Fermer">✕</button>
             </div>
          
-          <div class="form-panel">
-            <div class="form-body">
+          <div class="fiches-central">
+            <div class="fiches-central-corps">
               <input type="hidden" id="fg-id">
-              <div class="fiche-visuel">
-                <div class="form-groupe">
-                  <div id="fg-photo-preview" class="fiche-visuel-photo"></div>
-                  <button type="button" class="bouton" onclick="ouvrirMediatheque('fg-photo-url', 'fg-photo-preview', 'Gamme')">Médiathèque</button>
+              <div class="fiches-visuel">
+                <div class="fiches-champ">
+                  <div id="fg-photo-preview" class="fiches-visuel-photo"></div>
+                  <button type="button" class="boutons boutons-vert" onclick="ouvrirMediatheque('fg-photo-url', 'fg-photo-preview', 'Gamme')">Médiathèque</button>
                 </div>
-                <div class="form-groupe">
-                  <div id="fg-photo-noel-preview" class="fiche-visuel-photo"></div>
-                  <button type="button" class="bouton" onclick="ouvrirMediatheque('fg-photo-noel-url', 'fg-photo-noel-preview', 'Gamme Noël')">Médiathèque</button>
+                <div class="fiches-champ">
+                  <div id="fg-photo-noel-preview" class="fiches-visuel-photo"></div>
+                  <button type="button" class="boutons boutons-vert" onclick="ouvrirMediatheque('fg-photo-noel-url', 'fg-photo-noel-preview', 'Gamme Noël')">Médiathèque</button>
                 </div>
-                <div class="form-groupe">
-                  <div id="fg-rang-apercu" class="fiche-visuel-hex"></div>
-                  <select class="form-ctrl" id="fg-position">
+                <div class="fiches-champ">
+                  <div id="fg-rang-apercu" class="fiches-visuel-hex"></div>
+                  <select class="fiches-ctrl" id="fg-position">
                     <option value="0">En premier</option>
                   </select>
                 </div>
               </div>
-              <div class="form-grille">
-                <div class="form-groupe col-demi">
-                  <label class="form-label">gamme</label>
-                  <input type="text" class="form-ctrl" id="fg-nom">
+              <div class="fiches-grille">
+                <div class="fiches-champ col-demi">
+                  <label class="fiches-label">gamme</label>
+                  <input type="text" class="fiches-ctrl" id="fg-nom">
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Collection</label>
-                  <select class="form-ctrl" id="fg-collection" onchange="peuplerPositionGamme(this.value, null)">
+                <div class="fiches-champ">
+                  <label class="fiches-label">Collection</label>
+                  <select class="fiches-ctrl" id="fg-collection" onchange="peuplerPositionGamme(this.value, null)">
                     <option value="">— Choisir —</option>
                   </select>
                 </div>
                 
                 <input type="hidden" id="fg-rang">
-                <div class="form-groupe col-plein">
-                  <label class="form-label">Slogan</label>
-                  <input type="text" class="form-ctrl" id="fg-slogan">
+                <div class="fiches-champ fiches-champ-plein">
+                  <label class="fiches-label">Slogan</label>
+                  <input type="text" class="fiches-ctrl" id="fg-slogan">
                 </div>
-                <div class="form-groupe col-plein">
-                  <label class="form-label">Description</label>
-                  <textarea class="form-ctrl textarea-auto" id="fg-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
+                <div class="fiches-champ fiches-champ-plein">
+                  <label class="fiches-label">Description</label>
+                  <textarea class="fiches-ctrl textarea-auto" id="fg-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
                 </div>
                 <input type="hidden" id="fg-photo-url">
                 <input type="hidden" id="fg-photo-noel-url">
-                <div class="form-groupe col-plein">
-                  <label class="form-label">Ingrédients de base</label>
+                <div class="fiches-champ fiches-champ-plein">
+                  <label class="fiches-label">Ingrédients de base</label>
                   <div id="liste-ingredients-base"></div>
-                  <button type="button" class="bouton bouton-vert-pale btn-ajouter-ingredient" onclick="ajouterGammeIng()">+ Ajouter un ingrédient</button>
+                  <button type="button" class="boutons boutons-gris btn-ajouter-ingredient" onclick="ajouterGammeIng()">+ Ajouter un ingrédient</button>
                 </div>
               </div>
             </div>
           </div>
-          <div class="form-panel bandeau">
-            <div class="form-actions">
+          <div class="bandeau">
+            <div class="fiches-actions">
               
-              <button class="bouton bouton-contour" onclick="fermerFormGamme2()">Annuler</button>
-			  <button class="bouton" onclick="sauvegarderGamme2()">Enregistrer</button>
+              <button class="boutons boutons-contour" onclick="fermerFormGamme2()">Annuler</button>
+			  <button class="boutons boutons-vert" onclick="sauvegarderGamme2()">Enregistrer</button>
             </div>
           </div>
         </div>
