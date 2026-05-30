@@ -24,23 +24,23 @@ async function chargerMediatheque() {
   _mediathequeDonnees = res.items.filter(i => (i.categorie || '').toLowerCase().startsWith('images/'));
   const niveaux2 = [...new Set(_mediathequeDonnees.map(i => i.categorie.split('/')[1]).filter(Boolean))].sort();
   const div = document.getElementById('med-filtres-boutons');
-  div.innerHTML = `<button class="filtre-btn actif" onclick="medFiltrerN2('')">Toutes</button>` +
-    niveaux2.map(n2 => `<button class="filtre-btn" onclick="medFiltrerN2('${n2}')">${n2}</button>`).join('');
+  div.innerHTML = `<button class="boutons boutons-vert" onclick="medFiltrerN2('')">Toutes</button>` +
+    niveaux2.map(n2 => `<button class="boutons boutons-contour" onclick="medFiltrerN2('${n2}')">${n2}</button>`).join('');
   medFiltrer();
 }
 
 function medFiltrer() {
   // Mise à jour boutons niveau 2 actifs
-  document.querySelectorAll('#med-filtres-boutons .filtre-btn').forEach(b => {
+  document.querySelectorAll('#med-filtres-boutons .boutons').forEach(b => {
     const onclick = b.getAttribute('onclick') || '';
     const match = onclick.match(/medFiltrerN2\('([^']*)'\)/);
     const val = match ? match[1] : null;
     if (val === _medNiveau2) {
-      b.classList.add('actif');
-      b.classList.remove('bouton-vert-pale');
+      b.classList.add('boutons-vert');
+      b.classList.remove('boutons-contour');
     } else {
-      b.classList.remove('actif');
-      if (!b.classList.contains('bouton-vert-pale')) b.classList.add('bouton-vert-pale');
+      b.classList.remove('boutons-vert');
+      b.classList.add('boutons-contour');
     }
   });
 
@@ -58,8 +58,8 @@ function medFiltrer() {
       .map(i => i.categorie.split('/')[2])
       .filter(Boolean))].sort();
     if (sousCats.length) {
-      zoneN3.innerHTML = `<button class="filtre-btn${!_medNiveau3 ? ' actif' : ''}" onclick="medFiltrerN3('')">Tout ${_medNiveau2}</button>` +
-        sousCats.map(n3 => `<button class="filtre-btn${_medNiveau3 === n3 ? ' actif' : ''}" onclick="medFiltrerN3('${n3}')">${n3}</button>`).join('');
+      zoneN3.innerHTML = `<button class="boutons ${!_medNiveau3 ? 'boutons-vert' : 'boutons-contour'}" onclick="medFiltrerN3('')">Tout ${_medNiveau2}</button>` +
+        sousCats.map(n3 => `<button class="boutons ${_medNiveau3 === n3 ? 'boutons-vert' : 'boutons-contour'}" onclick="medFiltrerN3('${n3}')">${n3}</button>`).join('');
     } else {
       zoneN3.innerHTML = '';
     }
@@ -148,8 +148,8 @@ function peuplerFiltresCategoriesMediatheque() {
   const items = (_mediathequeDonnees || []).filter(i => (i.categorie || '').toLowerCase().startsWith('images/'));
   const niveaux2 = [...new Set(items.map(i => i.categorie.split('/')[1]).filter(Boolean))].sort();
   const divN2 = document.getElementById('med-modal-filtres-n2');
-  divN2.innerHTML = `<button class="filtre-btn${!_medModalNiveau2 ? ' actif' : ''}" onclick="medModalFiltrerN2('')">Toutes</button>` +
-    niveaux2.map(n2 => `<button class="filtre-btn${_medModalNiveau2 === n2 ? ' actif' : ''}" onclick="medModalFiltrerN2('${n2}')">${n2}</button>`).join('');
+  divN2.innerHTML = `<button class="boutons ${!_medModalNiveau2 ? 'boutons-vert' : 'boutons-contour'}" onclick="medModalFiltrerN2('')">Toutes</button>` +
+    niveaux2.map(n2 => `<button class="boutons ${_medModalNiveau2 === n2 ? 'boutons-vert' : 'boutons-contour'}" onclick="medModalFiltrerN2('${n2}')">${n2}</button>`).join('');
 }
 
 function medModalFiltrerN2(n2) {
@@ -165,16 +165,16 @@ function medModalFiltrerN3(n3) {
 
 function filtrerMediatheque() {
   // Mise à jour boutons niveau 2 actifs
-  document.querySelectorAll('#med-modal-filtres-n2 .filtre-btn').forEach(b => {
+  document.querySelectorAll('#med-modal-filtres-n2 .boutons').forEach(b => {
     const onclick = b.getAttribute('onclick') || '';
     const match = onclick.match(/medModalFiltrerN2\('([^']*)'\)/);
     const val = match ? match[1] : null;
     if (val === _medModalNiveau2) {
-      b.classList.add('actif');
-      b.classList.remove('bouton-vert-pale');
+      b.classList.add('boutons-vert');
+      b.classList.remove('boutons-contour');
     } else {
-      b.classList.remove('actif');
-      if (!b.classList.contains('bouton-vert-pale')) b.classList.add('bouton-vert-pale');
+      b.classList.remove('boutons-vert');
+      b.classList.add('boutons-contour');
     }
   });
 
@@ -187,8 +187,8 @@ function filtrerMediatheque() {
       .map(i => i.categorie.split('/')[2])
       .filter(Boolean))].sort();
     if (sousCats.length) {
-      zoneN3.innerHTML = `<button class="filtre-btn${!_medModalNiveau3 ? ' actif' : ''}" onclick="medModalFiltrerN3('')">Tout ${_medModalNiveau2}</button>` +
-        sousCats.map(n3 => `<button class="filtre-btn${_medModalNiveau3 === n3 ? ' actif' : ''}" onclick="medModalFiltrerN3('${n3}')">${n3}</button>`).join('');
+      zoneN3.innerHTML = `<button class="boutons ${!_medModalNiveau3 ? 'boutons-vert' : 'boutons-contour'}" onclick="medModalFiltrerN3('')">Tout ${_medModalNiveau2}</button>` +
+        sousCats.map(n3 => `<button class="boutons ${_medModalNiveau3 === n3 ? 'boutons-vert' : 'boutons-contour'}" onclick="medModalFiltrerN3('${n3}')">${n3}</button>`).join('');
     } else {
       zoneN3.innerHTML = '';
     }
