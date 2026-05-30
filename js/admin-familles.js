@@ -50,11 +50,11 @@ function ouvrirFicheFamille(fam_id) {
   document.getElementById('fiche-famille-desc').textContent       = fam.description || '—';
 
   let wrapHtml = '';
-  if (fam.photo_url)      wrapHtml += `<img src="${fam.photo_url}" class="fiche-visuel-photo">`;
-  if (fam.photo_noel_url) wrapHtml += `<img src="${fam.photo_noel_url}" class="fiche-visuel-photo">`;
-  if (fam.couleur_hex)    wrapHtml += `<div class="fiche-visuel-hex" style="background:${fam.couleur_hex}"></div>`;
+  if (fam.photo_url)      wrapHtml += `<img src="${fam.photo_url}" class="fiches-visuel-photo">`;
+  if (fam.photo_noel_url) wrapHtml += `<img src="${fam.photo_noel_url}" class="fiches-visuel-photo">`;
+  if (fam.couleur_hex)    wrapHtml += `<div class="fiches-visuel-hex" style="background:${fam.couleur_hex}"></div>`;
   const ficheExtras = document.getElementById('fiche-famille-extras');
-  if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class="fiche-visuel">${wrapHtml}</div>` : '';
+  if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class="fiches-visuel">${wrapHtml}</div>` : '';
 
   document.getElementById('fiche-famille-modifier').onclick = () => {
     fermerFicheFamille();

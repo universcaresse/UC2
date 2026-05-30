@@ -467,19 +467,27 @@
               <button class="btn-fermer-panneau" onclick="fermerFicheFamille()" title="Fermer">✕</button>
             </div>
         
-          <div class="form-panel">
-            <div class="form-body">
+         <div class="bandeau">
+              <div class="fiches-bandeau" id="fiche-famille-bandeau">
+                <span class="fiches-titre" id="fiche-famille-titre"></span>
+                <span class="fiches-slogan" id="fiche-famille-slogan"></span>
+              </div>
+              <button class="boutons-fermer" onclick="fermerFicheFamille()" title="Fermer">✕</button>
+            </div>
+        
+          <div class="fiches-central">
+            <div class="fiches-central-corps">
               <div id="fiche-famille-extras"></div>
-              <p class="fiche-desc" id="fiche-famille-desc"></p>
-              <div class="section-label">Collection</div>
+              <p class="fiches-desc" id="fiche-famille-desc"></p>
+              <div class="fiches-section-label">Collection</div>
               <div class="form-valeur" id="fiche-famille-collection"></div>
             </div>
           </div>
-          <div class="form-panel bandeau">
-            <div class="form-actions">
-              <button class="bouton bouton-contour" onclick="fermerFicheFamille()">Fermer</button>
-              <button class="bouton" id="fiche-famille-modifier">Modifier cette famille</button>
-              <button class="bouton bouton-rouge" id="btn-supprimer-famille">Supprimer cette famille</button>
+          <div class="bandeau">
+            <div class="fiches-actions">
+              <button class="boutons boutons-contour" onclick="fermerFicheFamille()">Fermer</button>
+              <button class="boutons boutons-vert" id="fiche-famille-modifier">Modifier cette famille</button>
+              <button class="boutons boutons-rouge" id="btn-supprimer-famille">Supprimer cette famille</button>
             </div>
           </div>
         </div>
@@ -493,55 +501,55 @@
         <div id="form-familles" class="cache">
          
             <div class="bandeau">
-              <div class="fiche-bandeau" id="form-familles-bandeau">
-                <span class="form-panel-titre" id="form-familles-titre">Nouvelle famille</span>
+              <div class="fiches-bandeau" id="form-familles-bandeau">
+                <span class="fiches-titre" id="form-familles-titre">Nouvelle famille</span>
               </div>
-              <button class="btn-fermer-panneau" onclick="fermerFormFamille()" title="Fermer">✕</button>
+              <button class="boutons-fermer" onclick="fermerFormFamille()" title="Fermer">✕</button>
             </div>
           
-          <div class="form-panel">
-            <div class="form-body">
+          <div class="fiches-central">
+            <div class="fiches-central-corps">
               <input type="hidden" id="ff-id">
               <input type="hidden" id="ff-rang">
-              <div class="form-grille">
-                <div class="form-groupe">
-                  <label class="form-label">Nom</label>
-                  <input type="text" class="form-ctrl" id="ff-nom">
+              <div class="fiches-grille">
+                <div class="fiches-champ">
+                  <label class="fiches-label">Nom</label>
+                  <input type="text" class="fiches-ctrl" id="ff-nom">
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Collection</label>
-                  <select class="form-ctrl" id="ff-collection" onchange="peuplerPositionFamille(this.value, null)">
+                <div class="fiches-champ">
+                  <label class="fiches-label">Collection</label>
+                  <select class="fiches-ctrl" id="ff-collection" onchange="peuplerPositionFamille(this.value, null)">
                     <option value="">— Choisir —</option>
                   </select>
                 </div>
-                <div class="form-groupe">
-                  <label class="form-label">Gamme (optionnel)</label>
-                  <select class="form-ctrl" id="ff-gamme" onchange="peuplerPositionFamille(document.getElementById('ff-collection').value, null)">
+                <div class="fiches-champ">
+                  <label class="fiches-label">Gamme (optionnel)</label>
+                  <select class="fiches-ctrl" id="ff-gamme" onchange="peuplerPositionFamille(document.getElementById('ff-collection').value, null)">
                     <option value="">— Aucune —</option>
                   </select>
                 </div>
-                <div class="form-groupe col-petit">
-                  <label class="form-label">Position</label>
-                  <select class="form-ctrl" id="ff-position">
+                <div class="fiches-champ col-petit">
+                  <label class="fiches-label">Position</label>
+                  <select class="fiches-ctrl" id="ff-position">
                     <option value="0">En premier</option>
                   </select>
                 </div>
-                <div class="form-groupe col-plein">
-                  <label class="form-label">Description</label>
-                  <textarea class="form-ctrl textarea-auto" id="ff-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
+                <div class="fiches-champ fiches-champ-plein">
+                  <label class="fiches-label">Description</label>
+                  <textarea class="fiches-ctrl textarea-auto" id="ff-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
                 </div>
                
               </div>
             </div>
           </div>
-          <div class="form-panel bandeau">
-            <div class="form-actions">
-               <button class="bouton bouton-contour" onclick="fermerFormFamille()">Annuler</button>
-			   <button class="bouton" onclick="sauvegarderFamille()">Enregistrer</button>
+          <div class="bandeau">
+            <div class="fiches-actions">
+               <button class="boutons boutons-contour" onclick="fermerFormFamille()">Annuler</button>
+			   <button class="boutons boutons-vert" onclick="sauvegarderFamille()">Enregistrer</button>
             
             </div>
           </div>
-        </div>
+                   </div>
 		
 		
 		
