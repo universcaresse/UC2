@@ -2386,7 +2386,6 @@ tr:has(+ .ven-resume-row) td {
 }
 .fiches-item:hover {
   background: var(--primary-08);
-  transform: translateX(4px);
 }
 .fiches-item-nom {
   font-family: 'Playfair Display', serif;
