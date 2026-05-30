@@ -2292,7 +2292,7 @@ textarea.zonedetexte {
   flex-wrap: wrap;
   align-items: center;
   background: var(--blanc);
-  border-bottom: 1px solid var(--accent);
+  border-bottom: 0.5px solid var(--accent);
   padding: 16px 56px;
   margin-left: -56px;
   margin-right: -56px;
