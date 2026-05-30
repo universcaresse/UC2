@@ -123,7 +123,7 @@ Petit conseil pour que ça se passe encore mieux la prochaine fois : garde aussi
 Bon courage pour la suite — le plus dur (créer la base générique propre) est déjà fait.
 
 
-mise a jour du 30 mai 2026
+mise a jour du 30 mai 2026 à 10h00
 
 # Suivi — Migration CSS générique (Univers Caresse)
 
@@ -198,3 +198,56 @@ mise a jour du 30 mai 2026
    - doublon `.bandeau` (commenté « à effacer »)
    - `.bouton*`, `.form-panel*`, `.form-groupe`, `.form-label`, `.form-ctrl`, `.form-grille`, `.col-*`, `.texte-secondaire`, `.checkboxes-groupe`, `.textarea-auto`, `.btn-ajouter-ingredient`
 4. Auditer `admin.js` (jamais reçu) pour styles de mise en page en dur.
+
+
+mise a jour 30 mai 2023 12h08
+
+Suivi — Migration CSS générique (Univers Caresse)
+Correspondances : ancien → générique
+Ancienne classeClasse génériqueType.fiche-bandeau.fiches-bandeaufiche.form-panel-titre (titre fiche).fiches-titrefiche.fiche-slogan.fiches-sloganfiche.btn-fermer-panneau (✕).boutons-fermerbouton.form-panel (bloc central).fiches-centralfiche.form-body.fiches-central-corpsfiche.fiche-desc.fiches-descfiche.section-label.fiches-section-labelfiche.form-actions.fiches-actionsfiche.form-valeur.fiches-valeurfiche.form-grille.fiches-grillefiche.form-groupe.fiches-champfiche.col-plein.fiches-champ-pleinfiche.form-label.fiches-labelfiche.form-ctrl.fiches-ctrlfiche.fiche-visuel.fiches-visuelfiche.fiche-visuel-photo.fiches-visuel-photofiche.fiche-visuel-hex.fiches-visuel-hexfiche.fiche-visuel-rang.fiches-visuel-rangfiche.bouton.boutonsbouton.bouton (vert).boutons-vertbouton.bouton-contour.boutons-contourbouton.bouton-rouge.boutons-rougebouton.bouton-or.boutons-accentbouton.bouton-vert-pale.boutons-grisbouton.bouton-petit.boutons-petitbouton.texte-secondaire.textes-discretsutilitaire.checkboxes-groupe.casesacocherutilitaire.col-demi.champ-demiutilitaire.col-petit.champ-petitutilitaire.textarea-auto.zonedetexteutilitaire.btn-ajouter-ingredient.bouton-ajoututilitaire.photo-preview(supprimée — la div parent gère)nettoyage
+État d'avancement par section
+SectionHTMLJSUtilitairesVisuel identiqueCollections✅✅✅✅ (référence)Gammes✅✅*✅✅Familles✅✅✅✅ (photos + aperçu rang ajoutés)Univers (regroupements)⏳⏳✅❌ EN COURSProduits❌❌❌❌Factures / achats❌❌❌❌Ventes❌❌❌❌Commandes❌❌❌❌Remboursements❌❌❌❌Fabrication❌❌❌❌Contenu site❌❌❌❌Rédaction❌❌❌❌Densités❌❌❌❌Promotions❌❌❌❌INCI / Médiathèque / Catalogue❌❌❌❌
+* Gammes JS : tout migré sauf les rangées d'ingrédients (ingredient-rangee, ing-type, ing-nom, ing-inci, ing-qte) — classes partagées avec Produits, pas encore migrées.
+Univers (regroupements) — travail EN COURS, à reprendre ici
+Objectif : même visuel que collections (bloc photos + carré aperçu rang + position en haut, rang dans le hex de la fiche consultation). Les champs propres à univers (mode, cat_id, ing_id, exclusions, slogan) restent.
+Colonnes de la table : fra_id, rang, nom, description, cat_id, ing_id, photo_url, photo_noel_url, couleur_hex, slogan, categories_exclues, collections_exclues, gammes_exclues, mode.
+Étapes restantes pour univers
+
+HTML #form-regroupements — déplacer le bloc visuel en haut :
+
+Créer un .fiches-visuel en tête du corps avec : 2 photos (freg-photo-preview, freg-photo-noel-preview) + boutons Médiathèque, un carré freg-rang-apercu (.fiches-visuel-hex) et le select#freg-position en dessous.
+Retirer l'ancien champ Position d'en haut.
+Retirer les 2 anciens blocs photos situés en bas (après Description).
+⚠️ Le trouve a échoué la dernière fois (indentation réelle différente). Reprendre en demandant le bloc exact à l'utilisateur, du premier <div class="fiches-grille"> jusqu'à la ligne Mode.
+
+
+JS admin-regroupements.js :
+
+Ajouter une fonction majApercuRangRegroupement() (calquée sur majApercuRangGamme) : lit freg-position, applique un dégradé couleurCollection(...) sur freg-rang-apercu, injecte <span class="fiches-visuel-rang">${position+1}</span>.
+Dans peuplerPositionRegroupement : brancher sel.onchange = majApercuRangRegroupement et appeler majApercuRangRegroupement() à la fin.
+Vérifier que modifierRegroupement / ouvrirFormRegroupement n'ont plus de class="photo-preview" (déjà nettoyé) et que les previews se rechargent.
+
+
+Fiche consultation ouvrirFicheRegroupement : afficher le rang dans le hex. Actuellement le wrap n'ajoute que les photos. Pour être pareil, ajouter (si couleur_hex) un <div class="fiches-visuel-hex" style="background:${fra.couleur_hex}"><span class="fiches-visuel-rang">${fra.rang||''}</span></div>.
+
+Reste global à faire
+
+Migrer les sections non faites (Produits, Factures, Ventes, etc.) vers le générique.
+Créer un générique pour les rangées d'ingrédients (ingredient-rangee, ing-*), partagé Gammes + Produits.
+Ménage final CSS — supprimer les anciens blocs orphelins UNIQUEMENT quand plus aucune section ne les utilise :
+
+.fiche-bandeau, .fiche-slogan, .fiche-desc, .section-label
+.fiche-visuel*, #form-collections .fiche-visuel...
+.photo-preview, .form-valeur
+doublon .bandeau (commenté « à effacer »)
+.bouton*, .form-panel*, .form-groupe, .form-label, .form-ctrl, .form-grille, .col-*, .texte-secondaire, .checkboxes-groupe, .textarea-auto, .btn-ajouter-ingredient
+
+
+Auditer admin.js (jamais reçu) pour styles de mise en page en dur.
+
+Méthode de travail (rappel)
+
+Corrections par trouve / remplace, un seul changement à la fois, attendre le « ok » entre chaque.
+Ne jamais coder sans autorisation.
+Préfixe .fiches réservé au composant fiche ; utilitaires transversaux sans préfixe fiches (textes-discrets, casesacocher, champ-demi, champ-petit, zonedetexte, bouton-ajout).
+Ne pas renommer les id (ancres JS) — uniquement les classes.
