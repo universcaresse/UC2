@@ -61,7 +61,7 @@ const gammesHtml = gammes.map(gam => `
     <div class="item" onclick="fermerFicheCollection(); afficherSection('gammes', null); ouvrirFicheGamme2('${gam.gam_id}')">
       <div>
         <span class="item-nom">${(gam.nom || '').toUpperCase()}</span>
-        ${gam.description ? `<p class=item-desc">${gam.description}</p>` : ''}
+        ${gam.description ? `<p class="item-description">${gam.description}</p>` : ''}
       </div>
     </div>`).join('');
 
@@ -76,7 +76,7 @@ const gammesHtml = gammes.map(gam => `
   if (col.photo_noel_url)  wrapHtml += `<img src="${col.photo_noel_url}" class="visuel-photo">`;
  if (col.couleur_hex)     wrapHtml += `<div class="visuel-hex" style="background:${col.couleur_hex}"><span class="visuel-rang">${col.rang || ''}</span></div>`;
   const ficheExtras = document.getElementById('fiche-collection-extras');
-  if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class=visuel">${wrapHtml}</div>` : '';
+  if (ficheExtras) ficheExtras.innerHTML = wrapHtml ? `<div class="visuel">${wrapHtml}</div>` : '';
 
   document.getElementById('fiche-collection-lignes').innerHTML = gammesHtml || '<p class="vide-desc">Aucune gamme</p>';
 
