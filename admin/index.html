@@ -883,19 +883,8 @@
     <!-- ════════════════════════════════════════
      PRODUITS — Liste des produits + filtres
 -->
-        <div class="filtres-bar">
-          <div id="filtre-recette-collection-bar" class="filtres-ligne"></div>
-          <div id="filtre-recette-ligne-bar" class="filtres-ligne cache"></div>
-<select class="form-ctrl filtre-select cache" id="filtre-recette-ligne" onchange="filtrerRecettes()" disabled></select>
-          <select class="form-ctrl filtre-select cache" id="filtre-recette-statut" onchange="filtrerRecettes()">
-            <option value="">Statuts</option>
-            <option value="test">Test</option>
-            <option value="public">Public</option>
-          </select>
-          <input type="text" class="form-ctrl filtre-recherche cache" id="filtre-recette-nom" oninput="filtrerRecettes()" placeholder="Par nom">
-          
-          <button class="bouton2" onclick="reinitialiserFiltresRecettes()" title="Réinitialiser" style="margin-left:auto">✕</button>
-        </div>
+        <div id="filtre-recette-collection-bar" class="baudeaufiltre"></div>
+        <div id="filtre-recette-ligne-bar" class="baudeaufiltre cache"></div>
 		
 		
 		
