@@ -403,6 +403,17 @@ function filtrerRecettes() {
     carte.classList.toggle('cache', !ok);
     if (ok) visible++;
   });
+  if (vide) vide.classList.toggle('cache', visible !== 0);
+
+  document.querySelectorAll('#grille-produits .recette-section-ligne').forEach(function(sec) {
+    var aDesCartesVisibles = [].slice.call(sec.querySelectorAll('.carte-produit')).some(function(c) { return !c.classList.contains('cache'); });
+    sec.classList.toggle('cache', !aDesCartesVisibles);
+  });
+  document.querySelectorAll('#grille-produits .recette-section-collection').forEach(function(sec) {
+    var aDesLignesVisibles = [].slice.call(sec.querySelectorAll('.recette-section-ligne')).some(function(l) { return !l.classList.contains('cache'); });
+    sec.classList.toggle('cache', !aDesLignesVisibles);
+  });
+}
 
 
 function reinitialiserFiltresRecettes() {
