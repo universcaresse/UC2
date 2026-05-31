@@ -2217,19 +2217,9 @@ tr:has(+ .ven-resume-row) td {
 }
 
 /* ═══════════════════════════════════════
-   BANDEAU a effacer quand BANDEAUx seran en fonction—— style unifié panneau admin
-   Remplace form-panel-header et form-body-actions
+ toute cette section sera a effacée quand le ménage sera fait car les ostis de claude en ajoute et ajoute et ajoute.
    ═══════════════════════════════════════ */
-.bandeau {
-  padding: 8px 28px;
-  border: 1px solid var(--beige);
-  background: var(--blanc);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-  margin-bottom: 4px;
-}
+
 
 .bandeau .fiche-bandeau {
   padding: 0;
@@ -2238,137 +2228,6 @@ tr:has(+ .ven-resume-row) td {
   flex-direction: column;
   gap: 2px;
   flex: 1;
-}
-
-
-
-/* ════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-   Du générique et ses variantes
-   ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
-
-.textes-discrets {
-  color: var(--gris);
-  font-size: 0.85em;
-}
-.casesacocher {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-  padding: 8px 0;
-}
-.casesacocher label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-.casesacocher input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  accent-color: var(--primary);
-}
-.champ-demi {
-  grid-column: span 1;
-}
-.champ-petit {
-  max-width: 120px;
-}
-textarea.zonedetexte {
-  resize: none;
-  overflow: hidden;
-}
-
-
-
-
-/* ═══════════════════════════════════════
-   BANDEAU FILTRE — bande pleine largeur
-   ═══════════════════════════════════════ */
-.baudeaufiltre {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-  background: var(--blanc);
-  border-bottom: 0.5px solid var(--beige);
-  padding: 16px 56px;
-  margin-left: -56px;
-  margin-right: -56px;
-  margin-bottom: 24px;
-}
-
-
-/* ═══════════════════════════════════════
-   BOUTONS — base + variantes
-   ═══════════════════════════════════════ */
-.boutons {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.70rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  font-weight: 400;
-  cursor: pointer;
-  border: 0.5px solid transparent;
-  padding: 8px 28px;
-  transition: background 0.2s;
-  text-decoration: none;
-}
-.boutons-vert {
-  background: var(--primary);
-  color: white;
-}
-.boutons-contour {
-  background: transparent;
-  color: var(--gris);
-  border: 0.5px solid var(--accent);
-}
-.boutons-rouge {
-  background: var(--danger);
-  color: white;
-}
-.boutons-accent {
-  background: var(--accent);
-  color: white;
-}
-.boutons-gris {
-  background: var(--gris);
-  color: white;
-}
-
-.boutons-fermer {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1.6rem;
-  color: var(--gris);
-  padding: 8px 12px;
-}
-.boutons-petit {
-  padding: 10px 16px;
-  font-size: 0.68rem;
-}
-.boutons-ajout {
-  margin-top: 8px;
-}
-
-/* ═══════════════════════════════════════
-   BANDEAU — haut (titre + slogan + ✕) et bas (boutons)
-   ═══════════════════════════════════════ */
-.bandeau {
-  padding: 8px 28px;
-  border: 1px solid var(--beige);
-  background: var(--blanc);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-  margin-bottom: 4px;
 }
 .bandeau .fiches-bandeau {
   padding: 0;
@@ -2513,18 +2372,6 @@ textarea.zonedetexte {
 .fiches-ctrl:focus {
   border-color: var(--primary);
 }
-textarea.fiches-ctrl {
-  resize: vertical;
-  min-height: 120px;
-  line-height: 1.6;
-}
-
-/* ═══════════════════════════════════════
-   GÉNÉRIQUE - FICHES
-   consultation + modification
-   collections, gammes, familles, univers
-   ═══════════════════════════════════════ */
-
 .fiches-visuel {
   display: flex;
   flex-wrap: wrap;
@@ -2561,9 +2408,7 @@ textarea.fiches-ctrl {
   transform: translateY(-8px);
 }
 
-/* ═══════════════════════════════════════
-   GÉNÉRIQUE — responsive
-   ═══════════════════════════════════════ */
+
 @media (max-width: 900px) {
   .fiches-grille { grid-template-columns: 1fr; }
   .fiches-champ-plein { grid-column: 1; }
@@ -2573,3 +2418,10 @@ textarea.fiches-ctrl {
     margin-right: calc(-1 * var(--padding-mobile));
   }
 }
+textarea.fiches-ctrl {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+}
+
+

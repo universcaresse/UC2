@@ -1,0 +1,239 @@
+/* ═══════════════════════════════════════
+   UNIVERS CARESSE — generique.css
+   Vocabulaire commun, construit au fur et à mesure.
+   Démarrage : fiches Collections (consultation + modification).
+   Indépendant : ses propres variables ci-dessous.
+   ═══════════════════════════════════════ */
+
+:root {
+  --primaire:      #5a8a3a;
+  --primaire-04:   rgba(90,138,58,0.04);
+  --primaire-08:   rgba(90,138,58,0.08);
+  --secondaire:    #d4a445;
+  --rouge:         #c44536;
+  --sable:         #f2e4cf;
+  --blancpur:      #ffffff;
+  --grise:         #8b8680;
+  --grise-foncee:  #3d3b39;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+   Du générique et ses variantes
+   ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+
+.textes-discrets {
+  color: var(--grise);
+  font-size: 0.85em;
+}
+.casesacocher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding: 8px 0;
+}
+.casesacocher label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.casesacocher input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primaire);
+}
+.champ-demi {
+  grid-column: span 1;
+}
+.champ-petit {
+  max-width: 120px;
+}
+textarea.zonedetexte {
+  resize: none;
+  overflow: hidden;
+}
+
+.fenetre {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--blancpur);
+  overflow-y: auto;
+}
+
+.libelle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.90rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primaire);
+  display: block;
+  margin-top: 6px;
+  font-weight: 550;
+}
+.entete {
+  padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 2px; flex: 1;
+}
+.titre {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem; color: var(--grise-foncee); display: block;
+}
+.slogan {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 1rem; color: var(--secondaire); display: block; margin-top: 6px;
+}
+.actions {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.central {
+  background: white; border: 1px solid var(--sable); margin-bottom: 4px;
+}
+.central-corps {
+  padding: 14px 28px 28px;
+}
+.description {
+  font-family: 'DM Sans', sans-serif; font-size: 1rem;
+  color: var(--grise); line-height: 1.7; margin-bottom: 24px;
+}
+.section-label {
+  font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 550;
+  letter-spacing: 0.15em; text-transform: uppercase; color: var(--primaire);
+  margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--sable); margin-top: 24px;
+}
+.valeur {
+  font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+  color: var(--grise-foncee); padding: 4px 0;
+}
+.item {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; padding: 16px 20px; margin-bottom: 10px;
+  border-left: 3px solid var(--primaire); background: var(--primaire-04);
+  cursor: pointer; transition: background 0.2s, transform 0.2s;
+}
+
+.item-nom {
+  font-family: 'Playfair Display', serif; font-size: 1.05rem;
+  font-weight: 600; color: var(--primaire); display: block; letter-spacing: 0.02em;
+}
+.item-description {
+  font-family: 'DM Sans', sans-serif; font-size: 0.78rem;
+  color: var(--grise); margin-top: 6px; line-height: 1.6;
+}
+.grille {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px;
+}
+.champ {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.champ-plein {
+  grid-column: 1 / -1;
+}
+.controle {
+  width: 100%; padding: 8px 14px 6px;
+  font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 300;
+  border: 1px solid var(--sable); background: white; color: var(--grise-foncee);
+  outline: none; transition: border-color 0.2s;
+  -webkit-appearance: none; appearance: none;
+}
+.controle:focus { border-color: var(--primaire); }
+textarea.controle { resize: vertical; min-height: 120px; line-height: 1.6; }
+
+.visuel {
+  display: flex; flex-wrap: wrap; gap: 16px;
+  margin-bottom: 24px; align-items: flex-start;
+}
+.visuel-photo {
+  width: 180px; height: 180px;
+  flex-shrink: 0; overflow: hidden; object-fit: cover;
+}
+.visuel-photo img {
+  width: 180px; height: 180px; object-fit: cover; display: block;
+}
+.visuel-hex {
+  width: 180px; height: 180px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.visuel-rang {
+  font-family: 'Playfair Display', serif; font-size: 80px;
+  color: var(--blancpur); font-weight: 300; transform: translateY(-8px);
+}
+.baudeaufiltre {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  background: var(--blancpur);
+  border-bottom: 0.5px solid var(--sable);
+  padding: 16px 56px;
+  margin-left: -56px;
+  margin-right: -56px;
+  margin-bottom: 24px;
+}
+.boutons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.70rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 400;
+  cursor: pointer;
+  border: 0.5px solid transparent;
+  padding: 8px 28px;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+.boutons-vert {
+  background: var(--primaire);
+  color: white;
+}
+.boutons-contour {
+  background: transparent;
+  color: var(--grise);
+  border: 0.5px solid var(--secondaire);
+}
+.boutons-rouge {
+  background: var(--rouge);
+  color: white;
+}
+.boutons-accent {
+  background: var(--secondaire);
+  color: white;
+}
+.boutons-gris {
+  background: var(--grise);
+  color: white;
+}
+
+.boutons-fermer {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.6rem;
+  color: var(--grise);
+  padding: 8px 12px;
+}
+.boutons-petit {
+  padding: 10px 16px;
+  font-size: 0.68rem;
+}
+.boutons-ajout {
+  margin-top: 8px;
+}
+.bandeau {
+  padding: 8px 28px;
+  border: 1px solid var(--sable);
+  background: var(--blancpur);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  margin-bottom: 4px;
+}

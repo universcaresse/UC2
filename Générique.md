@@ -251,3 +251,57 @@ Corrections par trouve / remplace, un seul changement à la fois, attendre le «
 Ne jamais coder sans autorisation.
 Préfixe .fiches réservé au composant fiche ; utilitaires transversaux sans préfixe fiches (textes-discrets, casesacocher, champ-demi, champ-petit, zonedetexte, bouton-ajout).
 Ne pas renommer les id (ancres JS) — uniquement les classes.
+
+
+
+section la plus importante
+# Migration .fiches-* vers générique
+
+## Correspondances : ancien vers nouveau
+
+| Ancienne classe        | Nouvelle classe      |
+|------------------------|----------------------|
+| .fiches-bandeau        | .bandeau-entete      |
+| .fiches-titre          | .titre               |
+| .fiches-slogan         | .slogan              |
+| .fiches-actions        | .actions             |
+| .fiches-central        | .central             |
+| .fiches-central-corps  | .central-corps       |
+| .fiches-desc           | .description         |
+| .fiches-section-label  | .section-label       |
+| .fiches-valeur         | .valeur              |
+| .fiches-item           | .item                |
+| .fiches-item-nom       | .item-nom            |
+| .fiches-item-desc      | .item-description    |
+| .fiches-grille         | .grille              |
+| .fiches-champ          | .champ               |
+| .fiches-champ-plein    | .champ-plein         |
+| .fiches-label          | .libelle (deja fait) |
+| .fiches-ctrl           | .controle            |
+| .fiches-visuel         | .visuel              |
+| .fiches-visuel-photo   | .visuel-photo        |
+| .fiches-visuel-hex     | .visuel-hex          |
+| .fiches-visuel-rang    | .visuel-rang         |
+
+## Ou chercher
+
+- index.html : sections collections, gammes, familles, univers
+- admin-collections.js : ouvrirFicheCollection, modifierCollection
+- admin-gammes.js : ouvrirFicheGamme2, ouvrirFicheGamme, majApercuRangGamme
+- admin-familles.js : ouvrirFicheFamille, majApercuRangFamille
+- admin-regroupements.js : ouvrirFicheRegroupement, majApercuRangRegroupement
+
+## Methode
+
+1. Coller le bloc des nouvelles classes dans la section Generique du CSS.
+2. Remplacer chaque .fiches-xxx par son equivalent partout dans le HTML et les 4 JS.
+3. ORDRE IMPORTANT (remplacer le plus long en premier) :
+   - fiches-visuel-photo, fiches-visuel-hex, fiches-visuel-rang AVANT fiches-visuel
+   - fiches-item-nom, fiches-item-desc AVANT fiches-item
+   - fiches-central-corps AVANT fiches-central
+   - fiches-champ-plein AVANT fiches-champ
+4. Quand plus aucun .fiches- n'existe dans le HTML ni les JS, supprimer les anciens blocs .fiches-* du CSS.
+
+## Attention
+
+.section-label existe DEJA dans le CSS ancien (zone fiche collection admin) avec un style identique. En migrant fiches-section-label vers section-label, verifier qu'il n'y a pas de conflit ; n'en garder qu'une seule definition au menage final.
