@@ -819,6 +819,16 @@ function ouvrirFormCompleter(cmd_id) {
   document.getElementById('completer-livraison').value = (c.livraison && c.livraison > 0) ? c.livraison : '';
   document.getElementById('completer-note').value     = c.note_proposition || '';
   document.getElementById('completer-square').value   = c.lien_square || '';
+  if (!document.getElementById('btn-generer-square')) {
+    const btnSq = document.createElement('button');
+    btnSq.id = 'btn-generer-square';
+    btnSq.type = 'button';
+    btnSq.className = 'bouton bouton-contour';
+    btnSq.textContent = 'Générer le lien Square';
+    btnSq.style.marginTop = '8px';
+    btnSq.onclick = genererLienSquare;
+    document.getElementById('completer-square').insertAdjacentElement('afterend', btnSq);
+  }
 
   document.getElementById('fiche-commande').classList.add('cache');
   document.getElementById('contenu-commandes').classList.add('cache');
@@ -835,6 +845,23 @@ function fermerFormCompleter() {
   document.getElementById('filtres-commandes').classList.remove('cache');
   document.querySelector('#section-commandes .page-entete .bouton')?.classList.remove('cache');
   cmdCompleterIdEnCours = null;
+}
+
+async function genererLienSquare() {
+  const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
+  if (!c) return;
+  const livraison = parseFloat(String(document.getElementById('completer-livraison').value).replace(',', '.')) || 0;
+  const montant = (c.total_prevu || 0) + livraison;
+  if (montant <= 0) { afficherMsg('commandes', 'Montant invalide.', 'erreur'); return; }
+  afficherChargement();
+  const res = await appelAPIPost('creerLienPaiement', { montant: montant, nom: 'Commande ' + c.cmd_id });
+  cacherChargement();
+  if (res && res.success && res.url) {
+    document.getElementById('completer-square').value = res.url;
+    afficherMsg('commandes', '✅ Lien de paiement généré.');
+  } else {
+    afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur Square.'), 'erreur');
+  }
 }
 
 async function envoyerProposition() {
