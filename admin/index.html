@@ -2139,10 +2139,10 @@
     </div>
 
     <div class="form-panel visible">
-      <div class="form-panel-header">
-        <span class="form-panel-titre">Coordonnées du client (corrige au besoin)</span>
+      <div class="form-panel-header" style="cursor:pointer" onclick="cmdCompleterToggleClient()">
+        <span class="form-panel-titre">Coordonnées du client (corrige au besoin) <span id="completer-client-chevron">▸</span></span>
       </div>
-      <div class="form-body">
+      <div class="form-body" id="completer-client-body" style="display:none">
         <div class="form-grille">
           <div class="form-groupe col-plein">
             <label class="form-label">Prénom</label>
@@ -2179,6 +2179,23 @@
       </div>
       <div class="form-body">
         <textarea class="form-ctrl" id="completer-note" rows="4" placeholder="Message personnalisé qui accompagnera la proposition…"></textarea>
+      </div>
+    </div>
+
+    <div class="form-panel visible">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Promotion / Rabais</span>
+      </div>
+      <div class="form-body">
+        <div class="form-groupe">
+          <select class="form-ctrl" id="completer-promotion" onchange="cmdCompleterAppliquerPromo()">
+            <option value="">— Aucune —</option>
+          </select>
+        </div>
+        <div class="form-groupe" id="completer-rabais-libre-zone" style="display:none;margin-top:12px">
+          <label class="form-label" id="completer-rabais-libre-label">Rabais</label>
+          <input type="text" inputmode="decimal" class="form-ctrl" id="completer-rabais-libre" placeholder="">
+        </div>
       </div>
     </div>
 

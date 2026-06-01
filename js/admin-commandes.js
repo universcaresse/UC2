@@ -809,6 +809,13 @@ function ouvrirFormCompleter(cmd_id) {
   document.getElementById('form-completer-titre').textContent = 'Compléter la commande ' + cmd_id.replace('CMD-', '');
 
   const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmd_id);
+  cmdCompleterPanier = lignes.map(l => ({
+    pro_id: l.pro_id,
+    poids: l.format_poids,
+    unite: l.format_unite,
+    quantite: parseInt(l.quantite) || 0,
+    prix_unitaire: parseFloat(l.prix_unitaire) || 0
+  }));
   let recap = '<div style="margin-bottom:12px"><strong>' + (c.client || '—') + '</strong>';
   if (c.courriel)  recap += '<br><span class="texte-secondaire">' + c.courriel + '</span>';
   if (c.telephone) recap += '<br><span class="texte-secondaire">' + c.telephone + '</span>';
@@ -828,6 +835,15 @@ function ouvrirFormCompleter(cmd_id) {
   document.getElementById('completer-livraison').value = (c.livraison && c.livraison > 0) ? c.livraison : '';
   document.getElementById('completer-note').value     = c.note_proposition || '';
   document.getElementById('completer-square').value   = c.lien_square || '';
+  const selPromoCmd = document.getElementById('completer-promotion');
+  if (selPromoCmd) selPromoCmd.value = '';
+  const champRabaisCmd = document.getElementById('completer-rabais-libre');
+  if (champRabaisCmd) champRabaisCmd.value = '';
+  const clientBody = document.getElementById('completer-client-body');
+  if (clientBody) clientBody.style.display = 'none';
+  const clientChevron = document.getElementById('completer-client-chevron');
+  if (clientChevron) clientChevron.textContent = '▸';
+  cmdCompleterMajPromos();
   if (!document.getElementById('btn-generer-square')) {
     const btnSq = document.createElement('button');
     btnSq.id = 'btn-generer-square';
@@ -860,7 +876,8 @@ async function genererLienSquare() {
   const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
   if (!c) return;
   const livraison = parseFloat(String(document.getElementById('completer-livraison').value).replace(',', '.')) || 0;
-  const montant = (c.total_prevu || 0) + livraison;
+  const rabais = cmdCompleterCalculerRabais();
+  const montant = Math.max(0, (c.total_prevu || 0) + livraison - rabais);
   if (montant <= 0) { afficherMsg('commandes', 'Montant invalide.', 'erreur'); return; }
   afficherChargement();
   const courriel = document.getElementById('completer-courriel').value.trim();
@@ -875,6 +892,147 @@ async function genererLienSquare() {
   } else {
     afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur Square.'), 'erreur');
   }
+}
+
+var cmdCompleterPanier = [];
+
+function cmdCompleterToggleClient() {
+  const body = document.getElementById('completer-client-body');
+  const chevron = document.getElementById('completer-client-chevron');
+  if (!body) return;
+  const ouvert = body.style.display !== 'none';
+  body.style.display = ouvert ? 'none' : 'block';
+  if (chevron) chevron.textContent = ouvert ? '▸' : '▾';
+}
+
+function cmdCompleterMajPromos() {
+  const sel = document.getElementById('completer-promotion');
+  if (!sel) return;
+  const valActuelle = sel.value;
+  sel.innerHTML = '<option value="">— Aucune —</option>';
+  const totalPanier = cmdCompleterPanier.reduce((s, l) => s + l.quantite, 0);
+  (donneesPromotions || []).forEach(p => {
+    let statut = '';
+    let manque = 0;
+    if (p.type === 'qte_produit') {
+      const maxQte = Math.max(...Object.values(
+        cmdCompleterPanier.reduce((acc, l) => { acc[l.pro_id] = (acc[l.pro_id] || 0) + l.quantite; return acc; }, {})
+      ).concat([0]));
+      if (maxQte >= p.quantite_min) statut = 'applicable';
+      else { manque = p.quantite_min - maxQte; if (manque <= p.quantite_seuil) statut = 'presque'; }
+    } else if (p.type === 'qte_panier') {
+      if (totalPanier >= p.quantite_min) statut = 'applicable';
+      else { manque = p.quantite_min - totalPanier; if (manque <= p.quantite_seuil) statut = 'presque'; }
+    } else if (p.type === 'lot_complet') {
+      const ok = cmdCompleterPanier.some(l => {
+        const pro = donneesProduits.find(x => x.pro_id === l.pro_id);
+        const fmt = (pro?.formats || []).find(f => String(f.poids) === String(l.poids) && f.unite === l.unite);
+        return fmt && l.quantite >= (fmt.nb_unites || 0) && fmt.nb_unites > 0;
+      });
+      if (ok) statut = 'applicable';
+    } else if (p.type === 'ensemble_famille') {
+      if (!p.fam_id) return;
+      const produitsFamille = donneesProduits.filter(x => x.fam_id === p.fam_id);
+      const proIds = new Set(cmdCompleterPanier.map(l => l.pro_id));
+      const manquants = produitsFamille.filter(x => !proIds.has(x.pro_id));
+      if (!manquants.length) statut = 'applicable';
+      else { manque = manquants.length; if (manque <= p.quantite_seuil) statut = 'presque'; }
+    }
+    if (!statut) return;
+    const o = document.createElement('option');
+    o.value = JSON.stringify({ kind: 'programmee', promo_id: p.promo_id, statut });
+    o.textContent = (statut === 'applicable' ? '✅ ' : `🔜 (manque ${manque}) `) + p.nom;
+    sel.appendChild(o);
+  });
+  const optM = document.createElement('option');
+  optM.value = JSON.stringify({ kind: 'montant' });
+  optM.textContent = 'Montant libre ($)';
+  sel.appendChild(optM);
+  const optP = document.createElement('option');
+  optP.value = JSON.stringify({ kind: 'pourcentage' });
+  optP.textContent = '% libre';
+  sel.appendChild(optP);
+  if (valActuelle) {
+    const match = [...sel.options].find(o => o.value === valActuelle);
+    if (match) sel.value = valActuelle;
+  }
+  cmdCompleterAppliquerPromo();
+}
+
+function cmdCompleterAppliquerPromo() {
+  const sel = document.getElementById('completer-promotion');
+  const zone = document.getElementById('completer-rabais-libre-zone');
+  const champ = document.getElementById('completer-rabais-libre');
+  const label = document.getElementById('completer-rabais-libre-label');
+  if (!sel.value) { if (zone) zone.style.display = 'none'; return; }
+  const data = JSON.parse(sel.value);
+  if (data.kind === 'montant') {
+    if (zone) zone.style.display = 'block';
+    if (label) label.textContent = 'Rabais ($)';
+    if (champ) champ.placeholder = 'Ex: 5,00';
+  } else if (data.kind === 'pourcentage') {
+    if (zone) zone.style.display = 'block';
+    if (label) label.textContent = 'Rabais (%)';
+    if (champ) champ.placeholder = 'Ex: 10';
+  } else {
+    if (zone) zone.style.display = 'none';
+  }
+}
+
+function cmdCompleterCalculerRabais() {
+  const sel = document.getElementById('completer-promotion');
+  if (!sel || !sel.value) return 0;
+  const data = JSON.parse(sel.value);
+  const sousTotal = cmdCompleterPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  if (data.kind === 'programmee') {
+    if (data.statut !== 'applicable') return 0;
+    const p = donneesPromotions.find(x => x.promo_id === data.promo_id);
+    if (!p) return 0;
+    if (p.type === 'qte_produit') {
+      let rabais = 0;
+      cmdCompleterPanier.forEach(l => {
+        const qteTotale = cmdCompleterPanier.filter(x => x.pro_id === l.pro_id).reduce((s, x) => s + x.quantite, 0);
+        if (qteTotale >= p.quantite_min) rabais += p.valeur * l.quantite;
+      });
+      return rabais;
+    }
+    return sousTotal * (p.valeur / 100);
+  }
+  if (data.kind === 'montant') {
+    const v = parseFloat(String(document.getElementById('completer-rabais-libre').value).replace(',', '.')) || 0;
+    return Math.max(0, v);
+  }
+  if (data.kind === 'pourcentage') {
+    const v = parseFloat(String(document.getElementById('completer-rabais-libre').value).replace(',', '.')) || 0;
+    return sousTotal * (Math.max(0, Math.min(100, v)) / 100);
+  }
+  return 0;
+}
+
+function cmdCompleterNomPromo() {
+  const sel = document.getElementById('completer-promotion');
+  if (!sel || !sel.value) return '';
+  const data = JSON.parse(sel.value);
+  if (data.kind === 'programmee') {
+    const p = donneesPromotions.find(x => x.promo_id === data.promo_id);
+    return p ? p.nom : '';
+  }
+  if (data.kind === 'montant') return 'Rabais';
+  if (data.kind === 'pourcentage') {
+    const v = parseFloat(String(document.getElementById('completer-rabais-libre').value).replace(',', '.')) || 0;
+    return `Rabais (${v} %)`;
+  }
+  return '';
+}
+
+function cmdCompleterTypePromo() {
+  const sel = document.getElementById('completer-promotion');
+  if (!sel || !sel.value) return { type: '', promo_id: '' };
+  const data = JSON.parse(sel.value);
+  if (data.kind === 'programmee')  return { type: 'programmée', promo_id: data.promo_id };
+  if (data.kind === 'montant')     return { type: 'montant', promo_id: '' };
+  if (data.kind === 'pourcentage') return { type: 'pourcentage', promo_id: '' };
+  return { type: '', promo_id: '' };
 }
 
 async function envoyerProposition() {
@@ -913,7 +1071,9 @@ async function envoyerProposition() {
     prix_unitaire: l.prix_unitaire
   }));
 
-  const totalAvec = (c.total_prevu || 0) + livraisonNum;
+  const rabais = cmdCompleterCalculerRabais();
+  const promoInfo = cmdCompleterTypePromo();
+  const totalAvec = Math.max(0, (c.total_prevu || 0) + livraisonNum - rabais);
 
   const resUpdate = await appelAPIPost('updateCommandeComplete', {
     cmd_id: cmdCompleterIdEnCours,
@@ -929,6 +1089,9 @@ async function envoyerProposition() {
     note_proposition: note,
     lien_square: square,
     livraison: livraisonNum,
+    rabais: rabais,
+    promo_id: promoInfo.promo_id,
+    type_promo: promoInfo.type,
     date_proposition: dateProposition,
     lignes: lignesPayload
   });
@@ -970,6 +1133,8 @@ async function envoyerProposition() {
     lien_square: square,
     lignes: lignesCourriel,
     sous_total: formaterPrix(c.total_prevu || 0),
+    rabais: rabais > 0 ? formaterPrix(rabais) : 0,
+    promo_nom: cmdCompleterNomPromo(),
     livraison: livraisonNum > 0 ? formaterPrix(livraisonNum) : 0,
     total: formaterPrix(totalAvec)
   });
