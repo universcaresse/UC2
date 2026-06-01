@@ -221,7 +221,7 @@ function demandeCreerModalListe() {
         '<button type="button" class="bouton bouton-grand demande-form-envoyer" data-action="envoyer">Envoyer la demande</button>' +
       '</div>' +
       '<div id="demande-vue-merci" class="cache">' +
-        '<h2 class="demande-modal-titre">Demande envoyée !</h2>' +
+        '<h2 class="demande-modal-titre">Coups de cœur reçus!</h2>' +
         '<p class="demande-form-intro">Merci! Nous avons bien reçu vos Coups de coeur. Nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison. À bientôt!</p>' +
         '<p class="demande-form-intro">Surveillez votre boîte de réception et pensez à vérifier vos pourriels, au cas où.</p>' +
         '<button type="button" class="bouton bouton-grand demande-continuer" data-action="fermer">Fermer</button>' +
@@ -377,7 +377,7 @@ async function demandeEnvoyer() {
     erreurEl.textContent = "Une erreur s'est produite. Veuillez réessayer ou nous écrire directement.";
     erreurEl.classList.remove('cache');
   }
-  if (btn) { btn.disabled = false; btn.textContent = 'Envoyer la demande'; }
+  if (btn) { btn.disabled = false; btn.textContent = 'Envoyer mes coups de cœur'; }
 }
 
 // ─── INITIALISATION ───
