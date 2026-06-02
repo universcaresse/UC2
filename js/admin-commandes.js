@@ -520,7 +520,7 @@ async function voirDetailCommande(cmd_id) {
   });
 
   // Afficher la fiche
-  document.getElementById('fiche-commande-titre').textContent = 'Commande ' + c.cmd_id.replace('CMD-', '');
+  document.getElementById('fiche-commande-titre').textContent = 'Commande ' + c.cmd_id.replace('CMD-', '-');
 
   let html = `
     <div style="margin-bottom:16px">
@@ -884,7 +884,7 @@ async function genererLienSquare() {
   const telephone = document.getElementById('completer-telephone').value.trim();
   const prenom = document.getElementById('completer-prenom').value.trim();
   const nomClient = document.getElementById('completer-client').value.trim();
-  const res = await appelAPIPost('creerLienPaiement', { montant: montant, nom: 'Commande ' + c.cmd_id, courriel: courriel, telephone: telephone, prenom: prenom, nom_client: nomClient });
+  const res = await appelAPIPost('creerLienPaiement', { montant: montant, nom: 'Vos coups de cœur. Commande ' + c.cmd_id.replace('CMD-', '-'), courriel: courriel, telephone: telephone, prenom: prenom, nom_client: nomClient });
   cacherChargement();
   if (res && res.success && res.url) {
     document.getElementById('completer-square').value = res.url;
@@ -1085,7 +1085,7 @@ function apercuProposition() {
   <div style="padding:28px;color:#3d3b39;line-height:1.6;font-family:'DM Sans',sans-serif">
     <p>Bonjour,</p>
     ${noteHTML}
-    <div style="margin:24px 0 16px;font-size:0.7rem;letter-spacing:0.2em;color:#8b8680;text-transform:uppercase">Votre commande — ${c.cmd_id}</div>
+    <div style="margin:24px 0 16px;font-size:0.7rem;letter-spacing:0.2em;color:#8b8680;text-transform:uppercase">Votre commande — ${c.cmd_id.replace('CMD-', '-')}</div>
     <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
       <thead>
         <tr style="border-bottom:2px solid #f2e4cf">
