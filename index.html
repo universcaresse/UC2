@@ -863,9 +863,43 @@
 
     </div>
 
+ <!-- ══════════════════════════════════
+       SECTION MERCI — retour paiement Square
+  ══════════════════════════════════ -->
+  <section id="section-merci" class="page-section">
+    <div class="hero">
+
+      <!-- GAUCHE : message -->
+      <div class="hero-left">
+        <div style="font-family:'Birthstone',cursive;font-size:clamp(3rem,7vw,5rem);color:var(--accent);line-height:1;margin-bottom:24px">Merci!</div>
+        <p class="page-hero-texte" style="margin-top:0">Nous avons bien reçu votre paiement via Square.</p>
+        <p class="page-hero-texte" style="margin-top:16px">Nous allons préparer et expédier votre commande dans les 3 jours ouvrables. Une confirmation par courriel et par texto vous sera envoyée dès l'expédition.</p>
+        <div class="page-hero-signature-bloc">
+          <div class="page-hero-signature">Merci de votre confiance</div>
+          <div class="page-hero-titre-signature">L'équipe Univers Caresse — Savonnerie artisanale</div>
+        </div>
+      </div>
+
+      <!-- DROITE : logo + bouton + stats (comme l'accueil) -->
+      <div class="hero-left">
+        <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1779274322/Logofinal_kphpp9.png" alt="Univers Caresse" class="hero-logo-img">
+        <a href="#accueil" class="bouton bouton-grand" onclick="naviguer('accueil')">
+          Retour à l'accueil
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="hero-stat-num visible" id="merci-stat-collections">—</div><div class="hero-stat-label">Collections</div></div>
+          <div class="hero-stat"><div class="hero-stat-num visible" id="merci-stat-univers">—</div><div class="hero-stat-label">Univers</div></div>
+          <div class="hero-stat"><div class="hero-stat-num visible" id="merci-stat-artisanal">—</div><div class="hero-stat-label">Artisanal</div></div>
+        </div>
+      </div>
+
+    </div>
   </section>
 
 </main>
+
+
 
 <footer>
   <div class="footer-left">

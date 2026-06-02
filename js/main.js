@@ -48,6 +48,7 @@ let accueilAnime = false;
 
 // ─── INITIALISATION ───
 document.addEventListener('DOMContentLoaded', async () => {
+  verifierRetourPaiement();
   verifierSession();
   initNav();
   initScrollAnimations();
@@ -59,7 +60,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     afficherCollectionsPublic();
     afficherNbProduits();
     afficherRegroupementsPublic();
-    document.querySelectorAll('.hero-stat-num').forEach(el => setTimeout(() => el.classList.add('visible'), 50));
+    const cp = (de, vers) => { const a = document.getElementById(de), b = document.getElementById(vers); if (a && b) b.textContent = a.textContent; };
+    cp('hero-stat-collections', 'merci-stat-collections');
+    cp('hero-stat-univers', 'merci-stat-univers');
+    cp('contenu-accueil-stat-valeur', 'merci-stat-artisanal');
+    document.querySelectorAll('.hero-stat-num').forEach(el => setTimeout(() => el.classList.add('visible'), 50));classList.add('visible'), 50));
   }
 });
 
@@ -177,6 +182,13 @@ function verifierSession() {
   if (session === 'true') {
     adminConnecte = true;
     afficherModeAdmin();
+  }
+}
+
+function verifierRetourPaiement() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('paiement') === 'recu' || window.location.hash === '#merci') {
+    window.location.hash = 'merci';
   }
 }
 
