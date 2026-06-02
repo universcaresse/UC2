@@ -60,10 +60,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     afficherCollectionsPublic();
     afficherNbProduits();
     afficherRegroupementsPublic();
-    const cp = (de, vers) => { const a = document.getElementById(de), b = document.getElementById(vers); if (a && b) b.textContent = a.textContent; };
-    cp('hero-stat-collections', 'merci-stat-collections');
-    cp('hero-stat-univers', 'merci-stat-univers');
-    cp('contenu-accueil-stat-valeur', 'merci-stat-artisanal');
     document.querySelectorAll('.hero-stat-num').forEach(el => setTimeout(() => el.classList.add('visible'), 50));
   }
 });
