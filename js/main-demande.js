@@ -405,3 +405,20 @@ document.addEventListener('DOMContentLoaded', () => {
   demandeCreerModalListe();
   demandeRafraichirAffichage();
 });
+
+
+// ── Étape 2 — lire le numéro de commande dans le lien ──
+window.addEventListener('DOMContentLoaded', function () {
+  const params = new URLSearchParams(window.location.search);
+  const numero = params.get('cmd');
+  if (!numero) return; // pas de numéro → la page reste normale
+
+  // Ouvrir la section coup de cœur
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  const section = document.getElementById('section-coupdecoeur');
+  if (section) section.classList.add('active');
+
+  // Preuve temporaire que le numéro est bien lu
+  const zone = document.getElementById('coupdecoeur-commande');
+  if (zone) zone.textContent = 'Commande lue : ' + numero;
+});
