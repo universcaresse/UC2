@@ -416,12 +416,13 @@ window.addEventListener('DOMContentLoaded', async function () {
   document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
   const section = document.getElementById('section-coupdecoeur');
   if (section) section.classList.add('active');
+  const zone = document.getElementById('coupdecoeur-commande');
 
   try {
-    const res = (typeof appelAPIPost === 'function')
-      ? await appelAPIPost('getCommandePublique', { cmd_id: numero })
-      : null;
-    if (!res || !res.success) return;
+    if (typeof appelAPIPost !== 'function') { if (zone) zone.textContent = 'appelAPIPost absent'; return; }
+    const res = await appelAPIPost('getCommandePublique', { cmd_id: numero });
+    if (!res)         { if (zone) zone.textContent = 'Aucune réponse du serveur'; return; }
+    if (!res.success) { if (zone) zone.textContent = 'Réponse : ' + (res.message || 'échec'); return; }
 
     demandeListe = res.lignes.map(l => ({
       pro_id: l.pro_id, format_poids: l.format_poids, format_unite: l.format_unite,
@@ -431,5 +432,7 @@ window.addEventListener('DOMContentLoaded', async function () {
     sauvegarderDemandeListe();
     demandeRafraichirAffichage();
     demandeOuvrirModalListe();
-  } catch (e) {}
+  } catch (e) {
+    if (zone) zone.textContent = 'Erreur : ' + e.message;
+  }
 });
