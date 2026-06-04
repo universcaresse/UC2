@@ -447,30 +447,32 @@ window.addEventListener('DOMContentLoaded', async function () {
     function coupdecoeurRendre() {
       if (!zone) return;
       if (!demandeListe.length) {
-        zone.innerHTML = '<h2 class="demande-modal-titre">Vos Coups de cœur</h2>' +
-          '<p>Vous avez retiré tous les produits. Si c\'est une erreur, rechargez la page.</p>' +
+        zone.innerHTML = '<h2 class="titre">Vos Coups de cœur</h2>' +
+          '<p class="textes-discrets">Vous avez retiré tous les produits. Si c\'est une erreur, rechargez la page.</p>' +
           '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
         return;
       }
       let total = 0;
-      let html = '<h2 class="demande-modal-titre">Vos Coups de cœur</h2><div class="coupdecoeur-liste">';
+      let html = '';
       demandeListe.forEach(i => {
         const sous = (i.prix_unitaire || 0) * (i.quantite || 1);
         total += sous;
         const cle = i.pro_id + '|' + i.format_poids + '|' + i.format_unite;
-        html += '<div class="coupdecoeur-ligne" data-cle="' + cle + '">' +
-            '<div class="coupdecoeur-nom">' + (i.nom_produit || i.pro_id) + '</div>' +
-            '<div class="coupdecoeur-format">' + i.format_poids + ' ' + i.format_unite + '</div>' +
-            '<div class="coupdecoeur-controles">' +
-              '<button type="button" class="coupdecoeur-moins" data-action="moins">−</button>' +
-              '<span class="coupdecoeur-qte">' + (i.quantite || 1) + '</span>' +
-              '<button type="button" class="coupdecoeur-plus" data-action="plus">+</button>' +
-              '<button type="button" class="coupdecoeur-retirer" data-action="retirer">Retirer</button>' +
+        html += '<div class="rangeeitem" data-cle="' + cle + '">' +
+            '<div class="rangeeitem-info">' +
+              '<div class="rangeeitem-titre">' + (i.nom_produit || i.pro_id) + '</div>' +
+              '<div class="rangeeitem-meta">' + i.format_poids + ' ' + i.format_unite + '</div>' +
             '</div>' +
-            '<div class="coupdecoeur-sous">' + sous.toFixed(2).replace('.', ',') + ' $</div>' +
+            '<div class="compteur">' +
+              '<button type="button" class="compteur-btn" data-action="moins">−</button>' +
+              '<span class="compteur-valeur">' + (i.quantite || 1) + '</span>' +
+              '<button type="button" class="compteur-btn" data-action="plus">+</button>' +
+            '</div>' +
+            '<button type="button" class="bouton bouton-contour bouton-petit" data-action="retirer">Retirer</button>' +
+            '<div class="rangeeitem-valeur">' + sous.toFixed(2).replace('.', ',') + ' $</div>' +
           '</div>';
       });
-      html += '</div><div class="coupdecoeur-pied"><span>Total avant les frais de livraison</span>' +
+      html += '<div class="lignetotal"><span class="lignetotal-libelle">Total avant les frais de livraison</span>' +
         '<span>' + total.toFixed(2).replace('.', ',') + ' $</span></div>' +
         '<button type="button" class="bouton bouton-grand" data-action="renvoyer">Renvoyer ma liste</button>' +
         '<div id="coupdecoeur-msg" class="cache"></div>';
