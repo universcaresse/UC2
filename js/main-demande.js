@@ -411,6 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('DOMContentLoaded', async function () {
   const params = new URLSearchParams(window.location.search);
   const numero = params.get('cmd');
+  const jeton = params.get('jeton');
   if (!numero) return;
 
   document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
@@ -420,7 +421,7 @@ window.addEventListener('DOMContentLoaded', async function () {
 
   try {
     if (typeof appelAPIPost !== 'function') { if (zone) zone.textContent = 'appelAPIPost absent'; return; }
-    const res = await appelAPIPost('getCommandePublique', { cmd_id: numero });
+    const res = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
     if (!res)         { if (zone) zone.textContent = 'Aucune réponse du serveur'; return; }
     if (!res.success) { if (zone) zone.textContent = 'Réponse : ' + (res.message || 'échec'); return; }
 
@@ -492,7 +493,7 @@ window.addEventListener('DOMContentLoaded', async function () {
             pro_id: i.pro_id, format_poids: i.format_poids, format_unite: i.format_unite,
             quantite: i.quantite, prix_unitaire: i.prix_unitaire
           }));
-          const r = await appelAPIPost('renvoyerListeCoupdecoeur', { cmd_id: numero, lignes });
+          const r = await appelAPIPost('renvoyerListeCoupdecoeur', { cmd_id: numero, lignes, jeton: jeton });
           if (r && r.success) {
             zone.innerHTML = '<h2 class="demande-modal-titre">Merci !</h2>' +
               '<p>Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt.</p>' +
