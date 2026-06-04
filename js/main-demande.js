@@ -424,6 +424,17 @@ window.addEventListener('DOMContentLoaded', async function () {
     if (!res)         { if (zone) zone.textContent = 'Aucune réponse du serveur'; return; }
     if (!res.success) { if (zone) zone.textContent = 'Réponse : ' + (res.message || 'échec'); return; }
 
+    if (res.statut !== 'En attente de paiement') {
+      if (zone) zone.innerHTML = '';
+      const bloque = document.getElementById('coupdecoeur-bloque');
+      if (bloque) {
+        bloque.classList.remove('cache');
+        bloque.innerHTML = '<p>Cette commande ne peut plus être modifiée.</p>' +
+          '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+      }
+      return;
+    }
+
     demandeListe = res.lignes.map(l => ({
       pro_id: l.pro_id, format_poids: l.format_poids, format_unite: l.format_unite,
       nom_produit: l.nom, prix_unitaire: l.prix_unitaire, image_url: l.image_url,
