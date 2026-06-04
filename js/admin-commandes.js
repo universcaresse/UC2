@@ -417,6 +417,8 @@ function afficherTableauCommandes(items) {
   // Blocs dans l'ordre d'affichage (statuts d'aujourd'hui)
   const blocs = [
     { titre: 'ENTRANTES',              statuts: ['En attente'] },
+    { titre: 'MODIFIÉES',              statuts: ['Modifiée'] },
+    { titre: 'QUESTIONS',              statuts: ['Question'] },
     { titre: 'EN ATTENTE DE PAIEMENT', statuts: ['En attente de paiement'] },
     { titre: 'À EXPÉDIER',             statuts: ['À expédier'] },
     { titre: 'TERMINÉES',              statuts: ['Terminée'] },
