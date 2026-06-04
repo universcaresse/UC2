@@ -594,6 +594,7 @@ async function voirDetailCommande(cmd_id) {
   }
   if (c.statut === 'En attente de paiement') {
     actionsHTML += `<button class="bouton bouton-or" onclick="paiementRecu('${c.cmd_id}')">Paiement reçu</button>`;
+    actionsHTML += `<button class="bouton bouton-contour" onclick="renvoyerPropositionV3('${c.cmd_id}')">Renvoyer la proposition</button>`;
     actionsHTML += `<button class="bouton bouton-contour" onclick="textoProposition('${c.cmd_id}')">Texto au client</button>`;
     actionsHTML += `<button class="bouton" onclick="modifierProduitsCommande('${c.cmd_id}')">Modifier les produits</button>`;
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
@@ -1233,7 +1234,7 @@ async function envoyerProposition() {
   fermerFormCompleter();
   chargerCommandes();
 }
-async function envoyerPropositiontest() {
+async function envoyerPropositionV3() { {
   if (!cmdCompleterIdEnCours) return;
   const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
   if (!c) return;
@@ -1324,7 +1325,7 @@ async function envoyerPropositiontest() {
     };
   });
 
-  const resCourriel = await appelAPIPost('envoyerPropositiontest', {
+  const resCourriel = await appelAPIPost('envoyerPropositionV3', {
     courriel: courriel,
     client: client,
     numero: c.cmd_id,
@@ -1396,4 +1397,55 @@ function textoProposition(cmd_id) {
   texte += 'Merci !\nUnivers Caresse';
 
   window.open('sms:' + telephone + '?body=' + encodeURIComponent(texte));
+}
+
+// ═══════════════════════════════════════
+// RENVOYER LA MÊME PROPOSITION (v3) — sans toucher stock ni statut
+// ═══════════════════════════════════════
+function renvoyerPropositionV3(cmd_id) {
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  if (!c) return;
+  const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmd_id);
+  if (!lignes.length) { afficherMsg('commandes', 'Aucune ligne pour cette commande.', 'erreur'); return; }
+
+  confirmerAction('Renvoyer la même proposition à ' + (c.courriel || 'ce client') + ' ?', async () => {
+    const lignesCourriel = lignes.map(l => {
+      const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
+      return {
+        nom: pro ? pro.nom : l.pro_id,
+        poids: l.format_poids,
+        unite: l.format_unite,
+        quantite: l.quantite,
+        prix_unitaire: formaterPrix(l.prix_unitaire),
+        prix_total: formaterPrix(l.prix_unitaire * l.quantite)
+      };
+    });
+
+    const sousTotal = lignes.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+    const rabais    = c.rabais || 0;
+    const livraison = c.livraison || 0;
+    const total     = Math.max(0, sousTotal - rabais + livraison);
+
+    afficherChargement();
+    const res = await appelAPIPost('envoyerPropositionV3', {
+      courriel:    c.courriel,
+      client:      c.client,
+      numero:      c.cmd_id,
+      note:        c.note_proposition || '',
+      lien_square: c.lien_square || '',
+      lignes:      lignesCourriel,
+      sous_total:  formaterPrix(sousTotal),
+      rabais:      rabais > 0 ? formaterPrix(rabais) : 0,
+      promo_nom:   '',
+      livraison:   livraison > 0 ? formaterPrix(livraison) : 0,
+      total:       formaterPrix(total)
+    });
+    cacherChargement();
+
+    if (res && res.success) {
+      afficherMsg('commandes', '✅ Proposition renvoyée.');
+    } else {
+      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    }
+  });
 }
