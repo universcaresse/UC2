@@ -1,7 +1,7 @@
 # MÉTHODE DE TRAVAIL — Chantal / Univers Caresse
 ### À lire en entier AVANT de commencer. Ces règles passent avant tout le reste. Chantal dirige.
 
---- 
+---
 
 ## 1. Le code
 
@@ -31,6 +31,8 @@
 ---
 
 ## 2. La conversation
+
+2.0 🔴 **DEUX MD AU TOTAL — `METHODE.md` ET `ETAT.md`. JAMAIS PLUS.** Toute analyse, rapport, carte, liste ou plan se verse DANS `ETAT.md`, jamais dans un nouveau fichier.
 
 2.1 **Réponses COURTES. Une idée à la fois.** Pas de roman.
 
