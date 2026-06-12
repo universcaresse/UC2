@@ -1,7 +1,7 @@
 # Système de demande de commande — Notes de discussion
 
 ## Contexte et philosophie
-
+ 
 Univers Caresse est une savonnerie artisanale avec peu d'inventaire. Le site ne doit **pas** être transactionnel. L'objectif est de garder le contact humain avec le client : discuter des délais, des coûts, de la disponibilité avant tout engagement.
 
 Le formulaire de contact actuel existe mais reste générique. Rien n'invite clairement le client à manifester son intérêt pour un ou plusieurs produits, ni ne lui explique comment procéder.

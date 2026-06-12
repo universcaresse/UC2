@@ -12,7 +12,7 @@ Une fiche = toujours 3 blocs :
 3. Bandeau du bas (boutons d'action)
 
 Les boutons = une famille `.boutons` avec variantes de couleur.
-
+ 
 ---
 
 ## CSS générique déjà créé

@@ -3,7 +3,7 @@
 À coller au début d'une nouvelle conversation pour continuer sans tout recommencer.
 
 ---
-
+ 
 ## RÈGLES DE TRAVAIL (à respecter absolument)
 
 - **Aucun code sans mon OK explicite.** Quand on construira : par trouve-et-remplace, un changement à la fois, attendre un OK entre chaque.

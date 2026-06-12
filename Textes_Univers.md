@@ -2,7 +2,7 @@
 *Mis à jour : 25 mai 2026*
 
 ---
-
+ 
 ## LUI
 **Slogan :** Simplement la nature au masculin
 
