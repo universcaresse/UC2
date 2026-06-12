@@ -40,7 +40,12 @@ async function chargerVentes() {
   if (loading) loading.classList.remove('cache');
   const res = await appelAPI('getVentesEntete');
   if (loading) loading.classList.add('cache');
-  if (!res || !res.success || !res.items.length) {
+  if (!res || !res.success) {
+    toutesVentes = [];
+    afficherMsg('ventes', '❌ Erreur de connexion. Rouvre la section pour réessayer.', 'erreur');
+    return;
+  }
+  if (!res.items.length) {
     toutesVentes = [];
     if (vide) vide.classList.remove('cache');
     return;
@@ -865,7 +870,7 @@ async function finaliserVente(modePaiement) {
   // Lignes (sauf pour un encaissement de vente "à payer")
   if (!encaissementAPayer) {
     for (const l of venPanier) {
-      await appelAPIPost('addVenteLigne', {
+      const resLigne = await appelAPIPost('addVenteLigne', {
         ven_id,
         pro_id: l.pro_id,
         lot_id: l.lot_id,
@@ -874,6 +879,11 @@ async function finaliserVente(modePaiement) {
         format_poids: l.poids,
         format_unite: l.unite
       });
+      if (!resLigne || !resLigne.success) {
+        cacherChargement();
+        afficherMsg('ventes', `❌ Le produit « ${l.nom} » n'a pas pu être enregistré. La vente n'a PAS été finalisée. Reprends la finalisation.`, 'erreur');
+        return;
+      }
     }
   }
 

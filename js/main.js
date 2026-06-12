@@ -445,11 +445,12 @@ function chargerCatalogue() {
     return;
   }
   
-  catalogueCharge = true;
-  catalogueTimestamp = maintenant;
+  
   
  try {
     if (donneesCatalogue && donneesCatalogue.produits) {
+      catalogueCharge = true;
+      catalogueTimestamp = maintenant;
       construireCatalogue();
     } else {
       appelAPI('getCatalogue').then(resCat => {
@@ -458,6 +459,8 @@ function chargerCatalogue() {
           return;
         }
         donneesCatalogue = resCat;
+        catalogueCharge = true;
+        catalogueTimestamp = maintenant;
         construireCatalogue();
       });
     }

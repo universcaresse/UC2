@@ -22,7 +22,12 @@ async function chargerRemboursements() {
 
   if (loading) loading.classList.add('cache');
 
-  if (!res || !res.success || !res.items.length) {
+  if (!res || !res.success) {
+    toutesRemboursements = [];
+    afficherMsg('remboursements', '❌ Erreur de connexion. Rouvre la section pour réessayer.', 'erreur');
+    return;
+  }
+  if (!res.items.length) {
     toutesRemboursements = [];
     const tableau = document.getElementById('tableau-remboursements');
     if (tableau) tableau.innerHTML = '';
