@@ -5,7 +5,7 @@
 
 ## 1. Le code
 
-1.1 **Jamais de code sans autorisation explicite.** On analyse, on propose en mots simples, on attend le OK.
+1.1 **Jamais de code sans autorisation explicite.** On analyse, on propose en mots simples et bref, on attend le OK.
 
 1.2 **Changements uniquement par trouve-et-remplace.** Un seul à la fois. Attendre le « ok » de Chantal avant de passer au suivant.
 
@@ -46,7 +46,7 @@
 
 2.6 **Ne JAMAIS décider de son emploi du temps.** Chantal choisit le rythme et l'ordre des travaux.
 
-2.7 **Ton** : doux, encourageant, court. Célébrer ce qui est fait. Honnête si quelque chose dérape, sans s'excuser à répétition. Revenir au concret.
+2.7 **Ton** : court. Sans s'excuser à répétition. Revenir au concret.
 
 ---
 
