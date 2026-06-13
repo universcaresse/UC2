@@ -4,6 +4,38 @@
 
 var refDonnees = [];
 var refActifId = null;
+var _refModalCallback = null;
+
+// ─── MODALE SAISIE ───
+
+function refOuvrirModalSaisie(titre, label, valeurDefaut, callback) {
+  document.getElementById('modal-ref-saisie-titre').textContent = titre;
+  document.getElementById('modal-ref-saisie-label').textContent = label;
+  const input = document.getElementById('modal-ref-saisie-valeur');
+  input.value = valeurDefaut || '';
+  _refModalCallback = callback;
+  document.getElementById('modal-ref-saisie').classList.add('ouvert');
+  setTimeout(() => input.focus(), 50);
+}
+
+function refFermerModalSaisie() {
+  document.getElementById('modal-ref-saisie').classList.remove('ouvert');
+  _refModalCallback = null;
+}
+
+function refConfirmerModalSaisie() {
+  const val = document.getElementById('modal-ref-saisie-valeur').value.trim();
+  if (!val) return;
+  refFermerModalSaisie();
+  if (_refModalCallback) _refModalCallback(val);
+}
+
+// Confirmer avec Enter
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('modal-ref-saisie')?.classList.contains('ouvert')) {
+    refConfirmerModalSaisie();
+  }
+});
 
 // ─── CHARGER ───
 
@@ -44,9 +76,11 @@ function refRendreListe() {
   }
 
   liste.innerHTML = refDonnees.map(r =>
-    '<button class="ref-liste-item' + (r.ref_id === refActifId ? ' actif' : '') + '" onclick="refSelectionner(\'' + r.ref_id + '\')">' +
-      '<span class="ref-liste-nom">' + (r.nom || '—') + '</span>' +
-    '</button>'
+    '<div class="item' + (r.ref_id === refActifId ? ' item-actif' : '') + '" onclick="refSelectionner(\'' + r.ref_id + '\')" style="cursor:pointer;margin-bottom:4px">' +
+      '<div><span class="item-nom">' + (r.nom || '—') + '</span>' +
+      (r.lien ? '<div class="item-description">' + r.lien + '</div>' : '') +
+      '</div>' +
+    '</div>'
   ).join('');
 }
 
@@ -69,69 +103,77 @@ function refRendreDetail(ref) {
   }
 
   const etapesHtml = (ref.etapes || []).map((e, i) =>
-    '<div class="ref-etape" data-index="' + i + '">' +
-      '<span class="ref-etape-num">' + (i + 1) + '</span>' +
-      '<span class="ref-etape-texte">' + e + '</span>' +
-      '<div class="ref-etape-actions">' +
-        '<button class="bouton bouton-petit bouton-contour" onclick="refMonterEtape(' + i + ')" ' + (i === 0 ? 'disabled' : '') + '>↑</button>' +
-        '<button class="bouton bouton-petit bouton-contour" onclick="refDescendreEtape(' + i + ')" ' + (i === (ref.etapes.length - 1) ? 'disabled' : '') + '>↓</button>' +
-        '<button class="bouton bouton-petit bouton-contour" onclick="refModifierEtape(' + i + ')">Modifier</button>' +
-        '<button class="bouton bouton-petit bouton-rouge" onclick="refSupprimerEtape(' + i + ')">✕</button>' +
+    '<div class="rangeeitem" data-index="' + i + '">' +
+      '<span class="rangeeitem-meta" style="min-width:24px">' + (i + 1) + '</span>' +
+      '<div class="rangeeitem-info"><div class="rangeeitem-titre">' + e + '</div></div>' +
+      '<div style="display:flex;gap:6px">' +
+        '<button class="boutons boutons-contour boutons-petit" onclick="refMonterEtape(' + i + ')" ' + (i === 0 ? 'disabled' : '') + '>↑</button>' +
+        '<button class="boutons boutons-contour boutons-petit" onclick="refDescendreEtape(' + i + ')" ' + (i === (ref.etapes.length - 1) ? 'disabled' : '') + '>↓</button>' +
+        '<button class="boutons boutons-contour boutons-petit" onclick="refModifierEtape(' + i + ')">Modifier</button>' +
+        '<button class="boutons boutons-rouge boutons-petit" onclick="refSupprimerEtape(' + i + ')">✕</button>' +
       '</div>' +
     '</div>'
   ).join('');
 
   zone.innerHTML =
-    '<div class="ref-detail-entete">' +
-      '<div class="form-groupe">' +
-        '<label class="form-label">Nom</label>' +
-        '<input class="form-ctrl" id="ref-nom" value="' + (ref.nom || '') + '" oninput="refMettreAJour()">' +
+    '<div class="bandeau" style="margin-bottom:12px">' +
+      '<div class="entete">' +
+        '<span class="titre" id="ref-detail-nom">' + (ref.nom || '—') + '</span>' +
+        (ref.lien ? '<a href="' + ref.lien + '" target="_blank" class="slogan">' + ref.lien + '</a>' : '<span class="slogan">Aucun lien</span>') +
       '</div>' +
-      '<div class="form-groupe">' +
-        '<label class="form-label">Lien</label>' +
-        '<div style="display:flex;gap:8px;align-items:center">' +
-          '<input class="form-ctrl" id="ref-lien" value="' + (ref.lien || '') + '" oninput="refMettreAJour()">' +
-          '<a href="' + (ref.lien || '#') + '" target="_blank" class="bouton bouton-contour bouton-petit">Ouvrir</a>' +
-        '</div>' +
+      '<div class="actions">' +
+        '<button class="boutons boutons-contour boutons-petit" onclick="refModifierNom()">Renommer</button>' +
+        '<button class="boutons boutons-contour boutons-petit" onclick="refModifierLien()">Modifier le lien</button>' +
+        '<button class="boutons boutons-rouge boutons-petit" onclick="refSupprimerOutil()">Supprimer</button>' +
       '</div>' +
     '</div>' +
-    '<div class="ref-etapes-titre">Étapes</div>' +
-    '<div id="ref-etapes-liste">' + (etapesHtml || '<div class="vide-desc" style="padding:8px">Aucune étape</div>') + '</div>' +
-    '<div style="margin-top:12px;display:flex;gap:8px">' +
-      '<button class="bouton bouton-contour" onclick="refAjouterEtape()">+ Ajouter une étape</button>' +
-      '<button class="bouton bouton-rouge" onclick="refSupprimerOutil()">Supprimer cet outil</button>' +
+    '<div class="section-label">Étapes</div>' +
+    '<div id="ref-etapes-liste">' + (etapesHtml || '<div class="vide-desc">Aucune étape</div>') + '</div>' +
+    '<div style="margin-top:12px">' +
+      '<button class="boutons boutons-contour" onclick="refAjouterEtape()">+ Ajouter une étape</button>' +
     '</div>';
 }
 
-// ─── MODIFICATIONS EN DIRECT ───
+// ─── MODIFIER NOM / LIEN ───
 
-function refMettreAJour() {
+function refModifierNom() {
   const ref = refDonnees.find(r => r.ref_id === refActifId);
   if (!ref) return;
-  ref.nom  = document.getElementById('ref-nom')?.value  || '';
-  ref.lien = document.getElementById('ref-lien')?.value || '';
-  refRendreListe();
+  refOuvrirModalSaisie('Renommer', 'Nom de l\'outil', ref.nom, val => {
+    ref.nom = val;
+    refRendreListe();
+    refRendreDetail(ref);
+  });
+}
+
+function refModifierLien() {
+  const ref = refDonnees.find(r => r.ref_id === refActifId);
+  if (!ref) return;
+  refOuvrirModalSaisie('Modifier le lien', 'URL', ref.lien, val => {
+    ref.lien = val;
+    refRendreDetail(ref);
+  });
 }
 
 // ─── ÉTAPES ───
 
 function refAjouterEtape() {
-  const texte = prompt('Texte de la nouvelle étape :');
-  if (!texte) return;
-  const ref = refDonnees.find(r => r.ref_id === refActifId);
-  if (!ref) return;
-  ref.etapes = ref.etapes || [];
-  ref.etapes.push(texte.trim());
-  refRendreDetail(ref);
+  refOuvrirModalSaisie('Nouvelle étape', 'Texte de l\'étape', '', val => {
+    const ref = refDonnees.find(r => r.ref_id === refActifId);
+    if (!ref) return;
+    ref.etapes = ref.etapes || [];
+    ref.etapes.push(val);
+    refRendreDetail(ref);
+  });
 }
 
 function refModifierEtape(index) {
   const ref = refDonnees.find(r => r.ref_id === refActifId);
   if (!ref) return;
-  const texte = prompt('Modifier l\'étape :', ref.etapes[index]);
-  if (texte === null) return;
-  ref.etapes[index] = texte.trim();
-  refRendreDetail(ref);
+  refOuvrirModalSaisie('Modifier l\'étape', 'Texte', ref.etapes[index], val => {
+    ref.etapes[index] = val;
+    refRendreDetail(ref);
+  });
 }
 
 function refSupprimerEtape(index) {
@@ -158,11 +200,11 @@ function refDescendreEtape(index) {
 // ─── AJOUTER UN OUTIL ───
 
 function refAjouterOutil() {
-  const nom = prompt('Nom du nouvel outil :');
-  if (!nom) return;
-  const ref_id = 'REF-' + Date.now();
-  refDonnees.push({ ref_id, nom: nom.trim(), lien: '', etapes: [] });
-  refSelectionner(ref_id);
+  refOuvrirModalSaisie('Nouvel outil', 'Nom de l\'outil', '', val => {
+    const ref_id = 'REF-' + Date.now();
+    refDonnees.push({ ref_id, nom: val, lien: '', etapes: [] });
+    refSelectionner(ref_id);
+  });
 }
 
 // ─── SUPPRIMER UN OUTIL ───
