@@ -200,9 +200,13 @@ function refDescendreEtape(index) {
 // ─── AJOUTER UN OUTIL ───
 
 function refAjouterOutil() {
+  document.getElementById('modal-ref-saisie-lien-groupe').style.display = '';
   refOuvrirModalSaisie('Nouvel outil', 'Nom de l\'outil', '', val => {
+    const lien = document.getElementById('modal-ref-saisie-lien').value.trim();
+    document.getElementById('modal-ref-saisie-lien').value = '';
+    document.getElementById('modal-ref-saisie-lien-groupe').style.display = 'none';
     const ref_id = 'REF-' + Date.now();
-    const nouvel = { ref_id, nom: val, lien: '', etapes: [] };
+    const nouvel = { ref_id, nom: val, lien, etapes: [] };
     refDonnees.push(nouvel);
     refRendreListe();
     refSelectionner(ref_id);
