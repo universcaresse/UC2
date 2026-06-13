@@ -3832,6 +3832,27 @@
 <script src="../js/admin-liste-prix.js"></script>
 <script src="../js/admin-references.js"></script>
 
+<div class="modal-admin-overlay" id="modal-ref-saisie">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre" id="modal-ref-saisie-titre">Nouvel outil</div>
+      <button class="btn-fermer-panneau" onclick="refFermerModalSaisie()">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe">
+        <label class="form-label" id="modal-ref-saisie-label">Nom</label>
+        <input type="text" class="form-ctrl" id="modal-ref-saisie-valeur" placeholder="">
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-petit bouton-contour" onclick="refFermerModalSaisie()">Annuler</button>
+        <button class="bouton bouton-petit" id="modal-ref-saisie-btn-ok" onclick="refConfirmerModalSaisie()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODALE FICHE PRODUIT -->
 <div class="modal-admin-overlay" id="modal-cb-fiche" style="display:none">
   <div class="modal-admin">
