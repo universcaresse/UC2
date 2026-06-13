@@ -206,6 +206,7 @@ if (id === 'fournisseurs')   afficherFournisseurs();
   if (id === 'contenu-site')   chargerContenuSite();
 if (id === 'redaction')      redInit();
   if (id === 'mediatheque')    chargerMediatheque();
+  if (id === 'references')     chargerReferences();
   if (id === 'inventaire-production') { afficherSection('inventaire', null); return; }
  if (id === 'ventes')          { chargerVentes(); }
     if (id === 'remboursements')  { chargerRemboursements(); }
