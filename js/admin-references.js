@@ -26,11 +26,11 @@ function refFermerModalSaisie() {
 function refConfirmerModalSaisie() {
   const val = document.getElementById('modal-ref-saisie-valeur').value.trim();
   if (!val) return;
+  const cb = _refModalCallback;
   refFermerModalSaisie();
-  if (_refModalCallback) _refModalCallback(val);
+  if (cb) cb(val);
 }
 
-// Confirmer avec Enter
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.getElementById('modal-ref-saisie')?.classList.contains('ouvert')) {
     refConfirmerModalSaisie();
@@ -202,7 +202,9 @@ function refDescendreEtape(index) {
 function refAjouterOutil() {
   refOuvrirModalSaisie('Nouvel outil', 'Nom de l\'outil', '', val => {
     const ref_id = 'REF-' + Date.now();
-    refDonnees.push({ ref_id, nom: val, lien: '', etapes: [] });
+    const nouvel = { ref_id, nom: val, lien: '', etapes: [] };
+    refDonnees.push(nouvel);
+    refRendreListe();
     refSelectionner(ref_id);
   });
 }
@@ -225,11 +227,12 @@ function refSupprimerOutil() {
 
 async function refSauvegarder() {
   afficherChargement();
+  const payload = { action: 'saveReferences', items: refDonnees };
   const res = await appelAPIPost('saveReferences', { items: refDonnees });
   cacherChargement();
   if (res && res.success) {
     afficherMsg('references', 'Références sauvegardées.', 'succes');
   } else {
-    afficherMsg('references', 'Erreur lors de la sauvegarde.', 'erreur');
+    afficherMsg('references', 'Erreur : ' + (res?.message || 'inconnue'), 'erreur');
   }
 }
