@@ -278,14 +278,20 @@ function ajoutApercu() {
           (img.height - taille) / 2,
           taille, taille, 0, 0, taille, taille
         );
-        const base64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+        const MAX = 1200;
+        const scale = Math.min(1, MAX / taille);
+        const canvas2 = document.createElement('canvas');
+        canvas2.width  = Math.round(taille * scale);
+        canvas2.height = Math.round(taille * scale);
+        canvas2.getContext('2d').drawImage(canvas, 0, 0, canvas2.width, canvas2.height);
+        const base64 = canvas2.toDataURL('image/jpeg', 0.85).split(',')[1];
         _ajoutPhotos[idx] = { base64, nom: f.name.replace(/\.[^.]+$/, '') };
 
         // Aperçu + champ nom
         const div = document.createElement('div');
         div.style.cssText = 'display:flex;flex-direction:column;gap:8px;width:180px';
         div.innerHTML = `
-          <img src="${canvas.toDataURL('image/jpeg', 0.9)}" style="width:180px;height:180px;object-fit:cover;border-radius:8px">
+          <img src="${canvas2.toDataURL('image/jpeg', 0.85)}" style="width:180px;height:180px;object-fit:cover;border-radius:8px">
           <input type="text" class="form-ctrl" value="${_ajoutPhotos[idx].nom}"
             oninput="_ajoutPhotos[${idx}].nom=this.value" placeholder="Nom de la photo">
         `;
