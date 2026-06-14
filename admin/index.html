@@ -3220,7 +3220,8 @@
 			</div>
 			
 			<div class="form-actions">
-				<button class="bouton" onclick="mediathequeSyncCloudinary()">↺ Cloudinary</button>
+				<button class="bouton bouton-contour" onclick="mediathequeSyncCloudinary()">↺ Cloudinary</button>
+<button class="bouton" onclick="ouvrirModalAjouterPhoto()">+ Ajouter</button>
 			</div>
 		</div>
 		
@@ -3784,6 +3785,45 @@
       </div>
     </div>
   </div>
+
+<div class="modal-admin-overlay" id="modal-ajouter-photo">
+  <div class="modal-admin">
+    <div class="modal-admin-header">
+      <div class="modal-admin-titre">Ajouter des photos</div>
+      <button class="btn-fermer-panneau" onclick="fermerModalAjouterPhoto()">✕</button>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-groupe">
+        <label class="form-label">Photos (1 ou 2)</label>
+        <input type="file" class="form-ctrl" id="ajout-fichiers" accept="image/*" multiple onchange="ajoutApercu()">
+      </div>
+      <div id="ajout-previews" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px"></div>
+      <div class="form-groupe" style="margin-top:16px">
+        <label class="form-label">Dossier</label>
+        <select class="form-ctrl" id="ajout-dossier">
+          <option value="01Saponica">01Saponica</option>
+          <option value="02petitnuage">02petitnuage</option>
+          <option value="03Caprin">03Caprin</option>
+          <option value="04emolia">04emolia</option>
+          <option value="05epure">05epure</option>
+          <option value="06kerys">06kerys</option>
+          <option value="07casa">07casa</option>
+          <option value="08Lui">08Lui</option>
+          <option value="09Anima">09Anima</option>
+          <option value="10Accessoires">10Accessoires</option>
+          <option value="11Divers">11Divers</option>
+          <option value="12pourUnivers">12pourUnivers</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-admin-body">
+      <div class="form-actions">
+        <button class="bouton bouton-contour" onclick="fermerModalAjouterPhoto()">Annuler</button>
+        <button class="bouton" id="ajout-btn-envoyer" onclick="envoyerPhotos()">Envoyer</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="modal-admin-overlay" id="modal-mediatheque">
   <div class="modal-admin modal-mediatheque-contenu">

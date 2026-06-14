@@ -241,6 +241,86 @@ function fermerModalMediatheque() {
 
 
 
+// ─── AJOUTER DES PHOTOS ───
+var _ajoutPhotos = [];
+
+function ouvrirModalAjouterPhoto() {
+  _ajoutPhotos = [];
+  document.getElementById('ajout-fichiers').value = '';
+  document.getElementById('ajout-previews').innerHTML = '';
+  document.getElementById('ajout-btn-envoyer').disabled = false;
+  document.getElementById('ajout-btn-envoyer').textContent = 'Envoyer';
+  document.getElementById('modal-ajouter-photo').classList.add('ouvert');
+}
+
+function fermerModalAjouterPhoto() {
+  document.getElementById('modal-ajouter-photo').classList.remove('ouvert');
+}
+
+function ajoutApercu() {
+  const fichiers = document.getElementById('ajout-fichiers').files;
+  const zone = document.getElementById('ajout-previews');
+  zone.innerHTML = '';
+  _ajoutPhotos = [];
+  Array.from(fichiers).slice(0, 2).forEach((f, idx) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        // Crop carré centré
+        const taille = Math.min(img.width, img.height);
+        const canvas = document.createElement('canvas');
+        canvas.width  = taille;
+        canvas.height = taille;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img,
+          (img.width  - taille) / 2,
+          (img.height - taille) / 2,
+          taille, taille, 0, 0, taille, taille
+        );
+        const base64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+        _ajoutPhotos[idx] = { base64, nom: f.name.replace(/\.[^.]+$/, '') };
+
+        // Aperçu + champ nom
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex;flex-direction:column;gap:8px;width:180px';
+        div.innerHTML = `
+          <img src="${canvas.toDataURL('image/jpeg', 0.9)}" style="width:180px;height:180px;object-fit:cover;border-radius:8px">
+          <input type="text" class="form-ctrl" value="${_ajoutPhotos[idx].nom}"
+            oninput="_ajoutPhotos[${idx}].nom=this.value" placeholder="Nom de la photo">
+        `;
+        zone.appendChild(div);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+async function envoyerPhotos() {
+  if (!_ajoutPhotos.length) { afficherMsg('mediatheque', 'Choisissez au moins une photo.', 'erreur'); return; }
+  const dossier = document.getElementById('ajout-dossier').value;
+  const btn = document.getElementById('ajout-btn-envoyer');
+  btn.disabled = true;
+  btn.textContent = 'Envoi…';
+  let erreurs = 0;
+  for (const p of _ajoutPhotos) {
+    if (!p) continue;
+    const res = await appelAPIPost('uploadPhoto', { image: p.base64, nom: p.nom, dossier });
+    if (!res || !res.success) erreurs++;
+  }
+  btn.textContent = 'Envoyer';
+  btn.disabled = false;
+  fermerModalAjouterPhoto();
+  if (erreurs) {
+    afficherMsg('mediatheque', '❌ ' + erreurs + ' photo(s) en erreur.', 'erreur');
+  } else {
+    afficherMsg('mediatheque', '✅ Photo(s) ajoutée(s) avec succès.');
+    _mediathequeDonnees = null;
+    chargerMediatheque();
+  }
+}
+
 function medOuvrirPhoto(url, nom) {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
