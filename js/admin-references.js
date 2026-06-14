@@ -210,6 +210,7 @@ function refAjouterOutil() {
     refDonnees.push(nouvel);
     refRendreListe();
     refSelectionner(ref_id);
+    refSauvegarder();
   });
 }
 
