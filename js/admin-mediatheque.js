@@ -319,7 +319,7 @@ async function envoyerPhotos() {
   btn.disabled = false;
   fermerModalAjouterPhoto();
   if (erreurs) {
-    afficherMsg('mediatheque', '❌ ' + erreurs + ' photo(s) en erreur.', 'erreur');
+    afficherMsg('mediatheque', '❌ ' + erreurs + ' photo(s) en erreur. ' + (dernierMessage || ''), 'erreur');
   } else {
     afficherMsg('mediatheque', '✅ Photo(s) ajoutée(s) avec succès.');
     _mediathequeDonnees = null;
