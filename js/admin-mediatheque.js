@@ -310,10 +310,11 @@ async function envoyerPhotos() {
   btn.disabled = true;
   btn.textContent = 'Envoi…';
   let erreurs = 0;
+  let dernierMessage = '';
   for (const p of _ajoutPhotos) {
     if (!p) continue;
     const res = await appelAPIPost('uploadPhoto', { image: p.base64, nom: p.nom, dossier });
-    if (!res || !res.success) erreurs++;
+    if (!res || !res.success) { erreurs++; dernierMessage = res?.message || ''; }
   }
   btn.textContent = 'Envoyer';
   btn.disabled = false;
