@@ -102,18 +102,19 @@ function refRendreDetail(ref) {
     return;
   }
 
-  const etapesHtml = (ref.etapes || []).map((e, i) =>
-    '<div class="rangeeitem" data-index="' + i + '">' +
-      '<span class="rangeeitem-meta" style="min-width:24px">' + (i + 1) + '</span>' +
+  const etapesHtml = (ref.etapes || []).map((e, i) => {
+    const ei = i;
+    return '<div class="rangeeitem" data-index="' + ei + '">' +
+      '<span class="rangeeitem-meta" style="min-width:24px">' + (ei + 1) + '</span>' +
       '<div class="rangeeitem-info"><div class="rangeeitem-titre">' + e + '</div></div>' +
       '<div style="display:flex;gap:6px">' +
-        '<button class="boutons boutons-contour boutons-petit" onclick="refMonterEtape(' + i + ')" ' + (i === 0 ? 'disabled' : '') + '>↑</button>' +
-        '<button class="boutons boutons-contour boutons-petit" onclick="refDescendreEtape(' + i + ')" ' + (i === (ref.etapes.length - 1) ? 'disabled' : '') + '>↓</button>' +
-        '<button class="boutons boutons-contour boutons-petit" onclick="refModifierEtape(' + i + ')">Modifier</button>' +
-        '<button class="boutons boutons-rouge boutons-petit" onclick="refSupprimerEtape(' + i + ')">✕</button>' +
+        '<button class="boutons boutons-contour boutons-petit" onclick="refMonterEtape(' + ei + ')" ' + (ei === 0 ? 'disabled' : '') + '>↑</button>' +
+        '<button class="boutons boutons-contour boutons-petit" onclick="refDescendreEtape(' + ei + ')" ' + (ei === (ref.etapes.length - 1) ? 'disabled' : '') + '>↓</button>' +
+        '<button class="boutons boutons-contour boutons-petit" onclick="refModifierEtape(' + ei + ')">Modifier</button>' +
+        '<button class="boutons boutons-rouge boutons-petit" onclick="refSupprimerEtape(' + ei + ')">✕</button>' +
       '</div>' +
-    '</div>'
-  ).join('');
+    '</div>';
+  }).join('');
 
   zone.innerHTML =
     '<div class="bandeau" style="margin-bottom:12px">' +
