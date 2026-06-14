@@ -164,6 +164,7 @@ function refAjouterEtape() {
     ref.etapes = ref.etapes || [];
     ref.etapes.push(val);
     refRendreDetail(ref);
+    refSauvegarder();
   });
 }
 
@@ -173,6 +174,7 @@ function refModifierEtape(index) {
   refOuvrirModalSaisie('Modifier l\'étape', 'Texte', ref.etapes[index], val => {
     ref.etapes[index] = val;
     refRendreDetail(ref);
+    refSauvegarder();
   });
 }
 
@@ -181,6 +183,7 @@ function refSupprimerEtape(index) {
   if (!ref) return;
   ref.etapes.splice(index, 1);
   refRendreDetail(ref);
+  refSauvegarder();
 }
 
 function refMonterEtape(index) {
@@ -188,6 +191,7 @@ function refMonterEtape(index) {
   if (!ref || index === 0) return;
   [ref.etapes[index - 1], ref.etapes[index]] = [ref.etapes[index], ref.etapes[index - 1]];
   refRendreDetail(ref);
+  refSauvegarder();
 }
 
 function refDescendreEtape(index) {
@@ -195,6 +199,7 @@ function refDescendreEtape(index) {
   if (!ref || index >= ref.etapes.length - 1) return;
   [ref.etapes[index + 1], ref.etapes[index]] = [ref.etapes[index], ref.etapes[index + 1]];
   refRendreDetail(ref);
+  refSauvegarder();
 }
 
 // ─── AJOUTER UN OUTIL ───
