@@ -1245,13 +1245,22 @@ async function envoyerProposition() {
 
   const dateProposition = new Date().toLocaleDateString('fr-CA');
 
-  const lignesPayload = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => ({
-    pro_id: l.pro_id,
-    format_poids: l.format_poids,
-    format_unite: l.format_unite,
-    quantite: l.quantite,
-    prix_unitaire: l.prix_unitaire
-  }));
+  const lignesPayload = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
+    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
+    const sel = document.querySelector('[data-cle="' + cle + '"]');
+    const inp = document.querySelector('[data-cle-date="' + cle + '"]');
+    const type = (sel && sel.value) ? sel.value : 'pret';
+    const typeNormalise = type.startsWith('temporaire') ? 'temporaire' : type === 'definitif' ? 'definitif' : 'pret';
+    return {
+      pro_id: l.pro_id,
+      format_poids: l.format_poids,
+      format_unite: l.format_unite,
+      quantite: l.quantite,
+      prix_unitaire: l.prix_unitaire,
+      type_ligne: typeNormalise,
+      date_dispo: inp ? inp.value : ''
+    };
+  });
 
   const rabais = cmdCompleterCalculerRabais();
   const promoInfo = cmdCompleterTypePromo();
