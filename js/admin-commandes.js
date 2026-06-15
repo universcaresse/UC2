@@ -936,7 +936,7 @@ async function genererLienSquare() {
   const totalPrets = lignes.reduce((s, l) => {
     const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
     const sel = document.querySelector('[data-cle="' + cle + '"]');
-    const type = sel ? sel.value : 'pret';
+    const type = (sel && sel.value) ? sel.value : 'pret';
     if (type === 'definitif' || type.startsWith('temporaire')) return s;
     return s + (l.prix_unitaire * l.quantite);
   }, 0);
