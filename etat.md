@@ -78,58 +78,24 @@
 
 ---
 
-## 4. CE QUI RESTE À CONSTRUIRE — dans l'ordre
+## 4. CE QUI RESTE À CONSTRUIRE
 
-### 4.1 Étape 7 — Les boutons du courriel de proposition (bloc 1)
-Le harnais de test dort, prêt. C'est la porte d'entrée de toute la boucle client.
-- Ajouter les trois portes dans le courriel : Payer / Modifier / J'ai une question
-- Chaque bouton mène au bon endroit
-- **Textes à écrire** (essence validée, mots exacts à finaliser) :
-  - Courriel de proposition
-  - Courriel de relance (couvre oubli + hésitation + pépin de paiement, sans accuser)
-  - Message de blocage (commande non modifiable) + « Écrivez-nous »
-  - Message de confirmation d'annulation vu par le client
+### 4.1 — Coder le bloc 1
+Selon `bloc1-jai-tout.md` — référence unique.
 
-### 4.2 Fondation Square
-- Sauvegarder le `link_id` à la création du lien (col 21)
+### 4.2 — Coder le bloc 2
+Selon `bloc2-il-manque-du-stock.md` — référence unique.
+
+### 4.3 — Coder le bloc 3
+Selon `bloc3.md` — référence unique.
+
+### 4.4 — Après les 3 blocs
+- Sauvegarder le `link_id` Square à la création (col 21)
 - Fonction `annulerLienSquare_v2`
-- Sans ça, rien ne peut être fermé automatiquement
-
-### 4.3 Côté admin — nouveaux comportements
-- Pastilles orange/rouge calculées à partir de `date_proposition` (col 16)
-- Bouton Relancer avec aperçu
-- Bouton Annuler au rouge (bloc 1) : remet le stock, passe à « Annulée »
-- Écran de complétion étendu (blocs 2 et 3) : marquer chaque ligne temporaire/définitif, dates calculées automatiquement, modifiables à la main
-
-### 4.4 Page unique client (blocs 2 et 3)
-- Sections prêts / temporaires / définitifs
-- Boutons Garder / Laisser tomber par temporaire
-- Boutons principaux visibles seulement quand tous les temporaires ont leur réponse
-- Réponses sauvegardées en localStorage par cmd_id
-- « Recevoir ce qui est prêt » : paie le prêt, crée la 2e commande pour les gardés, retire les définitifs
-- « Attendre » : caduce le lien Square, retire les définitifs, passe à « En attente de réapprovisionnement »
-- « Modifier » : conserve les réponses aux temporaires, peut ajouter des produits disponibles
-- « J'ai une question » : formulaire Contact pré-rempli
-
-### 4.5 Nouvelles fonctions à créer dans `Code.gs`
-- `annulerLienSquare_v2` : ferme un lien Square par son link_id
-- `enregistrerReponsesTemporaires` : sauvegarde les réponses garder/laisser tomber par cmd_id
-- `recevoirPret` : déclenche le paiement, crée la 2e commande, retire les définitifs, caduce le lien
-- `attendreTout` : caduce le lien, retire les définitifs, change le statut
-- `creerCommandeLiee` : crée la 2e commande avec lien vers la 1re
-- Ajouter « En attente de réapprovisionnement » dans le filtre admin (`admin-commandes.js`)
-
-### 4.6 Textes bloc 2 et 3 (essence validée, mots exacts plus tard)
-**Bloc 2**
-- Courriel : chaleureux, honnête, trois sections, note sur le stock qui varie
-- Confirmation « Recevoir le prêt » : prêt en route, tu recontactes pour le reste
-- Confirmation « Attendre » : tu recontactes quand tout est prêt, définitifs retirés avec douceur
-- Définitifs retirés : mot doux, sans jugement
-
-**Bloc 3**
-- Courriel : plus doux qu'au bloc 2, met en valeur ce qui s'en vient plutôt que ce qui manque
-- Confirmation « Attendre » : même ton que bloc 2
-- Il a tout laissé tomber : annulation douce, même chemin que bloc 1
+- Courriel avant texto à l'envoi de la proposition
+- Pastilles orange/rouge calculées à partir de `date_proposition`
+- Bouton Relancer avec aperçu avant envoi
+- Deux nouvelles colonnes dans `Commandes_Lignes_v2` : col 8 = type_ligne, col 9 = date_dispo
 
 ---
 
