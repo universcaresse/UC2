@@ -79,6 +79,29 @@
 - Filet fermeture lien Square au clic « Paiement reçu »
 - Avertissement visible si courriel échoue après le texto
 
+### 2.6 Bloc 2 — codé (15 juin 2026)
+- Colonnes `type_ligne` (col 8) et `date_dispo` (col 9) dans `Commandes_Lignes_v2`
+- Écran de complétion : couleurs vert/orange/rouge par ligne + menu type + date calculée
+- `sortirStockCommande_v2` : prêts seulement
+- Courriel trois sections (prêts / temporaires / définitifs)
+- Page unique client : sections, boutons Garder/Laisser tomber, localStorage
+- Fonctions `recevoirPret`, `attendreTout`, `creerCommandeLiee` dans Code.gs
+- Statut « En attente de réapprovisionnement » dans le filtre admin
+
+### 2.7 Bloc 3 — couvert (15 juin 2026)
+- Aucun code supplémentaire requis — tout est géré par le bloc 2
+- Pas de section prêts si vide, pas de bouton « Recevoir ce qui est prêt » si aucun prêt
+- Trois portes dans le courriel (Payer / Modifier / J'ai une question)
+- Prénom du client dans l'accueil du courriel
+- Message de blocage avec « Écrivez-nous »
+- Bouton « Je ne veux plus donner suite » + page de confirmation + raison facultative
+- Fonction `annulerCommandeClient` dans Code.gs
+- Pastilles orange/rouge selon le délai (7 / 14 jours)
+- Bouton Relancer avec aperçu et mot personnel
+- Sauvegarde du `link_id` Square (col 21) + `annulerLienSquare_v2`
+- Filet fermeture lien Square au clic « Paiement reçu »
+- Avertissement visible si courriel échoue après le texto
+
 ---
 
 ## 3. CORRECTIONS DÉCIDÉES — à appliquer dans le code

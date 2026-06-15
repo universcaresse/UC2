@@ -432,18 +432,29 @@ window.addEventListener('DOMContentLoaded', async function () {
       if (bloque) {
         bloque.classList.remove('cache');
         bloque.innerHTML = '<p>Cette commande ne peut plus être modifiée.</p>' +
+          '<p><a href="#" class="lien-discret" onclick="naviguer(\'contact\');return false;">Une question? Écrivez-nous.</a></p>' +
           '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
       }
       return;
     }
 
-    demandeListe = res.lignes.map(l => ({
-      pro_id: l.pro_id, format_poids: l.format_poids, format_unite: l.format_unite,
-      nom_produit: l.nom, prix_unitaire: l.prix_unitaire, image_url: l.image_url,
-      nom_collection: l.nom_collection, nom_gamme: l.nom_gamme, quantite: l.quantite
-    }));
-    sauvegarderDemandeListe();
-    demandeRafraichirAffichage();
+    const aDesTemporaires = res.lignes.some(l => l.type_ligne === 'temporaire');
+    const aDesDefinitifs  = res.lignes.some(l => l.type_ligne === 'definitif');
+    const estBloc2ou3 = aDesTemporaires || aDesDefinitifs;
+
+    if (!estBloc2ou3) {
+      // Bloc 1 — comportement existant
+      demandeListe = res.lignes.map(l => ({
+        pro_id: l.pro_id, format_poids: l.format_poids, format_unite: l.format_unite,
+        nom_produit: l.nom, prix_unitaire: l.prix_unitaire, image_url: l.image_url,
+        nom_collection: l.nom_collection, nom_gamme: l.nom_gamme, quantite: l.quantite
+      }));
+      sauvegarderDemandeListe();
+      demandeRafraichirAffichage();
+    } else {
+      // Blocs 2 et 3 — page unique avec sections
+      afficherPageUniqueBloc2(res.lignes, numero, jeton);
+    }
 
     function coupdecoeurRendre() {
       if (!zone) return;
@@ -476,6 +487,7 @@ window.addEventListener('DOMContentLoaded', async function () {
       html += '<div class="lignetotal"><span class="lignetotal-libelle">Total avant les frais de livraison</span>' +
         '<span>' + total.toFixed(2).replace('.', ',') + ' $</span></div>' +
         '<button type="button" class="bouton bouton-grand" data-action="renvoyer">Renvoyer ma liste</button>' +
+        '<button type="button" class="bouton bouton-contour" data-action="annuler" style="margin-top:12px">Je ne veux plus donner suite</button>' +
         '<div id="coupdecoeur-msg" class="cache"></div>';
       zone.innerHTML = html;
     }
@@ -484,6 +496,42 @@ window.addEventListener('DOMContentLoaded', async function () {
       const btn = ev.target.closest('[data-action]');
       if (!btn) return;
       const action = btn.dataset.action;
+
+      if (action === 'annuler') {
+        zone.innerHTML = '<h2 class="titre">Vous souhaitez annuler?</h2>' +
+          '<p>Cette action est définitive. Voulez-vous vraiment annuler cette commande?</p>' +
+          '<div class="form-group" style="margin:16px 0"><label class="form-label">Si vous voulez nous dire ce qui s\'est passé, nous lisons tout (facultatif)</label>' +
+          '<textarea id="coupdecoeur-raison" class="form-control" rows="3"></textarea></div>' +
+          '<button type="button" class="bouton bouton-rouge" data-action="confirmer-annulation">Oui, annuler ma commande</button>' +
+          '<button type="button" class="bouton bouton-contour" data-action="retour-liste" style="margin-top:8px">Non, revenir à ma liste</button>' +
+          '<div id="coupdecoeur-msg" class="cache"></div>';
+        return;
+      }
+
+      if (action === 'retour-liste') {
+        coupdecoeurRendre();
+        return;
+      }
+
+      if (action === 'confirmer-annulation') {
+        const btn2 = ev.target.closest('[data-action]');
+        if (btn2) btn2.disabled = true;
+        const msg = document.getElementById('coupdecoeur-msg');
+        const raison = (document.getElementById('coupdecoeur-raison') || {}).value || '';
+        try {
+          const r = await appelAPIPost('annulerCommandeClient', { cmd_id: numero, jeton: jeton, raison });
+          if (r && r.success) {
+            zone.innerHTML = '<h2 class="titre">Commande annulée</h2>' +
+              '<p>Votre commande a bien été annulée. Nous espérons vous revoir bientôt.</p>' +
+              '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+          } else {
+            if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || 'échec'); msg.classList.remove('cache'); }
+          }
+        } catch (e) {
+          if (msg) { msg.textContent = 'Erreur : ' + e.message; msg.classList.remove('cache'); }
+        }
+        return;
+      }
 
       if (action === 'renvoyer') {
         btn.disabled = true;
@@ -523,3 +571,120 @@ window.addEventListener('DOMContentLoaded', async function () {
     if (zone) zone.textContent = 'Erreur : ' + e.message;
   }
 });
+
+function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
+  const zone = document.getElementById('coupdecoeur-commande');
+  if (!zone) return;
+
+  const prets      = lignes.filter(l => !l.type_ligne || l.type_ligne === 'pret');
+  const temporaires = lignes.filter(l => l.type_ligne === 'temporaire');
+  const definitifs  = lignes.filter(l => l.type_ligne === 'definitif');
+
+  // Charger les réponses sauvegardées
+  let reponsesStr = '';
+  try { reponsesStr = localStorage.getItem('uc_reponses_' + cmd_id) || '{}'; } catch(e) {}
+  const reponses = JSON.parse(reponsesStr);
+
+  function rangee(l, avecBoutons) {
+    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
+    const rep = reponses[cle];
+    let html = '<div class="rangeeitem" data-cle="' + cle + '" style="margin-bottom:8px">';
+    html += '<div class="rangeeitem-info">';
+    html += '<div class="rangeeitem-titre">' + (l.nom || l.pro_id) + '</div>';
+    html += '<div class="rangeeitem-meta">' + l.format_poids + ' ' + l.format_unite;
+    if (l.date_dispo) html += ' &nbsp;·&nbsp; disponible vers ' + l.date_dispo;
+    html += '</div></div>';
+    if (avecBoutons) {
+      html += '<div style="display:flex;gap:8px;margin-top:6px">';
+      html += '<button type="button" class="bouton bouton-petit' + (rep === 'garder' ? ' bouton-or' : ' bouton-contour') + '" data-action="garder" data-cle="' + cle + '">Garder</button>';
+      html += '<button type="button" class="bouton bouton-petit' + (rep === 'laisser' ? ' bouton-rouge' : ' bouton-contour') + '" data-action="laisser" data-cle="' + cle + '">Laisser tomber</button>';
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function section(titre, liste, avecBoutons, sousTitre) {
+    if (!liste.length) return '';
+    let h = '<div style="margin:20px 0 8px;font-size:0.7rem;letter-spacing:0.2em;color:#8b8680;text-transform:uppercase">' + titre + '</div>';
+    if (sousTitre) h += '<p class="textes-discrets" style="margin-bottom:8px">' + sousTitre + '</p>';
+    liste.forEach(l => { h += rangee(l, avecBoutons); });
+    return h;
+  }
+
+  const tousRepondus = temporaires.every(l => {
+    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
+    return reponses[cle] === 'garder' || reponses[cle] === 'laisser';
+  });
+
+  let html = section('Prêts à partir', prets, false, '');
+  html += section('En attente de fabrication', temporaires, true, 'Indiquez ce que vous souhaitez faire pour chaque produit.');
+  html += section('Non disponibles', definitifs, false, 'Ces produits ne peuvent pas faire partie de cette commande.');
+
+  if (tousRepondus || !temporaires.length) {
+    const aGardes = temporaires.some(l => reponses[l.pro_id + '|' + l.format_poids + '|' + l.format_unite] === 'garder');
+    if (prets.length || aGardes) {
+      html += '<button type="button" class="bouton bouton-grand" data-action="recevoir-pret" style="margin-top:16px">Recevoir ce qui est prêt</button>';
+    }
+    html += '<button type="button" class="bouton bouton-contour" data-action="attendre-tout" style="margin-top:8px">Attendre que tout soit prêt</button>';
+  }
+
+  html += '<button type="button" class="bouton bouton-contour" data-action="modifier-bloc2" style="margin-top:8px">Modifier</button>';
+  html += '<a href="#" class="lien-discret" onclick="naviguer(\'contact\');return false;" style="display:block;margin-top:8px;text-align:center">J\'ai une question</a>';
+  html += '<div id="coupdecoeur-msg" class="cache"></div>';
+
+  zone.innerHTML = html;
+
+  zone.addEventListener('click', async function handler(ev) {
+    const btn = ev.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const cle    = btn.dataset.cle || '';
+
+    if (action === 'garder' || action === 'laisser') {
+      reponses[cle] = action;
+      try { localStorage.setItem('uc_reponses_' + cmd_id, JSON.stringify(reponses)); } catch(e) {}
+      afficherPageUniqueBloc2(lignes, cmd_id, jeton);
+      return;
+    }
+
+    if (action === 'modifier-bloc2') {
+      demandeListe = lignes.map(l => ({
+        pro_id: l.pro_id, format_poids: l.format_poids, format_unite: l.format_unite,
+        nom_produit: l.nom, prix_unitaire: l.prix_unitaire, image_url: l.image_url,
+        nom_collection: l.nom_collection, nom_gamme: l.nom_gamme, quantite: l.quantite
+      }));
+      sauvegarderDemandeListe();
+      demandeRafraichirAffichage();
+      return;
+    }
+
+    if (action === 'attendre-tout' || action === 'recevoir-pret') {
+      btn.disabled = true;
+      const msg = document.getElementById('coupdecoeur-msg');
+      const temporairesGardes = temporaires
+        .filter(l => reponses[l.pro_id + '|' + l.format_poids + '|' + l.format_unite] === 'garder')
+        .map(l => ({ pro_id: l.pro_id, format_poids: l.format_poids, format_unite: l.format_unite, date_dispo: l.date_dispo }));
+
+      try {
+        const r = await appelAPIPost(action === 'recevoir-pret' ? 'recevoirPret' : 'attendreTout', {
+          cmd_id, jeton, temporaires_gardes: temporairesGardes
+        });
+        if (r && r.success) {
+          zone.removeEventListener('click', handler);
+          if (action === 'recevoir-pret') {
+            zone.innerHTML = '<h2 class="titre">Merci!</h2><p>Ce qui est prêt est en route. Nous vous recontacterons pour le reste.</p><button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+          } else {
+            zone.innerHTML = '<h2 class="titre">Noté!</h2><p>Nous vous recontacterons quand tout sera prêt.</p><button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+          }
+        } else {
+          if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || 'échec'); msg.classList.remove('cache'); }
+          btn.disabled = false;
+        }
+      } catch(e) {
+        if (msg) { msg.textContent = 'Erreur : ' + e.message; msg.classList.remove('cache'); }
+        btn.disabled = false;
+      }
+    }
+  });
+}

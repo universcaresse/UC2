@@ -416,13 +416,15 @@ function afficherTableauCommandes(items) {
 
   // Blocs dans l'ordre d'affichage (statuts d'aujourd'hui)
   const blocs = [
-    { titre: 'ENTRANTES',              statuts: ['En attente'] },
-    { titre: 'MODIFIÉES',              statuts: ['Modifiée'] },
-    { titre: 'QUESTIONS',              statuts: ['Question'] },
-    { titre: 'EN ATTENTE DE PAIEMENT', statuts: ['En attente de paiement'] },
-    { titre: 'À EXPÉDIER',             statuts: ['À expédier'] },
-    { titre: 'TERMINÉES',              statuts: ['Terminée'] },
-    { titre: 'ANNULÉES',               statuts: ['Annulée'] }
+    { titre: 'ENTRANTES',                       statuts: ['En attente'] },
+    { titre: 'MODIFIÉES',                       statuts: ['Modifiée'] },
+    { titre: 'QUESTIONS',                       statuts: ['Question'] },
+    { titre: 'EN ATTENTE DE PAIEMENT',          statuts: ['En attente de paiement'] },
+    { titre: 'EN ATTENTE DE RÉAPPROVISIONNEMENT', statuts: ['En attente de réapprovisionnement'] },
+    { titre: 'À RETRAVAILLER',                  statuts: ['À retravailler'] },
+    { titre: 'À EXPÉDIER',                      statuts: ['À expédier'] },
+    { titre: 'TERMINÉES',                       statuts: ['Terminée'] },
+    { titre: 'ANNULÉES',                        statuts: ['Annulée'] }
   ];
   const connus = blocs.reduce((s, b) => s.concat(b.statuts), []);
   const autres = items.filter(c => !connus.includes(c.statut));
@@ -836,11 +838,48 @@ function ouvrirFormCompleter(cmd_id) {
   if (c.courriel)  recap += '<br><span class="texte-secondaire">' + c.courriel + '</span>';
   if (c.telephone) recap += '<br><span class="texte-secondaire">' + c.telephone + '</span>';
   recap += '</div><div class="form-label">Items</div>';
+
   lignes.forEach(l => {
-    const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
-    const nom = pro ? pro.nom : l.pro_id;
-    recap += '<div style="padding:4px 0">' + nom + ' — ' + l.format_poids + ' ' + l.format_unite + ' × ' + l.quantite + ' = ' + formaterPrix(l.prix_unitaire * l.quantite) + '</div>';
+    const pro  = donneesProduits.find(p => p.pro_id === l.pro_id);
+    const nom  = pro ? pro.nom : l.pro_id;
+    const lot  = commandesLotsDispo.find(x =>
+      String(x.pro_id) === String(l.pro_id) &&
+      String(x.format_poids) === String(l.format_poids) &&
+      String(x.format_unite) === String(l.format_unite)
+    );
+    const dispo = lot ? lot.nb_disponible : 0;
+    let couleur, statut;
+    if (dispo >= l.quantite) { couleur = 'var(--primary)'; statut = 'pret'; }
+    else if (dispo > 0)      { couleur = 'var(--accent)';  statut = 'partiel'; }
+    else                     { couleur = 'var(--danger)';  statut = 'zero'; }
+
+    const cureJours = pro && pro.cure && !isNaN(pro.cure) ? parseInt(pro.cure) : 28;
+    const dateAuto  = new Date();
+    dateAuto.setDate(dateAuto.getDate() + cureJours + 7);
+    const dateAutoStr = dateAuto.toISOString().split('T')[0];
+
+    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
+
+    recap += '<div style="padding:8px 0;border-bottom:1px solid #f2e4cf" data-cle="' + cle + '">';
+    recap += '<div style="display:flex;align-items:center;gap:8px">';
+    recap += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + couleur + ';flex-shrink:0"></span>';
+    recap += '<span>' + nom + ' — ' + l.format_poids + ' ' + l.format_unite + ' × ' + l.quantite + ' = ' + formaterPrix(l.prix_unitaire * l.quantite) + '</span>';
+    recap += '</div>';
+
+    if (statut !== 'pret') {
+      recap += '<div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
+      recap += '<select class="form-ctrl" style="width:auto;font-size:0.85rem" data-cle="' + cle + '" onchange="cmdCompleterChangerType(this)">';
+      recap += '<option value="temporaire-cure">Lot en cure</option>';
+      recap += '<option value="temporaire-fab" selected>Pas encore fabriqué</option>';
+      recap += '<option value="temporaire-partiel">Quantité partielle</option>';
+      recap += '<option value="definitif">Définitif</option>';
+      recap += '</select>';
+      recap += '<input type="date" class="form-ctrl" style="width:auto;font-size:0.85rem" data-cle-date="' + cle + '" value="' + dateAutoStr + '">';
+      recap += '</div>';
+    }
+    recap += '</div>';
   });
+
   recap += '<div style="margin-top:8px;font-weight:500">Total prévu : ' + formaterPrix(c.total_prevu) + '</div>';
   document.getElementById('form-completer-recap').innerHTML = recap;
 
@@ -904,6 +943,11 @@ async function genererLienSquare() {
   cacherChargement();
   if (res && res.success && res.url) {
     document.getElementById('completer-square').value = res.url;
+    if (res.link_id) {
+      const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
+      if (c) c.link_id_square = res.link_id;
+      await appelAPIPost('updateCommandeEntete', { cmd_id: cmdCompleterIdEnCours, link_id_square: res.link_id });
+    }
     afficherMsg('commandes', '✅ Lien de paiement généré.');
   } else {
     afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur Square.'), 'erreur');
@@ -911,6 +955,38 @@ async function genererLienSquare() {
 }
 
 var cmdCompleterPanier = [];
+
+function cmdCompleterChangerType(sel) {
+  const cle = sel.dataset.cle;
+  const dateInput = document.querySelector('[data-cle-date="' + cle + '"]');
+  if (!dateInput) return;
+
+  const [pro_id, fp, fu] = cle.split('|');
+  const pro = donneesProduits.find(p => p.pro_id === pro_id);
+  const cureJours = pro && pro.cure && !isNaN(pro.cure) ? parseInt(pro.cure) : 28;
+
+  if (sel.value === 'temporaire-cure') {
+    // Chercher le lot en cure le plus proche pour ce produit/format
+    const lotEnCure = (commandesLotsDispo || []).find(x =>
+      String(x.pro_id) === pro_id &&
+      String(x.format_poids) === fp &&
+      String(x.format_unite) === fu
+    );
+    if (lotEnCure && lotEnCure.date_disponibilite) {
+      dateInput.value = lotEnCure.date_disponibilite;
+    }
+  } else if (sel.value === 'definitif') {
+    dateInput.value = '';
+    dateInput.disabled = true;
+    return;
+  } else {
+    // temporaire-fab ou temporaire-partiel
+    const d = new Date();
+    d.setDate(d.getDate() + cureJours + 7);
+    dateInput.value = d.toISOString().split('T')[0];
+  }
+  dateInput.disabled = false;
+}
 
 function cmdCompleterToggleClient() {
   const body = document.getElementById('completer-client-body');
@@ -1213,13 +1289,20 @@ async function envoyerProposition() {
   // Envoi du courriel de proposition au client
   const lignesCourriel = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
     const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
+    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
+    const selType = document.querySelector('[data-cle="' + cle + '"]');
+    const inpDate = document.querySelector('[data-cle-date="' + cle + '"]');
+    const typeVal = selType ? selType.value : 'pret';
+    const type_ligne = typeVal.startsWith('temporaire') ? 'temporaire' : typeVal === 'definitif' ? 'definitif' : 'pret';
     return {
       nom: pro ? pro.nom : l.pro_id,
       poids: l.format_poids,
       unite: l.format_unite,
       quantite: l.quantite,
       prix_unitaire: formaterPrix(l.prix_unitaire),
-      prix_total: formaterPrix(l.prix_unitaire * l.quantite)
+      prix_total: formaterPrix(l.prix_unitaire * l.quantite),
+      type_ligne: type_ligne,
+      date_dispo: inpDate ? inpDate.value : ''
     };
   });
 
@@ -1242,7 +1325,9 @@ async function envoyerProposition() {
   if (resCourriel && resCourriel.success) {
     afficherMsg('commandes', '✅ Proposition envoyée au client, stock sorti.');
   } else {
-    afficherMsg('commandes', '⚠️ Stock sorti, mais le courriel n\'est pas parti : ' + (resCourriel?.message || 'erreur') + '. Corrige le courriel et renvoie.', 'erreur');
+    afficherMsg('commandes', '⚠️ ATTENTION — Le texto est parti mais le courriel n\'a PAS été envoyé : ' + (resCourriel?.message || 'erreur') + '. Renvoie le courriel manuellement avant de fermer.', 'erreur');
+    cacherChargement();
+    return;
   }
   fermerFormCompleter();
   chargerCommandes();
@@ -1276,13 +1361,22 @@ async function envoyerPropositionV3() {
 
   const dateProposition = new Date().toLocaleDateString('fr-CA');
 
-  const lignesPayload = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => ({
-    pro_id: l.pro_id,
-    format_poids: l.format_poids,
-    format_unite: l.format_unite,
-    quantite: l.quantite,
-    prix_unitaire: l.prix_unitaire
-  }));
+  const lignesPayload = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
+    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
+    const selType  = document.querySelector('[data-cle="' + cle + '"]');
+    const inpDate  = document.querySelector('[data-cle-date="' + cle + '"]');
+    const typeLigne = selType ? selType.value : 'pret';
+    const dateDispo = inpDate ? inpDate.value : '';
+    return {
+      pro_id: l.pro_id,
+      format_poids: l.format_poids,
+      format_unite: l.format_unite,
+      quantite: l.quantite,
+      prix_unitaire: l.prix_unitaire,
+      type_ligne: typeLigne.startsWith('temporaire') ? 'temporaire' : typeLigne === 'definitif' ? 'definitif' : 'pret',
+      date_dispo: dateDispo
+    };
+  });
 
   const rabais = cmdCompleterCalculerRabais();
   const promoInfo = cmdCompleterTypePromo();
@@ -1380,12 +1474,18 @@ async function confirmerPaiementCommande(mode_paiement) {
   if (!cmd_id) return;
   afficherChargement();
   const res = await appelAPIPost('creerVenteDepuisCommande', { cmd_id, mode_paiement });
-  cacherChargement();
   if (res && res.success) {
+    // Filet : fermer le lien Square si on a le link_id
+    const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+    if (c && c.link_id_square) {
+      await appelAPIPost('annulerLienSquare', { link_id: c.link_id_square });
+    }
+    cacherChargement();
     afficherMsg('commandes', '✅ Paiement confirmé. Facture ' + res.ven_id + ' créée.');
     fermerFicheCommande();
     chargerCommandes();
   } else {
+    cacherChargement();
     afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
   }
 }
@@ -1421,44 +1521,89 @@ function renvoyerPropositionV3(cmd_id) {
   const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmd_id);
   if (!lignes.length) { afficherMsg('commandes', 'Aucune ligne pour cette commande.', 'erreur'); return; }
 
-  confirmerAction('Renvoyer la même proposition à ' + (c.courriel || 'ce client') + ' ?', async () => {
-    const lignesCourriel = lignes.map(l => {
-      const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
-      return {
-        nom: pro ? pro.nom : l.pro_id,
-        poids: l.format_poids,
-        unite: l.format_unite,
-        quantite: l.quantite,
-        prix_unitaire: formaterPrix(l.prix_unitaire),
-        prix_total: formaterPrix(l.prix_unitaire * l.quantite)
-      };
-    });
+  // Aperçu avant envoi
+  const sousTotal = lignes.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais    = c.rabais || 0;
+  const livraison = c.livraison || 0;
+  const total     = Math.max(0, sousTotal - rabais + livraison);
 
-    const sousTotal = lignes.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-    const rabais    = c.rabais || 0;
-    const livraison = c.livraison || 0;
-    const total     = Math.max(0, sousTotal - rabais + livraison);
+  const lignesHTML = lignes.map(l => {
+    const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
+    return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f2e4cf;font-size:0.9rem">
+      <span>${pro ? pro.nom : l.pro_id} — ${l.format_poids} ${l.format_unite} × ${l.quantite}</span>
+      <span>${formaterPrix(l.prix_unitaire * l.quantite)}</span>
+    </div>`;
+  }).join('');
 
-    afficherChargement();
-    const res = await appelAPIPost('envoyerPropositionV3', {
-      courriel:    c.courriel,
-      client:      c.client,
-      numero:      c.cmd_id,
-      note:        c.note_proposition || '',
-      lien_square: c.lien_square || '',
-      lignes:      lignesCourriel,
-      sous_total:  formaterPrix(sousTotal),
-      rabais:      rabais > 0 ? formaterPrix(rabais) : 0,
-      promo_nom:   '',
-      livraison:   livraison > 0 ? formaterPrix(livraison) : 0,
-      total:       formaterPrix(total)
-    });
-    cacherChargement();
+  const modal = document.createElement('div');
+  modal.className = 'modal-admin-overlay';
+  modal.id = 'modal-relancer';
+  modal.innerHTML = `
+    <div class="modal-admin" style="max-width:480px">
+      <div class="modal-admin-header">
+        <div class="modal-admin-titre">Relancer — ${c.client}</div>
+        <button class="btn-fermer-panneau" onclick="document.getElementById('modal-relancer').remove()">✕</button>
+      </div>
+      <div class="modal-admin-body">
+        <div style="margin-bottom:16px">${lignesHTML}</div>
+        <div style="text-align:right;font-family:Georgia,serif;font-size:1.1rem;color:var(--primary);margin-bottom:20px">Total : ${formaterPrix(total)}</div>
+        <div class="form-groupe">
+          <label class="form-label">Mot personnel (facultatif)</label>
+          <textarea class="form-ctrl" id="relancer-note" rows="3" placeholder="Un mot doux pour accompagner la relance…">${c.note_proposition || ''}</textarea>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button class="bouton bouton-or" onclick="confirmerRelanceV3('${cmd_id}')">Envoyer la relance</button>
+          <button class="bouton bouton-contour" onclick="document.getElementById('modal-relancer').remove()">Annuler</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.classList.add('ouvert');
+}
 
-    if (res && res.success) {
-      afficherMsg('commandes', '✅ Proposition renvoyée.');
-    } else {
-      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
-    }
+async function confirmerRelanceV3(cmd_id) {
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  if (!c) return;
+  const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmd_id);
+  const note = (document.getElementById('relancer-note') || {}).value || '';
+
+  const sousTotal = lignes.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const rabais    = c.rabais || 0;
+  const livraison = c.livraison || 0;
+  const total     = Math.max(0, sousTotal - rabais + livraison);
+
+  const lignesCourriel = lignes.map(l => {
+    const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
+    return {
+      nom: pro ? pro.nom : l.pro_id,
+      poids: l.format_poids,
+      unite: l.format_unite,
+      quantite: l.quantite,
+      prix_unitaire: formaterPrix(l.prix_unitaire),
+      prix_total: formaterPrix(l.prix_unitaire * l.quantite)
+    };
   });
+
+  document.getElementById('modal-relancer').remove();
+  afficherChargement();
+  const res = await appelAPIPost('envoyerPropositionV3', {
+    courriel:    c.courriel,
+    client:      c.client,
+    numero:      c.cmd_id,
+    note:        note,
+    lien_square: c.lien_square || '',
+    lignes:      lignesCourriel,
+    sous_total:  formaterPrix(sousTotal),
+    rabais:      rabais > 0 ? formaterPrix(rabais) : 0,
+    promo_nom:   '',
+    livraison:   livraison > 0 ? formaterPrix(livraison) : 0,
+    total:       formaterPrix(total)
+  });
+  cacherChargement();
+
+  if (res && res.success) {
+    afficherMsg('commandes', '✅ Relance envoyée.');
+  } else {
+    afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+  }
 }
