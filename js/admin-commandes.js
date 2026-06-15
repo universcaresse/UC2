@@ -932,8 +932,16 @@ async function genererLienSquare() {
   if (!c) return;
   const livraison = parseFloat(String(document.getElementById('completer-livraison').value).replace(',', '.')) || 0;
   const rabais = cmdCompleterCalculerRabais();
-  const montant = Math.max(0, (c.total_prevu || 0) + livraison - rabais);
-  if (montant <= 0) { afficherMsg('commandes', 'Montant invalide.', 'erreur'); return; }
+  const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours);
+  const totalPrets = lignes.reduce((s, l) => {
+    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
+    const sel = document.querySelector('[data-cle="' + cle + '"]');
+    const type = sel ? sel.value : 'pret';
+    if (type === 'definitif' || type.startsWith('temporaire')) return s;
+    return s + (l.prix_unitaire * l.quantite);
+  }, 0);
+  const montant = Math.max(0, totalPrets + livraison - rabais);
+  if (montant <= 0) { afficherMsg('commandes', 'Montant invalide — aucun produit prêt à payer.', 'erreur'); return; }
   afficherChargement();
   const courriel = document.getElementById('completer-courriel').value.trim();
   const telephone = document.getElementById('completer-telephone').value.trim();
@@ -1367,13 +1375,14 @@ async function envoyerPropositionV3() {
     const inpDate  = document.querySelector('[data-cle-date="' + cle + '"]');
     const typeLigne = selType ? selType.value : 'pret';
     const dateDispo = inpDate ? inpDate.value : '';
+    const typeNormalise = !typeLigne || typeLigne === 'pret' ? 'pret' : typeLigne.startsWith('temporaire') ? 'temporaire' : 'definitif';
     return {
       pro_id: l.pro_id,
       format_poids: l.format_poids,
       format_unite: l.format_unite,
       quantite: l.quantite,
       prix_unitaire: l.prix_unitaire,
-      type_ligne: typeLigne.startsWith('temporaire') ? 'temporaire' : typeLigne === 'definitif' ? 'definitif' : 'pret',
+      type_ligne: typeNormalise,
       date_dispo: dateDispo
     };
   });
