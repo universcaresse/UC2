@@ -428,6 +428,19 @@ function afficherTableauCommandes(items) {
   const autres = items.filter(c => !connus.includes(c.statut));
 
   function calculerPastilleStock(cmd_id) {
+    const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+
+    // Pastille délai pour « En attente de paiement »
+    if (c && c.statut === 'En attente de paiement' && c.date_proposition) {
+      const parts = c.date_proposition.split('/');
+      const dateP = new Date(parts[2], parts[1] - 1, parts[0]);
+      const jours = Math.floor((new Date() - dateP) / 86400000);
+      if (jours >= 14) return 'var(--danger)';
+      if (jours >= 7)  return 'var(--accent)';
+      return '';
+    }
+
+    // Pastille stock pour « En attente »
     const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmd_id);
     if (!lignes.length) return '';
     let toutPlein = true;
