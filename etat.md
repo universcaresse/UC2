@@ -162,4 +162,4 @@ Quand les blocs 1, 2 et 3 sont construits et testés :
 ## 7. MÉNAGE DU DOSSIER
 **On garde : le code + `METHODE.md` + `ETAT.md` + les 3 blocs md. TOUT autre fichier md ou « Copie » se jette.**
 - Jeter `admin/index - Copie.html`
-- Jeter tous les anciens md : etat-projet*, logique-coups-de-coeur, md-branche-1b, md-session-coupdecoeur*, handoff-*, brief-*, 1-decoupage-codegs, plan-modifications, uc_coups_de_coeur, INVENTAIRE, ANALYSE, PARCOURS, OUVERTURE
+- Jeter tous les anciens md
