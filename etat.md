@@ -22,7 +22,8 @@
 ### 1.3 Repères techniques — coups de cœur
 - Page client « modifier » = `section-coupdecoeur` (jamais le modal), deux zones : `#coupdecoeur-commande` et `#coupdecoeur-bloque` (cachée via `class="cache"`)
 - Lien client : `?cmd=CMD-XXXX`
-- Harnais de test : `envoyerProposition_v2test` ← dispatcher `envoyerPropositiontest` (petit t) ← bouton « Envoyer au client test ». Envoie à l'adresse de test au lieu du vrai client — tout le reste est identique
+- Harnais de test : `envoyerProposition_v2test` ← dispatcher `envoyerPropositiontest` (petit t) ← bouton « Envoyer au client test ».
+- Deux boutons dans l'admin : bouton régulier → `envoyerProposition_v2` (production, ne pas toucher). Bouton test → `envoyerProposition_V3` (c'est là qu'on bâtit les blocs 1-2-3). Envoie à l'adresse de test au lieu du vrai client — tout le reste est identique
 - Le courriel de proposition = une seule fonction : `envoyerProposition_v2`
 
 ### 1.4 Repères techniques — feuilles Google Sheets
