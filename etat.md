@@ -67,6 +67,18 @@
 - Bloc 1, Bloc 2, Bloc 3 : documentés en détail dans leurs propres fichiers md
 - Toutes les décisions tranchées, essences des textes notées, notes techniques complètes
 
+### 2.5 Bloc 1 — codé (15 juin 2026)
+- Trois portes dans le courriel (Payer / Modifier / J'ai une question)
+- Prénom du client dans l'accueil du courriel
+- Message de blocage avec « Écrivez-nous »
+- Bouton « Je ne veux plus donner suite » + page de confirmation + raison facultative
+- Fonction `annulerCommandeClient` dans Code.gs
+- Pastilles orange/rouge selon le délai (7 / 14 jours)
+- Bouton Relancer avec aperçu et mot personnel
+- Sauvegarde du `link_id` Square (col 21) + `annulerLienSquare_v2`
+- Filet fermeture lien Square au clic « Paiement reçu »
+- Avertissement visible si courriel échoue après le texto
+
 ---
 
 ## 3. CORRECTIONS DÉCIDÉES — à appliquer dans le code
