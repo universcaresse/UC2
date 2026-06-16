@@ -1593,7 +1593,9 @@
                 <div class="form-groupe" id="fab-groupe-multiplicateur">
                   <label class="form-label">Multiplicateur</label>
                   <select id="fab-multiplicateur" class="form-ctrl" onchange="calculerApercuLot()">
-                    <option value="1">1×</option>
+                    <option value="0.5">0.5×</option>
+					<option value="1">1×</option>
+					<option value="1.5">1.5×</option>
                     <option value="2">2×</option>
                     <option value="3">3×</option>
                   </select>
@@ -3706,8 +3708,7 @@
     <div class="modal-admin-body">
       <div class="form-actions">
         <button class="bouton bouton-contour" onclick="fermerApercuProposition()">Modifier</button>
-        <button class="bouton bouton-or" onclick="envoyerProposition()">Envoyer au client</button>
- <button class="bouton bouton-or" onclick="envoyerPropositionV3()">Envoyer au client (v3)</button>
+        <button class="bouton bouton-or" onclick="envoyerPropositionV3()">Envoyer au client</button>
       </div>
     </div>
   </div>

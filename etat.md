@@ -4,7 +4,7 @@ Avec METHODE.md, c'est l'un des deux seuls fichiers md du projet.
 ⚠️ = à confirmer dans les fichiers avant d'agir.
 
 ---
-
+ 
 ## 1. LA CARTE DU PROJET
 
 ### 1.1 Les trois étages
