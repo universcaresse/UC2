@@ -615,7 +615,7 @@ async function voirDetailCommande(cmd_id) {
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
   }
   if (c.statut === 'À expédier') {
-    actionsHTML += `<button class="bouton bouton-or" onclick="changerStatutCommande('${c.cmd_id}', 'Terminée')">Marquer comme expédiée</button>`;
+    actionsHTML += `<button class="bouton bouton-or" onclick="marquerExpediee('${c.cmd_id}')">Marquer comme expédiée</button>`;
   }
   actionsHTML += `<button class="bouton bouton-contour" onclick="fermerFicheCommande()">Fermer</button>`;
 
@@ -688,6 +688,37 @@ async function modifierCommande(cmd_id) {
 // ═══════════════════════════════════════
 // CHANGER LE STATUT D'UNE COMMANDE
 // ═══════════════════════════════════════
+
+async function marquerExpediee(cmd_id) {
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  if (!c) return;
+
+  const noTracage = (prompt('Numéro de traçage Postes Canada :') || '').trim();
+  if (!noTracage) return;
+
+  const telephone = c.telephone || '';
+  if (telephone) {
+    const lienSuivi = 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(noTracage);
+    let texteSms = 'Bonjour ' + (c.client || '') + ',\n\n';
+    texteSms += 'Bonne nouvelle, votre commande ' + cmd_id + ' est en route!\n';
+    texteSms += 'Suivez votre colis ici : ' + lienSuivi + '\n\n';
+    texteSms += 'Merci !\nUnivers Caresse';
+    window.open('sms:' + telephone + '?body=' + encodeURIComponent(texteSms));
+  }
+
+  afficherChargement();
+  const res = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: noTracage });
+  cacherChargement();
+  if (res && res.success) {
+    afficherMsg('commandes', '✅ Commande expédiée, courriel envoyé.');
+    fermerFicheCommande();
+    chargerCommandes();
+  } else {
+    afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+  }
+}
+
+
 async function changerStatutCommande(cmd_id, nouveauStatut) {
   afficherChargement();
   const res = await appelAPIPost('updateStatutCommande', { cmd_id, statut: nouveauStatut });
