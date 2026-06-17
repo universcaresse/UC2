@@ -604,7 +604,7 @@ async function voirDetailCommande(cmd_id) {
 
  if (c.statut === 'En attente') {
     actionsHTML += `<button class="bouton" onclick="modifierCommande('${c.cmd_id}')">Modifier</button>`;
-    actionsHTML += `<button class="bouton bouton-or" onclick="ouvrirFormCompleter('${c.cmd_id}')">Compléter la commande</button>`;
+    actionsHTML += `<button class="bouton bouton-or" onclick="ouvrirFormCompleter('${c.cmd_id}')">Créer la proposition</button>`;
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
   }
   if (c.statut === 'En attente de paiement') {
