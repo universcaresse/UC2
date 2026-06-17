@@ -1,3 +1,46 @@
+## FAIT — session du 17 juin 2026 (verrou + premier courriel) 18h09
+
+
+Deux chantiers : enrichir les courriels de demande, et protéger la commande pendant qu'on prépare la proposition.
+
+### A — Collection + gamme dans les deux courriels de demande → FAIT
+Avant : les courriels ne montraient que produit + poids. Maintenant : collection · gamme aussi, comme à l'écran. Utile car des noms de produits se répètent.
+- **main-demande.js, `demandeEnvoyer`** : la liste envoyée au serveur emporte maintenant `nom_collection` et `nom_gamme` (le site les avait déjà, il ne les transmettait pas).
+- **Code.gs, `envoyerDemandeCommande_v2`** : courriel à Chantal (`lignesTxt`) → préfixe « Collection · Gamme — » devant le nom (garde si absente). Courriel client (`lignesHTML`) → petite ligne dorée collection · gamme au-dessus du nom (garde si absente).
+
+### B — Verrou « Verrouillée » : le client ne peut plus toucher la commande pendant qu'on la traite → FAIT
+Principe décidé avec Chantal : dès que Chantal ouvre la proposition, la commande se verrouille; si elle ferme sans envoyer, ça revient en « En attente »; si elle envoie, ça passe en « En attente de paiement ». Pas de minuterie (trop risqué) — la commande verrouillée reste visible et se reprend à la main.
+
+Tout dans **admin-commandes.js** sauf indication :
+- `ouvrirFormCompleter` : pose le statut **Verrouillée** (via `updateStatutCommande`), seulement si la commande vient de « En attente ».
+- `fermerFormCompleter` : si on ferme **sans avoir envoyé** (drapeau `window.cmdCompleterEnvoiEnCours`), remet « En attente ». Le drapeau évite d'écraser le « En attente de paiement » après un vrai envoi.
+- `envoyerPropositionV3` : lève le drapeau au début; **remet « En attente » juste avant `sortirStockCommande`** — obligatoire, car la sortie de stock REFUSE tout statut autre que « En attente » (`sortirStockCommande_v2`).
+- `afficherTableauCommandes` : nouveau bloc **VERROUILLÉES** dans la liste (après ENTRANTES).
+- `voirDetailCommande` : sur une commande « Verrouillée », un seul bouton **« Reprendre la proposition »** (rouvre `ouvrirFormCompleter` sans re-verrouiller).
+
+### C — Deux boutons dans le PREMIER courriel (à la demande) → FAIT
+Le courriel que le client reçoit en envoyant ses coups de cœur a maintenant **Modifier la liste** et **Annuler**, pour corriger une erreur avant qu'on traite.
+- **Code.gs, `envoyerDemandeCommande_v2`** : le jeton, avant déclaré dans un `try` (invisible plus bas), est maintenant `let jeton` au niveau de la fonction → utilisable dans le courriel. Lien : `https://universcaresse.ca/?cmd=...&jeton=...`. Bouton Modifier → lien de base; bouton Annuler → `&action=annuler`.
+- **main-demande.js** : la page client accepte maintenant le statut **« En attente »** en plus de « En attente de paiement » (`res.statut !== ... && res.statut !== 'En attente'`). Tout autre statut (Verrouillée, Annulée) reste bloqué → le verrou tient.
+
+### À publier
+- **Republier le site** (admin-commandes.js + main-demande.js).
+- **Redéployer Apps Script** (Code.gs : A et C).
+
+### À VÉRIFIER au test
+- Verrou : ouvrir une proposition → la commande apparaît dans VERROUILLÉES; fermer sans envoyer → revient dans ENTRANTES; envoyer → « En attente de paiement », stock sorti (ne doit PAS planter).
+- « Reprendre la proposition » sur une verrouillée rouvre bien le formulaire.
+- Premier courriel : les deux boutons mènent à la bonne page; « Modifier la liste » ouvre la liste; le client peut renvoyer.
+- Courriels : collection + gamme s'affichent (les deux courriels).
+
+### LIMITES CONNUES / À FAIRE PLUS TARD
+- Le bouton **« Annuler »** du courriel ne va pas DIRECT à l'écran d'annulation : il mène à la page liste, où le bouton « Je ne veux plus donner suite… » est déjà présent en bas. Rendre l'annulation directe = bifurcation `action === 'annuler'` à ajouter dans le handler `?cmd=` de main-demande.js.
+- Dépendance à confirmer : `getCommandePublique` (Code.gs) doit bien renvoyer statut + lignes pour une commande « En attente » (sinon « Modifier la liste » du premier courriel n'ouvrira rien).
+- Edge : si Chantal quitte brutalement (onglet fermé, plantage) pendant la proposition, la commande reste « Verrouillée » → visible dans VERROUILLÉES, à reprendre à la main. Comportement voulu.
+
+
+
+
 ## FAIT — session du 17 juin 2026
 
 Suite des 3 bugs trouvés au test de Chantal (proposition envoyée, client modifie/paie/pose une question).

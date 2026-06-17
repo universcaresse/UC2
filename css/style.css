@@ -2440,4 +2440,26 @@ textarea.fiches-ctrl {
   line-height: 1.6;
 }
 
+/* ═══════════════════════════════════════
+   PAGE CLIENT « COUPS DE CŒUR » — cadre
+   (scopé à #section-coupdecoeur — n'affecte pas l'admin)
+   ═══════════════════════════════════════ */
+#section-coupdecoeur #coupdecoeur-commande,
+#section-coupdecoeur #coupdecoeur-bloque {
+  padding: 0 var(--padding-page) 64px;
+}
+#section-coupdecoeur #coupdecoeur-commande > .bouton {
+  display: flex;
+  width: 100%;
+}
+#section-coupdecoeur .lignetotal span:not(.lignetotal-libelle) {
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  #section-coupdecoeur #coupdecoeur-commande,
+  #section-coupdecoeur #coupdecoeur-bloque {
+    padding: 0 16px 48px;
+  }
+}
+
 
