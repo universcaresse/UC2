@@ -2448,12 +2448,22 @@ textarea.fiches-ctrl {
 #section-coupdecoeur #coupdecoeur-bloque {
   padding: 0 var(--padding-page) 64px;
 }
-#section-coupdecoeur #coupdecoeur-commande > .bouton {
+#section-coupdecoeur #coupdecoeur-commande > .bouton,
+#section-coupdecoeur #coupdecoeur-bloque > .bouton {
   display: flex;
   width: 100%;
 }
 #section-coupdecoeur .lignetotal span:not(.lignetotal-libelle) {
   white-space: nowrap;
+}
+#section-coupdecoeur .lien-discret {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+#section-coupdecoeur .lien-discret:hover {
+  color: var(--primary-dark);
 }
 @media (max-width: 900px) {
   #section-coupdecoeur .page-entete {
