@@ -537,7 +537,7 @@ async function voirDetailCommande(cmd_id) {
   });
 
   // Afficher la fiche
-  document.getElementById('fiche-commande-titre').textContent = 'Commande ' + c.cmd_id.replace('CMD-', '-');
+  document.getElementById('fiche-commande-titre').textContent = 'Commande' + c.cmd_id.replace('CMD-', '-');
 
   let html = `
     <div style="margin-bottom:16px">
