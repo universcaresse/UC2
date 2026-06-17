@@ -247,7 +247,13 @@ function demandeCreerModalListe() {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const action = btn.dataset.action;
-    if (action === 'continuer') { demandeAllerForm(); return; }
+    if (action === 'continuer') {
+      let modif = null;
+      try { modif = JSON.parse(localStorage.getItem('uc_modif_cmd') || 'null'); } catch (e) {}
+      if (modif && modif.cmd) { demandeRenvoyerModif(); return; }
+      demandeAllerForm();
+      return;
+    }
     if (action === 'retour')    { demandeRetourListe(); return; }
     if (action === 'envoyer')   { demandeEnvoyer(); return; }
     if (action === 'fermer')    { demandeFermerModalListe(); return; }
@@ -269,6 +275,10 @@ function demandeOuvrirModalListe() {
   if (!overlay) return;
   demandeRendreListe();
   demandeRetourListe();
+  let modif = null;
+  try { modif = JSON.parse(localStorage.getItem('uc_modif_cmd') || 'null'); } catch (e) {}
+  const contBtn = overlay.querySelector('.demande-continuer');
+  if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'Renvoyer à ma commande' : 'Continuer';
   overlay.classList.add('ouvert');
   document.body.style.overflow = 'hidden';
 }
@@ -302,7 +312,7 @@ function demandeRendreListe() {
           (i.nom_collection ? '<span class="demande-item-collection">' + i.nom_collection + '</span>' : '') +
           (i.nom_gamme ? '<span class="demande-item-gamme">' + i.nom_gamme + '</span>' : '') +
           '<span class="demande-item-nom">' + (i.nom_produit || '') + '</span>' +
-          '<span class="demande-item-format">' + i.format_poids + ' ' + i.format_unite + '</span>' +
+          '<span class="demande-item-format">' + (i.nom_gamme ? i.nom_gamme + ' · ' : '') + i.format_poids + ' ' + i.format_unite + '</span>' +
         '</div>' +
         '<div class="demande-item-droite">' +
           '<div class="demande-item-qte">' +
@@ -392,9 +402,36 @@ async function demandeEnvoyer() {
   if (btn) { btn.disabled = false; const ov = document.getElementById('demande-spinner-overlay'); if (ov) ov.remove(); }
 }
 
+async function demandeRenvoyerModif() {
+  let modif = null;
+  try { modif = JSON.parse(localStorage.getItem('uc_modif_cmd') || 'null'); } catch (e) {}
+  if (!modif || !modif.cmd) { demandeAllerForm(); return; }
+  const vueListe = document.getElementById('demande-vue-liste');
+  const vueMerci = document.getElementById('demande-vue-merci');
+  const btn = document.querySelector('.demande-continuer');
+  if (btn) btn.disabled = true;
+  const lignes = demandeListe.map(i => ({
+    pro_id: i.pro_id, format_poids: i.format_poids, format_unite: i.format_unite,
+    quantite: i.quantite, prix_unitaire: i.prix_unitaire
+  }));
+  try {
+    const r = (typeof appelAPIPost === 'function')
+      ? await appelAPIPost('renvoyerListeCoupdecoeur', { cmd_id: modif.cmd, lignes, jeton: modif.jeton })
+      : null;
+    if (!r || !r.success) throw new Error((r && r.message) || 'échec');
+    try { localStorage.removeItem('uc_modif_cmd'); } catch (e) {}
+    demandeVider();
+    if (vueListe) vueListe.classList.add('cache');
+    if (vueMerci) vueMerci.classList.remove('cache');
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Erreur — réessayer'; }
+  }
+}
+
 // ─── INITIALISATION ───
 document.addEventListener('DOMContentLoaded', () => {
   if (!DEMANDE_ACTIVE) return;
+  try { localStorage.removeItem('uc_modif_cmd'); } catch (e) {}
   chargerDemandeListe();
   const bulle = document.createElement('div');
   bulle.id = 'demande-bulle';
@@ -487,6 +524,7 @@ window.addEventListener('DOMContentLoaded', async function () {
 
     if (!estBloc2ou3) {
       // Bloc 1 — comportement existant
+      try { localStorage.setItem('uc_modif_cmd', JSON.stringify({ cmd: numero, jeton: jeton })); } catch (e) {}
       demandeListe = res.lignes.map(l => ({
         pro_id: l.pro_id, format_poids: l.format_poids, format_unite: l.format_unite,
         nom_produit: l.nom, prix_unitaire: l.prix_unitaire, image_url: l.image_url,
@@ -516,7 +554,7 @@ window.addEventListener('DOMContentLoaded', async function () {
         html += '<div class="rangeeitem" data-cle="' + cle + '">' +
             '<div class="rangeeitem-info">' +
               '<div class="rangeeitem-titre">' + (i.nom_produit || i.pro_id) + '</div>' +
-              '<div class="rangeeitem-meta">' + i.format_poids + ' ' + i.format_unite + '</div>' +
+              '<div class="rangeeitem-meta">' + (i.nom_gamme ? i.nom_gamme + ' · ' : '') + i.format_poids + ' ' + i.format_unite + '</div>' +
             '</div>' +
             '<div class="compteur">' +
               '<button type="button" class="compteur-btn" data-action="moins">−</button>' +
@@ -529,8 +567,9 @@ window.addEventListener('DOMContentLoaded', async function () {
       });
       html += '<div class="lignetotal"><span class="lignetotal-libelle">Total avant les frais de livraison</span>' +
         '<span>' + total.toFixed(2).replace('.', ',') + ' $</span></div>' +
+        '<button type="button" class="bouton bouton-contour" onclick="naviguer(\'catalogue\')" style="margin-bottom:8px">Ajouter d\'autres produits</button>' +
         '<button type="button" class="bouton bouton-grand" data-action="renvoyer">Renvoyer ma liste</button>' +
-        '<button type="button" class="bouton bouton-contour" data-action="annuler" style="margin-top:12px">Je ne veux plus donner suite</button>' +
+        '<button type="button" class="bouton bouton-contour" data-action="annuler" style="margin-top:12px">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
         '<div id="coupdecoeur-msg" class="cache"></div>';
       zone.innerHTML = html;
     }
