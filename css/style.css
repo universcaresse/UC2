@@ -2456,9 +2456,22 @@ textarea.fiches-ctrl {
   white-space: nowrap;
 }
 @media (max-width: 900px) {
+  #section-coupdecoeur .page-entete {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
   #section-coupdecoeur #coupdecoeur-commande,
   #section-coupdecoeur #coupdecoeur-bloque {
     padding: 0 16px 48px;
+  }
+  #section-coupdecoeur .rangeeitem {
+    flex-wrap: wrap;
+  }
+  #section-coupdecoeur .rangeeitem-info {
+    flex: 1 1 100%;
+  }
+  #section-coupdecoeur .rangeeitem-valeur {
+    margin-left: auto;
   }
 }
 
