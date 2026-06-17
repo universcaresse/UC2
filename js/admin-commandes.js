@@ -548,7 +548,7 @@ async function voirDetailCommande(cmd_id) {
       ${c.code_postal ? `<div class="texte-secondaire">${c.code_postal}</div>` : ''}
     </div>
     <div style="margin-bottom:16px">
-      <div class="form-label">Date de la commande</div>
+      <div class="form-label">Date de la commande - ${c.date}</div>
       <div>${c.date}</div>
     </div>
     <div style="margin-bottom:16px">
