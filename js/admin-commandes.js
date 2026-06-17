@@ -578,7 +578,10 @@ async function voirDetailCommande(cmd_id) {
     <div style="margin-bottom:16px">
       <div class="form-label">Total prévu</div>
       <div>${formaterPrix(c.total_prevu)}</div>
-   
+      <div class="form-label" style="margin-top:8px">Acompte versé</div>
+       <div>${formaterPrix(c.acompte)}</div>
+      <div class="form-label" style="margin-top:8px">Solde à payer</div>
+      <div style="color:var(--primary);font-weight:500">${formaterPrix(c.solde)}</div>
     </div>
     ${c.notes ? `<div style="margin-bottom:16px">
       <div class="form-label">Notes</div>
