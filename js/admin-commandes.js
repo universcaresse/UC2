@@ -855,7 +855,7 @@ function ouvrirFormCompleter(cmd_id) {
   if (!c) return;
   cmdCompleterIdEnCours = cmd_id;
 
-  document.getElementById('form-completer-titre').textContent = 'Compléter la commande ' + cmd_id.replace('CMD-', '');
+  document.getElementById('form-completer-titre').textContent = 'Créer la proposition - ' + cmd_id.replace('CMD-', '');
 
   const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmd_id);
   cmdCompleterPanier = lignes.map(l => ({
