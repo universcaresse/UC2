@@ -1166,20 +1166,22 @@ function cmdCompleterTypePromo() {
   return { type: '', promo_id: '' };
 }
 
-function apercuProposition() {
+async function apercuProposition() {
   if (!cmdCompleterIdEnCours) return;
   const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
   if (!c) return;
 
-  const note         = document.getElementById('completer-note').value;
-  const square       = document.getElementById('completer-square').value.trim();
+  const prenom    = document.getElementById('completer-prenom').value.trim();
+  const nom       = document.getElementById('completer-client').value.trim();
+  const client    = (prenom + ' ' + nom).trim();
+  const courriel  = document.getElementById('completer-courriel').value.trim();
+  const note      = document.getElementById('completer-note').value;
+  const square    = document.getElementById('completer-square').value.trim();
   const livraisonNum = parseFloat(String(document.getElementById('completer-livraison').value).replace(',', '.')) || 0;
-  const rabais       = cmdCompleterCalculerRabais();
-  const promoNom     = cmdCompleterNomPromo();
-  const sousTotalNum = c.total_prevu || 0;
-  const totalAvec    = Math.max(0, sousTotalNum + livraisonNum - rabais);
+  const rabais    = cmdCompleterCalculerRabais();
+  const totalAvec = Math.max(0, (c.total_prevu || 0) + livraisonNum - rabais);
 
-  const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
+  const lignesCourriel = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
     const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
     return {
       nom: pro ? pro.nom : l.pro_id,
@@ -1191,170 +1193,8 @@ function apercuProposition() {
     };
   });
 
-  const lignesHTML = lignes.map(l => `
-    <tr>
-      <td style="padding:10px 0;border-bottom:1px solid #f2e4cf">
-        <div style="color:#3d3b39">${l.nom}</div>
-        <div style="font-size:0.78rem;color:#8b8680;margin-top:2px">${l.poids} ${l.unite} &nbsp;·&nbsp; ${l.prix_unitaire} / unité</div>
-      </td>
-      <td style="padding:10px 0;border-bottom:1px solid #f2e4cf;text-align:center;color:#8b8680">${l.quantite}</td>
-      <td style="padding:10px 0;border-bottom:1px solid #f2e4cf;text-align:right;color:#5a8a3a">${l.prix_total}</td>
-    </tr>`).join('');
-
-  const noteHTML = note ? `<div style="margin:0 0 24px;padding:14px 18px;background:#e8f4e8;border-left:4px solid #5a8a3a;border-radius:4px;color:#3d3b39;line-height:1.6;white-space:pre-line">${note}</div>` : '';
-
-  const squareHTML = square
-    ? `<div style="text-align:center;margin:28px 0 8px"><span style="display:inline-block;background:#5a8a3a;color:#fff;font-size:1rem;padding:14px 36px;border-radius:6px;letter-spacing:0.04em">Payer maintenant</span></div>
-       <div style="text-align:center;font-size:0.72rem;color:#8b8680;margin-bottom:8px">Paiement sécurisé par Square</div>`
-    : `<div style="text-align:center;margin:20px 0;padding:12px;background:#fff4e6;border-left:4px solid #d4a445;border-radius:4px;color:#3d3b39;font-size:0.85rem">⚠️ Aucun lien Square — le bouton « Payer maintenant » n'apparaîtra pas dans le courriel.</div>`;
-
-  const html = `
-<div style="max-width:520px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08)">
-  <div style="background:#5a8a3a;padding:28px;text-align:center">
-    <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1780105142/Logoblanc_ojpqc4.png" alt="Univers Caresse" style="width:160px;display:block;margin:0 auto">
-  </div>
-  <div style="padding:28px;color:#3d3b39;line-height:1.6;font-family:'DM Sans',sans-serif">
-    <p>Bonjour,</p>
-    ${noteHTML}
-    <div style="margin:24px 0 16px;font-size:0.7rem;letter-spacing:0.2em;color:#8b8680;text-transform:uppercase">Votre commande — ${c.cmd_id.replace('CMD-', '-')}</div>
-    <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
-      <thead>
-        <tr style="border-bottom:2px solid #f2e4cf">
-          <th style="text-align:left;padding:8px 0;font-size:0.65rem;letter-spacing:0.15em;color:#8b8680;text-transform:uppercase;font-weight:500">Produit</th>
-          <th style="text-align:center;padding:8px 0;font-size:0.65rem;letter-spacing:0.15em;color:#8b8680;text-transform:uppercase;font-weight:500">Qté</th>
-          <th style="text-align:right;padding:8px 0;font-size:0.65rem;letter-spacing:0.15em;color:#8b8680;text-transform:uppercase;font-weight:500">Total</th>
-        </tr>
-      </thead>
-      <tbody>${lignesHTML}</tbody>
-    </table>
-    <div style="margin-left:auto;width:220px">
-      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:0.85rem;color:#8b8680"><span>Sous-total</span><span>${formaterPrix(sousTotalNum)}</span></div>
-      ${rabais > 0 ? `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:0.85rem;color:#5a8a3a"><span>Rabais${promoNom ? ' — ' + promoNom : ''}</span><span>-${formaterPrix(rabais)}</span></div>` : ''}
-      ${livraisonNum > 0 ? `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:0.85rem;color:#8b8680"><span>Livraison</span><span>${formaterPrix(livraisonNum)}</span></div>` : ''}
-      <div style="display:flex;justify-content:space-between;padding:10px 0 4px;font-family:'Playfair Display',serif;font-size:1.3rem;color:#5a8a3a;border-top:2px solid #5a8a3a;margin-top:6px"><span>Total</span><span>${formaterPrix(totalAvec)}</span></div>
-    </div>
-    ${squareHTML}
-    <p style="margin-top:24px">Au plaisir,</p>
-    <p style="font-family:'Playfair Display',serif;font-style:italic;color:#5a8a3a">L'équipe univers caresse savonnerie artisanale</p>
-  </div>
-</div>`;
-
-  document.getElementById('modal-apercu-proposition-contenu').innerHTML = html;
-  document.getElementById('modal-apercu-proposition').classList.add('ouvert');
-}
-
-function fermerApercuProposition() {
-  document.getElementById('modal-apercu-proposition').classList.remove('ouvert');
-}
-
-async function envoyerProposition() {
-  if (!cmdCompleterIdEnCours) return;
-  const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
-  if (!c) return;
-  fermerApercuProposition();
-
-  const prenom    = document.getElementById('completer-prenom').value.trim();
-  const nom       = document.getElementById('completer-client').value.trim();
-  const client    = (prenom + ' ' + nom).trim();
-  const courriel  = document.getElementById('completer-courriel').value.trim();
-  const telephone = document.getElementById('completer-telephone').value.trim();
-  const livraison = document.getElementById('completer-livraison').value;
-  const note      = document.getElementById('completer-note').value;
-  const square    = document.getElementById('completer-square').value;
-  const livraisonNum = parseFloat(String(livraison).replace(',', '.')) || 0;
-
-  // Ouvrir le texto tout de suite — doit partir du clic direct, avant les envois
-  if (telephone) {
-    let texteSms = 'Bonjour ' + (client || '') + ',\n\n';
-    texteSms += 'Votre proposition de commande Univers Caresse vient de vous être envoyée par courriel.\n';
-    texteSms += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
-    texteSms += 'Merci !\nUnivers Caresse';
-    window.open('sms:' + telephone + '?body=' + encodeURIComponent(texteSms));
-  }
-
   afficherChargement();
-
-  const dateProposition = new Date().toLocaleDateString('fr-CA');
-
-  const lignesPayload = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
-    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
-    const sel = document.querySelector('[data-cle="' + cle + '"]');
-    const inp = document.querySelector('[data-cle-date="' + cle + '"]');
-    const type = (sel && sel.value) ? sel.value : 'pret';
-    const typeNormalise = type.startsWith('temporaire') ? 'temporaire' : type === 'definitif' ? 'definitif' : 'pret';
-    return {
-      pro_id: l.pro_id,
-      format_poids: l.format_poids,
-      format_unite: l.format_unite,
-      quantite: l.quantite,
-      prix_unitaire: l.prix_unitaire,
-      type_ligne: typeNormalise,
-      date_dispo: inp ? inp.value : ''
-    };
-  });
-
-  const rabais = cmdCompleterCalculerRabais();
-  const promoInfo = cmdCompleterTypePromo();
-  const totalAvec = Math.max(0, (c.total_prevu || 0) + livraisonNum - rabais);
-
-  const resUpdate = await appelAPIPost('updateCommandeComplete', {
-    cmd_id: cmdCompleterIdEnCours,
-    client: client,
-    prenom: prenom,
-    nom: nom,
-    courriel: courriel,
-    telephone: telephone,
-    code_postal: c.code_postal,
-    total_prevu: totalAvec,
-    acompte: c.acompte || 0,
-    solde: totalAvec - (c.acompte || 0),
-    note_proposition: note,
-    lien_square: square,
-    livraison: livraisonNum,
-    rabais: rabais,
-    promo_id: promoInfo.promo_id,
-    type_promo: promoInfo.type,
-    date_proposition: dateProposition,
-    lignes: lignesPayload
-  });
-
-  if (!resUpdate || !resUpdate.success) {
-    cacherChargement();
-    afficherMsg('commandes', 'Erreur lors de la sauvegarde.', 'erreur');
-    return;
-  }
-
-  const resStock = await appelAPIPost('sortirStockCommande', {
-    cmd_id: cmdCompleterIdEnCours
-  });
-
-  if (!resStock || !resStock.success) {
-    cacherChargement();
-    afficherMsg('commandes', '❌ ' + (resStock?.message || 'Erreur lors de la sortie du stock.'), 'erreur');
-    return;
-  }
-
-  // Envoi du courriel de proposition au client
-  const lignesCourriel = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
-    const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
-    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
-    const selType = document.querySelector('[data-cle="' + cle + '"]');
-    const inpDate = document.querySelector('[data-cle-date="' + cle + '"]');
-    const typeVal = selType ? selType.value : 'pret';
-    const type_ligne = typeVal.startsWith('temporaire') ? 'temporaire' : typeVal === 'definitif' ? 'definitif' : 'pret';
-    return {
-      nom: pro ? pro.nom : l.pro_id,
-      poids: l.format_poids,
-      unite: l.format_unite,
-      quantite: l.quantite,
-      prix_unitaire: formaterPrix(l.prix_unitaire),
-      prix_total: formaterPrix(l.prix_unitaire * l.quantite),
-      type_ligne: type_ligne,
-      date_dispo: inpDate ? inpDate.value : ''
-    };
-  });
-
-  const resCourriel = await appelAPIPost('envoyerProposition', {
+  const res = await appelAPIPost('envoyerPropositionV3', {
     courriel: courriel,
     client: client,
     numero: c.cmd_id,
@@ -1365,21 +1205,25 @@ async function envoyerProposition() {
     rabais: rabais > 0 ? formaterPrix(rabais) : 0,
     promo_nom: cmdCompleterNomPromo(),
     livraison: livraisonNum > 0 ? formaterPrix(livraisonNum) : 0,
-    total: formaterPrix(totalAvec)
+    total: formaterPrix(totalAvec),
+    apercu: true
   });
-
   cacherChargement();
 
-  if (resCourriel && resCourriel.success) {
-    afficherMsg('commandes', '✅ Proposition envoyée au client, stock sorti.');
-  } else {
-    afficherMsg('commandes', '⚠️ ATTENTION — Le texto est parti mais le courriel n\'a PAS été envoyé : ' + (resCourriel?.message || 'erreur') + '. Renvoie le courriel manuellement avant de fermer.', 'erreur');
-    cacherChargement();
+  if (!res || !res.success || !res.html) {
+    afficherMsg('commandes', '❌ ' + (res?.message || 'Aperçu impossible.'), 'erreur');
     return;
   }
-  fermerFormCompleter();
-  chargerCommandes();
+
+  document.getElementById('modal-apercu-proposition-contenu').innerHTML = res.html;
+  document.getElementById('modal-apercu-proposition').classList.add('ouvert');
 }
+
+function fermerApercuProposition() {
+  document.getElementById('modal-apercu-proposition').classList.remove('ouvert');
+}
+
+
 async function envoyerPropositionV3() { 
   if (!cmdCompleterIdEnCours) return;
   const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
