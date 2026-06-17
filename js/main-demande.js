@@ -507,7 +507,7 @@ window.addEventListener('DOMContentLoaded', async function () {
     if (!res)         { if (zone) zone.textContent = 'Aucune réponse du serveur'; return; }
     if (!res.success) { if (zone) zone.textContent = 'Réponse : ' + (res.message || 'échec'); return; }
 
-    if (res.statut !== 'En attente de paiement') {
+    if (res.statut !== 'En attente de paiement' && res.statut !== 'En attente') {
       demandeVider();
       if (zone) zone.innerHTML = '';
       const bloque = document.getElementById('coupdecoeur-bloque');
