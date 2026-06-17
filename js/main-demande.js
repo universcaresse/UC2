@@ -377,7 +377,9 @@ async function demandeEnvoyer() {
     format_poids: i.format_poids,
     format_unite: i.format_unite,
     quantite: i.quantite,
-    prix_unitaire: i.prix_unitaire
+    prix_unitaire: i.prix_unitaire,
+    nom_collection: i.nom_collection,
+    nom_gamme: i.nom_gamme
   }));
 
   try {
