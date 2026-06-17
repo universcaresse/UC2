@@ -617,6 +617,13 @@ async function voirDetailCommande(cmd_id) {
   if (c.statut === 'À expédier') {
     actionsHTML += `<button class="bouton bouton-or" onclick="marquerExpediee('${c.cmd_id}')">Marquer comme expédiée</button>`;
   }
+  if (c.statut === 'Modifiée') {
+    actionsHTML += `<button class="bouton bouton-or" onclick="modifierProduitsCommande('${c.cmd_id}')">Revoir et re-proposer</button>`;
+  }
+  if (c.statut === 'Modifiée') {
+    actionsHTML += `<button class="bouton bouton-or" onclick="modifierProduitsCommande('${c.cmd_id}')">Revoir et re-proposer</button>`;
+    actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
+  }
   actionsHTML += `<button class="bouton bouton-contour" onclick="fermerFicheCommande()">Fermer</button>`;
 
   actions.innerHTML = actionsHTML;
@@ -750,7 +757,7 @@ function modifierProduitsCommande(cmd_id) {
 
 function annulerCommande(cmd_id) {
   const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
-  const stockSorti = c && c.statut === 'En attente de paiement';
+  const stockSorti = c && (c.statut === 'En attente de paiement' || c.statut === 'Modifiée');
   let message = stockSorti
     ? 'Annuler cette commande ? Le stock réservé sera remis en inventaire.'
     : 'Annuler cette commande ?';
