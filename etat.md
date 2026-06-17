@@ -1,3 +1,39 @@
+## FAIT — session du 16 juin 2026
+
+Tout passe par la seule version d'envoi : `envoyerProposition_V3` (Code.gs) ← `envoyerPropositionV3` (admin-commandes.js).
+
+### 1. Courriel de proposition — message personnel déplacé
+- Le message personnel apparaît maintenant **sous le total**, avant les boutons (avant : tout en haut, après l'intro).
+- Toujours caché quand c'est vide (déjà le cas, pas touché).
+
+### 2. Ménage : ancienne version supprimée (décision 3.1 — une seule version)
+Le chemin de l'ancien courriel retiré à 4 endroits :
+- **index.html** — ancien bouton « Envoyer au client » enlevé; le bouton restant ne dit plus « (v3) ».
+- **Code.gs (doPost)** — ligne d'aiguillage `envoyerProposition` retirée.
+- **Code.gs** — fonction `envoyerProposition_v2` supprimée au complet.
+- **admin-commandes.js** — fonction d'écran `envoyerProposition` supprimée au complet.
+- Résultat : un seul chemin d'envoi. La double version emmêlée (cause des sessions qui tournaient en rond) est partie.
+
+### 3. Aperçu = vrai courriel
+- **Code.gs** : `envoyerProposition_V3` renvoie le HTML sans l'envoyer quand `data.apercu` est vrai.
+- **admin-commandes.js** : `apercuProposition` va chercher ce HTML et l'affiche (son ancien dessin maison est supprimé).
+- Résultat : « ce que je vois dans l'aperçu = ce que le client reçoit », pour de bon.
+
+---
+
+## À FAIRE AVANT DE S'Y FIER
+- Republier le site **et** redéployer Apps Script, puis tester une vraie proposition.
+- Rien n'a été testé de bout en bout cette session.
+
+## ENCORE OUVERT (pas touché)
+- Le type des lignes (prêt / à venir / pas dispo) n'est pas transmis au courriel → blocs 2 et 3 ne se séparent pas en sections à l'envoi. L'aperçu et le courriel restent identiques, mais tous deux incomplets pour 2 et 3.
+- Corrections décidées du bloc 1 toujours pas faites : courriel avant texto · garder l'identifiant du lien Square · faire expirer le lien Square.
+- Arbre du bloc 1 (cas 1 à 7) cartographié; seuls le courriel et l'aperçu sont bâtis. Cas 2 à 7 restent à construire.
+
+
+
+
+
 # ÉTAT DU PROJET — Univers Caresse
 Refait le 16 juin 2026, à partir du vrai historique et du vrai code.
 Avec METHODE.md, c'est l'un des deux seuls fichiers md du projet.
