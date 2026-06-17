@@ -312,7 +312,7 @@ function demandeRendreListe() {
           (i.nom_collection ? '<span class="demande-item-collection">' + i.nom_collection + '</span>' : '') +
           (i.nom_gamme ? '<span class="demande-item-gamme">' + i.nom_gamme + '</span>' : '') +
           '<span class="demande-item-nom">' + (i.nom_produit || '') + '</span>' +
-          '<span class="demande-item-format">' + (i.nom_gamme ? i.nom_gamme + ' · ' : '') + i.format_poids + ' ' + i.format_unite + '</span>' +
+          '<span class="demande-item-format">' +  i.format_poids + ' ' + i.format_unite + '</span>' +
         '</div>' +
         '<div class="demande-item-droite">' +
           '<div class="demande-item-qte">' +
