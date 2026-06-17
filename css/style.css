@@ -23,10 +23,10 @@
   
   --nav-h:          72px;
   --padding-page:   80px;
-  --padding-mobile: 1px; 
+  --padding-mobile: 20px; 
 
   /* PRIMARY */
-  --primary-04:    rgba(90,138,58,0.04);
+  --primary-04:   	rgba(90,138,58,0.04);
   --primary-05:     rgba(90,138,58,0.05);
   --primary-06:     rgba(90,138,58,0.06);
   --primary-08:     rgba(90,138,58,0.08);
@@ -1201,7 +1201,7 @@ tr.cliquable { cursor: pointer; }
   .hero-left::after { display: none; }
 
   .section-collections { padding: 48px var(--padding-mobile); }
-.page-entete { padding: 48px var(--padding-mobile) 40px; flex-direction: column; gap: 16px; align-items: flex-start; }
+.page-entete { padding: 48px 16px 40px; flex-direction: column; gap: 16px; align-items: flex-start; }
 .edu-pager { align-self: flex-end; margin-left: auto; }
  
   .collection-tile { aspect-ratio: 19/9; }
