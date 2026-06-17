@@ -537,7 +537,7 @@ async function voirDetailCommande(cmd_id) {
   });
 
   // Afficher la fiche
-  document.getElementById('fiche-commande-titre').textContent = 'Commande' + c.cmd_id.replace('CMD-', '-');
+  document.getElementById('fiche-commande-titre').textContent = 'Commande' + c.cmd_id.replace('CMD-', '-')+'du ' +${c.date};
 
   let html = `
     <div style="margin-bottom:16px">
@@ -549,7 +549,7 @@ async function voirDetailCommande(cmd_id) {
     </div>
     <div style="margin-bottom:16px">
       <div class="form-label">Date de la commande - ${c.date}</div>
-      <div>${c.date}</div>
+     
     </div>
     <div style="margin-bottom:16px">
       <div class="form-label">Items commandés</div>`;
