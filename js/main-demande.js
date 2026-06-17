@@ -414,6 +414,49 @@ window.addEventListener('DOMContentLoaded', async function () {
   const jeton = params.get('jeton');
   if (!numero) return;
 
+  if (params.get('action') === 'question') {
+    if (typeof naviguer === 'function') naviguer('contact');
+    const nomComplet = params.get('nom') || '';
+    const courrielQ  = params.get('courriel') || '';
+    const sp = nomComplet.indexOf(' ');
+    const elP = document.getElementById('prenom');
+    const elN = document.getElementById('nom');
+    const elC = document.getElementById('courriel');
+    const elS = document.getElementById('sujet');
+    if (elP) elP.value = sp > -1 ? nomComplet.slice(0, sp) : nomComplet;
+    if (elN) elN.value = sp > -1 ? nomComplet.slice(sp + 1) : nomComplet;
+    if (elC) elC.value = courrielQ;
+    if (elS) {
+      const opt = document.createElement('option');
+      opt.value = 'Question — commande ' + numero;
+      opt.textContent = 'Question — commande ' + numero;
+      opt.selected = true;
+      elS.appendChild(opt);
+    }
+    return;
+  }
+
+  if (params.get('action') === 'payer') {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    const sec = document.getElementById('section-coupdecoeur');
+    if (sec) sec.classList.add('active');
+    const z = document.getElementById('coupdecoeur-commande');
+    try {
+      if (typeof appelAPIPost !== 'function') { if (z) z.textContent = 'appelAPIPost absent'; return; }
+      const r = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
+      if (r && r.success && r.statut === 'En attente de paiement' && r.lien_square) {
+        window.location.href = r.lien_square;
+        return;
+      }
+      if (z) z.innerHTML = '<h2 class="titre">Paiement</h2>' +
+        '<p>Cette commande n\'est plus disponible pour le paiement.</p>' +
+        '<p><a href="#" class="lien-discret" onclick="naviguer(\'contact\');return false;">Une question?</a></p>';
+    } catch (e) {
+      if (z) z.textContent = 'Erreur : ' + e.message;
+    }
+    return;
+  }
+
   document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
   const section = document.getElementById('section-coupdecoeur');
   if (section) section.classList.add('active');
