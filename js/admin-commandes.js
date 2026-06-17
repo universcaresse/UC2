@@ -417,6 +417,7 @@ function afficherTableauCommandes(items) {
   // Blocs dans l'ordre d'affichage (statuts d'aujourd'hui)
   const blocs = [
     { titre: 'ENTRANTES',                       statuts: ['En attente'] },
+    { titre: 'VERROUILLÉES',                    statuts: ['Verrouillée'] },
     { titre: 'MODIFIÉES',                       statuts: ['Modifiée'] },
     { titre: 'QUESTIONS',                       statuts: ['Question'] },
     { titre: 'EN ATTENTE DE PAIEMENT',          statuts: ['En attente de paiement'] },
@@ -621,6 +622,9 @@ async function voirDetailCommande(cmd_id) {
   if (c.statut === 'Modifiée') {
     actionsHTML += `<button class="bouton bouton-or" onclick="modifierProduitsCommande('${c.cmd_id}')">Revoir et re-proposer</button>`;
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
+  }
+  if (c.statut === 'Verrouillée') {
+    actionsHTML += `<button class="bouton bouton-or" onclick="ouvrirFormCompleter('${c.cmd_id}')">Reprendre la proposition</button>`;
   }
   actionsHTML += `<button class="bouton bouton-contour" onclick="fermerFicheCommande()">Fermer</button>`;
 
@@ -860,6 +864,12 @@ function ouvrirFormCompleter(cmd_id) {
   if (!c) return;
   cmdCompleterIdEnCours = cmd_id;
 
+  // Verrou : le client ne peut plus toucher la commande pendant qu'on prépare la proposition
+  if (c.statut === 'En attente') {
+    appelAPIPost('updateStatutCommande', { cmd_id: cmd_id, statut: 'Verrouillée' });
+    c.statut = 'Verrouillée';
+  }
+
   document.getElementById('form-completer-titre').textContent = 'Créer la proposition - ' + cmd_id.replace('CMD-', '');
 
   const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmd_id);
@@ -956,6 +966,15 @@ function ouvrirFormCompleter(cmd_id) {
 }
 
 function fermerFormCompleter() {
+  // Fermé sans envoyer → on relâche le verrou, la commande retourne dans Entrantes
+  if (!window.cmdCompleterEnvoiEnCours && cmdCompleterIdEnCours) {
+    const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
+    if (c && c.statut === 'Verrouillée') {
+      appelAPIPost('updateStatutCommande', { cmd_id: cmdCompleterIdEnCours, statut: 'En attente' });
+      c.statut = 'En attente';
+    }
+  }
+  window.cmdCompleterEnvoiEnCours = false;
   document.getElementById('form-completer-commande').classList.add('cache');
   document.getElementById('contenu-commandes').classList.remove('cache');
   document.getElementById('filtres-commandes').classList.remove('cache');
@@ -1233,6 +1252,7 @@ async function envoyerPropositionV3() {
   if (!cmdCompleterIdEnCours) return;
   const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
   if (!c) return;
+  window.cmdCompleterEnvoiEnCours = true;
   fermerApercuProposition();
 
   const prenom    = document.getElementById('completer-prenom').value.trim();
@@ -1306,6 +1326,9 @@ async function envoyerPropositionV3() {
     afficherMsg('commandes', 'Erreur lors de la sauvegarde.', 'erreur');
     return;
   }
+
+  // Lever le verrou juste avant la sortie de stock (elle exige « En attente »)
+  await appelAPIPost('updateStatutCommande', { cmd_id: cmdCompleterIdEnCours, statut: 'En attente' });
 
   const resStock = await appelAPIPost('sortirStockCommande', {
     cmd_id: cmdCompleterIdEnCours
