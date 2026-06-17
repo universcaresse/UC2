@@ -1,3 +1,59 @@
+## FAIT — session du 17 juin 2026
+
+Suite des 3 bugs trouvés au test de Chantal (proposition envoyée, client modifie/paie/pose une question).
+
+### Bug #1 — spinner au renvoi de liste
+Fait (session précédente). Spinner sur le bouton quand le client renvoie sa liste modifiée.
+
+### Bug #3 — bouton « J'ai une question » du courriel → FAIT
+Avant : le bouton ouvrait un `mailto`. Maintenant il mène au formulaire Contact du site, **pré-rempli**.
+- **Code.gs, `envoyerProposition_V3`** : le lien du bouton question = `lienModifier + '&action=question&nom=' + encodeURIComponent(client) + '&courriel=' + encodeURIComponent(courriel)`.
+- **main-demande.js, handler `?cmd=…`** : nouvelle bifurcation `action === 'question'` → `naviguer('contact')`, puis pré-remplit prénom (avant le 1er espace du nom), nom (après), courriel, et le sujet (« Question — commande CMD-XXXX », ajouté comme option au menu déroulant `#sujet`).
+- Le nom complet voyage dans le lien et est coupé au 1er espace.
+
+### Bug #2 — le lien Square doit mourir quand le client modifie → FAIT
+Principe : le bouton **Payer du courriel passe par notre site avant d'aller à Square**. Le site regarde le statut : si « En attente de paiement » → redirige vers Square; sinon → message « cette commande n'est plus disponible pour le paiement ». (Effacer le lien dans la sheet ne suffisait pas : le courriel garde le lien Square vivant.)
+- **Code.gs, `getCommandePublique_v2`** : renvoie maintenant aussi `lien_square` (colonne 14 = index 13). Capture `lienSquareRow` dans la boucle + ajout au `return`.
+- **main-demande.js** : bifurcation `action === 'payer'` → appelle `getCommandePublique`, redirige vers `r.lien_square` si `statut === 'En attente de paiement'`, sinon message.
+- **Code.gs, `envoyerProposition_V3`** : bouton Payer pointe vers `lienModifier + '&action=payer'`. Le bloc jeton/`lienModifier` a été **remonté au-dessus** de `boutonHTML` pour qu'il puisse l'utiliser.
+
+### #3 — afficher la gamme avec le nom → PARTIEL
+Fait seulement sur la **page Modifier** (`coupdecoeurRendre` : gamme ajoutée dans `rangeeitem-meta`, avant le format, avec garde si absente). Le « partout » est **abandonné pour l'instant** (le courriel n'a pas encore la gamme dans ses données).
+
+### #2 (texte du bouton annuler)
+Fait directement par Chantal : « Je ne veux plus donner suite, annuler cette commande s.v.p. ».
+
+### #1 — ajouter un nouveau produit depuis la page Modifier → FAIT
+Tout dans **main-demande.js**. Évite le doublon de commande (la bulle créait sinon une nouvelle commande via `envoyerDemandeCommande`).
+- Bouton **« Ajouter d'autres produits »** sur la page Modifier → `naviguer('catalogue')`.
+- Au chargement bloc 1 : on retient la commande en modif → `localStorage 'uc_modif_cmd' = {cmd, jeton}`.
+- La **bulle** (panier) : quand `uc_modif_cmd` existe, le bouton « Continuer » devient **« Renvoyer à ma commande »** et appelle `demandeRenvoyerModif()` → renvoie via `renvoyerListeCoupdecoeur` à **la même commande**, puis efface la note.
+- `uc_modif_cmd` est **effacé au début de chaque chargement** de page; la page `?cmd=` le réécrit. Empêche un prochain visiteur de rester accroché.
+- Edge connu : si le client **recharge la page en plein milieu**, il sort du mode modif (il doit re-cliquer le lien du courriel).
+
+### À publier
+- #1, #3-page : republier le site (main-demande.js).
+- #2, #3 : aussi **redéployer Apps Script** (Code.gs).
+- Statut de test : #1 en cours de test par Chantal; #2 et #3 pas encore confirmés de bout en bout.
+
+---
+
+## ENCORE OUVERT (priorité haute)
+
+### 🔴 Admin — le statut « Modifiée » n'a aucun bouton d'action
+Quand le client renvoie sa liste, la commande passe à **« Modifiée »**, mais la fiche admin n'offre que « Fermer » → impossible de la re-compléter. À faire : ajouter le bon bouton (probablement **« Compléter » / re-proposer**) pour ce statut. **En attente de la fonction `ouvrirFicheCommande` (admin-commandes.js)** pour voir la logique des boutons par statut.
+
+### #3 « gamme partout » — reste à faire
+- Courriel : ajouter `nom_gamme` dans `lignesCourriel` (admin-commandes.js, via `donneesGammes`) + l'afficher dans `rangeeHTML` (Code.gs).
+- Autres affichages : page bloc 2/3, bulle.
+
+---
+
+
+
+
+
+
 ## FAIT — session du 16 juin 2026
 
 Tout passe par la seule version d'envoi : `envoyerProposition_V3` (Code.gs) ← `envoyerPropositionV3` (admin-commandes.js).
