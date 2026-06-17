@@ -1242,10 +1242,10 @@ async function envoyerPropositionV3() {
 
   // Ouvrir le texto tout de suite — doit partir du clic direct, avant les envois
   if (telephone) {
-    let texteSms = 'Bonjour ' + (client || '') + ',\n\n';
-    texteSms += 'Votre proposition de commande Univers Caresse vient de vous être envoyée par courriel.\n';
+    let texteSms = 'Bonjour ' + ',\n\n';
+    texteSms += 'Votre proposition de commande Univers Caresse Savonnerie artisanale vient de vous être envoyée par courriel.\n';
     texteSms += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
-    texteSms += 'Merci !\nUnivers Caresse';
+    texteSms += 'Merci !\nUnivers Caresse - Savonnerie artisanale';
     window.open('sms:' + telephone + '?body=' + encodeURIComponent(texteSms));
   }
 

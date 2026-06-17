@@ -535,6 +535,8 @@ window.addEventListener('DOMContentLoaded', async function () {
 
       if (action === 'renvoyer') {
         btn.disabled = true;
+        btn.style.position = 'relative';
+        btn.insertAdjacentHTML('beforeend', '<div id="demande-spinner-overlay" style="position:absolute;inset:0;background:var(--primary);display:flex;align-items:center;justify-content:center;"><span class=\'spinner\' style=\'margin-right:0\'><span></span><span></span><span></span><span></span><span></span></span></div>');
         const msg = document.getElementById('coupdecoeur-msg');
         try {
           const lignes = demandeListe.map(i => ({
@@ -549,10 +551,12 @@ window.addEventListener('DOMContentLoaded', async function () {
           } else {
             if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || 'envoi échoué'); msg.classList.remove('cache'); }
             btn.disabled = false;
+            const ov = document.getElementById('demande-spinner-overlay'); if (ov) ov.remove();
           }
         } catch (e) {
           if (msg) { msg.textContent = 'Erreur : ' + e.message; msg.classList.remove('cache'); }
           btn.disabled = false;
+          const ov = document.getElementById('demande-spinner-overlay'); if (ov) ov.remove();
         }
         return;
       }
