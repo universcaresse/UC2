@@ -555,6 +555,7 @@ window.addEventListener('DOMContentLoaded', async function () {
         const cle = i.pro_id + '|' + i.format_poids + '|' + i.format_unite;
         html += '<div class="rangeeitem" data-cle="' + cle + '">' +
             '<div class="rangeeitem-info">' +
+              (i.nom_collection ? '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:2px">' + i.nom_collection + '</div>' : '') +
               '<div class="rangeeitem-titre">' + (i.nom_produit || i.pro_id) + '</div>' +
               '<div class="rangeeitem-meta">' + (i.nom_gamme ? i.nom_gamme + ' · ' : '') + i.format_poids + ' ' + i.format_unite + '</div>' +
             '</div>' +
@@ -570,7 +571,7 @@ window.addEventListener('DOMContentLoaded', async function () {
       html += '<div class="lignetotal"><span class="lignetotal-libelle">Total avant les frais de livraison</span>' +
         '<span>' + total.toFixed(2).replace('.', ',') + ' $</span></div>' +
         '<button type="button" class="bouton bouton-contour" onclick="naviguer(\'catalogue\')" style="margin-bottom:8px">Ajouter d\'autres produits</button>' +
-        '<button type="button" class="bouton bouton-grand" data-action="renvoyer">Renvoyer ma liste</button>' +
+        '<button type="button" class="bouton bouton-grand" data-action="renvoyer">Renvoyer mes Coups de coeur</button>' +
         '<button type="button" class="bouton bouton-contour" data-action="annuler" style="margin-top:12px">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
         '<div id="coupdecoeur-msg" class="cache"></div>';
       zone.innerHTML = html;
@@ -678,8 +679,9 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
     const rep = reponses[cle];
     let html = '<div class="rangeeitem" data-cle="' + cle + '" style="margin-bottom:8px">';
     html += '<div class="rangeeitem-info">';
+    if (l.nom_collection) html += '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:2px">' + l.nom_collection + '</div>';
     html += '<div class="rangeeitem-titre">' + (l.nom || l.pro_id) + '</div>';
-    html += '<div class="rangeeitem-meta">' + l.format_poids + ' ' + l.format_unite;
+    html += '<div class="rangeeitem-meta">' + (l.nom_gamme ? l.nom_gamme + ' · ' : '') + l.format_poids + ' ' + l.format_unite;
     if (l.date_dispo) html += ' &nbsp;·&nbsp; disponible vers ' + l.date_dispo;
     html += '</div></div>';
     if (avecBoutons) {

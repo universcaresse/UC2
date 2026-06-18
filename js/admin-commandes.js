@@ -1207,8 +1207,12 @@ async function apercuProposition() {
 
   const lignesCourriel = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
     const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
+    const col = donneesCollections.find(cc => cc.col_id === (pro && pro.col_id));
+    const gam = donneesGammes.find(gg => gg.gam_id === (pro && pro.gam_id));
     return {
       nom: pro ? pro.nom : l.pro_id,
+      nom_collection: col ? col.nom : '',
+      nom_gamme: gam ? gam.nom : '',
       poids: l.format_poids,
       unite: l.format_unite,
       quantite: l.quantite,
@@ -1343,8 +1347,12 @@ async function envoyerPropositionV3() {
   // Envoi du courriel de proposition au client
   const lignesCourriel = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
     const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
+    const col = donneesCollections.find(cc => cc.col_id === (pro && pro.col_id));
+    const gam = donneesGammes.find(gg => gg.gam_id === (pro && pro.gam_id));
     return {
       nom: pro ? pro.nom : l.pro_id,
+      nom_collection: col ? col.nom : '',
+      nom_gamme: gam ? gam.nom : '',
       poids: l.format_poids,
       unite: l.format_unite,
       quantite: l.quantite,
