@@ -1,3 +1,66 @@
+## FAIT — session du 17 juin 2026 (soirée)
+
+Grosse session. Trois chantiers : le verrou de proposition + boutons du premier courriel, le look de la page client, et la collection/gamme affichées PARTOUT.
+
+---
+
+### A — Verrou « Verrouillée » (le client ne peut plus toucher la commande pendant qu'on la traite) → FAIT
+Décidé avec Chantal : pas de minuterie (trop risqué), la commande verrouillée reste visible et se reprend à la main.
+- **admin-commandes.js, `ouvrirFormCompleter`** : pose le statut **Verrouillée** (via `updateStatutCommande`), seulement si la commande venait de « En attente ».
+- **`fermerFormCompleter`** : si on ferme **sans avoir envoyé** (drapeau `window.cmdCompleterEnvoiEnCours`), remet « En attente ». Le drapeau évite d'écraser le « En attente de paiement » après un vrai envoi.
+- **`envoyerPropositionV3`** : lève le drapeau au début + **remet « En attente » juste avant `sortirStockCommande`**. ⚠️ Obligatoire : `sortirStockCommande_v2` REFUSE tout statut autre que « En attente ».
+- **`afficherTableauCommandes`** : nouveau bloc **VERROUILLÉES** (après ENTRANTES).
+- **`voirDetailCommande`** : sur une « Verrouillée », un seul bouton **« Reprendre la proposition »** (rouvre `ouvrirFormCompleter` sans re-verrouiller).
+- Edge voulu : abandon brutal (onglet fermé) → reste Verrouillée, visible dans VERROUILLÉES, à reprendre à la main.
+
+### B — Deux boutons dans le PREMIER courriel (à la demande) → FAIT
+- **Code.gs, `envoyerDemandeCommande_v2`** : le jeton, avant déclaré dans un `try` (invisible), est maintenant `let jeton` au niveau fonction. Boutons **Modifier la liste** (`?cmd=…&jeton=…`) et **Annuler** (`&action=annuler`).
+- **main-demande.js** : la page client accepte maintenant le statut **« En attente »** en plus de « En attente de paiement » (`res.statut !== … && res.statut !== 'En attente'`). Verrouillée/Annulée restent bloqués.
+- ⚠️ Limite connue : le bouton **Annuler** mène à la page liste (où le bouton d'annulation est déjà présent en bas), pas direct à l'écran d'annulation. À améliorer plus tard = bifurcation `action === 'annuler'` dans le handler `?cmd=` de main-demande.js.
+
+### C — Déblocage du renvoi pour une commande encore « En attente » → FAIT
+Le client qui corrige depuis le premier courriel était bloqué (« cette commande ne peut plus être modifiée »).
+- **Code.gs, `renvoyerListeCoupdecoeur_v2`** : la garde accepte maintenant « En attente » en plus de « En attente de paiement ». Si c'était « En attente » → **reste « En attente »** (Entrantes); si « En attente de paiement » → « Modifiée » (comme avant). Coquille `i.nom_gamme` → `l.nom_gamme` corrigée (empêchait ton courriel de modif de partir).
+
+### D — Look de la page client « coups de cœur » → FAIT
+Tout en CSS **scopé à `#section-coupdecoeur`** (jamais de classe partagée → l'admin ne bouge pas). Ajout au bas de **style.css** :
+- Produits/total/boutons alignés sur la marge du titre (`--padding-page` desktop, 16px mobile).
+- Boutons du bas (et zone bloquée) en pleine largeur (`> .bouton { display:flex; width:100% }`).
+- Total qui ne se coupe plus (`nowrap` sur la valeur).
+- Mobile : titre ramené à 16px (l'id bat la vieille règle qui gagnait par spécificité); rangée produit sur 2 lignes (nom seul, puis − + · Retirer · prix à droite via `flex-wrap` + `flex:1 1 100%` + `margin-left:auto`).
+- `.lien-discret` stylé en vert (avant : bleu souligné brut).
+
+### E — Collection + gamme affichées PARTOUT → FAIT
+Repères feuilles : **Produits_v2** (COL-id = col 2 / index 1, GAM-id = col 3 / index 2, nom = index 4) · **Collections_v2** (COL-id index 0, nom index 2) · **Gammes_v2** (GAM-id index 0, nom index 3).
+- **Courriels de demande** (`envoyerDemandeCommande_v2`) : le serveur redéduit collection+gamme par pro_id (maps `colParPro`/`gamParPro`), affichées dans le courriel client (HTML) et le tien (texte).
+- **Page de modification** (main-demande.js, `coupdecoeurRendre`) : ligne collection dorée ajoutée au-dessus du nom.
+- **Page « prêt / à venir / non dispo »** (main-demande.js, `afficherPageUniqueBloc2` → `rangee`) : collection + gamme ajoutées.
+- **Courriel de proposition** (`envoyerProposition_V3`) : `rangeeHTML` affiche collection·gamme; les infos sont fournies par **admin-commandes.js** (`apercuProposition` ET `envoyerPropositionV3`, via `donneesCollections`/`donneesGammes`).
+- **Courriel de renvoi** (`renvoyerListeCoupdecoeur_v2`) : serveur redéduit (mêmes maps).
+- Garde partout : si collection/gamme absente, rien ne s'affiche.
+
+---
+
+### À PUBLIER (tout en attente de test de bout en bout)
+- **Republier le site** : index.html (aucun), css/style.css, js/main-demande.js, js/admin-commandes.js.
+- **Redéployer Apps Script** : Code.gs (A, B, C, E).
+
+### À VÉRIFIER au prochain test
+- Verrou complet : ouvrir → VERROUILLÉES; fermer sans envoyer → ENTRANTES; envoyer → En attente de paiement + stock sorti (ne doit PAS planter).
+- Premier courriel : Modifier ouvre la liste; le client peut renvoyer (reste En attente); Annuler fonctionne.
+- Collection + gamme présentes dans : page modif, page bloc 2/3, courriel de demande (client + toi), courriel de proposition + son aperçu, courriel de renvoi.
+- Look client OK sur iPhone ET iPad.
+
+### RESTE OUVERT
+
+
+Bouton « Annuler » du premier courriel : le rendre direct (voir B).
+Relance de proposition (confirmerRelanceV3) : pas encore enrichie de collection/gamme (les deux autres chemins de proposition le sont).
+Uniformiser les titres de toutes les pages publiques sur le modèle de la page coups de cœur (bloc page-entete : petit mot doré page-entete-eyebrow + grand titre page-entete-titre Playfair avec <em> en vert). Aujourd'hui chaque page a son propre habillage (page « qui sommes-nous » via page-hero, contact via contact-info-titre, etc.). À faire dans une session fraîche : regarder chaque page une à une dans index.html, puis soit poser le même bloc de titre partout, soit harmoniser via le CSS — ⚠️ prudence avec le CSS partagé (.page-entete est aussi utilisé par l'admin, ne pas le faire bouger).
+
+
+
+
 ## FAIT — session du 17 juin 2026 (verrou + premier courriel) 18h09
 
 
