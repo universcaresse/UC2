@@ -854,7 +854,7 @@ footer > * { position: relative; z-index: 1; }
    ADMIN — SIDEBAR
    ═══════════════════════════════════════ */
 #burger-admin { display: flex; }
-.sidebar { position: fixed; top: var(--nav-h); right: 0; left: auto; width: 220px; height: calc(100vh - var(--nav-h)); transform: translateX(100%); z-index: 90; background: var(--blanc); box-shadow: -4px 0 20px rgba(0,0,0,0.08); overflow-y: auto; overscroll-behavior: contain; }
+.sidebar { position: fixed; top: var(--nav-h); right: 0; left: auto; width: 220px; height: calc(100dvh - var(--nav-h)); transform: translateX(100%); z-index: 90; background: var(--blanc); box-shadow: -4px 0 20px rgba(0,0,0,0.08); overflow-y: auto; overscroll-behavior: contain; }
 .sidebar.ouvert { transform: translateX(0); }
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(30,28,25,0.4); z-index: 89; top: var(--nav-h); }
 .sidebar-overlay.visible { display: block; }
@@ -1202,7 +1202,8 @@ tr.cliquable { cursor: pointer; }
   .hero-left::after { display: none; }
 
   .section-collections { padding: 48px var(--padding-mobile); }
-.page-entete { padding: 12px 16px 40px; flex-direction: column; gap: 16px; align-items: flex-start; }
+.page-entete { padding: 12px 0 40px; flex-direction: column; gap: 16px; align-items: flex-start; }
+.page-section .page-entete { padding: 12px var(--padding-mobile) 40px; }
 .edu-pager { align-self: flex-end; margin-left: auto; }
  
   .collection-tile { aspect-ratio: 19/9; }
@@ -2429,7 +2430,7 @@ tr:has(+ .ven-resume-row) td {
 @media (max-width: 900px) {
   .fiches-grille { grid-template-columns: 1fr; }
   .fiches-champ-plein { grid-column: 1; }
-  .baudeaufiltre {
+  .admin-contenu .baudeaufiltre {
     padding: 16px var(--padding-mobile);
     margin-left: calc(-1 * var(--padding-mobile));
     margin-right: calc(-1 * var(--padding-mobile));
