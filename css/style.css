@@ -1202,7 +1202,7 @@ tr.cliquable { cursor: pointer; }
   .hero-left::after { display: none; }
 
   .section-collections { padding: 48px var(--padding-mobile); }
-.page-entete { padding: 48px 16px 40px; flex-direction: column; gap: 16px; align-items: flex-start; }
+.page-entete { padding: 12px 16px 40px; flex-direction: column; gap: 16px; align-items: flex-start; }
 .edu-pager { align-self: flex-end; margin-left: auto; }
  
   .collection-tile { aspect-ratio: 19/9; }
