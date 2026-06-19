@@ -44,6 +44,12 @@ function genererFormatId() {
   return 'FMT-' + String(dernierNum + 1).padStart(4, '0');
 }
 
+function formaterFormat(poids, unite) {
+  if (unite === 'unite') return 'unité';
+  return poids + ' ' + unite;
+}
+
+
 // ─── VUES ───
 function produitsAfficherVue(vue) {
   var grille      = document.getElementById('grille-produits');
@@ -267,7 +273,7 @@ async function afficherProduits() {
             ? '<div class="carte-formats">' + [].concat(pro.formats).sort(function(a, b) { return parseFloat(a.poids) - parseFloat(b.poids); }).map(function(f) {
                 var qteInv = inv[f.poids + '_' + f.unite] || 0;
                 var invHTML = '<span class="carte-format-prix">(' + qteInv + ' dispo)</span>';
-                return '<div class="carte-format-tag"><span class="carte-format-prix">' + parseFloat(f.prix_vente).toFixed(2).replace('.', ',') + ' $</span><span class="carte-format-sep"></span><span class="carte-format-prix">' + f.poids + ' ' + f.unite + '</span>' + invHTML + '</div>';
+                return '<div class="carte-format-tag"><span class="carte-format-prix">' + parseFloat(f.prix_vente).toFixed(2).replace('.', ',') + ' $</span><span class="carte-format-sep"></span><span class="carte-format-prix">' + formaterFormat(f.poids, f.unite) + '</span>' + invHTML + '</div>';
               }).join('') + '</div>'
             : '';
 
@@ -659,7 +665,7 @@ function construireTableauFormats(formats, embItems, stock, coutIngsTotal, CAT_C
     var margeNum = (f.prix_vente && coutTotal > 0) ? (f.prix_vente - coutTotal) / f.prix_vente * 100 : null;
     var margeCouleur = margeNum === null ? '' : margeNum >= 50 ? 'color:var(--vert)' : margeNum >= 30 ? 'color:var(--or)' : 'color:var(--rouge)';
     return '<tr style="border-bottom:1px solid var(--beige)">' +
-      '<td style="padding:14px 8px;font-weight:500">' + f.poids + ' ' + f.unite + '</td>' +
+      '<td style="padding:14px 8px;font-weight:500">' + formaterFormat(f.poids, f.unite) + '</td>' +
       '<td style="padding:14px 8px;text-align:right;color:var(--gris)">' + (nbUnites || '—') + '</td>' +
       '<td style="padding:14px 8px;text-align:right">' + (coutIngParUnite > 0 ? formaterPrix(coutIngParUnite) : '—') + '</td>' +
       '<td style="padding:14px 8px;text-align:right">' + (coutContenant > 0 ? formaterPrix(coutContenant) : '—') + '</td>' +
@@ -1754,6 +1760,7 @@ function rafraichirListeFormatsRecette() {
           '<select class="form-ctrl" onchange="formatsRecette[' + i + '].unite=this.value">' +
             '<option value="g" ' + (f.unite === 'g' ? 'selected' : '') + '>g</option>' +
             '<option value="ml" ' + (f.unite === 'ml' ? 'selected' : '') + '>ml</option>' +
+            '<option value="unite" ' + (f.unite === 'unite' ? 'selected' : '') + '>unité</option>' +
           '</select>' +
           '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.nb_unites || '') + '" placeholder="Nb unités produits" onchange="formatsRecette[' + i + '].nb_unites=parseInt(this.value)||0">' +
           '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.prix || '') + '" placeholder="Prix $" onchange="formatsRecette[' + i + '].prix=parseFloat(this.value)||0">' +
@@ -1834,7 +1841,7 @@ var inciLabel = ings
     .map(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return '- ' + i.nom_ingredient + ' | ' + ((o && o.inci) || '⚠ INCI manquant') + ' | ' + i.quantite_g + ' g'; })
     .join('\n'); 
 
-  var formatsTexte = formats.map(function(f) { return '- ' + f.poids + ' ' + f.unite + ' : ' + (f.prix_vente || '—') + ' $'; }).join('\n');
+  var formatsTexte = formats.map(function(f) { return '- ' + formaterFormat(f.poids, f.unite) + ' : ' + (f.prix_vente || '—') + ' $'; }).join('\n');
 
   // Construire le texte des emballages par format
   var embItems = prodCache.emballages[pro.pro_id] || [];
@@ -1846,7 +1853,7 @@ var inciLabel = ings
       var catNom = ing ? ((listesDropdown.categoriesMap || {})[ing.cat_id] || '') : '';
       return '  • ' + (catNom ? catNom + ' — ' : '') + (ing ? ing.nom_UC : e.ing_id);
     }).join('\n');
-    return 'Format ' + f.poids + ' ' + f.unite + ' :\n' + lignes;
+    return 'Format ' + formaterFormat(f.poids, f.unite) + ' :\n' + lignes;
   }).filter(function(t) { return t; }).join('\n\n');
 
   var commentaire = (document.getElementById('modal-export-graphiste-commentaire').value || '').trim();
