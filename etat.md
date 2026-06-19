@@ -1,14 +1,4 @@
 
-🔴 PROCHAINE SESSION — COMMENCER ICI (Chantal bloquée)
-Bug : la validation INCI ne trouve plus rien au scraping.
-
-Cause : dans admin-inci.js, inciToggleDetail envoie nom_UC: ing.nom_UC à rechercherScraping. Mais le fournisseur nomme le produit autrement → le scraping cherche un nom qui n'existe pas chez lui → rien trouvé.
-Il faut chercher avec le nom du FOURNISSEUR, pas le nom UC.
-Chemin des données : ing_id → Mapping_Fournisseurs_v2 (ing_id → prod_fourn_id) → feuille des produits fournisseurs (prod_fourn_id → nom). Note : ing.source = code fournisseur (PA/MH/Arbressence/DE), à relier au four_id via la feuille des fournisseurs (code → four_id).
-Approche retenue : côté serveur. Modifier rechercherScraping (Code.gs) pour recevoir l'ing_id, retrouver le nom fournisseur via le mapping, et scraper avec ce nom. Côté inci : envoyer ing_id.
-À fournir en début de session : (1) la fonction rechercherScraping de Code.gs, (2) les en-têtes de Mapping_Fournisseurs_v2, (3) le nom + les en-têtes de la feuille derrière getProduitsFournisseurs.
-
-
 
 
 ## FAIT — session du 17 juin 2026 (soirée)
