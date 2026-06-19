@@ -86,7 +86,7 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
 
   cats.forEach((cat, idx) => {
     const lignes     = parCat[cat];
-    const nbInci     = lignes.filter(l => l.inci).length;
+    const nbInci     = lignes.filter(l => l.inci || CATS_SANS_INCI.includes(l.cat_id)).length;
     const nbSansInci = lignes.length - nbInci;
 
     const bloc = document.createElement('div');
@@ -96,7 +96,7 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
       <div class="form-panel-header" onclick="inciToggleAccordeon(this)" style="cursor:pointer">
         <div class="form-panel-titre">${cat}</div>
         <div style="display:flex;gap:8px;align-items:center">
-          ${nbSansInci > 0 && !['CAT-1776369774938', 'CAT-1776641557249', 'CAT-014'].includes(lignes[0]?.cat_id) ? `<span class="badge-statut-cours">${nbSansInci} 🔴</span>` : ''}
+          ${nbSansInci > 0 ? `<span class="badge-statut-cours">${nbSansInci} 🔴</span>` : ''}
           <span class="badge-statut-ok">${nbInci} ✅</span>
         </div>
       </div>
@@ -164,14 +164,8 @@ async function inciToggleDetail(id) {
   const ing = listesDropdown.fullData.find(d => d.ing_id === detail.dataset.ingId);
   if (!ing || !ing.source) return;
   const zoneScraping = document.getElementById(`${id}-scraping`);
-  if (!zoneScraping || zoneScraping.dataset.charge === 'true') return;
-  zoneScraping.textContent = 'Recherche en cours…';
-  const res = await appelAPI('rechercherScraping', { source: ing.source, ing_id: ing.ing_id });
-  if (!res || !res.success || !res.found) { zoneScraping.textContent = 'Aucune donnée de scraping trouvée.'; return; }
-  zoneScraping.dataset.charge = 'true';
-  if (res.inci && !document.getElementById(`${id}-inci`).value) document.getElementById(`${id}-inci`).value = res.inci;
-  if (res.nom_botanique && !document.getElementById(`${id}-bot`).value) document.getElementById(`${id}-bot`).value = res.nom_botanique;
-  zoneScraping.textContent = res.texte_brut || 'Aucun texte brut disponible.';
+  if (!zoneScraping) return;
+  zoneScraping.textContent = ing.texte_brut || 'Aucune donnée fournisseur.';
 }
 
 function inciToggleAccordeon(header) {

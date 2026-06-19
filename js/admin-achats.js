@@ -1140,10 +1140,16 @@ async function efConfirmerModalIngredient() {
 
     var statut = EF_CATS_SANS_INCI.indexOf(cat_id) >= 0 ? 'valide' : 'a-valider';
 
+    var selNomFourn = document.getElementById('ef-nom-fourn');
+    var nomFourn = (selNomFourn && selNomFourn.value && selNomFourn.value !== '__nouveau__')
+      ? selNomFourn.options[selNomFourn.selectedIndex].textContent
+      : '';
+
     var res = await appelAPIPost('createIngredientInci', {
       ing_id: ing_id, cat_id: cat_id, nom_UC: nouveauNom,
       statut: statut, inci: '',
-      source: ef.factureActive ? ef.factureActive.four_code : ''
+      source: ef.factureActive ? ef.factureActive.four_code : '',
+      nom_fournisseur: nomFourn
     });
     if (!res || !res.success) {
       afficherMsg('ef', (res && res.message) || 'Erreur création ingrédient.', 'erreur');
