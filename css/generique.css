@@ -128,10 +128,20 @@
     --bord-page: 20px;
     flex-wrap: nowrap;
     overflow-x: auto;
-    border-bottom: var(--bordure) solid var(--sable);
+    
+    
+        border-bottom: var(--bordure) solid var(--primaire);
     position: relative;
-    -webkit-mask-image: linear-gradient(to right, transparent 0, black 20px, black calc(100% - 20px), transparent 100%);
-            mask-image: linear-gradient(to right, transparent 0, black 20px, black calc(100% - 20px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 48px, black calc(100% - 48px), transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, black 48px, black calc(100% - 48px), transparent 100%);
+
+    
+    
+    
+    
+    
+    
+    
   }
   .bandeau_filtre > * { flex-shrink: 0; }
   .bandeau_filtre > *:first-child { margin-left: var(--bord-page); }
