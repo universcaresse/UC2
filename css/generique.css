@@ -17,8 +17,8 @@
   --grise-foncee:  #3d3b39;
 
   /* Mesures — une seule place à changer */
-  --bordure:   0.5px;   /* épaisseur de toutes les bordures */
-  
+  --bordure-05:   0.5px;   
+  --bordure-1:   1px; 
   
   --espace-8:  8px;
   --espace-10: 10px;
@@ -115,7 +115,7 @@
   flex-wrap: wrap;
   align-items: center;
   background: var(--blancpur);
-  border-bottom: var(--bordure) solid var(--sable);
+  border-bottom: var(--bordure-1) solid var(--sable);
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   padding: var(--espace-16) var(--bord-page);
@@ -128,15 +128,13 @@
     --bord-page: 20px;
     flex-wrap: nowrap;
     overflow-x: auto;
-    border-bottom: var(--bordure) solid var(--primaire);
+    border-bottom: 1px solid var(--primaire);
     position: relative;
   }
   .bandeau_filtre > * { flex-shrink: 0; }
   .bandeau_filtre > *:first-child { margin-left: var(--bord-page); }
   .bandeau_filtre > *:last-child { margin-right: var(--bord-page); }
 }
-
-   
    
    
    
