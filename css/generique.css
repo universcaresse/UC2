@@ -122,19 +122,25 @@
   margin-bottom: var(--espace-10);
 }
 
-/* Variante iPhone : une seule ligne qui glisse */
+/* iPhone : deux rangées, chacune glisse sur sa ligne */
 @media (max-width: 900px) {
   .bandeau_filtre {
     --bord-page: 20px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-direction: column;
+    align-items: stretch;
     border-bottom: 1px solid var(--primaire);
     position: relative;
   }
-  .bandeau_filtre > * { flex-shrink: 0; }
-  .bandeau_filtre > *:first-child { margin-left: var(--bord-page); }
-  .bandeau_filtre > *:last-child { margin-right: var(--bord-page); }
+  #med-filtres-boutons,
+  #med-filtres-n3 {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    gap: 8px;
+  }
 }
+
+Vous 
    
    
    
