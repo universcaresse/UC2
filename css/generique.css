@@ -15,11 +15,132 @@
   --blancpur:      #ffffff;
   --grise:         #8b8680;
   --grise-foncee:  #3d3b39;
+
+  /* Mesures — une seule place à changer */
+  --bordure:   0.5px;   /* épaisseur de toutes les bordures */
+  
+  
+  --espace-8:  8px;
+  --espace-10: 10px;
+  --espace-16: 16px;
 }
 
-/* ════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+/*═════════════════════════════════════════════════
    Du générique et ses variantes
-   ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+   ════════════════════════════════════════════════ */
+   
+   
+/*═════════════════════════════════════════════════
+  Barre de Menu et burger
+   ════════════════════════════════════════════════ */
+   
+   
+/*═════════════════════════════════════════════════
+  En-tete
+   ════════════════════════════════════════════════ */ 
+   
+/*═════════════════════════════════════════════════
+ Pied de page
+   ════════════════════════════════════════════════ */  
+   
+   
+ /*═════════════════════════════════════════════════
+   Des boutons
+   ════════════════════════════════════════════════ */
+
+.boutons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.70rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 400;
+  cursor: pointer;
+  border: 0.5px solid transparent;
+  padding: 8px 15px;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+.boutons-vert {
+  background: var(--primaire);
+  color: white;
+}
+.boutons-contour {
+  background: transparent;
+  color: var(--grise);
+  border: 0.5px solid var(--secondaire);
+}
+.boutons-rouge {
+  background: var(--rouge);
+  color: white;
+}
+.boutons-accent {
+  background: var(--secondaire);
+  color: white;
+}
+.boutons-gris {
+  background: var(--grise);
+  color: white;
+}
+
+.boutons-fermer {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.6rem;
+  color: var(--grise);
+  padding: 8px 12px;
+}
+.boutons-petit {
+  padding: 10px 16px;
+  font-size: 0.68rem;
+}
+.boutons-ajout {
+  margin-top: 8px;
+}
+  
+/* ════════════════════════════════════════
+   BARRE DE FILTRES — une seule, pareille partout
+   Boutons à l'intérieur : .boutons-vert (actif) / .boutons-contour
+   ════════════════════════════════════════ */
+:root          { --bord-page: 80px; }   /* marge des pages publiques */
+.admin-contenu { --bord-page: 56px; }   /* marge de l'admin */
+
+.bandeau_filtre {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  background: var(--blancpur);
+  border-bottom: 0.5px solid var(--sable);
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 16px var(--bord-page);
+  margin-bottom: 10px;
+}
+
+/* Variante iPhone : une seule ligne qui glisse */
+@media (max-width: 900px) {
+  .bandeau_filtre {
+    --bord-page: 20px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .bandeau_filtre > * { flex-shrink: 0; }
+}  
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
 
 .rangeeitem {
   display: flex;
@@ -236,59 +357,13 @@ textarea.controle { resize: vertical; min-height: 120px; line-height: 1.6; }
   color: var(--blancpur); font-weight: 300; transform: translateY(-8px);
 }
 
-.boutons {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.70rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  font-weight: 400;
-  cursor: pointer;
-  border: 0.5px solid transparent;
-  padding: 8px 15px;
-  transition: background 0.2s;
-  text-decoration: none;
-}
-.boutons-vert {
-  background: var(--primaire);
-  color: white;
-}
-.boutons-contour {
-  background: transparent;
-  color: var(--grise);
-  border: 0.5px solid var(--secondaire);
-}
-.boutons-rouge {
-  background: var(--rouge);
-  color: white;
-}
-.boutons-accent {
-  background: var(--secondaire);
-  color: white;
-}
-.boutons-gris {
-  background: var(--grise);
-  color: white;
-}
 
-.boutons-fermer {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1.6rem;
-  color: var(--grise);
-  padding: 8px 12px;
-}
-.boutons-petit {
-  padding: 10px 16px;
-  font-size: 0.68rem;
-}
-.boutons-ajout {
-  margin-top: 8px;
-}
+/*═════════════════════════════════════════════════
+   Bandeau
+   
+   ════════════════════════════════════════════════ */
+
+
 .bandeau {
   padding: 8px 28px;
   border: 1px solid var(--sable);
@@ -300,6 +375,11 @@ textarea.controle { resize: vertical; min-height: 120px; line-height: 1.6; }
   margin-bottom: 4px;
 }
 
+
+
+/*═════════════════════════════════════════════════
+   les filtres
+   ════════════════════════════════════════════════ */
 
 .baudeaufiltre {
   display: flex;
@@ -313,3 +393,4 @@ textarea.controle { resize: vertical; min-height: 120px; line-height: 1.6; }
   margin-right: -56px;
   margin-bottom: 10px;
 }
+
