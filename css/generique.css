@@ -111,15 +111,15 @@
 
 .bandeau_filtre {
   display: flex;
-  gap: 8px;
+  gap: var(--espace-8);
   flex-wrap: wrap;
   align-items: center;
   background: var(--blancpur);
-  border-bottom: 0.5px solid var(--sable);
+  border-bottom: var(--bordure) solid var(--sable);
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  padding: 16px var(--bord-page);
-  margin-bottom: 10px;
+  padding: var(--espace-16) var(--bord-page);
+  margin-bottom: var(--espace-10);
 }
 
 /* Variante iPhone : une seule ligne qui glisse */
@@ -130,7 +130,7 @@
     overflow-x: auto;
   }
   .bandeau_filtre > * { flex-shrink: 0; }
-}  
+}
    
    
    
