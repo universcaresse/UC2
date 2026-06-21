@@ -547,6 +547,7 @@ async function voirDetailCommande(cmd_id) {
       ${c.courriel ? `<div class="texte-secondaire">${c.courriel}</div>` : ''}
       ${c.telephone ? `<div class="texte-secondaire">${c.telephone}</div>` : ''}
       ${c.code_postal ? `<div class="texte-secondaire">${c.code_postal}</div>` : ''}
+      ${(c.rue || c.ville || c.province) ? `<div class="texte-secondaire">${[c.rue, c.ville, c.province].filter(Boolean).join(', ')}</div>` : ''}
     </div>
     <div style="margin-bottom:16px">
       <div class="form-label">Date de la commande - ${c.date}</div>
@@ -638,6 +639,35 @@ async function voirDetailCommande(cmd_id) {
   document.querySelector('#section-commandes .page-entete .bouton')?.classList.add('cache');
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
+}
+
+async function modifierAdresseCommande(cmd_id) {
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  if (!c) return;
+  const rue = prompt('Rue :', c.rue || '');
+  if (rue === null) return;
+  const ville = prompt('Ville :', c.ville || '');
+  if (ville === null) return;
+  const province = prompt('Province (ex. QC) :', c.province || '');
+  if (province === null) return;
+  const cp = prompt('Code postal :', c.code_postal || '');
+  if (cp === null) return;
+
+  afficherChargement();
+  const res = await appelAPIPost('updateCommandeEntete', {
+    cmd_id: cmd_id,
+    rue: rue.trim(),
+    ville: ville.trim(),
+    province: province.trim(),
+    code_postal: cp.trim()
+  });
+  cacherChargement();
+  if (res && res.success) {
+    afficherMsg('commandes', '✅ Adresse mise à jour.');
+    voirDetailCommande(cmd_id);
+  } else {
+    afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+  }
 }
 
 function fermerFicheCommande() {
