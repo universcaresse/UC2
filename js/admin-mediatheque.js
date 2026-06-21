@@ -33,6 +33,7 @@ async function chargerMediatheque() {
     div._flechesInit = true;
   }
   medMajFleches();
+  requestAnimationFrame(medMajFleches);
 }
 
 function medMajFleches() {

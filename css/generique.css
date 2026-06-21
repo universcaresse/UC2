@@ -243,15 +243,20 @@
 
 .bandeau_filtre {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--espace-8);
-  flex-wrap: wrap;
-  align-items: center;
   background: var(--blancpur);
   border-bottom: var(--bordure-1) solid var(--sable);
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  padding: var(--espace-16) var(--bord-page);
+  padding: var(--espace-16) 0;
   margin-bottom: var(--espace-10);
+}
+
+#med-filtres-boutons,
+#med-filtres-n3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-8);
 }
 
 /* iPhone : deux rangées, chacune glisse sur sa ligne */
@@ -260,7 +265,7 @@
     --bord-page: 20px;
     flex-direction: column;
     align-items: stretch;
-    border-bottom: 1px solid var(--primaire);
+    border-bottom: 1px solid var(--sable);
     position: relative;
   }
   #med-filtres-boutons,
