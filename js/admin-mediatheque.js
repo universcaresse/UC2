@@ -27,6 +27,21 @@ async function chargerMediatheque() {
   div.innerHTML = `<button class="boutons boutons-vert" onclick="medFiltrerN2('')">Toutes</button>` +
     niveaux2.map(n2 => `<button class="boutons boutons-contour" onclick="medFiltrerN2('${n2}')">${n2}</button>`).join('');
   medFiltrer();
+  if (!div._flechesInit) {
+    div.addEventListener('scroll', medMajFleches);
+    window.addEventListener('resize', medMajFleches);
+    div._flechesInit = true;
+  }
+  medMajFleches();
+}
+
+function medMajFleches() {
+  const rangee = document.getElementById('med-filtres-boutons');
+  if (!rangee) return;
+  const bar = rangee.closest('.bandeau_filtre');
+  if (!bar) return;
+  bar.classList.toggle('glisse-gauche', rangee.scrollLeft > 2);
+  bar.classList.toggle('glisse-droite', rangee.scrollLeft + rangee.clientWidth < rangee.scrollWidth - 2);
 }
 
 function medFiltrer() {

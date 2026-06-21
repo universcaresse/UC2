@@ -272,6 +272,21 @@
   }
   #med-filtres-boutons > *,
   #med-filtres-n3 > * { flex-shrink: 0; }
+
+  .bandeau_filtre.glisse-gauche::before,
+  .bandeau_filtre.glisse-droite::after {
+    position: absolute;
+    bottom: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--primaire);
+    background: var(--blancpur);
+    padding: 0 4px;
+    pointer-events: none;
+  }
+  .bandeau_filtre.glisse-gauche::before { content: '<'; left: 0; }
+  .bandeau_filtre.glisse-droite::after  { content: '>'; right: 0; }
 }
 
 
