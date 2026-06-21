@@ -92,7 +92,7 @@ function medFiltrer() {
   }).sort((a, b) => (a.nom || '').localeCompare(b.nom || '', 'fr'));
 
   const grille = document.getElementById('med-grille');
-  document.getElementById('med-compteur').textContent = items.length + ' photo(s)';
+  
   if (!items.length) { grille.innerHTML = '<p class="vide-desc">Aucune photo.</p>'; return; }
   grille.innerHTML = items.map(i => {
     const catAffichee = i.categorie.replace(/^images\//i, '');
