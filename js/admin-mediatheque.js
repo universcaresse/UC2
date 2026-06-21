@@ -25,7 +25,7 @@ async function chargerMediatheque() {
   const niveaux2 = [...new Set(_mediathequeDonnees.map(i => i.categorie.split('/')[1]).filter(Boolean))].sort();
   const div = document.getElementById('med-filtres-boutons');
   div.innerHTML = `<button class="boutons boutons-vert" onclick="medFiltrerN2('')">Toutes</button>` +
-    niveaux2.map(n2 => `<button class="boutons boutons-contour" onclick="medFiltrerN2('${n2}')">${n2}</button>`).join('');
+    niveaux2.map(n2 => `<button class="boutons boutons-contour" onclick="medFiltrerN2('${n2}')">${n2.slice(2)}</button>`).join('');
   medFiltrer();
   if (!div._flechesInit) {
     div.addEventListener('scroll', medMajFleches);
@@ -180,7 +180,7 @@ function peuplerFiltresCategoriesMediatheque() {
   const niveaux2 = [...new Set(items.map(i => i.categorie.split('/')[1]).filter(Boolean))].sort();
   const divN2 = document.getElementById('med-modal-filtres-n2');
   divN2.innerHTML = `<button class="boutons ${!_medModalNiveau2 ? 'boutons-vert' : 'boutons-contour'}" onclick="medModalFiltrerN2('')">Toutes</button>` +
-    niveaux2.map(n2 => `<button class="boutons ${_medModalNiveau2 === n2 ? 'boutons-vert' : 'boutons-contour'}" onclick="medModalFiltrerN2('${n2}')">${n2}</button>`).join('');
+    niveaux2.map(n2 => `<button class="boutons ${_medModalNiveau2 === n2 ? 'boutons-vert' : 'boutons-contour'}" onclick="medModalFiltrerN2('${n2}')">${n2.slice(2)}</button>`).join('');
 }
 
 function medModalFiltrerN2(n2) {
