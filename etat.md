@@ -1,3 +1,81 @@
+## POSTE CANADA — poids auto + tarif dans la proposition
+### Arbre validé avec Chantal — 21 juin 2026
+
+But (admin seulement) : dans l'écran « Créer la proposition », calculer les frais
+de livraison via Poste Canada à partir du poids des produits, avec un bouton et une
+case de poids ajustable. Remplit le champ « Frais de livraison » déjà en place.
+Rien de neuf côté client.
+
+1. Le poids
+- 1.1 Addition automatique du poids des produits PRÊTS seulement.
+- 1.2 La boîte n'entre pas dans l'auto (plusieurs formats) → Chantal ajoute son poids à la main.
+- 1.3 Poids manquant : n'arrive jamais (tous les produits ont un poids).
+
+2. La case de poids
+- 2.1 Le système PROPOSE le poids calculé; si bon, Chantal garde; sinon elle corrige → son chiffre sert au tarif.
+- 2.2 Chantal change la liste après coup → le poids auto se recalcule et ÉCRASE son ajustement; elle revérifie.
+
+3. Le bouton « calculer le tarif »
+- 3.1 Le tarif n'est PAS automatique : Chantal appuie sur le bouton quand le poids est prêt (appel Poste Canada = 1-2 s).
+- 3.2 Code postal toujours là (obligatoire au formulaire) + poids → tarif Régulier d'office → remplit la livraison.
+- 3.3 Poste Canada ne répond pas → message « il y a eu un problème » → Chantal réappuie pour réessayer.
+
+4. Quels produits, quels envois
+- 4.1 Tout prêt → on pèse tout, un seul colis.
+- 4.2 Partie prête, reste à venir → on pèse seulement les prêts.
+- 4.3 Rien de prêt → aucune livraison à calculer.
+- 4.4 Produit jamais disponible → ne pèse rien, ne part pas.
+- 4.5 Produit à venir → 2e envoi plus tard → on recalcule le poids à ce moment-là.
+
+Service par défaut : Colis régulier. Tarif = estimation au poids; dimensions non envoyées (savon = petit et dense).
+
+À préciser avant de bâtir : numéro de client Poste Canada, adresse d'expédition d'origine, clés API (dans PropertiesService).
+
+## ÉTAPE ADRESSE — le client remplit son adresse avant de payer
+### Arbre validé avec Chantal — 21 juin 2026
+
+But : récolter l'adresse complète du client (pour l'étiquette Poste Canada) sur
+une page à nous, juste avant Square. Saisie à la main; nom et code postal déjà
+pré-remplis. Pas d'AddressComplete pour l'instant (option gardée pour plus tard :
+35 $ pour 300 recherches, valide 12 mois).
+
+Décision clé : aucun ajustement de tarif. Même si le client fait livrer ailleurs,
+il paie le montant de la proposition; Chantal absorbe la différence.
+
+1. L'adresse qu'il remplit
+- 1.1 Code postal pré-rempli gardé (même endroit) → adresse normale.
+- 1.2 Il change le code postal (livre ailleurs) → accepté au même montant; Chantal absorbe.
+- 1.3 Rue / ville / province vides → on BLOQUE : impossible d'aller à Square tant que ce n'est pas rempli.
+- 1.4 Sans AddressComplete, aucune vérification auto → on fait confiance à ce qu'il tape (une faute peut apparaître à l'impression).
+- 1.5 Canada seulement — pas de livraison à l'étranger.
+
+2. Ce qu'il fait avec le formulaire
+- 2.1 Il remplit et continue → adresse enregistrée sur la commande, puis Square.
+- 2.2 Il quitte avant de payer → on GARDE ce qu'il a tapé pour son retour.
+- 2.3 Il revient plus tard → son adresse déjà saisie est re-remplie (pas à retaper).
+- 2.4 Produit « à venir » → 2e envoi plus tard → on réutilise la même adresse.
+
+3. Le paiement
+- 3.1 Adresse complète → bouton « Payer » → Square au montant prévu.
+- 3.2 Paiement réussi → comme avant; l'adresse est attachée à la commande pour l'étiquette.
+- 3.3 Paiement abandonné → rien ne bouge, le lien reste valide, l'adresse reste gardée.
+
+4. Côté admin
+- 4.1 L'adresse complète apparaît dans la fiche commande.
+- 4.2 Chantal peut la corriger à la main au besoin.
+
+Note technique : l'adresse doit être enregistrée sur la commande AVANT Square
+(sinon pas d'étiquette). La commande garde déjà prénom/nom/code postal; il faudra
+ajouter rue, ville, province (Commandes_Entete_v2).
+
+Annulation : inchangée.
+
+
+
+
+
+
+
 
 
 
