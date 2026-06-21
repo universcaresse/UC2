@@ -18,7 +18,7 @@
   --noir-15:    rgba(0,0,0,0.15);
   --noir-30:    rgba(0,0,0,0.30);
 
-  /* Mesures — une seule place à changer */
+
   --bordure-05: 0.5px;   
   --bordure-1:  1px; 
   --bordure-2:  2px;
@@ -249,15 +249,39 @@
   background: var(--blancpur);
   border-bottom: var(--bordure-1) solid var(--sable);
   padding: var(--espace-16) 0;
+  position: relative;
   margin-bottom: var(--espace-10);
 }
 
 #med-filtres-boutons,
 #med-filtres-n3 {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: var(--espace-8);
 }
+#med-filtres-boutons > *,
+#med-filtres-n3 > * { flex-shrink: 0; }
+
+.med-fleche {
+  display: none;
+  position: absolute;
+  bottom: calc(-1 * var(--espace-12));
+  width: var(--espace-24);
+  height: var(--espace-24);
+  align-items: center;
+  justify-content: center;
+  border: var(--bordure-1) solid var(--sable);
+  border-radius: var(--rayon-1);
+  background: var(--blancpur);
+  color: var(--primaire);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+}
+.bandeau_filtre.glisse-gauche .med-fleche-gauche { display: inline-flex; left: var(--espace-8); }
+.bandeau_filtre.glisse-droite .med-fleche-droite { display: inline-flex; right: var(--espace-8); }
 
 /* iPhone : deux rangées, chacune glisse sur sa ligne */
 @media (max-width: 900px) {
@@ -278,22 +302,7 @@
   #med-filtres-boutons > *,
   #med-filtres-n3 > * { flex-shrink: 0; }
 
-  .bandeau_filtre.glisse-gauche::before,
-  .bandeau_filtre.glisse-droite::after {
-    position: absolute;
-    bottom: 0;
-    font-size: 1.4rem;
-    font-weight: 600;
-    line-height: 1;
-    color: var(--primaire);
-    background: var(--blancpur);
-    padding: 0 4px;
-    pointer-events: none;
-  }
-  .bandeau_filtre.glisse-gauche::before { content: '<'; left: 0; }
-  .bandeau_filtre.glisse-droite::after  { content: '>'; right: 0; }
-}
-
+ /* flèches : voir .med-fleche dans le bloc de base */
 
    
    

@@ -30,6 +30,21 @@ async function chargerMediatheque() {
   if (!div._flechesInit) {
     div.addEventListener('scroll', medMajFleches);
     window.addEventListener('resize', medMajFleches);
+    const bar = div.closest('.bandeau_filtre');
+    if (bar) {
+      const g = document.createElement('button');
+      g.type = 'button';
+      g.className = 'med-fleche med-fleche-gauche';
+      g.textContent = '‹';
+      g.onclick = () => div.scrollBy({ left: -200, behavior: 'smooth' });
+      const d = document.createElement('button');
+      d.type = 'button';
+      d.className = 'med-fleche med-fleche-droite';
+      d.textContent = '›';
+      d.onclick = () => div.scrollBy({ left: 200, behavior: 'smooth' });
+      bar.appendChild(g);
+      bar.appendChild(d);
+    }
     div._flechesInit = true;
   }
   medMajFleches();
