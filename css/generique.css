@@ -15,14 +15,33 @@
   --blancpur:      #ffffff;
   --grise:         #8b8680;
   --grise-foncee:  #3d3b39;
+  --noir-15:    rgba(0,0,0,0.15);
+  --noir-30:    rgba(0,0,0,0.30);
 
   /* Mesures — une seule place à changer */
-  --bordure-05:   0.5px;   
-  --bordure-1:   1px; 
+  --bordure-05: 0.5px;   
+  --bordure-1:  1px; 
+  --bordure-2:  2px;
+ 
   
-  --espace-8:  8px;
-  --espace-10: 10px;
-  --espace-16: 16px;
+  --espace-4:   4px;
+  --espace-5:   5px;
+  --espace-8:   8px;
+  --espace-10:  10px;
+  --espace-12:  12px;
+  --espace-16:  16px;
+  --espace-20:  20px;
+  --espace-22:  22px;
+  --espace-24:  24px;
+  --espace-32:  32px;
+  --espace-48:  48px;
+
+  --taille-72:  72px;
+  --taille-48:  48px;
+  --taille-220: 220px;
+
+  --rayon-1:    50%;
+}
 }
 
 /*═════════════════════════════════════════════════
@@ -33,7 +52,120 @@
 /*═════════════════════════════════════════════════
   Barre de Menu et burger
    ════════════════════════════════════════════════ */
-   
+   /* ═══════════════════════════════════════
+   BARRE DE MENU — version generique.css
+   ═══════════════════════════════════════ */
+
+.barremenu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--taille-72);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: rgba(255,255,255,0.95);
+  padding: 0 var(--espace-48);
+  transition: box-shadow 0.3s;
+}
+
+.barremenu-liens {
+  display: flex;
+  gap: var(--espace-32);
+  list-style: none;
+  margin-left: auto;
+}
+
+.barremenu-liens a {
+  font-family: 'Birthstone', cursive;
+  font-size: 1.6rem;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  color: var(--primaire);
+  font-weight: 450;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.barremenu-liens a::after {
+  content: '';
+  position: absolute;
+  bottom: calc(-1 * var(--espace-4));
+  left: 0;
+  right: 0;
+  height: var(--bordure-1);
+  background: var(--secondaire);
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+
+.barremenu-liens a:hover { color: var(--primaire); }
+.barremenu-liens a:hover::after { transform: scaleX(1); }
+.barremenu-liens a.active { color: var(--primaire); }
+.barremenu-liens a.active::after { transform: scaleX(1); }
+
+.barremenu-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-12);
+  margin-left: auto;
+}
+
+.barremenu-burger {
+  display: none;
+  flex-direction: column;
+  gap: var(--espace-5);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--espace-4);
+}
+.barremenu-burger span {
+  display: block;
+  width: var(--espace-22);
+  height: var(--bordure-2);
+  background: white;
+  transition: all 0.3s;
+}
+
+@media (max-width: 900px) {
+  .barremenu { background: none; box-shadow: none; }
+  .barremenu-actions { display: none; }
+  .barremenu-liens { display: none; }
+
+  .barremenu-liens.ouvert {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: var(--espace-48);
+    right: var(--espace-24);
+    width: var(--taille-220);
+    background: var(--blancpur);
+    padding: var(--espace-20);
+    border: var(--bordure-1) solid var(--sable);
+	box-shadow: 0 var(--espace-8) var(--espace-32) var(--noir-15);
+    gap: var(--espace-16);
+    z-index: 201;
+  }
+
+  .barremenu-burger {
+    display: flex;
+    position: fixed;
+    top: var(--espace-16);
+    right: var(--espace-24);
+    z-index: 200;
+    width: var(--taille-48);
+    height: var(--taille-48);
+    border-radius: var(--rayon-1);
+    background: var(--primaire);
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 var(--espace-4) var(--espace-16) var(--noir-30);
+  }
+}
    
 /*═════════════════════════════════════════════════
   En-tete
@@ -138,6 +270,8 @@
     overflow-x: auto;
     gap: 8px;
   }
+  #med-filtres-boutons > *,
+  #med-filtres-n3 > * { flex-shrink: 0; }
 }
 
 
