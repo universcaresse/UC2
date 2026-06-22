@@ -1100,6 +1100,11 @@ async function cmdCompleterCalculerTarif() {
   const poids = parseFloat(String(document.getElementById('completer-poids').value).replace(',', '.')) || 0;
   if (poids <= 0) { afficherMsg('commandes', 'Indique d\'abord un poids.', 'erreur'); return; }
   if (!c.code_postal) { afficherMsg('commandes', 'Aucun code postal pour cette commande.', 'erreur'); return; }
+  const cpNettoye = String(c.code_postal).replace(/\s+/g, '').toUpperCase();
+  if (!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(cpNettoye)) {
+    afficherMsg('commandes', 'Le code postal de cette commande semble invalide (' + c.code_postal + '). Corrige-le avec « Modifier l\'adresse ».', 'erreur');
+    return;
+  }
   afficherChargement();
   const res = await appelAPI('calculerTarifPosteCanada', { code_postal: c.code_postal, poids: poids });
   cacherChargement();

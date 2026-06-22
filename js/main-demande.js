@@ -368,6 +368,13 @@ async function demandeEnvoyer() {
     erreurEl.classList.remove('cache');
     return;
   }
+  const cpNettoye = codePostal.replace(/\s+/g, '').toUpperCase();
+  if (!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(cpNettoye)) {
+    erreurEl.textContent = 'Veuillez vérifier votre code postal (exemple : A1A 1A1).';
+    erreurEl.classList.remove('cache');
+    return;
+  }
+  const codePostalFormate = cpNettoye.slice(0, 3) + ' ' + cpNettoye.slice(3);
   erreurEl.classList.add('cache');
 
   if (btn) { btn.disabled = true; btn.style.position = 'relative'; btn.insertAdjacentHTML('beforeend', '<div id="demande-spinner-overlay" style="position:absolute;inset:0;background:var(--primary);display:flex;align-items:center;justify-content:center;"><span class=\'spinner\' style=\'margin-right:0\'><span></span><span></span><span></span><span></span><span></span></span></div>'); }
@@ -385,7 +392,7 @@ async function demandeEnvoyer() {
   try {
     const res = (typeof appelAPIPost === 'function')
       ? await appelAPIPost('envoyerDemandeCommande', {
-          prenom, nom, courriel, telephone, code_postal: codePostal, message, lignes
+          prenom, nom, courriel, telephone, code_postal: codePostalFormate, message, lignes
         })
       : null;
     if (!res || !res.success) throw new Error('Echec envoi');
