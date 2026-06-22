@@ -945,7 +945,7 @@ function ouvrirFormCompleter(cmd_id) {
 
     if (statut !== 'pret') {
       recap += '<div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
-      recap += '<select class="form-ctrl" style="width:auto;font-size:0.85rem" data-cle="' + cle + '" onchange="cmdCompleterChangerType(this)">';
+      recap += '<select class="form-ctrl" style="width:auto;font-size:0.85rem" data-cle="' + cle + '" onchange="cmdCompleterChangerType(this);cmdCompleterMajPoids()">';
       recap += '<option value="temporaire-cure">Lot en cure</option>';
       recap += '<option value="temporaire-fab" selected>Pas encore fabriqué</option>';
       recap += '<option value="temporaire-partiel">Quantité partielle</option>';
@@ -986,6 +986,19 @@ function ouvrirFormCompleter(cmd_id) {
     btnSq.onclick = genererLienSquare;
     document.getElementById('completer-square').insertAdjacentElement('afterend', btnSq);
   }
+  if (!document.getElementById('completer-poids')) {
+    const panneauPoids = document.createElement('div');
+    panneauPoids.className = 'form-panel visible';
+    panneauPoids.innerHTML =
+      '<div class="form-panel-header"><span class="form-panel-titre">Poids du colis (g)</span></div>' +
+      '<div class="form-body">' +
+        '<input type="text" inputmode="decimal" class="form-ctrl" id="completer-poids" placeholder="Calculé tout seul — ajustez et ajoutez la boîte">' +
+        '<button type="button" id="btn-calculer-tarif" class="bouton bouton-contour" style="margin-top:8px" onclick="cmdCompleterCalculerTarif()">Calculer le tarif</button>' +
+      '</div>';
+    const panneauLivraison = document.getElementById('completer-livraison').closest('.form-panel');
+    if (panneauLivraison) panneauLivraison.insertAdjacentElement('beforebegin', panneauPoids);
+  }
+  cmdCompleterChargerPoids();
 
   document.getElementById('fiche-commande').classList.add('cache');
   document.getElementById('contenu-commandes').classList.add('cache');
@@ -1049,6 +1062,54 @@ async function genererLienSquare() {
 }
 
 var cmdCompleterPanier = [];
+
+// ─── POSTE CANADA : poids du colis + tarif ───
+var cmdCompleterPoidsParFormat = {};
+
+async function cmdCompleterChargerPoids() {
+  const res = await appelAPI('getProduitsFormats');
+  cmdCompleterPoidsParFormat = {};
+  if (res && res.success) {
+    (res.items || []).forEach(f => {
+      const cle = String(f.pro_id) + '|' + String(f.poids) + '|' + String(f.unite);
+      cmdCompleterPoidsParFormat[cle] = parseFloat(f.poste_gr) || 0;
+    });
+  }
+  cmdCompleterMajPoids();
+}
+
+function cmdCompleterMajPoids() {
+  const box = document.getElementById('completer-poids');
+  if (!box) return;
+  const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours);
+  let total = 0;
+  lignes.forEach(l => {
+    const cleDom = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
+    const sel = document.querySelector('select[data-cle="' + cleDom + '"]');
+    const type = sel ? sel.value : 'pret';
+    if (type === 'definitif' || type.indexOf('temporaire') === 0) return;
+    const cleMap = String(l.pro_id) + '|' + String(l.format_poids) + '|' + String(l.format_unite);
+    total += (cmdCompleterPoidsParFormat[cleMap] || 0) * (parseInt(l.quantite) || 0);
+  });
+  box.value = total ? Math.round(total) : '';
+}
+
+async function cmdCompleterCalculerTarif() {
+  const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
+  if (!c) return;
+  const poids = parseFloat(String(document.getElementById('completer-poids').value).replace(',', '.')) || 0;
+  if (poids <= 0) { afficherMsg('commandes', 'Indique d\'abord un poids.', 'erreur'); return; }
+  if (!c.code_postal) { afficherMsg('commandes', 'Aucun code postal pour cette commande.', 'erreur'); return; }
+  afficherChargement();
+  const res = await appelAPI('calculerTarifPosteCanada', { code_postal: c.code_postal, poids: poids });
+  cacherChargement();
+  if (res && res.success) {
+    document.getElementById('completer-livraison').value = res.montant.toFixed(2).replace('.', ',');
+    afficherMsg('commandes', '✅ Tarif calculé : ' + formaterPrix(res.montant));
+  } else {
+    afficherMsg('commandes', '❌ ' + (res?.message || 'Poste Canada n\'a pas répondu. Réessaie.'), 'erreur');
+  }
+}
 
 function cmdCompleterChangerType(sel) {
   const cle = sel.dataset.cle;
