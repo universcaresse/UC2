@@ -548,6 +548,7 @@ async function voirDetailCommande(cmd_id) {
       ${c.telephone ? `<div class="texte-secondaire">${c.telephone}</div>` : ''}
       ${c.code_postal ? `<div class="texte-secondaire">${c.code_postal}</div>` : ''}
       ${(c.rue || c.ville || c.province) ? `<div class="texte-secondaire">${[c.rue, c.ville, c.province].filter(Boolean).join(', ')}</div>` : ''}
+      <button class="bouton bouton-contour bouton-petit" style="margin-top:6px" onclick="modifierAdresseCommande('${c.cmd_id}')">Modifier l'adresse</button>
     </div>
     <div style="margin-bottom:16px">
       <div class="form-label">Date de la commande - ${c.date}</div>

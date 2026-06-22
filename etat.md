@@ -521,3 +521,64 @@ ET l'adresse complète du client (étape A).
 Note technique : le suivi (courriel + texto) et le champ no_tracage existent déjà via marquerExpediee.
 
 
+# REPRISE — Poste Canada (bloc B)
+### À verser dans ETAT.md. Mise à jour du 21 juin 2026.
+### But : reprendre exactement ici, sans rien réexpliquer.
+
+---
+
+## 1. Où on est rendu
+- 1.1 **A — adresse du client avant le paiement : FAIT.**
+- 1.2 **Coffre Poste Canada : FAIT.** Quatre tiroirs créés dans Propriétés du script :
+  - `POSTECANADA_USERNAME` → 1er morceau de la clé (avant le « : »)
+  - `POSTECANADA_PASSWORD` → 2e morceau (après le « : »)
+  - `POSTECANADA_CLIENT` → numéro de client
+  - `POSTECANADA_ORIGINE` → code postal de départ
+  - Clé de **production** (demander un tarif ne coûte rien).
+- 1.3 **B — tarif dans la proposition : EN COURS.** Deux bouts restants : le moteur (serveur), puis la case poids + le bouton (écran). **On commence par le moteur.**
+
+---
+
+## 2. Prochaine étape : le moteur (PAS encore écrit)
+Nom : `calculerTarifPosteCanada`. Nouvelle demande de **lecture** dans `doGet` (appelée par `appelAPI`).
+- 2.1 Reçoit : le code postal du client + le poids.
+- 2.2 Lit les 4 tiroirs du coffre (section 1.2).
+- 2.3 Demande le prix à Poste Canada (service Rating / Get Rates), prend le **Colis régulier**, le renvoie.
+- 2.4 **Modèle à copier : `creerLienPaiementSquare_v2`** (lit le coffre → `UrlFetchApp` → renvoie `{success}`). Seule différence : Poste Canada parle **XML**, pas JSON → construire et lire le XML avec `XmlService`.
+- 2.5 Détails techniques :
+  - **Confirmé** — Auth = HTTP **Basic** (username = `POSTECANADA_USERNAME`, password = `POSTECANADA_PASSWORD`). Hôte production = `soa-gw.canadapost.ca`. En-têtes Accept + Content-Type = `application/vnd.cpc.ship.rate-v4+xml`. Poids en **kg**.
+  - **Corps XML** = `mailing-scenario` (rate-v4) : `customer-number` (POSTECANADA_CLIENT) · `parcel-characteristics/weight` (kg) · `origin-postal-code` (POSTECANADA_ORIGINE) · destination = code postal du client · `service-code` du Colis régulier.
+  - **À confirmer sur la doc avant d'écrire** : le chemin exact de l'adresse, et le code du Colis régulier (Regular Parcel = `DOM.RP`?). Page : `…/developers/services/rating/getrates/default.jsf`
+  - Le poids arrivera en **grammes** → ÷ 1000 pour Poste Canada. Codes postaux sans espace, en majuscules.
+- 2.6 Façon de faire : présenter en mots → OK de Chantal → trouve-et-remplace (≈ 2 : la fonction neuve + une ligne dans `doGet`). `Code.gs` → **redéploiement**. **Ne pas tester** tant que le bouton (section 3) n'existe pas : rien ne l'appelle encore.
+
+---
+
+## 3. Ensuite : la case poids + le bouton (écran « Compléter »)
+Fichiers : `admin-commandes.js` + `admin/index.html`. Arbre déjà validé dans ETAT.md (« POSTE CANADA — poids auto + tarif »).
+- 3.1 Le tarif remplit le champ **déjà en place** : `completer-livraison` (lu par `envoyerPropositionV3`).
+- 3.2 Case poids = somme automatique des **PRÊTS seulement**. Le type est déjà disponible : `getCommandesLignes_v2` → `type_ligne` (`pret` / `temporaire` / `definitif`). Sommer les lignes `pret` de `toutesCommandesLignes`.
+- 3.3 ⚠️ **À trancher avec Chantal** : comment traiter les unités (`format_poids` + `format_unite`, ex. 100 g, ml…) pour un poids d'envoi. Rappel de l'arbre : c'est une **proposition** que Chantal ajuste, et elle ajoute le poids de la boîte à la main.
+- 3.4 Bouton « calculer le tarif » → appelle le moteur (`appelAPI`) → remplit `completer-livraison`. Si Poste Canada ne répond pas : message + réessayer.
+
+---
+
+## 4. Repères vérifiés dans les vrais fichiers (ne pas re-chercher)
+- 4.1 Modèle Square : `creerLienPaiementSquare_v2` (Code.gs).
+- 4.2 `doGet` : aiguilleur if / else, renvoie du JSON via `ContentService`.
+- 4.3 Commande : `code_postal` = **colonne 12** de `Commandes_Entete_v2`.
+- 4.4 Ligne de commande : `type_ligne` = **colonne 8** (index 7), via `getCommandesLignes_v2`.
+- 4.5 Envoi proposition : `admin-commandes.js` `envoyerPropositionV3` → `Code.gs` `envoyerProposition_V3`.
+
+---
+
+## 5. Après B
+- 5.1 **C — l'étiquette** : arbre **déjà validé** dans ETAT.md (7 points). À bâtir après B. (Le vieux plan disait à tort « pas d'arbre » — l'arbre existe.)
+
+---
+
+## 6. Rappels méthode
+- Un trouve-et-remplace à la fois, « ok » de Chantal entre chaque.
+- Pas de code sans autorisation : présenter en mots d'abord.
+- `Code.gs` → redéploiement ; HTML / CSS / JS → republier le site.
+- Clés jamais dans le chat (déjà dans le coffre).

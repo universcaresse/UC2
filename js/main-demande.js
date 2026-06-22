@@ -488,7 +488,7 @@ window.addEventListener('DOMContentLoaded', async function () {
         const nomComplet = ((r.prenom || '') + ' ' + (r.nom || '')).trim();
         const optionsProv = provinces.map(function(p){ return '<option value="' + p + '"' + (r.province === p ? ' selected' : '') + '>' + p + '</option>'; }).join('');
         if (z) z.innerHTML = '<h2 class="titre">Adresse de livraison</h2>' +
-          '<p class="textes-discrets">Avant le paiement, confirmez l\'adresse de livraison' + (nomComplet ? ' pour ' + nomComplet : '') + '. Livraison au Canada seulement.</p>' +
+          '<p class="textes-discrets">Avant le paiement, confirmez votre adresse pour la livraison. Disponible pour le Canada seulement.</p>' +
           '<div class="form-group"><label class="form-label">Rue <span>*</span></label><input type="text" class="form-control" id="adr-rue" value="' + (r.rue || '') + '"></div>' +
           '<div class="form-group"><label class="form-label">Ville <span>*</span></label><input type="text" class="form-control" id="adr-ville" value="' + (r.ville || '') + '"></div>' +
           '<div class="form-group"><label class="form-label">Province <span>*</span></label><select class="form-control" id="adr-province"><option value="">— Choisir —</option>' + optionsProv + '</select></div>' +
