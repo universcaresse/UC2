@@ -957,7 +957,8 @@ async function modifierProduit(pro_id) {
       unite: f.unite,
       prix: f.prix_vente,
       desc: '',
-      nb_unites: f.nb_unites || 0
+      nb_unites: f.nb_unites || 0,
+      poste_gr: f.poste_gr || ''
     };
   });
 
@@ -1072,7 +1073,8 @@ async function sauvegarderRecette() {
           poids: f.poids,
           unite: f.unite,
           prix_vente: f.prix,
-          nb_unites: f.nb_unites || 0
+          nb_unites: f.nb_unites || 0,
+          poste_gr: f.poste_gr || 0
         };
       })
     };
@@ -1188,7 +1190,7 @@ function majCacheApresSauvegarde(d) {
   }
 
   prodCache.formats[pro_id] = formatsRecette.map(function(f) {
-    return { format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix, nb_unites: f.nb_unites || 0 };
+    return { format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix, nb_unites: f.nb_unites || 0, poste_gr: f.poste_gr || 0 };
   });
   prodCache.ingredients[pro_id] = ingredientsRecette.map(function(i) {
     return { ing_id: i.ing_id, pro_id: pro_id, nom_ingredient: i.nom, quantite_g: i.quantite };
@@ -1764,6 +1766,7 @@ function rafraichirListeFormatsRecette() {
           '</select>' +
           '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.nb_unites || '') + '" placeholder="Nb unités produits" onchange="formatsRecette[' + i + '].nb_unites=parseInt(this.value)||0">' +
           '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.prix || '') + '" placeholder="Prix $" onchange="formatsRecette[' + i + '].prix=parseFloat(this.value)||0">' +
+          '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.poste_gr || '') + '" placeholder="Poids réel (g)" onchange="formatsRecette[' + i + '].poste_gr=parseFloat(this.value)||0">' +
         '</div>' +
         '<div class="section-label">Contenant et emballage par unité</div>' +
         lignesEmb +
