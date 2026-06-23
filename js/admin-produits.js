@@ -151,6 +151,7 @@ async function chargerCacheProduits() {
   prodCache.charge = true;
   cacherChargement();
 }
+
 function calculerInventaireProduit(pro_id) {
   var inv = {};
   (prodCache.lots || []).forEach(function(l) {
@@ -951,6 +952,8 @@ async function modifierProduit(pro_id) {
   }).sort(function(a, b) { return b.quantite - a.quantite; });
 
   // Charger les formats avec format_id (générer un id si manquant)
+  
+  
   formatsRecette = formats.map(function(f) {
     return {
       format_id: f.format_id || genererFormatId(),
@@ -962,6 +965,8 @@ async function modifierProduit(pro_id) {
       poste_gr: f.poste_gr || ''
     };
   });
+  
+
 
   // Charger les emballages indexés par format_id
   emballagesRecette = {};
