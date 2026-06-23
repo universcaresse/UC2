@@ -102,6 +102,7 @@ async function chargerCacheProduits() {
         unite: f.unite,
         prix_vente: f.prix_vente,
         nb_unites: f.nb_unites
+		poste_gr: f.poste_gr
       });
     });
   }
