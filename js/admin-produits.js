@@ -101,7 +101,7 @@ async function chargerCacheProduits() {
         poids: f.poids,
         unite: f.unite,
         prix_vente: f.prix_vente,
-        nb_unites: f.nb_unites
+        nb_unites: f.nb_unites,
 		poste_gr: f.poste_gr
       });
     });
