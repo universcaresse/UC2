@@ -1755,6 +1755,7 @@ function rafraichirListeFormatsRecette() {
   '<span class="form-label" style="flex:1">Unité</span>' +
   '<span class="form-label" style="flex:1">Nb unités produites</span>' +
   '<span class="form-label" style="flex:1">Prix de vente ($)</span>' +
+  '<span class="form-label" style="flex:1">Poids pour livraison</span>' +
   '<span style="width:32px"></span>' +
 '</div>' +
 '<div class="ingredient-rangee">' +
