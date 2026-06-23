@@ -1110,6 +1110,25 @@ async function cmdCompleterCalculerTarif() {
   cacherChargement();
   if (res && res.success) {
     document.getElementById('completer-livraison').value = res.montant.toFixed(2).replace('.', ',');
+    let detail = document.getElementById('completer-tarif-detail');
+    if (!detail) {
+      detail = document.createElement('div');
+      detail.id = 'completer-tarif-detail';
+      detail.style.cssText = 'margin-top:8px;font-size:0.85rem;line-height:1.5';
+      const btnT = document.getElementById('btn-calculer-tarif');
+      if (btnT) btnT.insertAdjacentElement('afterend', detail);
+    }
+    let lignesDetail = '';
+    if (res.base) lignesDetail += 'Prix de base : ' + formaterPrix(res.base) + '<br>';
+    (res.rabais || []).forEach(function(r) {
+      lignesDetail += r.nom + ' : ' + (r.cout < 0 ? '-' : '+') + formaterPrix(Math.abs(r.cout)) + '<br>';
+    });
+    lignesDetail += '<strong>Total (taxes incluses) : ' + formaterPrix(res.montant) + '</strong>';
+    const aUneRemise = (res.rabais || []).some(function(r) { return r.cout < 0; });
+    lignesDetail += aUneRemise
+      ? '<br><span style="color:var(--primary)">✓ Une remise s\'applique.</span>'
+      : '<br><span style="color:var(--accent)">Aucune remise dans le détail — ce serait le tarif régulier.</span>';
+    detail.innerHTML = lignesDetail;
     afficherMsg('commandes', '✅ Tarif calculé : ' + formaterPrix(res.montant));
   } else {
     afficherMsg('commandes', '❌ ' + (res?.message || 'Poste Canada n\'a pas répondu. Réessaie.'), 'erreur');
