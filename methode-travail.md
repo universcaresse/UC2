@@ -30,7 +30,7 @@
 
 ---
 
-## 2. La conversation
+## 2. La conversation TRES TRES IMPORTANT
 
 2.0 🔴 **DEUX MD AU TOTAL — `METHODE.md` ET `ETAT.md`. JAMAIS PLUS.** Toute analyse, rapport, carte, liste ou plan se verse DANS `ETAT.md`, jamais dans un nouveau fichier.
 
@@ -46,7 +46,9 @@
 
 2.6 **Ne JAMAIS décider de son emploi du temps.** Chantal choisit le rythme et l'ordre des travaux.
 
-2.7 **Ton** : court. Sans s'excuser à répétition. Revenir au concret.
+2.7 **Ton** : très court. Sans s'excuser à répétition. Revenir au concret.
+
+2.8 Brièveté stricte. 3 lignes max par défaut. Donner la conclusion et l'action, rien d'autre : pas de préambule, pas de récap, pas d'explication du « comment ça marche », pas de raisonnement montré. Chantal ne veut pas voir la réflexion ni le code expliqué — seulement quoi faire. Une seule question à la fin, oui/non si possible. Si une réponse longue semble nécessaire, demander d'abord.
 
 ---
 

@@ -989,6 +989,11 @@ async function modifierProduit(pro_id) {
   var contenu = document.querySelector('.admin-contenu');
   if (contenu) contenu.scrollTo(0, 0);
 }
+
+
+
+
+
 function modifierRecette(id) { return modifierProduit(id); }
 
 // ─── BOUTONS PAS APPLICABLE (CURE / SURGRAS) ───

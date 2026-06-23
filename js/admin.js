@@ -72,7 +72,7 @@ if (resGam && resGam.success) {
   if (resFmt && resFmt.success) {
     (resFmt.items || []).forEach(f => {
       if (!formatsMap[f.pro_id]) formatsMap[f.pro_id] = [];
-      formatsMap[f.pro_id].push({ format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix_vente, nb_unites: f.nb_unites });
+      formatsMap[f.pro_id].push({ format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix_vente, nb_unites: f.nb_unites, poste_gr: f.poste_gr });
     });
   }
   if (resPro && resPro.success) {
@@ -218,7 +218,7 @@ if (id === 'redaction')      redInit();
         if (resFmt && resFmt.success) {
           (resFmt.items || []).forEach(f => {
             if (!formatsMap[f.pro_id]) formatsMap[f.pro_id] = [];
-            formatsMap[f.pro_id].push({ format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix_vente, nb_unites: f.nb_unites });
+            formatsMap[f.pro_id].push({ format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix_vente, nb_unites: f.nb_unites, poste_gr: f.poste_gr });
           });
         }
         if (resPro && resPro.items) donneesProduits = resPro.items.map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
