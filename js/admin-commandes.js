@@ -645,34 +645,54 @@ async function voirDetailCommande(cmd_id) {
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
-
 async function modifierAdresseCommande(cmd_id) {
   const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
   if (!c) return;
-  const rue = prompt('Rue :', c.rue || '');
-  if (rue === null) return;
-  const ville = prompt('Ville :', c.ville || '');
-  if (ville === null) return;
-  const province = prompt('Province (ex. QC) :', c.province || '');
-  if (province === null) return;
-  const cp = prompt('Code postal :', c.code_postal || '');
-  if (cp === null) return;
 
-  afficherChargement();
-  const res = await appelAPIPost('updateCommandeEntete', {
-    cmd_id: cmd_id,
-    rue: rue.trim(),
-    ville: ville.trim(),
-    province: province.trim(),
-    code_postal: cp.trim()
-  });
-  cacherChargement();
-  if (res && res.success) {
-    afficherMsg('commandes', '✅ Adresse mise à jour.');
-    voirDetailCommande(cmd_id);
-  } else {
-    afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
-  }
+  const ancien = document.getElementById('modif-adresse-overlay');
+  if (ancien) ancien.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'modif-adresse-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px';
+  overlay.innerHTML =
+    '<div style="background:#fff;border-radius:10px;padding:24px;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.2)">' +
+      '<h3 style="font-family:Georgia,serif;color:#5a8a3a;margin:0 0 16px">Adresse de livraison</h3>' +
+      '<div class="form-group"><label class="form-label">Rue</label><input type="text" class="form-control" id="modif-adr-rue"></div>' +
+      '<div class="form-group"><label class="form-label">Ville</label><input type="text" class="form-control" id="modif-adr-ville"></div>' +
+      '<div class="form-group"><label class="form-label">Province (ex. QC)</label><input type="text" class="form-control" id="modif-adr-province"></div>' +
+      '<div class="form-group"><label class="form-label">Code postal</label><input type="text" class="form-control" id="modif-adr-cp"></div>' +
+      '<div style="display:flex;gap:8px;margin-top:16px">' +
+        '<button type="button" class="bouton bouton-or" id="modif-adr-ok" style="flex:1">Enregistrer</button>' +
+        '<button type="button" class="bouton bouton-contour" id="modif-adr-annuler" style="flex:1">Annuler</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+
+  document.getElementById('modif-adr-rue').value      = c.rue || '';
+  document.getElementById('modif-adr-ville').value    = c.ville || '';
+  document.getElementById('modif-adr-province').value = c.province || '';
+  document.getElementById('modif-adr-cp').value       = c.code_postal || '';
+
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  document.getElementById('modif-adr-annuler').onclick = () => overlay.remove();
+
+  document.getElementById('modif-adr-ok').onclick = async () => {
+    const rue      = (document.getElementById('modif-adr-rue').value || '').trim();
+    const ville    = (document.getElementById('modif-adr-ville').value || '').trim();
+    const province = (document.getElementById('modif-adr-province').value || '').trim();
+    const cp       = (document.getElementById('modif-adr-cp').value || '').trim();
+    overlay.remove();
+    afficherChargement();
+    const res = await appelAPIPost('updateCommandeEntete', { cmd_id, rue, ville, province, code_postal: cp });
+    cacherChargement();
+    if (res && res.success) {
+      afficherMsg('commandes', '✅ Adresse mise à jour.');
+      voirDetailCommande(cmd_id);
+    } else {
+      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    }
+  };
 }
 
 function fermerFicheCommande() {
