@@ -1690,7 +1690,6 @@ async function genererEtiquette(cmd_id) {
     return;
   }
 
-  // Ouvrir la fenêtre du PDF MAINTENANT (sur le clic) pour que le navigateur ne la bloque pas
   const fenetrePdf = window.open('', '_blank');
 
   afficherChargement();
@@ -1698,7 +1697,10 @@ async function genererEtiquette(cmd_id) {
   cacherChargement();
 
   if (res && res.deja) {
-    if (fenetrePdf) fenetrePdf.location = res.url;
+    const dejaPdf = await appelAPIPost('getEtiquettePdf', { cmd_id });
+    if (dejaPdf && dejaPdf.success && fenetrePdf) {
+      fenetrePdf.location = await rognerEtiquetteEnUrl(dejaPdf.pdf_base64);
+    } else if (fenetrePdf) { fenetrePdf.close(); }
     afficherMsg('commandes', 'Une étiquette existait déjà — rouverte, aucun nouvel achat.');
     return;
   }
@@ -1708,7 +1710,7 @@ async function genererEtiquette(cmd_id) {
     return;
   }
 
-  if (fenetrePdf) fenetrePdf.location = res.url;
+  if (fenetrePdf) fenetrePdf.location = await rognerEtiquetteEnUrl(res.pdf_base64);
 
   const telephone = c.telephone || '';
   if (telephone) {
@@ -1774,4 +1776,18 @@ function construireFactureCommande(cmd_id) {
     livraison: livraison > 0 ? formaterPrix(livraison) : 0,
     total: formaterPrix(total)
   };
+}
+
+
+async function rognerEtiquetteEnUrl(base64) {
+  const octets = Uint8Array.from(atob(base64), ch => ch.charCodeAt(0));
+  const pdfDoc = await PDFLib.PDFDocument.load(octets);
+  const page = pdfDoc.getPage(0);
+  const { x, y, width, height } = page.getMediaBox();
+  const moitie = width / 2;
+  // garder la moitié DROITE (l'étiquette); le reste (instructions + reçu) est jeté
+  page.setMediaBox(x + moitie, y, moitie, height);
+  page.setCropBox(x + moitie, y, moitie, height);
+  const bytes = await pdfDoc.save();
+  return URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
 }
