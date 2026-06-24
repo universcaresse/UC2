@@ -618,7 +618,7 @@ async function voirDetailCommande(cmd_id) {
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
   }
   if (c.statut === 'À expédier') {
-    actionsHTML += `<div style="background:#fff4e6;border:1px solid #f0c98b;border-radius:6px;padding:10px 12px;margin-bottom:10px;font-size:0.85rem;color:#7a5a2a">⚠️ Générer l'étiquette achète l'envoi chez Poste Canada et facture le compte.</div>`;
+    actionsHTML += `<div style="background:#fff4e6;border:1px solid #f0c98b;border-radius:6px;padding:10px 12px;margin-bottom:10px;font-size:0.85rem;color:#7a5a2a">⚠️ Attention, générer l'étiquette achète l'envoi chez Poste Canada et facture votre compte.</div>`;
     actionsHTML += `<div class="form-label">Poids du colis (g, boîte incluse)</div>`;
     actionsHTML += `<input id="etiq-poids-${c.cmd_id}" type="number" min="1" value="${c.poids_colis || ''}" placeholder="ex. 250" style="width:100%;padding:10px;border:1px solid var(--primary);border-radius:6px;margin-bottom:10px">`;
     actionsHTML += `<button class="bouton bouton-or" onclick="genererEtiquette('${c.cmd_id}')">Générer l'étiquette</button>`;
