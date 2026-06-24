@@ -618,7 +618,8 @@ async function voirDetailCommande(cmd_id) {
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
   }
   if (c.statut === 'À expédier') {
-    actionsHTML += `<button class="bouton bouton-or" onclick="marquerExpediee('${c.cmd_id}')">Marquer comme expédiée</button>`;
+    actionsHTML += `<button class="bouton bouton-or" onclick="genererEtiquette('${c.cmd_id}')">Générer l'étiquette</button>`;
+    actionsHTML += `<button class="bouton bouton-contour" onclick="marquerExpediee('${c.cmd_id}')">Marquer comme expédiée</button>`;
   }
  
   if (c.statut === 'Modifiée') {
@@ -1650,5 +1651,51 @@ async function confirmerRelanceV3(cmd_id) {
     afficherMsg('commandes', '✅ Relance envoyée.');
   } else {
     afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+  }
+}
+
+
+
+async function genererEtiquette(cmd_id) {
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  if (!c) return;
+
+  const poidsTxt = (prompt('Poids du colis en grammes (boîte incluse) :', '') || '').trim();
+  const poids = parseFloat(poidsTxt);
+  if (!poids || poids <= 0) return;
+
+  if (!confirm('⚠️ Générer l\'étiquette achète l\'envoi chez Poste Canada et facture le compte. Continuer ?')) return;
+
+  afficherChargement();
+  const res = await appelAPIPost('genererEtiquette', { cmd_id, poids });
+  cacherChargement();
+
+  if (res && res.deja) {
+    if (confirm('Une étiquette existe déjà. Rouvrir le PDF (sans repayer) ?')) window.open(res.url, '_blank');
+    return;
+  }
+  if (!(res && res.success)) {
+    afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    return;
+  }
+
+  window.open(res.url, '_blank');
+
+  const telephone = c.telephone || '';
+  if (telephone) {
+    const lienSuivi = 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage);
+    let sms = 'Bonjour ' + (c.client || '') + ',\n\n';
+    sms += 'Bonne nouvelle, votre commande ' + cmd_id + ' est en route!\n';
+    sms += 'Suivez votre colis ici : ' + lienSuivi + '\n\nMerci !\nUnivers Caresse';
+    window.open('sms:' + telephone + '?body=' + encodeURIComponent(sms));
+  }
+
+  const res2 = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: res.no_tracage });
+  if (res2 && res2.success) {
+    afficherMsg('commandes', '✅ Étiquette générée, commande expédiée, courriel envoyé.');
+    fermerFicheCommande();
+    chargerCommandes();
+  } else {
+    afficherMsg('commandes', '⚠️ Étiquette créée, mais expédition non finalisée : ' + (res2?.message || ''), 'erreur');
   }
 }

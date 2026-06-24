@@ -535,26 +535,17 @@ Note technique : le suivi (courriel + texto) et le champ no_tracage existent dé
   - `POSTECANADA_CLIENT` → numéro de client
   - `POSTECANADA_ORIGINE` → code postal de départ
   - Clé de **production** (demander un tarif ne coûte rien).
-- 1.3 **B — tarif dans la proposition : EN COURS.** Deux bouts restants : le moteur (serveur), puis la case poids + le bouton (écran). **On commence par le moteur.**
+- 1.3 **B — tarif dans la proposition : FAIT.** Moteur, case poids et bouton « calculer le tarif » en place. Le calcul du tarif Poste Canada fonctionne.
+- 1.4 **Prochain — C : l'étiquette.** Arbre déjà validé (21 juin, 7 cas). À bâtir.
 
 ---
 
-## 2. Prochaine étape : le moteur (PAS encore écrit)
-Nom : `calculerTarifPosteCanada`. Nouvelle demande de **lecture** dans `doGet` (appelée par `appelAPI`).
-- 2.1 Reçoit : le code postal du client + le poids.
-- 2.2 Lit les 4 tiroirs du coffre (section 1.2).
-- 2.3 Demande le prix à Poste Canada (service Rating / Get Rates), prend le **Colis régulier**, le renvoie.
-- 2.4 **Modèle à copier : `creerLienPaiementSquare_v2`** (lit le coffre → `UrlFetchApp` → renvoie `{success}`). Seule différence : Poste Canada parle **XML**, pas JSON → construire et lire le XML avec `XmlService`.
-- 2.5 Détails techniques :
-  - **Confirmé** — Auth = HTTP **Basic** (username = `POSTECANADA_USERNAME`, password = `POSTECANADA_PASSWORD`). Hôte production = `soa-gw.canadapost.ca`. En-têtes Accept + Content-Type = `application/vnd.cpc.ship.rate-v4+xml`. Poids en **kg**.
-  - **Corps XML** = `mailing-scenario` (rate-v4) : `customer-number` (POSTECANADA_CLIENT) · `parcel-characteristics/weight` (kg) · `origin-postal-code` (POSTECANADA_ORIGINE) · destination = code postal du client · `service-code` du Colis régulier.
-  - **À confirmer sur la doc avant d'écrire** : le chemin exact de l'adresse, et le code du Colis régulier (Regular Parcel = `DOM.RP`?). Page : `…/developers/services/rating/getrates/default.jsf`
-  - Le poids arrivera en **grammes** → ÷ 1000 pour Poste Canada. Codes postaux sans espace, en majuscules.
-- 2.6 Façon de faire : présenter en mots → OK de Chantal → trouve-et-remplace (≈ 2 : la fonction neuve + une ligne dans `doGet`). `Code.gs` → **redéploiement**. **Ne pas tester** tant que le bouton (section 3) n'existe pas : rien ne l'appelle encore.
+## 2. FAIT — le moteur de tarif
+Le moteur (`calculerTarifPosteCanada`) est écrit dans `Code.gs` et fonctionne. Le détail vit maintenant dans le vrai code (source à jour) — le plan n'est plus nécessaire ici.
 
 ---
 
-## 3. Ensuite : la case poids + le bouton (écran « Compléter »)
+## 3. FAIT - Ensuite : la case poids + le bouton (écran « Compléter »)
 Fichiers : `admin-commandes.js` + `admin/index.html`. Arbre déjà validé dans ETAT.md (« POSTE CANADA — poids auto + tarif »).
 - 3.1 Le tarif remplit le champ **déjà en place** : `completer-livraison` (lu par `envoyerPropositionV3`).
 - 3.2 Case poids = somme automatique des **PRÊTS seulement**. Le type est déjà disponible : `getCommandesLignes_v2` → `type_ligne` (`pret` / `temporaire` / `definitif`). Sommer les lignes `pret` de `toutesCommandesLignes`.
