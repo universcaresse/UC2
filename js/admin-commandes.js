@@ -618,6 +618,9 @@ async function voirDetailCommande(cmd_id) {
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
   }
   if (c.statut === 'À expédier') {
+    actionsHTML += `<div style="background:#fff4e6;border:1px solid #f0c98b;border-radius:6px;padding:10px 12px;margin-bottom:10px;font-size:0.85rem;color:#7a5a2a">⚠️ Générer l'étiquette achète l'envoi chez Poste Canada et facture le compte.</div>`;
+    actionsHTML += `<div class="form-label">Poids du colis (g, boîte incluse)</div>`;
+    actionsHTML += `<input id="etiq-poids-${c.cmd_id}" type="number" min="1" placeholder="ex. 250" style="width:100%;padding:10px;border:1px solid var(--primary);border-radius:6px;margin-bottom:10px">`;
     actionsHTML += `<button class="bouton bouton-or" onclick="genererEtiquette('${c.cmd_id}')">Générer l'étiquette</button>`;
     actionsHTML += `<button class="bouton bouton-contour" onclick="marquerExpediee('${c.cmd_id}')">Marquer comme expédiée</button>`;
   }
@@ -1655,31 +1658,36 @@ async function confirmerRelanceV3(cmd_id) {
 }
 
 
-
 async function genererEtiquette(cmd_id) {
   const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
   if (!c) return;
 
-  const poidsTxt = (prompt('Poids du colis en grammes (boîte incluse) :', '') || '').trim();
-  const poids = parseFloat(poidsTxt);
-  if (!poids || poids <= 0) return;
+  const champPoids = document.getElementById('etiq-poids-' + cmd_id);
+  const poids = parseFloat(champPoids ? champPoids.value : '');
+  if (!poids || poids <= 0) {
+    afficherMsg('commandes', 'Entre le poids du colis en grammes avant de générer.', 'erreur');
+    return;
+  }
 
-  if (!confirm('⚠️ Générer l\'étiquette achète l\'envoi chez Poste Canada et facture le compte. Continuer ?')) return;
+  // Ouvrir la fenêtre du PDF MAINTENANT (sur le clic) pour que le navigateur ne la bloque pas
+  const fenetrePdf = window.open('', '_blank');
 
   afficherChargement();
   const res = await appelAPIPost('genererEtiquette', { cmd_id, poids });
   cacherChargement();
 
   if (res && res.deja) {
-    if (confirm('Une étiquette existe déjà. Rouvrir le PDF (sans repayer) ?')) window.open(res.url, '_blank');
+    if (fenetrePdf) fenetrePdf.location = res.url;
+    afficherMsg('commandes', 'Une étiquette existait déjà — rouverte, aucun nouvel achat.');
     return;
   }
   if (!(res && res.success)) {
+    if (fenetrePdf) fenetrePdf.close();
     afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
     return;
   }
 
-  window.open(res.url, '_blank');
+  if (fenetrePdf) fenetrePdf.location = res.url;
 
   const telephone = c.telephone || '';
   if (telephone) {
