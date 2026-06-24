@@ -620,7 +620,7 @@ async function voirDetailCommande(cmd_id) {
   if (c.statut === 'À expédier') {
     actionsHTML += `<div style="background:#fff4e6;border:1px solid #f0c98b;border-radius:6px;padding:10px 12px;margin-bottom:10px;font-size:0.85rem;color:#7a5a2a">⚠️ Générer l'étiquette achète l'envoi chez Poste Canada et facture le compte.</div>`;
     actionsHTML += `<div class="form-label">Poids du colis (g, boîte incluse)</div>`;
-    actionsHTML += `<input id="etiq-poids-${c.cmd_id}" type="number" min="1" placeholder="ex. 250" style="width:100%;padding:10px;border:1px solid var(--primary);border-radius:6px;margin-bottom:10px">`;
+    actionsHTML += `<input id="etiq-poids-${c.cmd_id}" type="number" min="1" value="${c.poids_colis || ''}" placeholder="ex. 250" style="width:100%;padding:10px;border:1px solid var(--primary);border-radius:6px;margin-bottom:10px">`;
     actionsHTML += `<button class="bouton bouton-or" onclick="genererEtiquette('${c.cmd_id}')">Générer l'étiquette</button>`;
     actionsHTML += `<button class="bouton bouton-contour" onclick="marquerExpediee('${c.cmd_id}')">Marquer comme expédiée</button>`;
   }
@@ -1133,6 +1133,7 @@ async function cmdCompleterCalculerTarif() {
       ? '<br><span style="color:var(--primary)">✓ Une remise s\'applique.</span>'
       : '<br><span style="color:var(--accent)">Aucune remise dans le détail — ce serait le tarif régulier.</span>';
     detail.innerHTML = lignesDetail;
+    appelAPIPost('updateCommandeEntete', { cmd_id: cmdCompleterIdEnCours, poids_colis: poids });
     afficherMsg('commandes', '✅ Tarif calculé : ' + formaterPrix(res.montant));
   } else {
     afficherMsg('commandes', '❌ ' + (res?.message || 'Poste Canada n\'a pas répondu. Réessaie.'), 'erreur');
