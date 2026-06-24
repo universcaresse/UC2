@@ -751,7 +751,7 @@ async function marquerExpediee(cmd_id) {
   }
 
   afficherChargement();
-  const res = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: noTracage });
+  const res = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: noTracage, facture: construireFactureCommande(cmd_id) });
   cacherChargement();
   if (res && res.success) {
     afficherMsg('commandes', '✅ Commande expédiée, courriel envoyé.');
@@ -1698,7 +1698,7 @@ async function genererEtiquette(cmd_id) {
     window.open('sms:' + telephone + '?body=' + encodeURIComponent(sms));
   }
 
-  const res2 = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: res.no_tracage });
+  const res2 = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: res.no_tracage, facture: construireFactureCommande(cmd_id) });
   if (res2 && res2.success) {
     afficherMsg('commandes', '✅ Étiquette générée, commande expédiée, courriel envoyé.');
     fermerFicheCommande();
@@ -1706,4 +1706,51 @@ async function genererEtiquette(cmd_id) {
   } else {
     afficherMsg('commandes', '⚠️ Étiquette créée, mais expédition non finalisée : ' + (res2?.message || ''), 'erreur');
   }
+}
+
+function construireFactureCommande(cmd_id) {
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  if (!c) return null;
+
+  let sousTotal = 0;
+  const lignes = toutesCommandesLignes
+    .filter(l => l.cmd_id === cmd_id && (!l.type_ligne || l.type_ligne === 'pret'))
+    .map(l => {
+      const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
+      const gam = donneesGammes.find(g => g.gam_id === (pro && pro.gam_id));
+      const pu  = parseFloat(l.prix_unitaire) || 0;
+      const qte = parseInt(l.quantite) || 0;
+      sousTotal += pu * qte;
+      return {
+        nom: pro ? pro.nom : l.pro_id,
+        gamme: gam ? gam.nom : '',
+        poids: l.format_poids,
+        unite: l.format_unite,
+        quantite: qte,
+        prix_unitaire: formaterPrix(pu),
+        prix_total: formaterPrix(pu * qte)
+      };
+    });
+
+  const livraison = parseFloat(c.livraison) || 0;
+  const rabais    = parseFloat(c.rabais) || 0;
+  const total     = Math.max(0, sousTotal - rabais + livraison);
+
+  let promoNom = '';
+  if (c.promo_id && typeof donneesPromotions !== 'undefined') {
+    const p = donneesPromotions.find(x => x.promo_id === c.promo_id);
+    if (p) promoNom = p.nom || '';
+  }
+
+  return {
+    numero: cmd_id,
+    date: new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' }),
+    client: c.client || '',
+    lignes: lignes,
+    sous_total: formaterPrix(sousTotal),
+    rabais: rabais > 0 ? formaterPrix(rabais) : 0,
+    promo_nom: promoNom,
+    livraison: livraison > 0 ? formaterPrix(livraison) : 0,
+    total: formaterPrix(total)
+  };
 }
