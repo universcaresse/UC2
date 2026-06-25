@@ -95,7 +95,9 @@ function afficherPanneauAProduire(cmdEntetes, cmdLignes, lotsDispo) {
 
 function fabToggleAccordeon(el) {
   const body = el.nextElementSibling;
-  body.classList.toggle('cache');
+  const estFerme = body.classList.contains('cache');
+  document.querySelectorAll('#contenu-fabrication .form-panel > .form-body').forEach(b => b.classList.add('cache'));
+  if (estFerme) body.classList.remove('cache');
 }
 
 function fabToggleLot(lot_id) {
@@ -191,7 +193,7 @@ function afficherTableauFabrication(lots) {
             <div class="form-panel-titre">${g.collection} — ${g.gamme}</div>
             <span class="texte-secondaire">${totalGroupe} savon${totalGroupe !== 1 ? 's' : ''}</span>
           </div>
-          <div class="form-body">
+          <div class="form-body cache">
             <table class="tableau-admin">
               <thead><tr><th>Produit</th><th>Fabriqué le</th><th>Disponible le</th><th>Unités</th><th>Vendus</th><th>Coût/unité</th></tr></thead>
               <tbody>${g.lots.map(rendreLot).join('')}</tbody>
