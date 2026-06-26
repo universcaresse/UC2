@@ -382,6 +382,7 @@ function filtrerCommandes() {
     let okRecherche = true;
     if (recherche) {
       const champs = [
+        c.cmd_id || '',
         c.client || '',
         c.courriel || '',
         c.telephone || '',
@@ -401,6 +402,13 @@ function reinitialiserFiltresCommandes() {
   document.getElementById('filtre-cmd-statut').value    = '';
   document.getElementById('filtre-cmd-recherche').value = '';
   afficherTableauCommandes(toutesCommandes);
+}
+
+function cmdToggleAccordeon(el) {
+  const body = el.nextElementSibling;
+  const estFerme = body.classList.contains('cache');
+  document.querySelectorAll('#tableau-commandes .tableau-wrap').forEach(b => b.classList.add('cache'));
+  if (estFerme) body.classList.remove('cache');
 }
 
 function afficherTableauCommandes(items) {
@@ -471,6 +479,7 @@ function afficherTableauCommandes(items) {
         ? `<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${couleur}"></span>`
         : '';
       return `<tr class="cliquable" onclick="voirDetailCommande('${c.cmd_id}')">
+        <td>${(c.cmd_id || '').replace('CMD-', '')}</td>
         <td>${c.date}</td>
         <td>${c.client || '—'}</td>
         <td>${formaterPrix(c.total_prevu)}</td>
@@ -480,10 +489,10 @@ function afficherTableauCommandes(items) {
       </tr>`;
     }).join('');
     return `<div class="carte-admin" style="margin-bottom:16px">
-      <div class="carte-admin-entete">${titre} <span class="texte-secondaire">${liste.length} commande${liste.length > 1 ? 's' : ''}</span></div>
-      <div class="tableau-wrap">
+      <div class="carte-admin-entete" onclick="cmdToggleAccordeon(this)" style="cursor:pointer">${titre} <span class="texte-secondaire">${liste.length} commande${liste.length > 1 ? 's' : ''}</span></div>
+      <div class="tableau-wrap cache">
         <table class="tableau-admin">
-          <thead><tr><th>Date</th><th>Client</th><th>Total prévu</th><th>Solde</th><th>Statut</th><th></th></tr></thead>
+          <thead><tr><th>Nº</th><th>Date</th><th>Client</th><th>Total prévu</th><th>Solde</th><th>Statut</th><th></th></tr></thead>
           <tbody>${lignes}</tbody>
         </table>
       </div>

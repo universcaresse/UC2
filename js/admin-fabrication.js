@@ -127,7 +127,11 @@ function afficherTableauFabrication(lots) {
       if (!groupes[cle]) groupes[cle] = { collection: col, gamme: gam, lots: [] };
       groupes[cle].lots.push(l);
     });
-    return Object.values(groupes).sort((a, b) => a.collection.localeCompare(b.collection) || a.gamme.localeCompare(b.gamme));
+    return Object.values(groupes).sort((a, b) => {
+      const rangA = donneesCollections.find(c => c.nom === a.collection)?.rang || 99;
+      const rangB = donneesCollections.find(c => c.nom === b.collection)?.rang || 99;
+      return rangA - rangB || a.gamme.localeCompare(b.gamme);
+    });
   }
 
   function rendreLot(l) {
@@ -281,17 +285,12 @@ function ouvrirFormFabrication(existant) {
     selAnnee.appendChild(o);
   }
 
-  // Pré-remplir avec aujourd'hui si nouveau lot
-  if (!existant) {
-    const today = new Date();
-    selJour.value = String(today.getDate()).padStart(2, '0');
-    document.getElementById('fab-date-mois').value = String(today.getMonth() + 1).padStart(2, '0');
-    selAnnee.value = today.getFullYear();
-    fabSyncDate();
-  } else {
-    document.getElementById('fab-date-mois').value = '';
-    document.getElementById('fab-date').value = '';
-  }
+  // Pré-remplir avec aujourd'hui (nouveau lot ET lot existant)
+  const today = new Date();
+  selJour.value = String(today.getDate()).padStart(2, '0');
+  document.getElementById('fab-date-mois').value = String(today.getMonth() + 1).padStart(2, '0');
+  selAnnee.value = today.getFullYear();
+  fabSyncDate();
 
   document.querySelector('#form-fabrication .form-panel-titre').textContent = existant ? 'Entrer un lot existant' : 'Nouveau lot';
   document.getElementById('fab-groupe-multiplicateur').classList.toggle('cache', !!existant);
@@ -469,6 +468,7 @@ async function sauvegarderLot() {
     : nbUnitesFormat * multi;
   const cure    = parseInt(opt.dataset.cure) || 0;
   const dateFab = document.getElementById('fab-date').value;
+  if (nbUnites <= 0) { cacherChargement(); afficherMsg('fabrication', '❌ Le nombre de savons doit être positif.'); return; }
   if (!dateFab) { cacherChargement(); afficherMsg('fabrication', '❌ Date de fabrication requise.'); return; }
 
   const d = new Date(dateFab);

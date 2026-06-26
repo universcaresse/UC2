@@ -60,6 +60,14 @@ async function ouvrirListePrix() {
   var today = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
   var contenuHTML = '';
 
+  // ── Stock disponible par produit + format (depuis les lots déjà chargés) ──
+  var stockParCle = {};
+  (prodCache.lots || []).forEach(function(l) {
+    if (l.statut !== 'disponible') return;
+    var cle = String(l.pro_id || '') + '|' + String(l.format_poids) + '|' + String(l.format_unite);
+    stockParCle[cle] = (stockParCle[cle] || 0) + ((parseInt(l.nb_unites) || 0) - (parseInt(l.nb_unites_vendu) || 0));
+  });
+
   ordreCollections.forEach(function(colId) {
     var col = parCollection[colId];
 
@@ -133,7 +141,7 @@ async function ouvrirListePrix() {
           blocProduit += '<div class="produit-nom" style="border-left-color:' + couleurBordure + '">' + (pro.nom || '—') + '</div>';
           formats.forEach(function(f) {
             var prix = parseFloat(f.prix_vente).toFixed(2).replace('.', ',') + ' $';
-            blocProduit += '<div class="produit-format"><span class="format-poids">' + f.poids + '&nbsp;' + f.unite + '</span><span class="format-tirets"></span><span class="format-prix">' + prix + '</span></div>';
+            blocProduit += '<div class="produit-format"><span class="format-poids">' + f.poids + '&nbsp;' + f.unite + '</span><span class="format-tirets"></span><span class="format-prix">' + prix + '</span><span class="format-stock">' + (stockParCle[String(pro.pro_id || '') + '|' + String(f.poids) + '|' + String(f.unite)] || 0) + '</span></div>';
           });
           blocProduit += '</div>';
           blocsGamme += blocProduit;
@@ -278,6 +286,8 @@ async function ouvrirListePrix() {
     '  margin-bottom: 2pt;\n' +
     '}\n' +
     '.format-prix { font-weight: 400; color: #3d3b39; white-space: nowrap; }\n' +
+    '.format-stock { display: none; font-weight: 500; color: #5a8a3a; white-space: nowrap; margin-left: 5pt; }\n' +
+    'body.montrer-stock .format-stock { display: inline; }\n' +
 
     '.pied-de-page {\n' +
     '  text-align: center;\n' +
@@ -294,7 +304,9 @@ async function ouvrirListePrix() {
 
     '</style>\n</head>\n<body>\n\n' +
 
-    '<button class="btn-imprimer" onclick="window.print()">Imprimer</button>\n\n' +
+    '<button class="btn-imprimer" onclick="window.print()">Imprimer</button>\n' +
+    '<button class="btn-imprimer btn-stock" onclick="basculerStock(this)">Afficher le stock</button>\n' +
+    '<script>function basculerStock(b){var on=document.body.classList.toggle("montrer-stock");b.textContent=on?"Masquer le stock":"Afficher le stock";}</script>\n\n' +
 
     '<div class="entete">\n' +
    '\n' +
