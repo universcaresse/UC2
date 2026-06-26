@@ -907,7 +907,7 @@ footer > * { position: relative; z-index: 1; }
 /* ═══════════════════════════════════════
    ADMIN — FORM PANEL
    ═══════════════════════════════════════ */
-.form-panel { display: none; background: white; border: 1px solid var(--beige); margin-bottom: 32px; overflow: hidden; position: relative; }
+.form-panel { display: none; background: white; border-bottom: 1px solid var(--beige); margin-bottom: 32px; overflow: hidden; position: relative; }
 .form-panel.visible { display: block; }
 .form-panel-header { padding: 12px 28px 10px; border-bottom: 1px solid var(--beige); background: var(--blanc); display: flex; align-items: center; gap: 16px; position: relative; }
 .form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 300; color: var(--gris-fonce); flex: 1; }
