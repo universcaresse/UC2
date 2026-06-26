@@ -1117,7 +1117,7 @@ tr.cliquable { cursor: pointer; }
     right: 0;
     left: auto;
     background: var(--blanc);
-    border: 1px solid var(--beige);
+    border-bottom: 1px solid var(--beige);
     box-shadow: 0 8px 24px rgba(30,28,25,0.08);
     min-width: 180px;
     z-index: 150;
