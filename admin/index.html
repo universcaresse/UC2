@@ -1540,8 +1540,8 @@
             <div class="page-entete-titre">Inventaire</div>
           </div>
           
-          <button class="bouton bouton-contour" onclick="ouvrirFormFabrication(true)">Entrer un lot existant</button>
-		  <button class="bouton" onclick="ouvrirFormFabrication()">+ Nouveau lot</button>
+          <button class="bouton bouton-contour" onclick="ouvrirFormFabrication(true)">+ Nouveau lot</button>
+		 <!--  <button class="bouton" onclick="ouvrirFormFabrication()">+ Nouveau lot</button> -->
         </div>
         <div class="msg-zone" id="msg-fabrication"></div>
         <div class="chargement" id="loading-fabrication"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
@@ -1599,7 +1599,7 @@
                   </select>
                 </div>
                 <div class="form-groupe cache" id="fab-groupe-nb-unites">
-                  <label class="form-label">Nombre de savons en inventaire</label>
+                  <label class="form-label">Nombre d'unité</label>
                   <input type="text" inputmode="numeric" id="fab-nb-unites" class="form-ctrl" oninput="calculerApercuLot()">
                 </div>
 
@@ -2278,7 +2278,7 @@
         <div class="page-entete fade-in">
           <div class="page-entete-gauche">
             <div class="page-entete-eyebrow">Production</div>
-            <div class="page-entete-titre">Inventaire</div>
+            <div class="page-entete-titre">Fabrication</div>
           </div>
         </div>
         <div class="msg-zone" id="msg-inventaire-production"></div>
