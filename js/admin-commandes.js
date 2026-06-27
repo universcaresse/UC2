@@ -660,6 +660,7 @@ async function voirDetailCommande(cmd_id) {
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
 }
+
 async function modifierAdresseCommande(cmd_id) {
   const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
   if (!c) return;
@@ -1094,6 +1095,9 @@ async function genererLienSquare() {
     document.getElementById('completer-square').value = res.url;
     if (res.link_id) {
       const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
+      if (c && c.link_id_square && c.link_id_square !== res.link_id) {
+        await appelAPIPost('annulerLienSquare', { link_id: c.link_id_square });
+      }
       if (c) c.link_id_square = res.link_id;
       await appelAPIPost('updateCommandeEntete', { cmd_id: cmdCompleterIdEnCours, link_id_square: res.link_id });
     }

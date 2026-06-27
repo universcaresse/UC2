@@ -214,7 +214,23 @@ if (id === 'fournisseurs')   afficherFournisseurs();
 if (id === 'redaction')      redInit();
   if (id === 'mediatheque')    chargerMediatheque();
   if (id === 'references')     chargerReferences();
-  if (id === 'inventaire-production') { afficherSection('inventaire', null); return; }
+  if (id === 'inventaire-production') {
+    if (!donneesProduits || donneesProduits.length === 0) {
+      Promise.all([appelAPI('getProduits'), appelAPI('getProduitsFormats')]).then(([resPro, resFmt]) => {
+        const formatsMap = {};
+        if (resFmt && resFmt.success) {
+          (resFmt.items || []).forEach(f => {
+            if (!formatsMap[f.pro_id]) formatsMap[f.pro_id] = [];
+            formatsMap[f.pro_id].push({ format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix_vente, nb_unites: f.nb_unites, poste_gr: f.poste_gr });
+          });
+        }
+        if (resPro && resPro.items) donneesProduits = resPro.items.map(p => ({ ...p, formats: formatsMap[p.pro_id] || [] }));
+        chargerInventaireProduction();
+      });
+    } else {
+      chargerInventaireProduction();
+    }
+  }
  if (id === 'ventes')          { chargerVentes(); }
     if (id === 'remboursements')  { chargerRemboursements(); }
   if (id === 'commandes')       { chargerCommandes(); }

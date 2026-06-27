@@ -41,6 +41,11 @@
   --taille-220: 220px;
 
   --rayon-1:    50%;
+
+  /* Typo */
+  --texte-72:        0.72rem;
+  --interlettre-12:  0.12em;
+  --poids-500:       500;
 }
 }
 
@@ -174,7 +179,9 @@
 /*═════════════════════════════════════════════════
  Pied de page
    ════════════════════════════════════════════════ */  
-   
+ /*═════════════════════════════════════════════════
+   LES FENETRES POUR DES QUESTIONS
+   ════════════════════════════════════════════════ */ 
    
  /*═════════════════════════════════════════════════
    Des boutons
@@ -307,7 +314,14 @@
    
    
    
-   
+.sur-titre {
+  font-size: var(--texte-72);
+  letter-spacing: var(--interlettre-12);
+  text-transform: uppercase;
+  color: var(--grise);
+  font-weight: var(--poids-500);
+  margin: var(--espace-16) 0 var(--espace-8);
+} 
    
    
    
@@ -531,7 +545,6 @@ textarea.controle { resize: vertical; min-height: 120px; line-height: 1.6; }
 
 /*═════════════════════════════════════════════════
    Bandeau
-   
    ════════════════════════════════════════════════ */
 
 

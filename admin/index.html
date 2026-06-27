@@ -56,7 +56,7 @@
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">production <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
           <button class="nav-dropdown-item" onclick="afficherSection('fabrication', this)">fabrication</button>
-          <button class="nav-dropdown-item bientot">inventaire</button>
+          <button class="nav-dropdown-item" onclick="afficherSection('inventaire-production', this)">inventaire</button>
 		  <button class="nav-dropdown-item bientot">correction inventaire</button>
 		</div>
       </li>
@@ -159,7 +159,7 @@
       <div class="sidebar-groupe">
       <div class="sidebar-titre" onclick="toggleGroupe(this)">Production</div>
         <button class="sidebar-lien" onclick="afficherSection('fabrication', this)">fabrication</button>
-        <button class="sidebar-lien" onclick="afficherSection('fabrication', this)">inventaire</button>
+        <button class="sidebar-lien" onclick="afficherSection('inventaire-production', this)">inventaire</button>
         <button class="sidebar-lien bientot">corrections Inventaire</button>
       </div>
 	  
@@ -1561,6 +1561,10 @@
         <div class="chargement" id="loading-fabrication"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
         <div id="contenu-fabrication"></div>
 
+        <div class="form-actions" style="margin-top:24px">
+          <button class="bouton bouton-contour" onclick="afficherSection('inventaire-production', null)">Voir inventaire</button>
+        </div>
+
         <!-- FORMULAIRE NOUVEAU LOT -->
 		
 		<div id="form-fabrication" class="cache" data-mode="">
@@ -1676,31 +1680,6 @@
        
 
       </div>
-
-	<!-- Inventaire -->
-       <div class="section-admin" id="section-fabrication">
-        <div class="page-entete fade-in">
-          <div class="page-entete-gauche">
-            <div class="page-entete-eyebrow">Production</div>
-            <div class="page-entete-titre">Inventaire</div>
-          </div>
-          
-     
-        </div>
-        <div class="msg-zone" id="msg-fabrication"></div>
-        <div class="chargement" id="loading-fabrication"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
-        <div id="contenu-fabrication"></div>
-
-
-		
-		
-          
-      
-         
-        </div>
-       
-
-     
 
 	<!-- VENTES -->
 	
@@ -2320,7 +2299,7 @@
         <div class="page-entete fade-in">
           <div class="page-entete-gauche">
             <div class="page-entete-eyebrow">Production</div>
-            <div class="page-entete-titre">Fabrication</div>
+            <div class="page-entete-titre">Inventaire</div>
           </div>
         </div>
         <div class="msg-zone" id="msg-inventaire-production"></div>

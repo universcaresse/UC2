@@ -29,12 +29,39 @@ async function chargerFabrication() {
   afficherTableauFabrication(_lotsData);
 }
 
-function afficherPanneauAProduire(cmdEntetes, cmdLignes, lotsDispo) {
-  var panneau = document.getElementById('panneau-a-produire');
+async function chargerInventaireProduction() {
+  afficherChargement();
+  document.getElementById('loading-inventaire-production').classList.remove('cache');
+  document.getElementById('contenu-inventaire-production').innerHTML = '';
+
+  const [res, resCmdEntete, resCmdLignes, resLotsDispo] = await Promise.all([
+    appelAPI('getLots'),
+    appelAPI('getCommandesEntete'),
+    appelAPI('getCommandesLignes'),
+    appelAPI('getLotsDisponibles')
+  ]);
+
+  document.getElementById('loading-inventaire-production').classList.add('cache');
+  if (!res || !res.success) { cacherChargement(); afficherMsg('inventaire-production', '❌ Erreur de chargement.'); return; }
+  _lotsData = res.items || [];
+
+  const cmdEntetes = (resCmdEntete && resCmdEntete.success) ? resCmdEntete.items : [];
+  const cmdLignes  = (resCmdLignes && resCmdLignes.success) ? resCmdLignes.items : [];
+  const lotsDispo  = (resLotsDispo && resLotsDispo.success) ? resLotsDispo.items : [];
+  afficherPanneauAProduire(cmdEntetes, cmdLignes, lotsDispo, 'contenu-inventaire-production', 'panneau-a-produire-inv');
+
+  cacherChargement();
+  afficherTableauFabrication(_lotsData, 'contenu-inventaire-production', ['disponible']);
+}
+
+function afficherPanneauAProduire(cmdEntetes, cmdLignes, lotsDispo, cibleId, panneauId) {
+  cibleId = cibleId || 'contenu-fabrication';
+  panneauId = panneauId || 'panneau-a-produire';
+  var panneau = document.getElementById(panneauId);
   if (!panneau) {
     panneau = document.createElement('div');
-    panneau.id = 'panneau-a-produire';
-    var contenu = document.getElementById('contenu-fabrication');
+    panneau.id = panneauId;
+    var contenu = document.getElementById(cibleId);
     contenu.parentNode.insertBefore(panneau, contenu);
   }
 
@@ -108,7 +135,9 @@ function fabToggleLot(lot_id) {
   if (!estOuvert) detail.classList.remove('cache');
 }
 
-function afficherTableauFabrication(lots) {
+function afficherTableauFabrication(lots, cibleId, blocs) {
+  cibleId = cibleId || 'contenu-fabrication';
+  blocs = blocs || ['en_cure', 'epuise'];
   const enCure      = lots.filter(l => l.statut === 'en_cure');
   const disponibles = lots.filter(l => l.statut === 'disponible');
   const epuises     = lots.filter(l => l.statut === 'epuise');
@@ -216,13 +245,14 @@ function afficherTableauFabrication(lots) {
   }
 
   if (!lots.length) {
-    document.getElementById('contenu-fabrication').innerHTML = '<div class="vide"><div class="vide-titre">Aucun lot enregistré</div><div class="vide-desc">Créez votre premier lot de fabrication</div></div>';
+    document.getElementById(cibleId).innerHTML = '<div class="vide"><div class="vide-titre">Aucun lot enregistré</div><div class="vide-desc">Créez votre premier lot de fabrication</div></div>';
     return;
   }
   let html = '';
-  html += rendreBlocStatut('EN CURE', totalEnCure, enCure);
-  html += rendreBlocStatut('ÉPUISÉ', totalEpuises, epuises);
-  document.getElementById('contenu-fabrication').innerHTML = html;
+  if (blocs.includes('en_cure'))    html += rendreBlocStatut('EN CURE', totalEnCure, enCure);
+  if (blocs.includes('disponible')) html += rendreBlocStatut('DISPONIBLE', totalDisponibles, disponibles);
+  if (blocs.includes('epuise'))     html += rendreBlocStatut('ÉPUISÉ', totalEpuises, epuises);
+  document.getElementById(cibleId).innerHTML = html;
 }
 
 
