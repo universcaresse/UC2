@@ -53,6 +53,16 @@
    Du générique et ses variantes
    ════════════════════════════════════════════════ */
    
+  /* ═══════════════════════════════════════
+   LIEN CLIQUABLE — générique, réutilisable
+   ═══════════════════════════════════════ */
+.lien-cliquable {
+  display: contents;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
    
 /*═════════════════════════════════════════════════
   Barre de Menu et burger
