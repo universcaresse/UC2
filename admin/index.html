@@ -162,13 +162,15 @@
       <div class="sidebar-sep"></div>
       <div class="sidebar-groupe">
      <div class="sidebar-titre" onclick="toggleGroupe(this)">vente</div>
-        <button class="sidebar-lien" onclick="afficherSection('ventes', this)">les ventes</button>
-		<button class="sidebar-lien" onclick="allerVersNouvelleVente()">nouvelle vente</button>
+        <button class="sidebar-lien" onclick="allerVersNouvelleVente()">+ nouvelle vente</button>
+		<button class="sidebar-lien" onclick="afficherSection('ventes', this)">les ventes</button>
+		
         <button class="sidebar-lien" onclick="afficherSection('commandes', this)">les commandes</button>
         <button class="sidebar-lien" onclick="afficherSection('remboursements', this)">remboursements</button>
-        <button class="sidebar-lien" onclick="afficherSection('fabrication', this)">inventaire</button>
+
 		<button class="sidebar-lien" onclick="ouvrirListePrix()">liste de prix</button>
 		<button class="sidebar-lien" onclick="afficherSection('promotions', this)">promotions</button>
+		<button class="sidebar-lien" onclick="afficherSection('fabrication', this)">inventaire</button>
       </div>
 	  
 	  
@@ -177,12 +179,10 @@
        <div class="sidebar-titre" onclick="toggleGroupe(this)">système</div>
         <button class="sidebar-lien" onclick="afficherSection('inci', this)">INCI</button>
         <button class="sidebar-lien" onclick="afficherSection('densites', this)">densité</button>
-        
         <button class="sidebar-lien" onclick="afficherSection('contenu-site', this)">contenu du site</button>
 		<button class="sidebar-lien" onclick="afficherSection('redaction', this)">rédaction</button>
         <button class="sidebar-lien" onclick="afficherSection('references', this)">Utilitaires</button>
 		<button class="sidebar-lien" onclick="afficherSection('catalogue-builder', null)">catalogue PDF</button>
-
         <button class="sidebar-lien" onclick="exporterTextes()">exporter textes</button>
         <button class="sidebar-lien" onclick="afficherSection('mediatheque', this)">médiathèque</button>
      
