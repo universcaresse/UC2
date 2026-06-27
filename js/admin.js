@@ -146,6 +146,12 @@ if (resGam && resGam.success) {
   prodCache.charge = true;
 }
 // ─── NAVIGATION SIDEBAR ───
+function toggleGroupe(el) {
+  const groupe = el.closest('.sidebar-groupe');
+  const estOuvert = groupe.classList.contains('ouvert');
+  document.querySelectorAll('.sidebar-groupe.ouvert').forEach(g => g.classList.remove('ouvert'));
+  if (!estOuvert) groupe.classList.add('ouvert');
+}
 function toggleDropdownAdmin(el) {
   const item = el.closest('.nav-admin-item');
   const estOuvert = item.classList.contains('ouvert');
@@ -177,6 +183,7 @@ function afficherSection(id, bouton) {
   document.querySelectorAll('.nav-admin-item.ouvert').forEach(i => i.classList.remove('ouvert'));
   document.querySelectorAll('.section-admin').forEach(s => s.classList.remove('visible'));
   document.querySelectorAll('.sidebar-lien').forEach(l => l.classList.remove('actif'));
+  document.querySelectorAll('.sidebar-groupe.ouvert').forEach(g => g.classList.remove('ouvert'));
   fermerFicheCollection();
   const s = document.getElementById('section-' + id);
   if (s) s.classList.add('visible');
