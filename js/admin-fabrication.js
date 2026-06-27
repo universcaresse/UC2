@@ -194,7 +194,7 @@ function afficherTableauFabrication(lots) {
       groupes.forEach(g => {
         if (g.collection !== collectionCourante) {
           collectionCourante = g.collection;
-          h += `<div class="recette-collection-titre">${g.collection.toUpperCase()}</div>`;
+          h += `<div class="sur-titre">${g.collection.toUpperCase()}</div>`;
         }
         const totalGroupe = g.lots.reduce((s, l) => s + (l.nb_unites - (l.nb_unites_vendu || 0)), 0);
         h += `<div class="form-panel visible" style="margin:8px 0">
@@ -221,10 +221,15 @@ function afficherTableauFabrication(lots) {
   }
   let html = '';
   html += rendreBlocStatut('EN CURE', totalEnCure, enCure);
-  html += rendreBlocStatut('DISPONIBLE', totalDisponibles, disponibles);
   html += rendreBlocStatut('ÉPUISÉ', totalEpuises, epuises);
   document.getElementById('contenu-fabrication').innerHTML = html;
 }
+
+
+
+
+
+
 
 function fabEditSyncDate(lot_id) {
   const j = document.getElementById(`fab-edit-jour-${lot_id}`).value;
