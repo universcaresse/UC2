@@ -2074,10 +2074,14 @@
       </div>
     </div>
 
-    <!-- SAISIE PRODUITS -->
-    <div class="form-panel">
+ 
+ 
+    <!-- LISTE DES LIGNES -->
+    <div class="form-panel" id="cmd-panier-panel">
+	
+	   <div class="form-panel">
       <div class="form-panel-header">
-        <span class="form-panel-titre">Produits commandés</span>
+        <span class="form-panel-titre">Produits</span>
       </div>
       <div class="form-body">
         <div class="form-grille">
@@ -2121,8 +2125,7 @@
       </div>
     </div>
 
-    <!-- LISTE DES LIGNES -->
-    <div class="form-panel" id="cmd-panier-panel">
+	   <!-- SAISIE PRODUITS -->
       <div class="form-panel-header">
         <span class="form-panel-titre">Items de la commande</span>
       </div>
@@ -2137,7 +2140,7 @@
             <input type="text" inputmode="decimal" class="form-ctrl" id="cmd-acompte" placeholder="0,00" value="0" oninput="cmdCalculerSolde()">
           </div>
           <div class="form-groupe col-plein">
-            <label class="form-label">Solde à payer à la livraison</label>
+            <label class="form-label">Solde à payer</label>
             <input type="text" class="form-ctrl" id="cmd-solde" readonly>
           </div>
         </div>
@@ -3554,22 +3557,11 @@
 </div>
 
 
-
-
-
- 
-	  </main>
+	</main>
   </div>	  
 		  
-		  
-		  
-		  
-		  
-		  
-		  
-<script src="../js/main.js"></script>
-
-  <script src="../js/admin.js"></script>
+	<script src="../js/main.js"></script>
+	<script src="../js/admin.js"></script>
     
  <div id="ecran-connexion" class="ecran-connexion cache">
     <div class="connexion-boite">
@@ -3580,7 +3572,6 @@
       <button class="bouton" onclick="validerConnexionAdmin()">Entrer</button>
     </div>
   </div>
-
 
  <div class="modal-admin-overlay" id="modal-if-nouvel-ingredient">
   <div class="modal-admin">
@@ -3674,10 +3665,6 @@
           </div>
         </div>
 		
-		
-		
-		
-		
  <div class="modal-admin-overlay" id="modal-facture-vente">
   <div class="modal-admin" style="max-width:600px">
     <div class="modal-admin-header">
@@ -3693,12 +3680,6 @@
     <span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>
     <div style="margin-top:8px;font-size:0.85rem;color:var(--gris)">Ouverture de Square…</div>
   </div>
-  
-  
-
-
- 
- 
   
 <div id="fv-boutons-paiement" class="fv-boutons-paiement">
   <button class="bouton bouton-plein-largeur fv-btn-square" id="btn-payer-square" onclick="payerParSquare()">Payer par Square</button>
@@ -3721,6 +3702,7 @@
     </div>
   </div>
 </div>
+
 <div class="modal-admin-overlay" id="modal-mode-paiement-cmd">
   <div class="modal-admin" style="max-width:400px">
     <div class="modal-admin-header">
@@ -3736,6 +3718,7 @@
     </div>
   </div>
 </div>
+
 <div class="modal-admin-overlay" id="modal-apercu-proposition">
   <div class="modal-admin" style="max-width:600px">
     <div class="modal-admin-header">
@@ -3766,6 +3749,7 @@
     </div>
   </div>
 </div>
+
 <div class="modal-admin-overlay" id="modal-apres-vente">
   <div class="modal-admin" style="max-width:400px">
     <div class="modal-admin-header">
@@ -3794,7 +3778,9 @@
     </div>
   </div>
 </div>
-    <div class="modal-admin-overlay" id="modal-confirm">
+
+<div class="modal-admin-overlay" id="modal-confirm">
+
     <div class="modal-admin">
       <div class="modal-admin-header">
         <div class="modal-admin-titre" id="modal-confirm-message"></div>
@@ -3805,6 +3791,7 @@
       </div>
     </div>
   </div>
+  
 <div class="modal-admin-overlay" id="modal-nom-uc">
     <div class="modal-admin">
       <div class="modal-admin-header">
@@ -3937,7 +3924,6 @@
   </div>
 </div>
 
-<!-- MODALE FICHE PRODUIT -->
 <div class="modal-admin-overlay" id="modal-cb-fiche" style="display:none">
   <div class="modal-admin">
     <div class="modal-admin-header">
@@ -3982,6 +3968,7 @@
     </div>
   </div>
 </div>
+
 <div id="overlay-chargement" class="overlay-chargement cache">
   <div class="chargement">
     <div class="chargement-spinner">
