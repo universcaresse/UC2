@@ -844,6 +844,9 @@ function annulerCommande(cmd_id) {
       : await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'Annulée' });
     cacherChargement();
     if (res && res.success) {
+      if (c && c.link_id_square) {
+        await appelAPIPost('annulerLienSquare', { link_id: c.link_id_square });
+      }
       afficherMsg('commandes', '✅ Commande annulée.');
       fermerFicheCommande();
       chargerCommandes();
