@@ -550,6 +550,11 @@ async function voirDetailCommande(cmd_id) {
   document.getElementById('fiche-commande-titre').textContent = 'Commande' + c.cmd_id.replace('CMD-', '-');
 
   let html = `
+    <div style="margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--beige);font-size:0.92rem">
+      Date : <strong>${c.date}</strong>${c.ven_id_lien ? ` &nbsp;—&nbsp; Facture : <a href="#" onclick="event.preventDefault();voirDetailVente('${c.ven_id_lien}')" style="color:var(--primary);text-decoration:underline">${c.ven_id_lien}</a>` : ''}
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+      <div style="flex:1 1 260px;min-width:260px">
     <div style="margin-bottom:16px">
       <div class="form-label">Client</div>
       <div>${c.client || '—'}</div>
@@ -559,10 +564,10 @@ async function voirDetailCommande(cmd_id) {
       ${(c.rue || c.ville || c.province) ? `<div class="texte-secondaire">${[c.rue, c.ville, c.province].filter(Boolean).join(', ')}</div>` : ''}
       <button class="bouton bouton-contour bouton-petit" style="margin-top:6px" onclick="modifierAdresseCommande('${c.cmd_id}')">Modifier l'adresse</button>
     </div>
-    <div style="margin-bottom:16px">
-      <div class="form-label">Date de la commande - ${c.date}</div>
-     
-    </div>
+    ${c.notes ? `<div style="margin-bottom:16px">
+      <div class="form-label">Notes</div>
+      <div>${c.notes}</div>
+    </div>` : ''}
     <div style="margin-bottom:16px">
       <div class="form-label">Items commandés</div>`;
 
@@ -586,27 +591,28 @@ async function voirDetailCommande(cmd_id) {
     </div>`;
   });
 
+  const totalArticles = (c.lignes || []).reduce((s, l) => s + (parseFloat(l.prix_unitaire) || 0) * (parseInt(l.quantite) || 0), 0);
+  const livraisonNum = parseFloat(c.livraison) || 0;
+  const rabaisNum = parseFloat(c.rabais) || 0;
+  const estPayee = !!c.ven_id_lien;
+
   html += `</div>
-    <div style="margin-bottom:16px">
-      <div class="form-label">Total prévu</div>
-      <div>${formaterPrix(c.total_prevu)}</div>
-      <div class="form-label" style="margin-top:8px">Acompte versé</div>
-       <div>${formaterPrix(c.acompte)}</div>
-      <div class="form-label" style="margin-top:8px">Solde à payer</div>
-      <div style="color:var(--primary);font-weight:500">${formaterPrix(c.solde)}</div>
+      </div>
+      <div style="flex:1 1 260px;min-width:260px">
+        <div class="form-label" style="margin-bottom:6px">Facturation</div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Total des articles</span><span>${formaterPrix(totalArticles)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Frais de livraison</span><span>${formaterPrix(livraisonNum)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Escomptes</span><span>${rabaisNum > 0 ? '-' + formaterPrix(rabaisNum) : formaterPrix(0)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;margin-top:2px;border-top:1px solid var(--beige);font-weight:600"><span>Sous-total</span><span>${formaterPrix(c.total_prevu)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;margin-top:6px"><span>Acompte versé</span><span>${formaterPrix(c.acompte)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Paiement reçu</span><span>${formaterPrix(estPayee ? c.total_prevu : c.acompte)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--beige);color:var(--primary);font-weight:600"><span>Solde à payer</span><span>${formaterPrix(estPayee ? 0 : c.solde)}</span></div>
+      </div>
     </div>
-    ${c.notes ? `<div style="margin-bottom:16px">
-      <div class="form-label">Notes</div>
-      <div>${c.notes}</div>
-    </div>` : ''}
-    <div style="margin-bottom:16px">
+    <div style="margin-top:16px">
       <div class="form-label">Statut</div>
       <div>${c.statut}</div>
-    </div>
-    ${c.ven_id_lien ? `<div style="margin-bottom:16px">
-      <div class="form-label">Facture liée</div>
-      <div><a href="#" onclick="event.preventDefault();voirDetailVente('${c.ven_id_lien}')" style="color:var(--primary);text-decoration:underline">${c.ven_id_lien}</a></div>
-    </div>` : ''}`;
+    </div>`;
 
   document.getElementById('fiche-commande-contenu').innerHTML = html;
 
