@@ -57,11 +57,17 @@
    LIEN CLIQUABLE — générique, réutilisable
    ═══════════════════════════════════════ */
 .lien-cliquable {
-  display: contents;
+  display: flex;
+  flex: 1;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
 }
+.lien-cliquable * {
+  text-decoration: none;
+  color: inherit;
+}
+
 
    
 /*═════════════════════════════════════════════════
