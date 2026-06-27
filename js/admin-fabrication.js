@@ -190,11 +190,16 @@ function afficherTableauFabrication(lots) {
       h += `<div class="texte-secondaire" style="padding:12px 0">Aucun lot</div>`;
     } else {
       const groupes = grouperParCollection(liste);
+      let collectionCourante = null;
       groupes.forEach(g => {
+        if (g.collection !== collectionCourante) {
+          collectionCourante = g.collection;
+          h += `<div class="recette-collection-titre">${g.collection.toUpperCase()}</div>`;
+        }
         const totalGroupe = g.lots.reduce((s, l) => s + (l.nb_unites - (l.nb_unites_vendu || 0)), 0);
         h += `<div class="form-panel visible" style="margin:8px 0">
           <div class="form-panel-header" onclick="fabToggleAccordeon(this)" style="cursor:pointer">
-            <div class="form-panel-titre">${g.collection} — ${g.gamme}</div>
+            <div class="form-panel-titre">${g.gamme}</div>
             <span class="texte-secondaire">${totalGroupe} savon${totalGroupe !== 1 ? 's' : ''}</span>
           </div>
           <div class="form-body cache">
