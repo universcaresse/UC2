@@ -321,6 +321,7 @@
   color: var(--grise);
   font-weight: var(--poids-500);
   margin: var(--espace-16) 0 var(--espace-8);
+  cursor: pointer;
 } 
    
    

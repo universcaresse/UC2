@@ -123,7 +123,17 @@ function afficherPanneauAProduire(cmdEntetes, cmdLignes, lotsDispo, cibleId, pan
 function fabToggleAccordeon(el) {
   const body = el.nextElementSibling;
   const estFerme = body.classList.contains('cache');
-  document.querySelectorAll('#contenu-fabrication .form-panel > .form-body').forEach(b => b.classList.add('cache'));
+  const zone = el.closest('.carte-admin') || document;
+  zone.querySelectorAll('.form-panel > .form-body').forEach(b => b.classList.add('cache'));
+  if (estFerme) body.classList.remove('cache');
+}
+
+function fabToggleCollection(el) {
+  const body = el.nextElementSibling;
+  const estFerme = body.classList.contains('cache');
+  const zone = el.closest('.carte-admin') || document;
+  zone.querySelectorAll('.fab-collection-body').forEach(b => b.classList.add('cache'));
+  zone.querySelectorAll('.form-panel > .form-body').forEach(b => b.classList.add('cache'));
   if (estFerme) body.classList.remove('cache');
 }
 
@@ -222,8 +232,10 @@ function afficherTableauFabrication(lots, cibleId, blocs) {
       let collectionCourante = null;
       groupes.forEach(g => {
         if (g.collection !== collectionCourante) {
+          if (collectionCourante !== null) h += `</div>`;
           collectionCourante = g.collection;
-          h += `<div class="sur-titre">${g.collection.toUpperCase()}</div>`;
+          h += `<div class="sur-titre" onclick="fabToggleCollection(this)">${g.collection.toUpperCase()}</div>`;
+          h += `<div class="fab-collection-body cache">`;
         }
         const totalGroupe = g.lots.reduce((s, l) => s + (l.nb_unites - (l.nb_unites_vendu || 0)), 0);
         h += `<div class="form-panel visible" style="margin:8px 0">
@@ -239,6 +251,7 @@ function afficherTableauFabrication(lots, cibleId, blocs) {
           </div>
         </div>`;
       });
+      if (collectionCourante !== null) h += `</div>`;
     }
     h += `</div>`;
     return h;
