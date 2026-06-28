@@ -42,10 +42,17 @@
 
   --rayon-1:    50%;
 
-  /* Typo */
+    /* Typo */
   --texte-72:        0.72rem;
   --interlettre-12:  0.12em;
   --poids-500:       500;
+
+  /* Base — police, grosseur, couleur du texte */
+  --police-texte:   'DM Sans', sans-serif;
+  --police-titre:   'Playfair Display', serif;
+  --texte-base:     1rem;
+  --texte-couleur:  var(--grise-foncee);
+
 }
 }
 
