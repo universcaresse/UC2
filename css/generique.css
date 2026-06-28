@@ -52,6 +52,22 @@
   --police-titre:   'Playfair Display', serif;
   --texte-base:     1rem;
   --texte-couleur:  var(--grise-foncee);
+}
+}
+
+/*═════════════════════════════════════════════════
+   Base du texte — generique tient seul
+   ════════════════════════════════════════════════ */
+body {
+  font-family: var(--police-texte);
+  font-size: var(--texte-base);
+  color: var(--texte-couleur);
+  background: var(--blancpur);
+}
+h1, h2, h3 {
+  font-family: var(--police-titre);
+}
+
 
 }
 }
