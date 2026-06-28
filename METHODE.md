@@ -25,6 +25,7 @@
 
 1.9 🔴🔴🔴 **AVANT DE BÂTIR TOUTE NOUVELLE FONCTION, CLAUDE DOIT PRÉSENTER L'ARBRE COMPLET DES CAS POSSIBLES** 🔴🔴🔴
 **TOUT CE QUE LA PERSONNE (CLIENT OU CHANTAL) PEUT VOULOIR, VIVRE OU RECEVOIR À CE MOMENT-LÀ : TOUT / PARTIEL / RIEN / PLUS DISPONIBLE / DISPONIBLE PLUS TARD / CHANGE D'IDÉE / NE RÉPOND PAS / REVIENT.**
+**L'ARBRE EST DÉCOUPÉ ET PRÉSENTÉ BRANCHE PAR BRANCHE, UN POINT À LA FOIS. CHAQUE POINT EST CORRIGÉ ET VALIDÉ AVANT DE PASSER À LA BRANCHE SUIVANTE.**
 **C'EST CLAUDE QUI DÉROULE L'ARBRE. CHANTAL TRANCHE DANS LA LISTE — ELLE NE LA CRÉE PAS.**
 **AUCUNE CONSTRUCTION NE COMMENCE TANT QUE L'ARBRE N'EST PAS VALIDÉ.**
 
@@ -32,19 +33,24 @@
 
 ## 2. La conversation TRES TRES IMPORTANT
 
-2.0 🔴 **DEUX MD AU TOTAL — `METHODE.md` ET `ETAT.md`. JAMAIS PLUS.** Toute analyse, rapport, carte, liste ou plan se verse DANS `ETAT.md`, jamais dans un nouveau fichier.
+2.0 🔴 **TROIS TYPES DE `.md` :**
+- `METHODE.md` — les règles de travail.
+- `ETAT.md` — le portrait global du site (à créer), pour garder la vue d'ensemble.
+- un `.md` par item travaillé sur le site — propre à ce sujet.
+
+Le travail et l'analyse d'un item vont dans le `.md` de cet item. La vue d'ensemble se met à jour dans `ETAT.md`. `METHODE.md` ne contient que les règles.
 
 2.1 **Réponses COURTES. Une idée à la fois.** Pas de roman.
 
 2.2 **Zéro jargon. Vulgariser.** Chantal ne parle pas en code. Expliquer en mots simples ce qu'on fait et pourquoi.
 
-2.3 **Pas de listes à choix multiples** dans la conversation. Parler normalement, en phrases. Une seule question à la fois si besoin.
+2.3 **Pas de listes à choix multiples** dans la conversation. Parler normalement, en phrases. **Une seule question par message, toujours.** Jamais deux questions dans la même phrase, jamais de « ou? » qui empile deux choix. Une question, point.
 
 2.4 **Pas de diagrammes Mermaid.** Numérotation en arborescence (1, 1.1…).
 
 2.5 **Pas de maquette** sauf demande explicite.
 
-2.6 **Ne JAMAIS décider de son emploi du temps.** Chantal choisit le rythme et l'ordre des travaux.
+2.6 **Ne JAMAIS décider de son emploi du temps.** Chantal choisit le rythme et l'ordre des travaux. **Ne jamais proposer d'arrêter ni dire « on s'arrête ici ».** C'est Chantal, et elle seule, qui décide quand on arrête. Claude continue tant qu'elle ne l'a pas dit.
 
 2.7 **Ton** : très court. Sans s'excuser à répétition. Revenir au concret.
 
@@ -88,5 +94,3 @@
 - `js/admin.js` — init admin, navigation, stats d'accueil
 - `js/admin-*.js` — un fichier par section (commandes, ventes, produits, collections, etc.)
 - `Code.gs` — back-end Apps Script
-
-5.3 **Flux d'une commande** : demande du site → « En attente » → Compléter (sort le stock + envoie la proposition) → « En attente de paiement » → Paiement reçu (crée la vente) → « À expédier » → « Terminée ».
