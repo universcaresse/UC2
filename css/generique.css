@@ -53,7 +53,10 @@
    Du générique et ses variantes
    ════════════════════════════════════════════════ */
    
-  
+  /* Décale les gammes sous leur collection */
+.fab-collection-body {
+  margin-left: var(--espace-24);
+}
 
    
 /*═════════════════════════════════════════════════
