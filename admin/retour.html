@@ -43,7 +43,57 @@
       font-size: 1.2rem;
       color: #3d3b39;
       text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .info-commande {
+      width: 100%;
+      background: #fff;
+      border: 1px solid #e0d8c8;
+      border-radius: 6px;
+      padding: 20px 24px;
       margin-bottom: 32px;
+    }
+
+    .info-ligne {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 6px 0;
+      border-bottom: 1px solid #f2e4cf;
+    }
+    .info-ligne:last-child { border-bottom: none; }
+
+    .info-ligne.principale {
+      padding-bottom: 12px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #d4a445;
+    }
+    .info-ligne.principale .info-valeur {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: #5a8a3a;
+      font-weight: 600;
+    }
+
+    .info-libelle {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8b8680;
+    }
+    .info-valeur {
+      font-size: 0.82rem;
+      color: #3d3b39;
+      word-break: break-all;
+      text-align: right;
+      margin-left: 16px;
+    }
+
+    .aucune-info {
+      color: #8b8680;
+      font-size: 0.85rem;
+      text-align: center;
     }
 
     .btn {
@@ -74,18 +124,52 @@
   <div class="wrap">
     <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1779274322/Logofinal_kphpp9.png" alt="Univers Caresse" class="logo">
     <div class="separateur"></div>
+    <p class="message">Paiement complété</p>
 
-    <button class="btn" onclick="fermer()">PAIEMENT RÉUSSI</button>
+    <div class="info-commande" id="info-commande"></div>
+
+    <button class="btn" onclick="fermer()">PAIEMENT RÉUSSI →</button>
     <p class="note" id="note-fermeture"></p>
   </div>
 
   <script>
+    function afficherInfos() {
+      const params = new URLSearchParams(window.location.search);
+      const referenceId = params.get('referenceId');
+      const orderId = params.get('orderId');
+      const transactionId = params.get('transactionId');
+      const checkoutId = params.get('checkoutId');
+      const conteneur = document.getElementById('info-commande');
+
+      if (!referenceId && !orderId && !transactionId && !checkoutId) {
+        conteneur.innerHTML = '<p class="aucune-info">Aucune information de paiement reçue dans l\'URL.</p>';
+        return;
+      }
+
+      let html = '';
+      if (referenceId) {
+        html += '<div class="info-ligne principale"><span class="info-libelle">Commande</span><span class="info-valeur">' + referenceId + '</span></div>';
+      }
+      if (orderId) {
+        html += '<div class="info-ligne"><span class="info-libelle">Order ID</span><span class="info-valeur">' + orderId + '</span></div>';
+      }
+      if (transactionId) {
+        html += '<div class="info-ligne"><span class="info-libelle">Transaction ID</span><span class="info-valeur">' + transactionId + '</span></div>';
+      }
+      if (checkoutId) {
+        html += '<div class="info-ligne"><span class="info-libelle">Checkout ID</span><span class="info-valeur">' + checkoutId + '</span></div>';
+      }
+      conteneur.innerHTML = html;
+    }
+
     function fermer() {
       window.close();
       setTimeout(function () {
         document.getElementById('note-fermeture').textContent = 'Vous pouvez fermer cet onglet manuellement.';
       }, 300);
     }
+
+    afficherInfos();
   </script>
 </body>
 </html>
