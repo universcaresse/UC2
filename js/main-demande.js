@@ -494,14 +494,33 @@ window.addEventListener('DOMContentLoaded', async function () {
         const provinces = ['QC','ON','NB','NS','PE','NL','MB','SK','AB','BC','YT','NT','NU'];
         const nomComplet = ((r.prenom || '') + ' ' + (r.nom || '')).trim();
         const optionsProv = provinces.map(function(p){ return '<option value="' + p + '"' + (r.province === p ? ' selected' : '') + '>' + p + '</option>'; }).join('');
-        if (z) z.innerHTML = '<h2 class="titre">Adresse de livraison</h2>' +
-          '<p class="textes-discrets">Avant le paiement, confirmez votre adresse pour la livraison. Disponible pour le Canada seulement.</p>' +
-          '<div class="form-group"><label class="form-label">Rue <span>*</span></label><input type="text" class="form-control" id="adr-rue" value="' + (r.rue || '') + '"></div>' +
-          '<div class="form-group"><label class="form-label">Ville <span>*</span></label><input type="text" class="form-control" id="adr-ville" value="' + (r.ville || '') + '"></div>' +
-          '<div class="form-group"><label class="form-label">Province <span>*</span></label><select class="form-control" id="adr-province"><option value="">— Choisir —</option>' + optionsProv + '</select></div>' +
-          '<div class="form-group"><label class="form-label">Code postal <span>*</span></label><input type="text" class="form-control" id="adr-code-postal" value="' + (r.code_postal || '') + '"></div>' +
-          '<div id="adr-erreur" class="demande-form-erreur cache"></div>' +
-          '<button type="button" class="bouton bouton-grand" id="adr-continuer">Continuer vers le paiement</button>';
+       const btnAdr = document.getElementById('adr-continuer');
+if (btnAdr) btnAdr.addEventListener('click', async function () {
+  const rue        = (document.getElementById('adr-rue').value || '').trim();
+  const ville      = (document.getElementById('adr-ville').value || '').trim();
+  const province   = (document.getElementById('adr-province').value || '').trim();
+  const cp         = (document.getElementById('adr-code-postal').value || '').trim();
+  const infolettre = document.getElementById('adr-infolettre').checked;
+  const err        = document.getElementById('adr-erreur');
+  if (!rue || !ville || !province || !cp) {
+    if (err) { err.textContent = 'Veuillez remplir tous les champs.'; err.classList.remove('cache'); }
+    return;
+  }
+  if (err) err.classList.add('cache');
+  btnAdr.disabled = true; btnAdr.textContent = 'Un instant…';
+  try {
+    const sav = await appelAPIPost('enregistrerAdresseCommande', { cmd_id: numero, jeton: jeton, rue: rue, ville: ville, province: province, code_postal: cp, infolettre: infolettre });
+    if (sav && sav.success) {
+      window.location.href = r.lien_square;
+    } else {
+      if (err) { err.textContent = 'Erreur : ' + ((sav && sav.message) || 'réessayez'); err.classList.remove('cache'); }
+      btnAdr.disabled = false; btnAdr.textContent = 'Continuer vers le paiement';
+    }
+  } catch (e2) {
+    if (err) { err.textContent = 'Erreur : ' + e2.message; err.classList.remove('cache'); }
+    btnAdr.disabled = false; btnAdr.textContent = 'Continuer vers le paiement';
+  }
+});
         const btnAdr = document.getElementById('adr-continuer');
         if (btnAdr) btnAdr.addEventListener('click', async function () {
           const rue      = (document.getElementById('adr-rue').value || '').trim();

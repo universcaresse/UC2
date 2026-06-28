@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dfasrauyy/image/upload/v1779040734/11Divers/plume.svg">
+  <title>Retour de paiement — Univers Caresse</title>
+  <link rel="preconnect" href="https://googleapis.com">
+  <link rel="preconnect" href="https://gstatic.com" crossorigin>
+  <link href="https://googleapis.com/css2?family=Birthstone&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #FFFFFF 0%, #FFFDF5 100%);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 480px;
+      padding: 40px 20px;
+      position: relative;
+    }
+
+    .logo {
+      width: 280px;
+      margin-bottom: 32px;
+      filter: drop-shadow(0 4px 8px rgba(212, 164, 69, 0.15));
+    }
+
+    .separateur { width: 100%; height: 1px; background: #d4a445; margin-bottom: 32px; opacity: 0.6; }
+
+    .message {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: #3d3b39;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      background: #5a8a3a;
+      color: #FFFDF5;
+      border: none;
+      border-radius: 4px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.3s;
+    }
+
+    .btn:hover { background: #4a6e2e; }
+
+    .note {
+      margin-top: 16px;
+      color: #8b8680;
+      font-size: 0.78rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1779274322/Logofinal_kphpp9.png" alt="Univers Caresse" class="logo">
+    <div class="separateur"></div>
+
+    <button class="btn" onclick="fermer()">PAIEMENT RÉUSSI</button>
+    <p class="note" id="note-fermeture"></p>
+  </div>
+
+  <script>
+    function fermer() {
+      window.close();
+      setTimeout(function () {
+        document.getElementById('note-fermeture').textContent = 'Vous pouvez fermer cet onglet manuellement.';
+      }, 300);
+    }
+  </script>
+</body>
+</html>
