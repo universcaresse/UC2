@@ -129,7 +129,7 @@ function fabToggleAccordeon(el) {
 }
 
 function fabToggleCollection(el) {
-  const body = el.nextElementSibling;
+  const body = el.closest('.form-panel').nextElementSibling;
   const estFerme = body.classList.contains('cache');
   const zone = el.closest('.carte-admin') || document;
   zone.querySelectorAll('.fab-collection-body').forEach(b => b.classList.add('cache'));
@@ -234,7 +234,11 @@ function afficherTableauFabrication(lots, cibleId, blocs) {
         if (g.collection !== collectionCourante) {
           if (collectionCourante !== null) h += `</div>`;
           collectionCourante = g.collection;
-          h += `<div class="sur-titre" onclick="fabToggleCollection(this)">${g.collection.toUpperCase()}</div>`;
+          h += `<div class="form-panel visible" style="margin:8px 0">
+          <div class="form-panel-header" onclick="fabToggleCollection(this)" style="cursor:pointer">
+            <div class="form-panel-titre">${g.collection.toUpperCase()}</div>
+          </div>
+        </div>`;
           h += `<div class="fab-collection-body cache">`;
         }
         const totalGroupe = g.lots.reduce((s, l) => s + (l.nb_unites - (l.nb_unites_vendu || 0)), 0);
