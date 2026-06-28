@@ -801,6 +801,7 @@ async function payerParSquare() {
 
   const sdkData = {
     amount_money: { amount: totalCents, currency_code: 'CAD' },
+    callback_url: 'https://universcaresse.ca/admin/#ventes',
     client_id: squareAppId,
     version: '1.3',
     notes: 'Vente Univers Caresse',

@@ -670,17 +670,26 @@ async function modifierAdresseCommande(cmd_id) {
 
   const overlay = document.createElement('div');
   overlay.id = 'modif-adresse-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px';
+  overlay.className = 'voile ouvert';
   overlay.innerHTML =
-    '<div style="background:#fff;border-radius:10px;padding:24px;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.2)">' +
-      '<h3 style="font-family:Georgia,serif;color:#5a8a3a;margin:0 0 16px">Adresse de livraison</h3>' +
-      '<div class="form-group"><label class="form-label">Rue</label><input type="text" class="form-control" id="modif-adr-rue"></div>' +
-      '<div class="form-group"><label class="form-label">Ville</label><input type="text" class="form-control" id="modif-adr-ville"></div>' +
-      '<div class="form-group"><label class="form-label">Province (ex. QC)</label><input type="text" class="form-control" id="modif-adr-province"></div>' +
-      '<div class="form-group"><label class="form-label">Code postal</label><input type="text" class="form-control" id="modif-adr-cp"></div>' +
-      '<div style="display:flex;gap:8px;margin-top:16px">' +
-        '<button type="button" class="bouton bouton-or" id="modif-adr-ok" style="flex:1">Enregistrer</button>' +
-        '<button type="button" class="bouton bouton-contour" id="modif-adr-annuler" style="flex:1">Annuler</button>' +
+    '<div class="modale">' +
+      '<div class="modale-entete">' +
+        '<span class="titre">Adresse de livraison</span>' +
+        '<button type="button" class="boutons-fermer" id="modif-adr-fermer">✕</button>' +
+      '</div>' +
+      '<div class="modale-corps">' +
+        '<div class="grille">' +
+          '<div class="champ champ-plein"><input type="text" class="controle" id="modif-adr-rue" placeholder="Rue"></div>' +
+          '<div class="champ"><input type="text" class="controle" id="modif-adr-ville" placeholder="Ville"></div>' +
+          '<div class="champ"><input type="text" class="controle" id="modif-adr-province" placeholder="Province (ex. QC)"></div>' +
+          '<div class="champ champ-plein"><input type="text" class="controle" id="modif-adr-cp" placeholder="Code postal"></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="modale-corps">' +
+        '<div class="actions">' +
+          '<button type="button" class="boutons boutons-vert" id="modif-adr-ok">Enregistrer</button>' +
+          '<button type="button" class="boutons boutons-contour" id="modif-adr-annuler">Annuler</button>' +
+        '</div>' +
       '</div>' +
     '</div>';
   document.body.appendChild(overlay);
@@ -692,6 +701,8 @@ async function modifierAdresseCommande(cmd_id) {
 
   overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
   document.getElementById('modif-adr-annuler').onclick = () => overlay.remove();
+  document.getElementById('modif-adr-fermer').onclick = () => overlay.remove();
+
 
   document.getElementById('modif-adr-ok').onclick = async () => {
     const rue      = (document.getElementById('modif-adr-rue').value || '').trim();

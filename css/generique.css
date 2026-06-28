@@ -102,6 +102,40 @@ h1, h2, h3 {
   padding: var(--espace-24) var(--espace-32);
 }
 
+/*═════════════════════════════════════════════════
+   Fenêtre centrée (modale) — voile + boîte
+   ════════════════════════════════════════════════ */
+.voile {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--noir-30);
+  align-items: center;
+  justify-content: center;
+  padding: var(--espace-16);
+}
+.voile.ouvert { display: flex; }
+
+.modale {
+  background: var(--blancpur);
+  width: 94%;
+  max-width: 860px;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+.modale-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espace-16);
+  padding: var(--espace-24) var(--espace-32);
+  border-bottom: var(--bordure-1) solid var(--sable);
+}
+.modale-corps {
+  padding: var(--espace-24) var(--espace-32);
+}
+
 
 
 }
