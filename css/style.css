@@ -913,7 +913,7 @@ footer > * { position: relative; z-index: 1; }
 .form-panel.visible { display: block; }
 .form-panel-header { padding: 12px 28px 10px; border-bottom: 1px solid var(--primary-70); background: var(--blanc); display: flex; align-items: center; gap: 16px; position: relative; }
 .form-panel-titre { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 300; color: var(--gris-fonce); flex: 1; }
-.form-panel-titre-2 { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 200; color: var(--primary); flex: 1; }
+.form-panel-titre-2 { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 200; color: var(--accent); flex: 1; }
 
 .form-body { padding: 14px 28px 28px; }
 .form-body .form-actions { padding-top: 28px; padding-bottom: 28px; }
