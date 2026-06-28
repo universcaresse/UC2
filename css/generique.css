@@ -50,14 +50,16 @@
 }
 
 /*═════════════════════════════════════════════════
-   Du générique et ses variantes
+   Du style créé par un claude imbécile. a corriger
    ════════════════════════════════════════════════ */
    
   /* Décale les gammes sous leur collection */
 .fab-collection-body {
   margin-left: var(--espace-24);
 }
-
+/*═════════════════════════════════════════════════
+   Du générique et ses variantes
+   ════════════════════════════════════════════════ */
    
 /*═════════════════════════════════════════════════
   Barre de Menu et burger
