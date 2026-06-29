@@ -495,6 +495,7 @@ window.addEventListener('DOMContentLoaded', async function () {
         const nomComplet = ((r.prenom || '') + ' ' + (r.nom || '')).trim();
         const optionsProv = provinces.map(function(p){ return '<option value="' + p + '"' + (r.province === p ? ' selected' : '') + '>' + p + '</option>'; }).join('');
        const btnAdr = document.getElementById('adr-continuer');
+      
 if (btnAdr) btnAdr.addEventListener('click', async function () {
   const rue        = (document.getElementById('adr-rue').value || '').trim();
   const ville      = (document.getElementById('adr-ville').value || '').trim();
@@ -521,32 +522,10 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     btnAdr.disabled = false; btnAdr.textContent = 'Continuer vers le paiement';
   }
 });
-        const btnAdr = document.getElementById('adr-continuer');
-        if (btnAdr) btnAdr.addEventListener('click', async function () {
-          const rue      = (document.getElementById('adr-rue').value || '').trim();
-          const ville    = (document.getElementById('adr-ville').value || '').trim();
-          const province = (document.getElementById('adr-province').value || '').trim();
-          const cp       = (document.getElementById('adr-code-postal').value || '').trim();
-          const err      = document.getElementById('adr-erreur');
-          if (!rue || !ville || !province || !cp) {
-            if (err) { err.textContent = 'Veuillez remplir tous les champs.'; err.classList.remove('cache'); }
-            return;
-          }
-          if (err) err.classList.add('cache');
-          btnAdr.disabled = true; btnAdr.textContent = 'Un instant…';
-          try {
-            const sav = await appelAPIPost('enregistrerAdresseCommande', { cmd_id: numero, jeton: jeton, rue: rue, ville: ville, province: province, code_postal: cp });
-            if (sav && sav.success) {
-              window.location.href = r.lien_square;
-            } else {
-              if (err) { err.textContent = 'Erreur : ' + ((sav && sav.message) || 'réessayez'); err.classList.remove('cache'); }
-              btnAdr.disabled = false; btnAdr.textContent = 'Continuer vers le paiement';
-            }
-          } catch (e2) {
-            if (err) { err.textContent = 'Erreur : ' + e2.message; err.classList.remove('cache'); }
-            btnAdr.disabled = false; btnAdr.textContent = 'Continuer vers le paiement';
-          }
-        });
+
+
+
+        
         return;
       }
       if (z) z.innerHTML = '<h2 class="titre">Paiement</h2>' +
