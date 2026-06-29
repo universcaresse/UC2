@@ -1820,6 +1820,13 @@ tr.cliquable { cursor: pointer; }
 .ven-fmt-stock { font-size: 0.62rem; color: rgba(255,255,255,0.75); grid-column: 1 / -1; grid-row: 2; }
 .ven-stock-bas .ven-fmt-stock  { color: var(--accent); }
 .ven-stock-zero .ven-fmt-stock { color: var(--danger); }
+.ven-tile-col.ven-tile-fonce,
+.ven-tile-gam.ven-tile-fonce,
+.ven-tile-fonce .ven-tile-pro-nom { color: rgba(0,0,0,0.85); }
+.ven-tile-fonce .ven-format-btn:not(.ven-format-actif) .ven-fmt-poids,
+.ven-tile-fonce .ven-format-btn:not(.ven-format-actif) .ven-fmt-prix { color: rgba(0,0,0,0.85); }
+.ven-tile-fonce .ven-format-btn:not(.ven-format-actif):not(.ven-stock-bas):not(.ven-stock-zero) .ven-fmt-stock { color: rgba(0,0,0,0.5); }
+.ven-tile-fonce .ven-format-btn:not(.ven-format-actif) { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.15); }
 .ven-sticky-bar {
   position: fixed;
   bottom: 0; left: 0; right: 0;

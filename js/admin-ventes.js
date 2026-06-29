@@ -135,6 +135,10 @@ function venAfficherEtape() {
   if      (venEtape === 'collection') venAfficherCollections();
   else if (venEtape === 'gamme')      venAfficherGammes();
   else if (venEtape === 'produit')    venAfficherProduits();
+  document.querySelectorAll('#ven-grille .ven-tile').forEach(t => {
+    const c = (t.style.getPropertyValue('--col-hex') || '').trim();
+    if (typeof couleurTexteContraste === 'function' && couleurTexteContraste(c) === 'carte-infos-fonce') t.classList.add('ven-tile-fonce');
+  });
   venMettreAJourBreadcrumb();
   document.querySelector('.admin-contenu')?.scrollTo({ top: 0, behavior: 'smooth' });
 }
