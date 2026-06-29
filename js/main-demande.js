@@ -148,6 +148,7 @@ function demandeInjecterCasesModal(produit) {
   const bloc = document.createElement('div');
   bloc.id = 'demande-cases';
   bloc.className = 'demande-cases';
+  if (typeof couleurTexteContraste === 'function' && couleurTexteContraste(produit.couleur_hex) === 'carte-infos-fonce') bloc.classList.add('demande-cases-fonce');
 
   const titre = document.createElement('div');
   titre.className = 'demande-cases-titre';
@@ -278,7 +279,7 @@ function demandeOuvrirModalListe() {
   let modif = null;
   try { modif = JSON.parse(localStorage.getItem('uc_modif_cmd') || 'null'); } catch (e) {}
   const contBtn = overlay.querySelector('.demande-continuer');
-  if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'Renvoyer à ma commande' : 'Continuer';
+  if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'S.V.P mettre à jour la commande' : 'Continuer';
   overlay.classList.add('ouvert');
   document.body.style.overflow = 'hidden';
 }
