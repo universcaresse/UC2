@@ -488,6 +488,7 @@ window.addEventListener('DOMContentLoaded', async function () {
     const sec = document.getElementById('section-coupdecoeur');
     if (sec) sec.classList.add('active');
     const z = document.getElementById('coupdecoeur-commande');
+    if (z) z.innerHTML = '<div class="chargement"><div class="chargement-spinner"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>Chargement…</div>';
     try {
       if (typeof appelAPIPost !== 'function') { if (z) z.textContent = 'appelAPIPost absent'; return; }
       const r = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
@@ -551,6 +552,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
   const section = document.getElementById('section-coupdecoeur');
   if (section) section.classList.add('active');
   const zone = document.getElementById('coupdecoeur-commande');
+  if (zone) zone.innerHTML = '<div class="chargement"><div class="chargement-spinner"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>Chargement…</div>';
 
   try {
     if (typeof appelAPIPost !== 'function') { if (zone) zone.textContent = 'appelAPIPost absent'; return; }
@@ -681,6 +683,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           }));
           const r = await appelAPIPost('renvoyerListeCoupdecoeur', { cmd_id: numero, lignes, jeton: jeton });
           if (r && r.success) {
+            demandeVider();
             zone.innerHTML = '<h2 class="demande-modal-titre">Merci !</h2>' +
               '<p>Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt.</p>' +
               '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';

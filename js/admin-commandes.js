@@ -351,9 +351,10 @@ async function enregistrerCommande() {
       afficherMsg('commandes', 'Erreur lors de la création.', 'erreur');
       return;
     }
+    const cmdIdReel = resCreate.cmd_id || cmd_id;
     for (const l of cmdLignes) {
       await appelAPIPost('addCommandeLigne', {
-        cmd_id,
+        cmd_id: cmdIdReel,
         pro_id: l.pro_id,
         format_poids: l.poids,
         format_unite: l.unite,
