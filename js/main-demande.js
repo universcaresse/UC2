@@ -475,8 +475,8 @@ window.addEventListener('DOMContentLoaded', async function () {
     if (elC) elC.value = courrielQ;
     if (elS) {
       const opt = document.createElement('option');
-      opt.value = 'Question — commande ' + numero;
-      opt.textContent = 'Question — commande ' + numero;
+      opt.value = 'Question —  ' + numero;
+      opt.textContent = 'Question —  ' + numero;
       opt.selected = true;
       elS.appendChild(opt);
     }

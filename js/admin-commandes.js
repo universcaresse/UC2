@@ -827,14 +827,21 @@ async function changerStatutCommande(cmd_id, nouveauStatut) {
 // ANNULER UNE COMMANDE
 // ═══════════════════════════════════════
 function modifierProduitsCommande(cmd_id) {
-  confirmerAction('Modifier les produits ? Le stock de cette commande sera remis en inventaire et tu devras renvoyer une proposition corrigée. Continuer ?', async () => {
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  const dejaModifiee = c && c.statut === 'Modifiée';
+  const message = dejaModifiee
+    ? 'Revoir cette commande et renvoyer une proposition corrigée ? Continuer ?'
+    : 'Modifier les produits ? Le stock de cette commande sera remis en inventaire et tu devras renvoyer une proposition corrigée. Continuer ?';
+  confirmerAction(message, async () => {
     afficherChargement();
-    const res = await appelAPIPost('remettreStockCommande', { cmd_id, statut_apres: 'En attente' });
+    const res = dejaModifiee
+      ? await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'En attente' })
+      : await appelAPIPost('remettreStockCommande', { cmd_id, statut_apres: 'En attente' });
     cacherChargement();
     if (res && res.success) {
       await modifierCommande(cmd_id);
     } else {
-      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur lors de la remise en stock.'), 'erreur');
+      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
     }
   });
 }

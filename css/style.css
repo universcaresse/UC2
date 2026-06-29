@@ -22,7 +22,7 @@
   --square-dark:    #0050CC;
   
   --nav-h:          72px;
-  --padding-page:   80px;
+  --padding-page:   75px;
   --padding-mobile: 12px; 
 
   /* PRIMARY */
@@ -176,7 +176,7 @@
   --noir-80:        rgba(0,0,0,0.80);
   --noir-85:        rgba(0,0,0,0.85);
   --noir-88:        rgba(0,0,0,0.88);
---noir-90:        rgba(0,0,0,0.90);
+  --noir-90:        rgba(0,0,0,0.90);
 
   /* TYPOGRAPHIE */
   --texte-70:  0.70rem;
