@@ -494,6 +494,15 @@ window.addEventListener('DOMContentLoaded', async function () {
         const provinces = ['QC','ON','NB','NS','PE','NL','MB','SK','AB','BC','YT','NT','NU'];
         const nomComplet = ((r.prenom || '') + ' ' + (r.nom || '')).trim();
         const optionsProv = provinces.map(function(p){ return '<option value="' + p + '"' + (r.province === p ? ' selected' : '') + '>' + p + '</option>'; }).join('');
+        if (z) z.innerHTML = '<h2 class="titre">Adresse de livraison</h2>' +
+          '<p class="textes-discrets">Avant le paiement, confirmez votre adresse pour la livraison. Disponible pour le Canada seulement.</p>' +
+          '<div class="form-group"><label class="form-label">Rue <span>*</span></label><input type="text" class="form-control" id="adr-rue" value="' + (r.rue || '') + '"></div>' +
+          '<div class="form-group"><label class="form-label">Ville <span>*</span></label><input type="text" class="form-control" id="adr-ville" value="' + (r.ville || '') + '"></div>' +
+          '<div class="form-group"><label class="form-label">Province <span>*</span></label><select class="form-control" id="adr-province"><option value="">— Choisir —</option>' + optionsProv + '</select></div>' +
+          '<div class="form-group"><label class="form-label">Code postal <span>*</span></label><input type="text" class="form-control" id="adr-code-postal" value="' + (r.code_postal || '') + '"></div>' +
+          '<div class="form-group"><label class="form-label"><input type="checkbox" id="adr-infolettre"> Je souhaite recevoir l\'infolettre par courriel</label></div>' +
+          '<div id="adr-erreur" class="demande-form-erreur cache"></div>' +
+          '<button type="button" class="bouton bouton-grand" id="adr-continuer">Continuer vers le paiement</button>';
        const btnAdr = document.getElementById('adr-continuer');
       
 if (btnAdr) btnAdr.addEventListener('click', async function () {
