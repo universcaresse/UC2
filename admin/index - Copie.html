@@ -3817,7 +3817,7 @@
       <div id="ajout-previews" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px"></div>
       <div class="form-groupe" style="margin-top:16px">
         <label class="form-label">Dossier</label>
-        <select class="form-ctrl" id="ajout-dossier" onchange="peuplerSousDossiersAjout()">
+        <select class="form-ctrl" id="ajout-dossier">
           <option value="01Saponica">01Saponica</option>
           <option value="02petitnuage">02petitnuage</option>
           <option value="03Caprin">03Caprin</option>
@@ -3831,14 +3831,6 @@
           <option value="11Divers">11Divers</option>
           <option value="12pourUnivers">12pourUnivers</option>
         </select>
-      </div>
-      <div class="form-groupe" style="margin-top:16px">
-        <label class="form-label">Sous-dossier (optionnel)</label>
-        <select class="form-ctrl" id="ajout-sous-dossier" onchange="ajoutSousDossierChange()">
-          <option value="">Aucun</option>
-          <option value="__nouveau__">+ Nouveau sous-dossier…</option>
-        </select>
-        <input type="text" class="form-ctrl cache" id="ajout-sous-dossier-nouveau" placeholder="Nom du nouveau sous-dossier" style="margin-top:8px">
       </div>
     </div>
     <div class="modal-admin-body">

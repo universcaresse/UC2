@@ -281,29 +281,7 @@ function ouvrirModalAjouterPhoto() {
   document.getElementById('ajout-previews').innerHTML = '';
   document.getElementById('ajout-btn-envoyer').disabled = false;
   document.getElementById('ajout-btn-envoyer').textContent = 'Envoyer';
-  document.getElementById('ajout-sous-dossier-nouveau').value = '';
-  document.getElementById('ajout-sous-dossier-nouveau').classList.add('cache');
-  peuplerSousDossiersAjout();
   document.getElementById('modal-ajouter-photo').classList.add('ouvert');
-}
-
-function peuplerSousDossiersAjout() {
-  const dossier = document.getElementById('ajout-dossier').value;
-  const select = document.getElementById('ajout-sous-dossier');
-  const sousCats = [...new Set((_mediathequeDonnees || [])
-    .filter(i => i.categorie.split('/')[1] === dossier)
-    .map(i => i.categorie.split('/')[2])
-    .filter(Boolean))].sort();
-  select.innerHTML = '<option value="">Aucun</option>' +
-    sousCats.map(sc => `<option value="${sc}">${sc}</option>`).join('') +
-    '<option value="__nouveau__">+ Nouveau sous-dossier…</option>';
-  document.getElementById('ajout-sous-dossier-nouveau').value = '';
-  document.getElementById('ajout-sous-dossier-nouveau').classList.add('cache');
-}
-
-function ajoutSousDossierChange() {
-  const val = document.getElementById('ajout-sous-dossier').value;
-  document.getElementById('ajout-sous-dossier-nouveau').classList.toggle('cache', val !== '__nouveau__');
 }
 
 function fermerModalAjouterPhoto() {
@@ -358,12 +336,7 @@ function ajoutApercu() {
 
 async function envoyerPhotos() {
   if (!_ajoutPhotos.length) { afficherMsg('mediatheque', 'Choisissez au moins une photo.', 'erreur'); return; }
-  let dossier = document.getElementById('ajout-dossier').value;
-  const sousDossierChoisi = document.getElementById('ajout-sous-dossier').value;
-  const sousDossier = sousDossierChoisi === '__nouveau__'
-    ? document.getElementById('ajout-sous-dossier-nouveau').value.trim()
-    : sousDossierChoisi;
-  if (sousDossier) dossier = dossier + '/' + sousDossier;
+  const dossier = document.getElementById('ajout-dossier').value;
   const btn = document.getElementById('ajout-btn-envoyer');
   btn.disabled = true;
   btn.textContent = 'Envoi…';
