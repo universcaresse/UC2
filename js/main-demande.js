@@ -591,6 +591,20 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     const estBloc2ou3 = aDesTemporaires || aDesDefinitifs;
 
     if (!estBloc2ou3) {
+      // Proposition déjà envoyée (statut « En attente de paiement ») : on NE laisse PAS
+      // modifier/renvoyer depuis le 1er courriel (ça effacerait la proposition). On guide
+      // le client vers le paiement, ou vers Contact.
+      if (res.statut === 'En attente de paiement') {
+        if (zone) zone.innerHTML = '<h2 class="titre">Votre proposition vous attend</h2>' +
+          '<p class="textes-discrets">Nous vous avons envoyé une proposition par courriel, avec les prix et la livraison. Vous pouvez aller au paiement, ou nous écrire si vous ne la retrouvez pas.</p>' +
+          '<button type="button" class="bouton bouton-grand" id="prop-payer">Aller au paiement</button>' +
+          '<button type="button" class="bouton bouton-contour" style="margin-top:8px" onclick="naviguer(\'contact\');return false;">J\'ai une question</button>';
+        var bPayer = document.getElementById('prop-payer');
+        if (bPayer) bPayer.addEventListener('click', function () {
+          window.location.href = window.location.pathname + '?cmd=' + encodeURIComponent(numero) + '&jeton=' + encodeURIComponent(jeton) + '&action=payer';
+        });
+        return;
+      }
       // Bloc 1 — comportement existant
       try { localStorage.setItem('uc_modif_cmd', JSON.stringify({ cmd: numero, jeton: jeton })); } catch (e) {}
       demandeListe = res.lignes.map(l => ({

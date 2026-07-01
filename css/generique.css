@@ -386,7 +386,7 @@ h1, h2, h3 {
   align-items: stretch;
   gap: var(--espace-8);
   background: var(--blancpur);
-  border-bottom: var(--bordure-1) solid var(--sable);
+  border-bottom: var(--bordure-05) solid var(--sable);
   padding: var(--espace-16) 0;
   position: relative;
   margin-bottom: var(--espace-10);
