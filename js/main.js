@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     afficherRegroupementsPublic();
     document.querySelectorAll('.hero-stat-num').forEach(el => setTimeout(() => el.classList.add('visible'), 50));
   }
+    window.dispatchEvent(new Event('uc:donneesChargees')); // ← seule ligne ajoutée
 });
 
 window.addEventListener('resize', () => {
