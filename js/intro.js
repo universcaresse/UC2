@@ -8,17 +8,23 @@
     return;
   }
 
+  // Page admin ET pas encore connecté → pas d'intro (elle bloquerait l'écran de connexion)
+  var estPageAdmin = !!document.getElementById("ecran-connexion");
+  if (estPageAdmin && sessionStorage.getItem("uc_admin") !== "true") {
+    overlay.remove();
+    return;
+  }
+
   var logo = overlay.querySelector(".uc-intro-logo");
   var texte = overlay.querySelector(".uc-intro-welcome");
   var ferme = false;
 
-    function demarrerSequence() {
+  function demarrerSequence() {
     setTimeout(function() { logo.classList.add("uc-show"); }, 300);           // 1. logo arrive doucement
     setTimeout(function() { texte.classList.add("uc-show"); }, 3400);          // 2. Bienvenue apparaît
     setTimeout(function() { texte.classList.remove("uc-show"); }, 5800);       // 3. Bienvenue disparaît lentement
     setTimeout(voyagerVersLogoReel, 7300);                                     // 4. le logo part vers son emplacement
   }
-
 
   function voyagerVersLogoReel() {
     var cible = document.querySelector("#section-accueil .hero-logo-img");
@@ -32,7 +38,6 @@
     var deltaX = (arrivee.left + arrivee.width / 2) - (depart.left + depart.width / 2);
     var deltaY = (arrivee.top + arrivee.height / 2) - (depart.top + depart.height / 2);
 
-    // Le vrai logo doit être visible dès que l'overlay se retire
     cible.style.opacity = "1";
     cible.style.transform = "none";
 
@@ -56,6 +61,5 @@
     window.addEventListener("load", demarrerSequence);
   }
 
-  // Filet de sécurité si "load" ne se déclenche jamais
   setTimeout(fermerIntro, 12000);
 })();
