@@ -111,8 +111,11 @@ function medFiltrer() {
   if (!items.length) { grille.innerHTML = '<p class="vide-desc">Aucune photo.</p>'; return; }
   grille.innerHTML = items.map(i => {
     const catAffichee = i.categorie.replace(/^images\//i, '');
+    const nomEchappe = (i.nom || '').replace(/'/g, "\\'");
     return `
     <div class="carte" onclick="medOuvrirPhoto('${i.url}', '${i.nom}')">
+      <button onclick="event.stopPropagation(); medSupprimerPhoto(${i.rowIndex}, '${nomEchappe}')" title="Supprimer"
+        style="position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:none;background:rgba(0,0,0,0.55);color:white;font-size:14px;line-height:1;cursor:pointer;z-index:2;">✕</button>
       <div class="carte-bg" style="background:#888"></div>
       <div style="position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);"></div>
       <img src="${i.url}" alt="${i.nom}" onerror="this.style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
@@ -122,6 +125,19 @@ function medFiltrer() {
       </div>
     </div>`;
   }).join('');
+}
+
+async function medSupprimerPhoto(rowIndex, nom) {
+  if (!confirm('Supprimer "' + nom + '" définitivement (feuille + Cloudinary) ?')) return;
+  afficherMsg('mediatheque', 'Suppression en cours…');
+  const res = await appelAPIPost('supprimerMediatheque', { rowIndex });
+  if (!res || !res.success) {
+    afficherMsg('mediatheque', '❌ Erreur : ' + (res?.message || 'inconnue'), 'erreur');
+    return;
+  }
+  afficherMsg('mediatheque', '✅ Photo supprimée.');
+  _mediathequeDonnees = null;
+  chargerMediatheque();
 }
 
 async function envoyerDriveVersCloudinary() {
