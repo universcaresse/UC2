@@ -7,15 +7,15 @@
   var texte = overlay.querySelector(".uc-intro-welcome");
   var ferme = false;
 
-  setTimeout(function() { logo.classList.add("uc-show"); }, 200);
-  setTimeout(function() { texte.classList.add("uc-show"); }, 1400);
+  setTimeout(function() { logo.classList.add("uc-show"); }, 400);
+  setTimeout(function() { texte.classList.add("uc-show"); }, 2400);
 
   function fermerIntro() {
     if (ferme) return;
     ferme = true;
     overlay.classList.add("uc-fade-out");
     sessionStorage.setItem("ucIntroVu", "true");
-    setTimeout(function() { overlay.remove(); }, 1000);
+    setTimeout(function() { overlay.remove(); }, 2000);
   }
 
   // Attend que TOUTE la page (images incluses) soit chargée
