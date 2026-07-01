@@ -7,7 +7,8 @@
   align-items: center;
   justify-content: center;
   background: #f2e4cf;
-  transition: opacity 0.9s ease;
+  opacity: 1;
+  transition: opacity 1s ease;
 }
 #uc-intro-overlay.uc-fade-out {
   opacity: 0;
@@ -15,16 +16,13 @@
 }
 .uc-intro-logo {
   width: 280px;
-  transform: scale(0.3);
-  transform-origin: center center;
-  transition: transform 1.5s cubic-bezier(0.34, 1.1, 0.4, 1);
-  will-change: transform;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 1.4s ease, transform 1.4s ease;
 }
-.uc-intro-logo.uc-grow {
+.uc-intro-logo.uc-show {
+  opacity: 1;
   transform: scale(1);
-}
-.uc-intro-logo.uc-voyage {
-  transition: transform 1.3s cubic-bezier(0.65, 0, 0.35, 1);
 }
 .uc-intro-welcome {
   font-family: 'Birthstone', cursive;
@@ -32,11 +30,11 @@
   color: #d4a445;
   opacity: 0;
   margin-top: 20px;
-  transition: opacity 0.9s ease;
+  transition: opacity 1s ease;
 }
 .uc-intro-welcome.uc-show {
   opacity: 1;
 }
 @media (prefers-reduced-motion: reduce) {
-  #uc-intro-overlay, .uc-intro-logo { transition: none; }
+  #uc-intro-overlay, .uc-intro-logo, .uc-intro-welcome { transition: none; }
 }
