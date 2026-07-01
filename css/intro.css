@@ -18,8 +18,9 @@
   width: 280px;
   opacity: 0;
   transform: scale(0.7);
-  transition: opacity 1.8s ease, transform 1.8s ease;
+  transition: opacity 3s ease-in-out, transform 3s cubic-bezier(0.34, 0, 0.2, 1);
 }
+
 .uc-intro-logo.uc-show {
   opacity: 1;
   transform: scale(1);
