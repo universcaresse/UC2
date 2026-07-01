@@ -12,12 +12,13 @@
   var texte = overlay.querySelector(".uc-intro-welcome");
   var ferme = false;
 
-  function demarrerSequence() {
+    function demarrerSequence() {
     setTimeout(function() { logo.classList.add("uc-show"); }, 300);           // 1. logo arrive doucement
-    setTimeout(function() { texte.classList.add("uc-show"); }, 2400);          // 2. Bienvenue apparaît
-    setTimeout(function() { texte.classList.remove("uc-show"); }, 4800);       // 3. Bienvenue disparaît lentement
-    setTimeout(voyagerVersLogoReel, 6300);                                     // 4. le logo part vers son emplacement
+    setTimeout(function() { texte.classList.add("uc-show"); }, 3400);          // 2. Bienvenue apparaît
+    setTimeout(function() { texte.classList.remove("uc-show"); }, 5800);       // 3. Bienvenue disparaît lentement
+    setTimeout(voyagerVersLogoReel, 7300);                                     // 4. le logo part vers son emplacement
   }
+
 
   function voyagerVersLogoReel() {
     var cible = document.querySelector("#section-accueil .hero-logo-img");
