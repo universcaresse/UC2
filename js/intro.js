@@ -52,7 +52,7 @@
     ferme = true;
     overlay.classList.add("uc-fade-out");
     sessionStorage.setItem("ucIntroVu", "true");
-    setTimeout(function() { overlay.remove(); }, 1000);
+    setTimeout(function() { overlay.remove(); }, 2500);
   }
 
   if (document.readyState === "complete") {
