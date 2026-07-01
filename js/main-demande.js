@@ -441,6 +441,15 @@ async function demandeRenvoyerModif() {
 // ─── INITIALISATION ───
 document.addEventListener('DOMContentLoaded', () => {
   if (!DEMANDE_ACTIVE) return;
+  // Nettoyage du brouillon : si on n'arrive PAS par le lien d'une commande (?cmd=)
+  // mais qu'une modification de commande traînait encore en mémoire, on efface cette
+  // liste pour qu'elle ne réapparaisse pas comme une nouvelle liste sur le site public.
+  try {
+    const surUneCommande = new URLSearchParams(window.location.search).get('cmd');
+    if (!surUneCommande && localStorage.getItem('uc_modif_cmd')) {
+      localStorage.removeItem(DEMANDE_STORAGE_KEY);
+    }
+  } catch (e) {}
   try { localStorage.removeItem('uc_modif_cmd'); } catch (e) {}
   chargerDemandeListe();
   const bulle = document.createElement('div');
@@ -558,7 +567,11 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     if (typeof appelAPIPost !== 'function') { if (zone) zone.textContent = 'appelAPIPost absent'; return; }
     const res = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
     if (!res)         { if (zone) zone.textContent = 'Aucune réponse du serveur'; return; }
-    if (!res.success) { if (zone) zone.textContent = 'Réponse : ' + (res.message || 'échec'); return; }
+    if (!res.success) {
+      if (zone) zone.innerHTML = '<p>Nous n\'avons pas pu ouvrir votre commande. Écrivez-nous et nous allons vous aider.</p>' +
+        '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</button>';
+      return;
+    }
 
     if (res.statut !== 'En attente de paiement' && res.statut !== 'En attente') {
       demandeVider();
