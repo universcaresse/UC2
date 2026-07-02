@@ -1638,99 +1638,21 @@ function textoProposition(cmd_id) {
 }
 
 // ═══════════════════════════════════════
-// RENVOYER LA MÊME PROPOSITION (v3) — sans toucher stock ni statut
+// RENVOYER LA MÊME PROPOSITION — copie gardée, renvoyée telle quelle
 // ═══════════════════════════════════════
 function renvoyerPropositionV3(cmd_id) {
   const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
   if (!c) return;
-  const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmd_id);
-  if (!lignes.length) { afficherMsg('commandes', 'Aucune ligne pour cette commande.', 'erreur'); return; }
-
-  // Aperçu avant envoi
-  const sousTotal = lignes.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-  const rabais    = c.rabais || 0;
-  const livraison = c.livraison || 0;
-  const total     = Math.max(0, sousTotal - rabais + livraison);
-
-  const lignesHTML = lignes.map(l => {
-    const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
-    return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f2e4cf;font-size:0.9rem">
-      <span>${pro ? pro.nom : l.pro_id} — ${l.format_poids} ${l.format_unite} × ${l.quantite}</span>
-      <span>${formaterPrix(l.prix_unitaire * l.quantite)}</span>
-    </div>`;
-  }).join('');
-
-  const modal = document.createElement('div');
-  modal.className = 'modal-admin-overlay';
-  modal.id = 'modal-relancer';
-  modal.innerHTML = `
-    <div class="modal-admin" style="max-width:480px">
-      <div class="modal-admin-header">
-        <div class="modal-admin-titre">Relancer — ${c.client}</div>
-        <button class="btn-fermer-panneau" onclick="document.getElementById('modal-relancer').remove()">✕</button>
-      </div>
-      <div class="modal-admin-body">
-        <div style="margin-bottom:16px">${lignesHTML}</div>
-        <div style="text-align:right;font-family:Georgia,serif;font-size:1.1rem;color:var(--primary);margin-bottom:20px">Total : ${formaterPrix(total)}</div>
-        <div class="form-groupe">
-          <label class="form-label">Mot personnel (facultatif)</label>
-          <textarea class="form-ctrl" id="relancer-note" rows="3" placeholder="Un mot doux pour accompagner la relance…">${c.note_proposition || ''}</textarea>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:16px">
-          <button class="bouton bouton-or" onclick="confirmerRelanceV3('${cmd_id}')">Envoyer la relance</button>
-          <button class="bouton bouton-contour" onclick="document.getElementById('modal-relancer').remove()">Annuler</button>
-        </div>
-      </div>
-    </div>`;
-  document.body.appendChild(modal);
-  modal.classList.add('ouvert');
-}
-
-async function confirmerRelanceV3(cmd_id) {
-  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
-  if (!c) return;
-  const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmd_id);
-  const note = (document.getElementById('relancer-note') || {}).value || '';
-
-  const sousTotal = lignes.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-  const rabais    = c.rabais || 0;
-  const livraison = c.livraison || 0;
-  const total     = Math.max(0, sousTotal - rabais + livraison);
-
-  const lignesCourriel = lignes.map(l => {
-    const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
-    return {
-      nom: pro ? pro.nom : l.pro_id,
-      poids: l.format_poids,
-      unite: l.format_unite,
-      quantite: l.quantite,
-      prix_unitaire: formaterPrix(l.prix_unitaire),
-      prix_total: formaterPrix(l.prix_unitaire * l.quantite)
-    };
+  confirmerAction('Renvoyer la proposition telle quelle à ' + (c.client || 'ce client') + ' ?', async () => {
+    afficherChargement();
+    const res = await appelAPIPost('renvoyerCopieProposition', { cmd_id: cmd_id, origine: 'admin' });
+    cacherChargement();
+    if (res && res.success) {
+      afficherMsg('commandes', '✅ Proposition renvoyée.');
+    } else {
+      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    }
   });
-
-  document.getElementById('modal-relancer').remove();
-  afficherChargement();
-  const res = await appelAPIPost('envoyerPropositionV3', {
-    courriel:    c.courriel,
-    client:      c.client,
-    numero:      c.cmd_id,
-    note:        note,
-    lien_square: c.lien_square || '',
-    lignes:      lignesCourriel,
-    sous_total:  formaterPrix(sousTotal),
-    rabais:      rabais > 0 ? formaterPrix(rabais) : 0,
-    promo_nom:   '',
-    livraison:   livraison > 0 ? formaterPrix(livraison) : 0,
-    total:       formaterPrix(total)
-  });
-  cacherChargement();
-
-  if (res && res.success) {
-    afficherMsg('commandes', '✅ Relance envoyée.');
-  } else {
-    afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
-  }
 }
 
 

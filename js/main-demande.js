@@ -599,13 +599,24 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       // modifier/renvoyer depuis le 1er courriel (ça effacerait la proposition). On guide
       // le client vers le paiement, ou vers Contact.
       if (res.statut === 'En attente de paiement') {
-        if (zone) zone.innerHTML = '<h2 class="titre">Votre proposition vous attend</h2>' +
-          '<p class="textes-discrets">Nous vous avons envoyé une proposition par courriel, avec les prix et la livraison. Vous pouvez aller au paiement, ou nous écrire si vous ne la retrouvez pas.</p>' +
-          '<button type="button" class="bouton bouton-grand" id="prop-payer">Aller au paiement</button>' +
-          '<button type="button" class="bouton bouton-contour" style="margin-top:8px" onclick="naviguer(\'contact\');return false;">J\'ai une question</button>';
-        var bPayer = document.getElementById('prop-payer');
-        if (bPayer) bPayer.addEventListener('click', function () {
-          window.location.href = window.location.pathname + '?cmd=' + encodeURIComponent(numero) + '&jeton=' + encodeURIComponent(jeton) + '&action=payer';
+        if (zone) zone.innerHTML = '<h2 class="titre">Une proposition vous a été envoyée pour cette commande.</h2>' +
+          '<p class="textes-discrets">Nous vous avons envoyé une proposition par courriel, avec les prix et la livraison. Si vous ne la retrouvez pas...</p>' +
+          '<button type="button" class="bouton bouton-grand" id="prop-renvoyer">Recevez à nouveau votre proposition</button>' +
+          '<button type="button" class="bouton bouton-contour" style="margin-top:8px" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</button>' +
+          '<p class="textes-discrets cache" id="prop-renvoyer-msg" style="margin-top:12px"></p>';
+        var bRenvoyer = document.getElementById('prop-renvoyer');
+        if (bRenvoyer) bRenvoyer.addEventListener('click', async function () {
+          var msgR = document.getElementById('prop-renvoyer-msg');
+          bRenvoyer.disabled = true;
+          var resR = (typeof appelAPIPost === 'function')
+            ? await appelAPIPost('renvoyerCopieProposition', { cmd_id: numero, jeton: jeton })
+            : null;
+          if (resR && resR.success) {
+            if (msgR) { msgR.textContent = 'C\'est envoyé, vérifiez vos courriels (pensez aux indésirables).'; msgR.classList.remove('cache'); }
+          } else {
+            bRenvoyer.disabled = false;
+            if (msgR) { msgR.textContent = 'Ça n\'a pas fonctionné — réessayez ou cliquez sur « Écrivez-nous ».'; msgR.classList.remove('cache'); }
+          }
         });
         return;
       }

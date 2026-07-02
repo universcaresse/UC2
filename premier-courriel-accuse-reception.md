@@ -97,6 +97,63 @@ Pendant que le formulaire s'envoie, les champs et le bouton sont désactivés po
 
 Ce document (1er courriel) est terminé. La suite : documenter le **2ᵉ courriel** (la proposition de Chantal) dans son propre fichier, avec la même approche — un scénario à la fois, en langage simple.
 
+---
+
+## 7. RENVOYER LA PROPOSITION — BÂTI (juillet 2026)
+
+### Le principe (validé)
+À chaque envoi de proposition, une **copie exacte du courriel** est gardée dans la sheet
+`Propositions_Copies` (créée toute seule au premier envoi). Le renvoi — bouton admin ou
+bouton client — renvoie **cette copie telle quelle**, sans rien recalculer.
+
+### L'arbre des cas (8 branches, toutes tranchées)
+1. **Cas normal** — clic → courriel identique renvoyé → « C'est envoyé, vérifiez vos
+   courriels ». Rien ne change dans la sheet. ✅
+2. **Pas de copie** — branche tombée : aucune commande d'avant. (Reste vrai : une
+   proposition envoyée AVANT la publication n'a pas de copie → message d'erreur →
+   « Écrivez-nous »; côté admin, repasser par « Créer la proposition ».)
+3. **La situation a changé** — le serveur vérifie le statut en premier : renvoi
+   seulement si « En attente de paiement », sinon message avec le statut. ✅
+4. **L'envoi échoue** — « Ça n'a pas fonctionné — réessayez ou cliquez sur
+   “Écrivez-nous” ». Rien ne change dans la sheet. ✅
+5. **Clics répétés** — bouton client désactivé après l'envoi. ✅
+6. **Nouvelle proposition** — la nouvelle copie écrase l'ancienne : on renvoie toujours
+   la dernière. ✅
+7. **Mot personnel** — figé dans la copie; pour le changer, repasser par « Créer la
+   proposition ». ✅ (l'ancienne fenêtre « Relancer » avec mot modifiable est retirée)
+8. **Bouton admin** — confirmation « Renvoyer la proposition telle quelle…? » avant
+   l'envoi. ✅
+
+### La page que voit le client (vieux lien, proposition partie) — TEXTES VALIDÉS
+Titre : « Une proposition vous a été envoyée pour cette commande. »
+Texte : « Nous vous avons envoyé une proposition par courriel, avec les prix et la
+livraison. Si vous ne la retrouvez pas... »
+Boutons : « Recevez à nouveau votre proposition » · « Écrivez-nous » (ouvre le
+formulaire Contact avec « Bonjour, je vous écris au sujet de ma commande X » déjà inscrit).
+**« Aller au paiement » RETIRÉ de cette page** — décision de Chantal : payer sans voir
+la facture est illégal; le paiement passe uniquement par le courriel de proposition.
+
+### Les 9 morceaux posés (tous appliqués, à publier)
+1. `Code.gs` — `envoyerProposition_V3` garde la copie dans `Propositions_Copies`
+   (l'aperçu ne garde rien, seul l'envoi réel).
+2. `Code.gs` — porte `renvoyerCopieProposition` ajoutée dans `doPost`.
+3. `Code.gs` — fonction `renvoyerCopieProposition` : jeton exigé, statut vérifié,
+   copie retrouvée, courriel envoyé à l'adresse inscrite dans la commande.
+4. `Code.gs` — appel admin passe sans jeton (`origine: 'admin'`) — sans danger, le
+   courriel ne peut partir qu'à l'adresse du client; le futur projet « clé secrète »
+   verrouillera cette porte.
+5. `js/admin-commandes.js` — `renvoyerPropositionV3` remplacée : confirmation puis
+   appel serveur (~90 lignes → 15; `confirmerRelanceV3` supprimée).
+6. `js/main-demande.js` — bouton client ajouté au bloc « En attente de paiement ».
+7. `js/main-demande.js` — textes de Chantal posés, « Aller au paiement » retiré.
+8. `js/main-demande.js` — « Écrivez-nous » pré-remplit le formulaire (même mécanisme
+   que le bloc « lien cassé »).
+9. `js/main-demande.js` — message d'erreur raccourci (le numéro est déjà pré-inscrit).
+
+### À publier
+Nouveau déploiement Apps Script (`Code.gs`) + republier le site. Le renvoi ne
+fonctionnera que pour les propositions envoyées APRÈS la publication (la copie se
+garde à l'envoi).
 
 
 
@@ -129,8 +186,7 @@ Ce document (1er courriel) est terminé. La suite : documenter le **2ᵉ courrie
 
 
 
-
-ancienne version : 
+ancienne version au cas ou tu oublie encore d'ou ca part tout ces problemes que tu as causé: 
 
 
 
