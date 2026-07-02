@@ -50,6 +50,15 @@ async function chargerCommandes() {
 }
 
 // ═══════════════════════════════════════
+// LIEN DEPUIS LA NAVIGATION (« nouvelle commande »)
+// ═══════════════════════════════════════
+async function allerVersNouvelleCommande() {
+  afficherSection('commandes', null);
+  await chargerCommandes();
+  ouvrirFormCommande();
+}
+
+// ═══════════════════════════════════════
 // NOUVELLE COMMANDE — OUVERTURE
 // ═══════════════════════════════════════
 function ouvrirFormCommande() {
