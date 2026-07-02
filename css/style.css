@@ -1293,7 +1293,7 @@ tr.cliquable { cursor: pointer; }
  
 @media (max-width: 600px) {
 
-  .hero-mosaic { grid-template-columns: 1fr !important; grid-template-rows: none; height: auto; }
+  .hero-mosaic { grid-template-columns: 1fr; grid-template-rows: none; height: auto; padding: 8px; gap: 12px; }
 }
 
 @media (max-width: 480px) {
