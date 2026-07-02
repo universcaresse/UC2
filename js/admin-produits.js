@@ -48,7 +48,10 @@ function formaterFormat(poids, unite) {
   if (unite === 'unite') return 'unité';
   return poids + ' ' + unite;
 }
-
+function cleFormatInventaire(poids, unite) {
+  var u = (unite || '').toString().trim().toLowerCase();
+  return (u === 'unite' || u === 'unité') ? 'unite' : poids + '_' + unite;
+}
 
 // ─── VUES ───
 function produitsAfficherVue(vue) {
@@ -159,7 +162,7 @@ function calculerInventaireProduit(pro_id) {
     var dispo = (parseInt(l.nb_unites) || 0) - (parseInt(l.nb_unites_vendu) || 0);
     if (dispo <= 0) return;
     if (!l.format_unite) return;
-    var cle = l.format_unite === 'unite' ? 'unite' : l.format_poids + '_' + l.format_unite;
+    var cle = cleFormatInventaire(l.format_poids, l.format_unite);
     inv[cle] = (inv[cle] || 0) + dispo;
   });
   return inv;
@@ -273,7 +276,7 @@ async function afficherProduits() {
 
           var formatsHTML = (pro.formats && pro.formats.length)
             ? '<div class="carte-formats">' + [].concat(pro.formats).sort(function(a, b) { return parseFloat(a.poids) - parseFloat(b.poids); }).map(function(f) {
-                var qteInv = inv[f.unite === 'unite' ? 'unite' : f.poids + '_' + f.unite] || 0;
+                var qteInv = inv[cleFormatInventaire(f.poids, f.unite)] || 0;
                 var invHTML = '<span class="carte-format-prix">(' + qteInv + ' dispo)</span>';
                 return '<div class="carte-format-tag"><span class="carte-format-prix">' + parseFloat(f.prix_vente).toFixed(2).replace('.', ',') + ' $</span><span class="carte-format-sep"></span><span class="carte-format-prix">' + formaterFormat(f.poids, f.unite) + '</span>' + invHTML + '</div>';
               }).join('') + '</div>'
