@@ -245,7 +245,7 @@ function afficherTableauFabrication(lots, cibleId, blocs) {
         h += `<div class="form-panel visible" style="margin:8px 0">
           <div class="form-panel-header" onclick="fabToggleAccordeon(this)" style="cursor:pointer">
             <div class="form-panel-titre-2">${g.gamme}</div>
-            <span class="texte-secondaire">${totalGroupe} savon${totalGroupe !== 1 ? 's' : ''}</span>
+            <span class="texte-secondaire">${totalGroupe} unité${totalGroupe !== 1 ? 's' : ''}</span>
           </div>
           <div class="form-body cache">
             <table class="tableau-admin">
