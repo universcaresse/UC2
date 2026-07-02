@@ -279,7 +279,7 @@ async function afficherProduits() {
               }).join('') + '</div>'
             : '';
 
-          // Badge de statut
+          // Badge de statut 
           var badgeStatut = 'Test';
           var badgeClass = 'test';
           if (pro.statut === 'public') { badgeStatut = 'Public'; badgeClass = ''; }
