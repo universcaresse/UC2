@@ -528,7 +528,9 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     return;
   }
   if (err) err.classList.add('cache');
+  const champsAdr = ['adr-rue', 'adr-ville', 'adr-province', 'adr-code-postal', 'adr-infolettre'];
   btnAdr.disabled = true; btnAdr.textContent = 'Un instant…';
+  champsAdr.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = true; });
   try {
     const sav = await appelAPIPost('enregistrerAdresseCommande', { cmd_id: numero, jeton: jeton, rue: rue, ville: ville, province: province, code_postal: cp, infolettre: infolettre });
     if (sav && sav.success) {
@@ -536,10 +538,12 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     } else {
       if (err) { err.textContent = 'Erreur : ' + ((sav && sav.message) || 'réessayez'); err.classList.remove('cache'); }
       btnAdr.disabled = false; btnAdr.textContent = 'Continuer vers le paiement';
+      champsAdr.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = false; });
     }
   } catch (e2) {
     if (err) { err.textContent = 'Erreur : ' + e2.message; err.classList.remove('cache'); }
     btnAdr.disabled = false; btnAdr.textContent = 'Continuer vers le paiement';
+    champsAdr.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = false; });
   }
 });
 
@@ -678,22 +682,29 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         return;
       }
 
-      if (action === 'confirmer-annulation') {
+    if (action === 'confirmer-annulation') {
         const btn2 = ev.target.closest('[data-action]');
-        if (btn2) btn2.disabled = true;
+        if (btn2) {
+          btn2.disabled = true;
+          btn2.style.position = 'relative';
+          btn2.insertAdjacentHTML('beforeend', '<div id="annul-spinner-overlay" style="position:absolute;inset:0;background:var(--danger);display:flex;align-items:center;justify-content:center;"><span class=\'spinner\' style=\'margin-right:0\'><span></span><span></span><span></span><span></span><span></span></span></div>');
+        }
         const msg = document.getElementById('coupdecoeur-msg');
         const raison = (document.getElementById('coupdecoeur-raison') || {}).value || '';
         try {
           const r = await appelAPIPost('annulerCommandeClient', { cmd_id: numero, jeton: jeton, raison });
           if (r && r.success) {
+            demandeVider();
             zone.innerHTML = '<h2 class="titre">Commande annulée</h2>' +
               '<p>Votre commande a bien été annulée. Nous espérons vous revoir bientôt.</p>' +
               '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
           } else {
             if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || 'échec'); msg.classList.remove('cache'); }
+            if (btn2) { btn2.disabled = false; const ov = document.getElementById('annul-spinner-overlay'); if (ov) ov.remove(); }
           }
         } catch (e) {
           if (msg) { msg.textContent = 'Erreur : ' + e.message; msg.classList.remove('cache'); }
+          if (btn2) { btn2.disabled = false; const ov = document.getElementById('annul-spinner-overlay'); if (ov) ov.remove(); }
         }
         return;
       }
@@ -832,6 +843,8 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
 
     if (action === 'attendre-tout' || action === 'recevoir-pret') {
       btn.disabled = true;
+      btn.style.position = 'relative';
+      btn.insertAdjacentHTML('beforeend', '<div id="demande-spinner-overlay" style="position:absolute;inset:0;background:var(--primary);display:flex;align-items:center;justify-content:center;"><span class=\'spinner\' style=\'margin-right:0\'><span></span><span></span><span></span><span></span><span></span></span></div>');
       const msg = document.getElementById('coupdecoeur-msg');
       const temporairesGardes = temporaires
         .filter(l => reponses[l.pro_id + '|' + l.format_poids + '|' + l.format_unite] === 'garder')
