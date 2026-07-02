@@ -54,6 +54,9 @@ async function chargerCommandes() {
 // ═══════════════════════════════════════
 async function allerVersNouvelleCommande() {
   afficherSection('commandes', null);
+  document.getElementById('contenu-commandes').classList.add('cache');
+  document.getElementById('filtres-commandes').classList.add('cache');
+  document.querySelector('#section-commandes .page-entete .bouton')?.classList.add('cache');
   await chargerCommandes();
   ouvrirFormCommande();
 }
