@@ -605,7 +605,7 @@ function construireCatalogue() {
 function carteProduit(p) {
   const formats = Array.isArray(p.formats) && p.formats.length ? [...p.formats].sort((a, b) => parseFloat(a.poids) - parseFloat(b.poids)) : [];
   const prix = formats.length
-    ? `<div class="carte-formats">${formats.map(f => `<div class="carte-format-tag"><span class="carte-format-prix">${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $</span><span class="carte-format-sep"></span><span class="carte-format-poids">${f.poids} ${f.unite}</span></div>`).join('')}</div>`
+    ? `<div class="carte-formats">${formats.map(f => `<div class="carte-format-tag"><span class="carte-format-prix">${parseFloat(f.prix_vente).toFixed(2).replace('.', ',')} $</span><span class="carte-format-sep"></span><span class="carte-format-poids">${f.unite === 'unite' ? 'à l’unité' : `${f.poids} ${f.unite}`}</span></div>`).join('')}</div>`
     : '';
   const photoUrl = (window.modeSaisonnier && p.image_noel_url) ? p.image_noel_url : p.image_url;
   const image    = photoUrl ? `<img src="${photoUrl}" alt="${p.nom}" onerror="this.style.display='none'">` : '';
