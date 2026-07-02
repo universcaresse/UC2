@@ -158,7 +158,7 @@ function calculerInventaireProduit(pro_id) {
     if (String(l.pro_id) !== String(pro_id)) return;
     var dispo = (parseInt(l.nb_unites) || 0) - (parseInt(l.nb_unites_vendu) || 0);
     if (dispo <= 0) return;
-    if (!l.format_poids || !l.format_unite) return;
+    if (!l.format_unite) return;
     var cle = l.format_poids + '_' + l.format_unite;
     inv[cle] = (inv[cle] || 0) + dispo;
   });
