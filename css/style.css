@@ -1290,7 +1290,7 @@ tr.cliquable { cursor: pointer; }
   .modal-fermer { position: absolute; top: 16px; right: 16px; }
 }
 
-
+ 
 @media (max-width: 600px) {
   body { background: red !important; }
   .hero-mosaic { grid-template-columns: 1fr !important; grid-template-rows: none; height: auto; }
