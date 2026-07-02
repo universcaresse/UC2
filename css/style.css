@@ -1290,6 +1290,11 @@ tr.cliquable { cursor: pointer; }
   .modal-fermer { position: absolute; top: 16px; right: 16px; }
 }
 
+@media (max-width: 600px) {
+  .hero-mosaic { grid-template-columns: 1fr; grid-template-rows: none; height: auto; }
+  .mosaic-item:first-child { grid-row: auto; }
+}
+
 @media (max-width: 480px) {
   .recettes-grille { grid-template-columns: 1fr 1fr; gap: 12px; }
   .collections-grille { grid-template-columns: 1fr 1fr; }
