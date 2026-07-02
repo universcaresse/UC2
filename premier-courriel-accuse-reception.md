@@ -1,3 +1,139 @@
+# Premier courriel (accusé de réception) — Guide des scénarios client
+
+> **But de ce document.** Comprendre, en langage simple, ce qui se passe pour chaque action possible d'un client à partir du **premier courriel** (l'accusé de réception de ses coups de cœur). Sert aussi de contexte pour reprendre le travail sans tout réexpliquer.
+>
+> **État : ce document est TERMINÉ.** Tous les scénarios ci-dessous sont réglés et confirmés fonctionnels en réel. Il ne reste qu'une chose optionnelle, non commencée (voir section 5).
+>
+> **Règle non négociable pour la suite du travail :** aucun code sans le OK de Chantal, un changement à la fois.
+
+---
+
+## 0. CONTEXTE
+
+- **Le site.** Univers Caresse, savonnerie artisanale. Le client coche des produits qui l'intéressent et envoie sa liste — **ce n'est pas une commande ferme**. Chantal reprend contact ensuite pour confirmer disponibilité, livraison et coût.
+- **DEUX courriels, à ne jamais confondre :**
+
+  1. **1ᵉʳ courriel** — « Nous avons bien reçu vos intérêts ». Automatique, dès que le client envoie sa liste. Statut de la commande : **« En attente »**. **C'est le sujet de ce document.**
+  
+  2. **2ᵉ courriel** — la proposition de Chantal, avec prix et livraison. Statut : **« En attente de paiement »**. Sera documenté séparément.
+  
+- **La règle d'or : le statut commande tout.** Le site regarde toujours le statut de la commande avant de décider ce qu'il permet. Le client ne peut jamais rien casser en regardant, recliquant ou ouvrant plusieurs onglets — seule une action confirmée (renvoyer, ou confirmer une annulation) change quoi que ce soit.
+
+- **Le stock** ne sort de l'inventaire qu'au moment où Chantal envoie la proposition (2ᵉ courriel). Tant que la commande est « En attente », rien n'est réservé.
+
+---
+
+## 1. LE PREMIER COURRIEL
+
+Le client reçoit un courriel avec 2 boutons :
+- **« Modifier vos Coups de coeur »** — l'amène sur une page où il peut ajuster sa liste.
+- **« J'ai changé d'idée »** — même page, mais ouvre directement l'écran d'annulation.
+
+Chantal reçoit toujours une copie de la demande initiale.
+
+---
+
+## 2. LES SCÉNARIOS — CE QUI SE PASSE POUR CHAQUE ACTION
+
+### Le client modifie sa liste et la renvoie
+Sa liste remplace l'ancienne (jamais de doublon, même s'il renvoie plusieurs fois). Chantal reçoit un avis « Coups de cœur modifiés ». **Le client reçoit aussi maintenant un courriel de confirmation** avec sa liste à jour et les mêmes 2 boutons (Modifier / Annuler) — avant, seul Chantal était avisée, ce qui n'était pas voulu.
+
+### Le client modifie sa liste, puis ferme sans l'envoyer
+Rien n'est enregistré côté commande — c'est comme s'il n'avait rien fait. Son brouillon local est nettoyé automatiquement s'il revient sur le site public plus tard, pour ne pas qu'il réapparaisse par erreur comme une nouvelle demande.
+
+### Le client annule sa commande
+Un écran de confirmation s'affiche (« Oui, annuler » / « Non, revenir »), avec une raison facultative. S'il confirme :
+- la commande passe au statut « Annulée » ;
+- le stock n'est remis en inventaire que s'il avait vraiment été sorti (donc jamais pour une commande encore « En attente », puisque rien n'était sorti) ;
+- son petit résumé de liste (le cœur flottant sur le site) est vidé, pour qu'il ne réapparaisse pas avec les boutons actifs ;
+- **le client reçoit un courriel confirmant l'annulation.**
+
+Un bouton « Non, revenir » ou le fait d'ouvrir puis fermer cet écran ne change rien.
+
+### Le client ne fait rien
+Couvert par des rappels automatiques (texto + courriel), hors de ce document.
+
+### Le client fait plusieurs actions dans le désordre
+Peu importe l'ordre (modifie puis renvoie puis annule, annule puis reclique modifier, renvoie plusieurs fois de suite) — chaque action est évaluée selon le statut réel de la commande au moment où elle est faite. Aucune combinaison ne duplique ou ne casse la commande.
+
+### Le lien du courriel est brisé ou pointe vers une commande introuvable
+Le client voit un message clair l'invitant à écrire à Chantal, avec le numéro de commande déjà rempli dans le formulaire de contact. Rien ne s'écrit dans la base de données dans ce cas.
+
+### Le courriel a été transféré à quelqu'un d'autre
+Le lien contient une clé secrète qui donne accès à la commande — quiconque reçoit le courriel transféré peut la voir/modifier/annuler. **Décision de Chantal : acceptable pour ce contexte** (clientèle de confiance), on garde le système tel quel.
+
+### Le client clique sur le vieux lien du 1er courriel après que la proposition (2ᵉ courriel) est déjà partie
+Il ne voit plus la liste modifiable — à la place, une page courte lui dit que sa proposition l'attend, avec un bouton pour aller directement au paiement, et un autre pour poser une question. Ça évite qu'il modifie ou efface la proposition sans le savoir depuis le vieux lien.
+
+*Cas à surveiller, pas testé : si sa commande contient des produits partiellement indisponibles (donc pas juste une liste simple), il pourrait voir un autre écran où « Modifier » n'est pas bloqué de la même façon. À vérifier si ça arrive un jour.*
+
+### Le client remplit le formulaire d'adresse avant de payer
+Pendant que le formulaire s'envoie, les champs et le bouton sont désactivés pour éviter qu'il continue à taper ou clique deux fois.
+
+---
+
+## 3. POUR CHANTAL — SIGNAUX ET AVIS
+
+- Renvoi de liste par le client → avis à Chantal + courriel de confirmation au client.
+- Annulation par le client → **aucun avis à Chantal actuellement** — seul le client est avisé. À revoir si Chantal en veut un aussi.
+
+---
+
+## 4. CE QUI RESTE OPTIONNEL, PAS COMMENCÉ
+
+**Renvoyer la proposition complète.** Actuellement, si le client clique sur « Aller au paiement » depuis le vieux lien, ça fonctionne déjà (section 2, dernier cas). Ce qui manque encore, c'est un vrai bouton « Recevez à nouveau votre proposition par courriel » — pas un bogue, juste jamais bâti. Demanderait du nouveau travail, à faire plus tard si Chantal le juge utile.
+
+---
+
+## 5. REPÈRES TECHNIQUES (pour orientation rapide, pas pour lire le code en détail)
+
+- **Fichiers :** `Code.gs` (back-end, Google Apps Script) · `js/main-demande.js` (comportement du client sur le site) · `index.html`.
+- **Fonctions clés à chercher si on doit retoucher quelque chose :** `envoyerDemandeCommande_v2` (1er courriel), `renvoyerListeCoupdecoeur_v2` (renvoi de liste), `annulerCommandeClient` (annulation), `getCommandePublique_v2` (lecture seule), `enregistrerAdresseCommande_v2` (formulaire d'adresse), `envoyerProposition_V3` (2e courriel, déclenché par Chantal).
+- **Mémoire locale du navigateur du client :** `uc_demande` (sa liste), `uc_modif_cmd` (repère de la commande en cours de modification).
+
+---
+
+## 6. PROCHAINE ÉTAPE
+
+Ce document (1er courriel) est terminé. La suite : documenter le **2ᵉ courriel** (la proposition de Chantal) dans son propre fichier, avec la même approche — un scénario à la fois, en langage simple.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ancienne version : 
+
+
+
 # Premier courriel (accusé de réception) — Scénarios client
 
 > **But de ce document.** Garder la vue complète des cas possibles à partir du **premier courriel** envoyé au client (l'accusé de réception de ses coups de cœur). On le détaille « plus que possible » pour ne **jamais avoir à recommencer ce dialogue**. Si la conversation se perd, ce fichier seul doit suffire à reprendre exactement où on était.

@@ -20,10 +20,10 @@
   var ferme = false;
 
   function demarrerSequence() {
-    setTimeout(function() { logo.classList.add("uc-show"); }, 300);           // 1. logo arrive doucement
-    setTimeout(function() { texte.classList.add("uc-show"); }, 3400);          // 2. Bienvenue apparaît
-    setTimeout(function() { texte.classList.remove("uc-show"); }, 5800);       // 3. Bienvenue disparaît lentement
-    setTimeout(voyagerVersLogoReel, 7300);                                     // 4. le logo part vers son emplacement
+    setTimeout(function() { logo.classList.add("uc-show"); }, 300);           // 1. logo arrive doucement (4.5s)
+    setTimeout(function() { texte.classList.add("uc-show"); }, 4900);          // 2. Bienvenue apparaît (2.4s)
+    setTimeout(function() { texte.classList.remove("uc-show"); }, 8200);       // 3. Bienvenue disparaît lentement (2.4s)
+    setTimeout(voyagerVersLogoReel, 10800);                                    // 4. le logo part vers son emplacement
   }
 
   function voyagerVersLogoReel() {
@@ -44,7 +44,7 @@
     logo.classList.add("uc-voyage");
     logo.style.transform = "translate(" + deltaX + "px, " + deltaY + "px) scale(" + echelle + ")";
 
-    setTimeout(fermerIntro, 1400);
+    setTimeout(fermerIntro, 2400);
   }
 
   function fermerIntro() {
@@ -52,7 +52,7 @@
     ferme = true;
     overlay.classList.add("uc-fade-out");
     sessionStorage.setItem("ucIntroVu", "true");
-    setTimeout(function() { overlay.remove(); }, 2500);
+    setTimeout(function() { overlay.remove(); }, 3500);
   }
 
   if (document.readyState === "complete") {
@@ -61,5 +61,5 @@
     window.addEventListener("load", demarrerSequence);
   }
 
-  setTimeout(fermerIntro, 12000);
+  setTimeout(fermerIntro, 17000);
 })();
