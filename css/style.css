@@ -1289,7 +1289,7 @@ tr.cliquable { cursor: pointer; }
   .modal-contenu { grid-column: 2; grid-row: 1; overflow-y: auto; }
   .modal-fermer { position: absolute; top: 16px; right: 16px; }
 }
-
+ 
  
 @media (max-width: 600px) {
   body { background: red !important; }
