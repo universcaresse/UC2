@@ -1169,6 +1169,11 @@ tr.cliquable { cursor: pointer; }
     color: var(--beige);
     border-left-color: transparent;
   }
+  .nav-dropdown-sep {
+    height: 1px;
+    background: var(--beige);
+    margin: 6px 16px;
+  }
 }
   
 /* ═══════════════════════════════════════
