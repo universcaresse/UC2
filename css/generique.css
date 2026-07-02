@@ -135,7 +135,6 @@ body {
   font-size: var(--texte-base);
   color: var(--texte-couleur);
   background: var(--blancpur);
-  padding: var(--espace-24) var(--espace-32);
 }
 h1, h2, h3 {
   font-family: var(--police-titre);
