@@ -441,6 +441,9 @@ h1, h2, h3 {
   #med-filtres-n3 > * { flex-shrink: 0; }
 
   /* flèches : voir .med-fleche dans le bloc de base */
+
+  .tableau-admin th,
+  .tableau-admin td { white-space: normal; }
 }
 
 .sur-titre {
