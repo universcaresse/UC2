@@ -445,7 +445,7 @@ h1, h2, h3 {
   .tableau-admin th,
   .tableau-admin td { white-space: normal; }
 }
-
+ 
 .sur-titre {
   font-size: var(--texte-72);
   letter-spacing: var(--interlettre-12);
