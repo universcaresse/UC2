@@ -758,6 +758,12 @@ function ouvrirApercuFacture() {
   document.getElementById('modal-fv-contenu').innerHTML = html;
   document.getElementById('modal-fv-numero').textContent = (venNumeroAffiche && venNumeroAffiche !== '—' ? 'Facture ' + venNumeroAffiche : 'Nouvelle vente') + ' · ' + date;
 
+  // Champs courriel et téléphone de la fiche (branche 6.1)
+  const champFvTel = document.getElementById('fv-telephone');
+  if (champFvTel) champFvTel.value = telephone;
+  const champFvCou = document.getElementById('fv-courriel');
+  if (champFvCou) champFvCou.value = courriel;
+
   // Boutons selon le contexte
   const btnSquare = document.getElementById('btn-payer-square');
   if (btnSquare) btnSquare.style.display = '';
@@ -1091,7 +1097,10 @@ async function imprimerFacture() {
 async function envoyerFactureCourriel() {
   if (venEnvoiCourrielEnCours) return;
   venEnvoiCourrielEnCours = true;
-  const courriel = document.getElementById('apv-courriel').value || document.getElementById('ven-courriel').value;
+  const champFvCourriel = document.getElementById('fv-courriel');
+  const ficheOuverte = document.getElementById('modal-facture-vente').classList.contains('ouvert');
+  const courriel = (ficheOuverte && champFvCourriel ? champFvCourriel.value : '') || document.getElementById('apv-courriel').value || document.getElementById('ven-courriel').value;
+  if (ficheOuverte && champFvCourriel && champFvCourriel.value) document.getElementById('apv-courriel').value = champFvCourriel.value;
   if (!courriel) {
     venEnvoiCourrielEnCours = false;
     const apresVenteOuvert = document.getElementById('modal-apres-vente').classList.contains('ouvert');
@@ -1099,6 +1108,11 @@ async function envoyerFactureCourriel() {
       document.getElementById('apv-courriel').style.border = '2px solid var(--danger)';
       document.getElementById('apv-courriel').placeholder = 'Courriel requis';
       document.getElementById('apv-courriel').focus();
+    } else if (ficheOuverte && champFvCourriel) {
+      champFvCourriel.style.border = '2px solid var(--danger)';
+      champFvCourriel.placeholder = 'Courriel requis pour envoyer';
+      champFvCourriel.focus();
+      return;
     } else {
       afficherMsg('ventes', 'Aucun courriel enregistré pour cette vente.', 'erreur');
     }
@@ -1153,14 +1167,20 @@ async function envoyerFactureCourriel() {
 }
 
 async function envoyerFactureTexto() {
-  const telephone = document.getElementById('apv-telephone').value || document.getElementById('ven-telephone').value;
+  const champApv = document.getElementById('apv-telephone');
+  const champFv  = document.getElementById('fv-telephone');
+  const ficheOuverte = document.getElementById('modal-facture-vente').classList.contains('ouvert');
+  const telephone = (ficheOuverte && champFv ? champFv.value : '') || champApv.value || document.getElementById('ven-telephone').value;
   if (!telephone) {
-    document.getElementById('apv-telephone').style.border = '2px solid var(--danger)';
-    document.getElementById('apv-telephone').placeholder = 'Téléphone requis pour envoyer par texto';
-    document.getElementById('apv-telephone').focus();
+    const champVisible = (ficheOuverte && champFv) ? champFv : champApv;
+    champVisible.style.border = '2px solid var(--danger)';
+    champVisible.placeholder = 'Téléphone requis pour envoyer par texto';
+    champVisible.focus();
     return;
   }
-  document.getElementById('apv-telephone').style.border = '';
+  if (ficheOuverte && champFv && champFv.value) champApv.value = champFv.value;
+  if (champApv) champApv.style.border = '';
+  if (champFv)  champFv.style.border  = '';
   const btnFvT = document.getElementById('btn-fv-texto');
   if (btnFvT) { btnFvT.disabled = true; btnFvT.dataset.texteOriginal = btnFvT.innerHTML; btnFvT.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
   afficherChargement();
