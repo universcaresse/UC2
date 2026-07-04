@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════
-   UNIVERS CARESSE — admin-commandes.js
+   Univers caresse Savonnerie artisanale — admin-commandes.js
    Créé le 4 mai 2026 selon LOGIQUE-VENTES.md
    ═══════════════════════════════════════ */
 
@@ -808,7 +808,7 @@ async function marquerExpediee(cmd_id) {
     let texteSms = 'Bonjour ' + (c.client || '') + ',\n\n';
     texteSms += 'Bonne nouvelle, votre commande ' + cmd_id + ' est en route!\n';
     texteSms += 'Suivez votre colis ici : ' + lienSuivi + '\n\n';
-    texteSms += 'Merci !\nUnivers Caresse';
+    texteSms += 'Merci !\nUnivers caresse Savonnerie artisanale';
     window.open('sms:' + telephone + '?body=' + encodeURIComponent(texteSms));
   }
 
@@ -1484,9 +1484,9 @@ async function envoyerPropositionV3() {
   // Ouvrir le texto tout de suite — doit partir du clic direct, avant les envois
   if (telephone) {
     let texteSms = 'Bonjour ' + ',\n\n';
-    texteSms += 'Votre proposition de commande Univers Caresse Savonnerie artisanale vient de vous être envoyée par courriel.\n';
+    texteSms += 'Votre proposition de commande Univers caresse Savonnerie artisanale Savonnerie artisanale vient de vous être envoyée par courriel.\n';
     texteSms += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
-    texteSms += 'Merci !\nUnivers Caresse - Savonnerie artisanale';
+    texteSms += 'Merci !\nUnivers caresse Savonnerie artisanale - Savonnerie artisanale';
     window.open('sms:' + telephone + '?body=' + encodeURIComponent(texteSms));
   }
 
@@ -1646,9 +1646,9 @@ function textoProposition(cmd_id) {
   }
 
   let texte = 'Bonjour ' + (c.client || '') + ',\n\n';
-  texte += 'Votre proposition de commande Univers Caresse vient de vous être envoyée par courriel.\n';
+  texte += 'Votre proposition de commande Univers caresse Savonnerie artisanale vient de vous être envoyée par courriel.\n';
   texte += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
-  texte += 'Merci !\nUnivers Caresse';
+  texte += 'Merci !\nUnivers caresse Savonnerie artisanale';
 
   window.open('sms:' + telephone + '?body=' + encodeURIComponent(texte));
 }
@@ -1710,7 +1710,7 @@ async function genererEtiquette(cmd_id) {
     const lienSuivi = 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage);
     let sms = 'Bonjour ' + (c.client || '') + ',\n\n';
     sms += 'Bonne nouvelle, votre commande ' + cmd_id + ' est en route!\n';
-    sms += 'Suivez votre colis ici : ' + lienSuivi + '\n\nMerci !\nUnivers Caresse';
+    sms += 'Suivez votre colis ici : ' + lienSuivi + '\n\nMerci !\nUnivers caresse Savonnerie artisanale';
     window.open('sms:' + telephone + '?body=' + encodeURIComponent(sms));
   }
 

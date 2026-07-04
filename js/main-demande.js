@@ -225,8 +225,8 @@ function demandeCreerModalListe() {
         '<div class="form-group"><label class="form-label">Prénom <span>*</span></label><input type="text" class="form-control" id="demande-prenom"></div>' +
         '<div class="form-group"><label class="form-label">Nom <span>*</span></label><input type="text" class="form-control" id="demande-nom"></div>' +
         '<div class="form-group"><label class="form-label">Courriel <span>*</span></label><input type="email" class="form-control" id="demande-courriel"></div>' +
-        '<div class="form-group"><label class="form-label">Cellulaire <span>*</span></label><input type="tel" class="form-control" id="demande-telephone" oninput="formaterTelephone(this)"></div>' +
-        '<div class="form-group"><label class="form-label">Code postal <span>*</span></label><input type="text" class="form-control" id="demande-code-postal"></div>' +
+        '<div class="form-group"><label class="form-label">Cellulaire (pour texto) <span>*</span></label><input type="tel" class="form-control" id="demande-telephone" oninput="formaterTelephone(this)"></div>' +
+        '<div class="form-group"><label class="form-label">Code postal (pour Poste Canada)<span>*</span></label><input type="text" class="form-control" id="demande-code-postal"></div>' +
         '<div class="form-group"><label class="form-label">Message</label><textarea class="form-control" id="demande-message"></textarea></div>' +
         '<div id="demande-form-erreur" class="demande-form-erreur cache"></div>' +
         '<button type="button" class="bouton bouton-grand demande-form-envoyer" data-action="envoyer">Envoyer vos Coups de coeur</button>' +
@@ -728,7 +728,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       if (action === 'annuler') {
         zone.innerHTML = '<h2 class="titre">Vous souhaitez annuler?</h2>' +
           '<p>Cette action est définitive. Voulez-vous vraiment annuler cette commande?</p>' +
-          '<div class="form-group" style="margin:16px 0"><label class="form-label">Si vous voulez nous dire ce qui s\'est passé, nous lisons tout (facultatif)</label>' +
+          '<div class="form-group" style="margin:16px 0"><label class="form-label">Si vous voulez nous dire ce qui s\'est passé, nous lisons tout (c'est facultatif)</label>' +
           '<textarea id="coupdecoeur-raison" class="form-control" rows="3"></textarea></div>' +
           '<button type="button" class="bouton bouton-rouge" data-action="confirmer-annulation">Oui, annuler ma commande</button>' +
           '<button type="button" class="bouton bouton-contour" data-action="retour-liste" style="margin-top:8px">Non, revenir à ma liste</button>' +

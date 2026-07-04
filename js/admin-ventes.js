@@ -1153,46 +1153,22 @@ async function envoyerFactureTexto() {
     return;
   }
   document.getElementById('apv-telephone').style.border = '';
- afficherChargement();
+  afficherChargement();
   await sauvegarderCoordonnees();
 
-  const livraison = venLivraisonSauvegarde;
-  const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-  const rabais    = venCalculerRabais();
-  const total     = Math.max(0, sousTotal + livraison - rabais);
-  const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
-  const nomPromo  = venGetNomPromo();
-  const sep = '--------------------';
-
-  // Regrouper les mêmes produits/formats
-  const panierGroupé = [];
-  venPanier.forEach(l => {
-    const clé = l.pro_id + '_' + l.poids + '_' + l.unite;
-    const exist = panierGroupé.find(x => x.clé === clé);
-    if (exist) { exist.quantite += l.quantite; }
-    else panierGroupé.push({ ...l, clé, quantite: l.quantite });
-  });
-
-  let texte = `FACTURE - ${venNumeroAffiche.replace('VEN-','').replace('ven-','')}\n`;
-  texte += `${date}\n\n`;
-  texte += `UNIVERS CARESSE\nsavonnerie artisanale\n\n`;
-  texte += `${sep}\n`;
-  panierGroupé.forEach(l => {
-    const nomGamme = venGetNomGamme(l.pro_id);
-    if (nomGamme) texte += `${nomGamme}\n`;
-    texte += `${l.nom}\n`;
-    texte += `${l.quantite} x ${formaterPrix(l.prix_unitaire)} = ${formaterPrix(l.prix_unitaire * l.quantite)}\n`;
-  });
-  texte += `${sep}\n`;
-  texte += `sous-total : ${formaterPrix(sousTotal)}\n`;
-  if (livraison > 0) texte += `livraison : ${formaterPrix(livraison)}\n`;
-  if (rabais > 0)    texte += `${nomPromo || 'rabais'} : -${formaterPrix(rabais)}\n`;
-  texte += `${sep}\n`;
-  texte += `total : ${formaterPrix(total)}\n\n`;
-  texte += `Merci pour votre achat !\n`;
-  texte += `universcaresse.ca — universcaresse@outlook.com\n`;
-
+  const numeroTexto = venNumeroAffiche.replace('VEN-','').replace('ven-','');
+  const resJeton = await appelAPIPost('getJetonVente', { ven_id: venIdEnCours });
   cacherChargement();
+  if (!resJeton || !resJeton.success || !resJeton.jeton) {
+    afficherMsg('ventes', '❌ Impossible de préparer le lien de la facture : ' + (resJeton?.message || 'erreur'), 'erreur');
+    return;
+  }
+  const lienFacture = 'https://universcaresse.ca/?facture=' + numeroTexto + '&jeton=' + resJeton.jeton;
+
+  let texte = `Merci pour votre achat chez Univers caresse — Savonnerie artisanale!\n\n`;
+  texte += `Voici la facture ${numeroTexto} :\n${lienFacture}\n\n`;
+  texte += `Au plaisir,\nUnivers caresse — Savonnerie artisanale\nuniverscaresse.ca`;
+
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
 }
