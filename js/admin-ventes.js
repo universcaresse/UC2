@@ -1200,8 +1200,7 @@ async function envoyerFactureTexto() {
 let texte = `Merci pour votre achat chez Univers caresse — Savonnerie artisanale!\n\n`;
   texte += `Voici votre facture ${numeroTexto}. Touchez le lien pour la voir.\n\n`;
   texte += `Au plaisir,\n`;
-  texte += `Univers caresse — Savonnerie artisanale\n`;
-  texte += `universcaresse.ca\n\n`;
+  texte += `Univers caresse — Savonnerie artisanale\n\n`;
   texte += `${lienFacture}`;
 
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
