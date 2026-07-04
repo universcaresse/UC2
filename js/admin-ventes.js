@@ -1140,6 +1140,7 @@ async function envoyerFactureCourriel() {
     prix_unitaire: formaterPrix(l.prix_unitaire),
     prix_total: formaterPrix(l.prix_unitaire * l.quantite)
   }));
+  
 
   const res = await appelAPIPost('envoyerFacture', {
     courriel,
