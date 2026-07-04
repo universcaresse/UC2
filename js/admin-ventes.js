@@ -1183,7 +1183,7 @@ async function envoyerFactureTexto() {
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
   if (btnFvT) { btnFvT.disabled = false; btnFvT.innerHTML = btnFvT.dataset.texteOriginal || 'Texto'; }
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
-}
+} 
 
 // ═══════════════════════════════════════
 // LISTE / FILTRES DES VENTES
