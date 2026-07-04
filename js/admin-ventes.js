@@ -1039,7 +1039,7 @@ async function imprimerFacture() {
 <body>
 <div class="page">
   <div class="entete">
-    <img src="../Images/Divers/Logofinal.png" alt="Univers Caresse" style="width:200px;">
+    <img src="https://res.cloudinary.com/dfasrauyy/image/upload/v1779274322/Logofinal_kphpp9.png" alt="Univers Caresse" style="width:200px;">
     <div class="entete-bas">
       <div class="facture-date">${date}</div>
       <div class="facture-ref">
@@ -1263,18 +1263,21 @@ async function voirDetailVente(ven_id) {
   venModeReprise = false;
   venEnvoiCourrielEnCours = false;
 
+  afficherChargement();
   const [resEntete, resLignes] = await Promise.all([
     appelAPI('getVentesEntete'),
     appelAPI('getVentesLignes', { ven_id })
   ]);
 
   if (!resEntete || !resEntete.success || !resLignes || !resLignes.success) {
+    cacherChargement();
     afficherMsg('ventes', 'Erreur de chargement.', 'erreur');
     return;
   }
 
   const v = resEntete.items.find(x => x.ven_id === ven_id);
   if (!v) {
+    cacherChargement();
     afficherMsg('ventes', 'Vente introuvable.', 'erreur');
     return;
   }
