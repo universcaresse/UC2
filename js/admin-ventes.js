@@ -1198,8 +1198,8 @@ async function envoyerFactureTexto() {
   const lienFacture = 'https://universcaresse.ca/?facture=' + numeroTexto + '&jeton=' + resJeton.jeton;
 
   let texte = `Merci pour votre achat chez Univers caresse — Savonnerie artisanale!\n\n`;
-  texte += `Voici la facture ${numeroTexto} :\n${lienFacture}\n\n`;
-  texte += `Au plaisir,\nUnivers caresse — Savonnerie artisanale\nuniverscaresse.ca`;
+  texte += `Voici votre facture ${numeroTexto} — touchez le lien pour la voir :\n\n`;
+  texte += `${lienFacture}`;
 
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
   if (btnFvT) { btnFvT.disabled = false; btnFvT.innerHTML = btnFvT.dataset.texteOriginal || 'Texto'; }
