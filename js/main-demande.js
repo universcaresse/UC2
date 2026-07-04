@@ -470,6 +470,15 @@ window.addEventListener('DOMContentLoaded', async function () {
   const jeton = params.get('jeton');
   if (!numero) return;
 
+  // Retour de Square (page Merci) : on ferme le lien de paiement en arrière-plan
+  // et on n'ouvre pas la page commande par-dessus la page Merci.
+  if (params.get('paiement') === 'recu') {
+    try {
+      if (typeof appelAPIPost === 'function') appelAPIPost('fermerLienSquareCommande', { cmd_id: numero, jeton: jeton });
+    } catch (e) {}
+    return;
+  }
+
   if (params.get('action') === 'question') {
     if (typeof naviguer === 'function') naviguer('contact');
     const nomComplet = params.get('nom') || '';
@@ -502,6 +511,14 @@ window.addEventListener('DOMContentLoaded', async function () {
       if (typeof appelAPIPost !== 'function') { if (z) z.textContent = 'appelAPIPost absent'; return; }
       const r = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
       if (r && r.success && r.statut === 'En attente de paiement' && r.lien_square) {
+        // Avant d'offrir le paiement : vérifier que le lien Square est encore vivant.
+        const verif = await appelAPIPost('verifierLienSquareCommande', { cmd_id: numero, jeton: jeton });
+        if (verif && verif.success && verif.valide === false) {
+          if (z) z.innerHTML = '<h2 class="titre">Paiement</h2>' +
+            '<p>Cette proposition a dépassé son délai de validité. Comme les produits sont faits à la main et en petites quantités, les disponibilités changent — nous préférons revalider avec vous plutôt que de vous décevoir. Écrivez-nous et nous préparerons une proposition à jour.</p>' +
+            '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</button>';
+          return;
+        }
         const provinces = ['QC','ON','NB','NS','PE','NL','MB','SK','AB','BC','YT','NT','NU'];
         const nomComplet = ((r.prenom || '') + ' ' + (r.nom || '')).trim();
         const optionsProv = provinces.map(function(p){ return '<option value="' + p + '"' + (r.province === p ? ' selected' : '') + '>' + p + '</option>'; }).join('');
@@ -510,7 +527,7 @@ window.addEventListener('DOMContentLoaded', async function () {
           '<div class="form-group"><label class="form-label">Rue <span>*</span></label><input type="text" class="form-control" id="adr-rue" value="' + (r.rue || '') + '"></div>' +
           '<div class="form-group"><label class="form-label">Ville <span>*</span></label><input type="text" class="form-control" id="adr-ville" value="' + (r.ville || '') + '"></div>' +
           '<div class="form-group"><label class="form-label">Province <span>*</span></label><select class="form-control" id="adr-province"><option value="">— Choisir —</option>' + optionsProv + '</select></div>' +
-          '<div class="form-group"><label class="form-label">Code postal <span>*</span></label><input type="text" class="form-control" id="adr-code-postal" value="' + (r.code_postal || '') + '"></div>' +
+          '<div class="form-group"><label class="form-label">Code postal</label><input type="text" class="form-control" id="adr-code-postal" value="' + (r.code_postal || '') + '" readonly style="background:#f5f1ea;cursor:not-allowed"><p class="textes-discrets" style="margin-top:4px">Les frais de livraison sont calculés avec ce code postal. Pour le changer, écrivez-nous.</p></div>' +
           '<div class="form-group"><label class="form-label"><input type="checkbox" id="adr-infolettre"> Je souhaite recevoir l\'infolettre par courriel</label></div>' +
           '<div id="adr-erreur" class="demande-form-erreur cache"></div>' +
           '<button type="button" class="bouton bouton-grand" id="adr-continuer">Continuer vers le paiement</button>';
@@ -536,12 +553,12 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     if (sav && sav.success) {
       window.location.href = r.lien_square;
     } else {
-      if (err) { err.textContent = 'Erreur : ' + ((sav && sav.message) || 'réessayez'); err.classList.remove('cache'); }
+      if (err) { err.innerHTML = 'Erreur : ' + ((sav && sav.message) || 'réessayez') + ' — <a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</a>'; err.classList.remove('cache'); }
       btnAdr.disabled = false; btnAdr.textContent = 'Continuer vers le paiement';
       champsAdr.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = false; });
     }
   } catch (e2) {
-    if (err) { err.textContent = 'Erreur : ' + e2.message; err.classList.remove('cache'); }
+    if (err) { err.innerHTML = 'Erreur : ' + e2.message + ' — <a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</a>'; err.classList.remove('cache'); }
     btnAdr.disabled = false; btnAdr.textContent = 'Continuer vers le paiement';
     champsAdr.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = false; });
   }
@@ -577,14 +594,37 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       return;
     }
 
+    // Vieux courriel de proposition : une plus récente existe
+    const propParam = parseInt(params.get('prop') || '0', 10);
+    if (propParam && res.date_prop && (res.date_prop - propParam) > 60000) {
+      demandeVider();
+      if (zone) zone.innerHTML = '<h2 class="titre">Une nouvelle proposition vous a été envoyée le ' + new Date(res.date_prop).toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' }) + '.</h2>' +
+        '<p class="textes-discrets">Ce courriel n\'est plus à jour. Retrouvez la proposition la plus récente dans vos courriels, ou recevez-la à nouveau.</p>' +
+        '<button type="button" class="bouton bouton-grand" id="prop-renvoyer2">Recevez à nouveau votre proposition</button>' +
+        '<button type="button" class="bouton bouton-contour" style="margin-top:8px" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</button>' +
+        '<p class="textes-discrets cache" id="prop-renvoyer2-msg" style="margin-top:12px"></p>';
+      var bR2 = document.getElementById('prop-renvoyer2');
+      if (bR2) bR2.addEventListener('click', async function () {
+        var msgR2 = document.getElementById('prop-renvoyer2-msg');
+        bR2.disabled = true;
+        var rR2 = (typeof appelAPIPost === 'function') ? await appelAPIPost('renvoyerCopieProposition', { cmd_id: numero, jeton: jeton }) : null;
+        if (rR2 && rR2.success) { if (msgR2) { msgR2.textContent = 'C\'est envoyé, vérifiez vos courriels (pensez aux indésirables).'; msgR2.classList.remove('cache'); } }
+        else { if (msgR2) { msgR2.textContent = 'Erreur : ' + ((rR2 && rR2.message) || 'échec'); msgR2.classList.remove('cache'); bR2.disabled = false; } }
+      });
+      return;
+    }
+
     if (res.statut !== 'En attente de paiement' && res.statut !== 'En attente') {
       demandeVider();
       if (zone) zone.innerHTML = '';
       const bloque = document.getElementById('coupdecoeur-bloque');
       if (bloque) {
         bloque.classList.remove('cache');
-        bloque.innerHTML = '<p>Cette commande ne peut plus être modifiée.</p>' +
-          '<p><a href="#" class="lien-discret" onclick="naviguer(\'contact\');return false;">Une question? Écrivez-nous.</a></p>' +
+        const messageBloque = (res.statut === 'À expédier')
+          ? 'Votre commande est en traitement — elle ne peut plus être modifiée.'
+          : 'Cette commande ne peut plus être modifiée.';
+        bloque.innerHTML = '<p>' + messageBloque + '</p>' +
+          '<p><a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Une question? Écrivez-nous.</a></p>' +
           '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
       }
       return;
@@ -598,7 +638,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       // Proposition déjà envoyée (statut « En attente de paiement ») : on NE laisse PAS
       // modifier/renvoyer depuis le 1er courriel (ça effacerait la proposition). On guide
       // le client vers le paiement, ou vers Contact.
-      if (res.statut === 'En attente de paiement') {
+      if (res.statut === 'En attente de paiement' && params.get('action') !== 'modifier') {
         if (zone) zone.innerHTML = '<h2 class="titre">Une proposition vous a été envoyée pour cette commande.</h2>' +
           '<p class="textes-discrets">Nous vous avons envoyé une proposition par courriel, avec les prix et la livraison. Si vous ne la retrouvez pas...</p>' +
           '<button type="button" class="bouton bouton-grand" id="prop-renvoyer">Recevez à nouveau votre proposition</button>' +
@@ -721,6 +761,17 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       }
 
       if (action === 'renvoyer') {
+        const msg0 = document.getElementById('coupdecoeur-msg');
+        if (!demandeListe.length) {
+          if (msg0) { msg0.textContent = 'Votre liste est vide. Pour ne plus donner suite, utilisez plutôt le bouton d\'annulation — ou rajoutez des produits.'; msg0.classList.remove('cache'); }
+          return;
+        }
+        const listeActuelle  = demandeListe.map(i => i.pro_id + '|' + i.format_poids + '|' + i.format_unite + '|' + i.quantite).sort().join(';');
+        const listeOriginale = res.lignes.map(l => l.pro_id + '|' + l.format_poids + '|' + l.format_unite + '|' + l.quantite).sort().join(';');
+        if (listeActuelle === listeOriginale) {
+          if (msg0) { msg0.textContent = 'Aucun changement à envoyer — votre liste est identique à celle que nous avons.'; msg0.classList.remove('cache'); }
+          return;
+        }
         btn.disabled = true;
         btn.style.position = 'relative';
         btn.insertAdjacentHTML('beforeend', '<div id="demande-spinner-overlay" style="position:absolute;inset:0;background:var(--primary);display:flex;align-items:center;justify-content:center;"><span class=\'spinner\' style=\'margin-right:0\'><span></span><span></span><span></span><span></span><span></span></span></div>');

@@ -442,7 +442,7 @@ function afficherTableauCommandes(items) {
     { titre: 'ENTRANTES',                       statuts: ['En attente'] },
     { titre: 'VERROUILLÉES',                    statuts: ['Verrouillée'] },
     { titre: 'MODIFIÉES',                       statuts: ['Modifiée'] },
-    { titre: 'QUESTIONS',                       statuts: ['Question'] },
+    { titre: 'À RETRAVAILLER',                  statuts: ['À retravailler'] },
     { titre: 'EN ATTENTE DE PAIEMENT',          statuts: ['En attente de paiement'] },
     { titre: 'EN ATTENTE DE RÉAPPROVISIONNEMENT', statuts: ['En attente de réapprovisionnement'] },
     { titre: 'À RETRAVAILLER',                  statuts: ['À retravailler'] },
@@ -987,6 +987,21 @@ function ouvrirFormCompleter(cmd_id) {
     quantite: parseInt(l.quantite) || 0,
     prix_unitaire: parseFloat(l.prix_unitaire) || 0
   }));
+  // Version originale (commande « À retravailler ») : affichée sous le récapitulatif
+  if (c.statut === 'À retravailler') {
+    appelAPIPost('getVersionCommande', { cmd_id: cmd_id }).then(function (rv) {
+      if (!rv || !rv.success || !rv.lignes || !rv.lignes.length) return;
+      const zoneRecap = document.getElementById('form-completer-recap');
+      if (!zoneRecap || cmdCompleterIdEnCours !== cmd_id) return;
+      let blocV = '<div style="margin-top:12px;padding:10px;border:1px dashed var(--accent);border-radius:6px"><div class="form-label">Version originale (avant la modification du client)</div>';
+      rv.lignes.forEach(function (l) {
+        const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
+        blocV += '<div class="texte-secondaire">' + (pro ? pro.nom : l.pro_id) + ' — ' + l.format_poids + ' ' + l.format_unite + ' × ' + l.quantite + '</div>';
+      });
+      blocV += '</div>';
+      zoneRecap.insertAdjacentHTML('beforeend', blocV);
+    });
+  }
   let recap = '<div style="margin-bottom:12px"><strong>' + (c.client || '—') + '</strong>';
   if (c.courriel)  recap += '<br><span class="texte-secondaire">' + c.courriel + '</span>';
   if (c.telephone) recap += '<br><span class="texte-secondaire">' + c.telephone + '</span>';
@@ -1122,7 +1137,7 @@ async function genererLienSquare() {
   const telephone = document.getElementById('completer-telephone').value.trim();
   const prenom = document.getElementById('completer-prenom').value.trim();
   const nomClient = document.getElementById('completer-client').value.trim();
-  const res = await appelAPIPost('creerLienPaiement', { montant: montant, nom: 'Vos coups de cœur. Commande ' + c.cmd_id.replace('CMD-', '-'), courriel: courriel, telephone: telephone, prenom: prenom, nom_client: nomClient });
+  const res = await appelAPIPost('creerLienPaiement', { cmd_id: cmdCompleterIdEnCours, montant: montant, nom: 'Vos coups de cœur. Commande ' + c.cmd_id.replace('CMD-', '-'), courriel: courriel, telephone: telephone, prenom: prenom, nom_client: nomClient });
   cacherChargement();
   if (res && res.success && res.url) {
     document.getElementById('completer-square').value = res.url;
