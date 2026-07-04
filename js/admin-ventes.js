@@ -16,6 +16,7 @@ var venModeReprise        = false;
 var venEnvoiCourrielEnCours = false;
 var venClientSauvegarde   = '';
 var venLivraisonSauvegarde = 0;
+var venDateSauvegarde     = null;
 var toutesVentes          = [];
 var venBlocageClic        = false;
 
@@ -62,6 +63,7 @@ function ouvrirFormVente() {
   document.getElementById('modal-facture-vente')?.classList.remove('ouvert');
   venPanier      = [];
   venModeReprise = false;
+  venDateSauvegarde = new Date();
 
   // Le numéro sera attribué par le serveur lors de la création
   venIdEnCours     = null;
@@ -698,7 +700,7 @@ function ouvrirApercuFacture() {
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
-  const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+  const date      = (venDateSauvegarde || new Date()).toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
   const nomPromo  = venGetNomPromo();
 
   let html = `
@@ -977,7 +979,7 @@ async function imprimerFacture() {
   await sauvegarderCoordonnees();
 
   const numero    = venNumeroAffiche;
-  const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+  const date      = (venDateSauvegarde || new Date()).toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
   const client    = venClientSauvegarde || document.getElementById('ven-client').value;
   const courriel  = document.getElementById('apv-courriel').value || document.getElementById('ven-courriel').value;
   const telephone = document.getElementById('apv-telephone').value || document.getElementById('ven-telephone').value;
@@ -1108,7 +1110,7 @@ async function envoyerFactureCourriel() {
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const rabais    = venCalculerRabais();
   const total     = Math.max(0, sousTotal + livraison - rabais);
-  const date      = new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+  const date      = (venDateSauvegarde || new Date()).toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' });
   const nomPromo  = venGetNomPromo();
   const lignes    = venPanier.map(l => ({
     nom: l.nom,
@@ -1301,6 +1303,10 @@ async function voirDetailVente(ven_id) {
   }));
   venClientSauvegarde    = v.client || '';
   venLivraisonSauvegarde = v.livraison || 0;
+  const partsDateVente = (v.date || '').split('/');
+  venDateSauvegarde = partsDateVente.length === 3
+    ? new Date(partsDateVente[2], partsDateVente[1] - 1, partsDateVente[0])
+    : new Date();
 
   document.getElementById('ven-livraison').value = v.livraison || 0;
   document.getElementById('ven-client').value    = v.client || '';
