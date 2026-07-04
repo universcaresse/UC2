@@ -263,3 +263,30 @@ vérification, rien ne change pour lui.
 - **Les 3 courriels du parcours client sont maintenant couverts** (1ᵉʳ =
   accusé de réception, 2ᵉ = proposition, 3ᵉ = expédition), chacun avec son
   `.md`.
+  
+  
+  ---
+
+## 12. MISE À JOUR — 4 juillet 2026 (construction faite et PUBLIÉE)
+
+Les 3 corrections de la section 8 sont posées, plus la 16 du 2ᵉ courriel :
+
+- **C (facture jointe) :** `envoyerFacture_v2` n'exige plus de courriel en
+  mode aperçu (`!courriel && !data.apercu`) — la facture PDF suit de nouveau
+  le courriel « en route ». L'envoi réel des factures de ventes garde sa
+  vérification.
+- **A (Écrivez-nous) :** lien contour ajouté sous « Suivre mon colis » dans
+  le courriel — « Un pépin avec la livraison? Écrivez-nous. » → formulaire
+  Contact pré-rempli via la porte `&action=question` existante (nom,
+  courriel, sujet avec le numéro).
+- **B (courriel échoué) :** `expedierCommande` retourne `courriel_parti`
+  (vrai/faux); `marquerExpediee` et `genererEtiquette` affichent
+  « ⚠️ … le courriel au client n'est PAS parti — à renvoyer à la main »
+  quand il est faux. L'expédition reste valide.
+- **16 du 2ᵉ courriel (vieux liens au statut « Terminée ») :**
+  `getCommandePublique_v2` retourne `no_tracage`; la page bloquée affiche
+  « Votre commande est en route! » + lien Postes Canada cliquable avec le
+  numéro + « Écrivez-nous » pré-rempli + Fermer.
+
+**Publication :** faite le 4 juillet 2026 (déploiement Apps Script + site).
+Les 3 courriels du parcours client sont couverts de bout en bout.

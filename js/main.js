@@ -187,6 +187,27 @@ function verifierRetourPaiement() {
   if (params.get('paiement') === 'recu' || window.location.hash === '#merci') {
     window.location.hash = 'merci';
   }
+  // Facture publique (texto) : ?facture=0042&jeton=...
+  if (params.get('facture')) afficherFacturePublique(params.get('facture'), params.get('jeton') || '');
+}
+
+async function afficherFacturePublique(numeroF, jetonF) {
+  const voile = document.createElement('div');
+  voile.id = 'facture-publique';
+  voile.style.cssText = 'position:fixed;inset:0;background:#f9f7f4;z-index:9999;display:flex;flex-direction:column';
+  voile.innerHTML = '<div style="padding:10px;text-align:center;background:#fff;border-bottom:1px solid #e0d4c0">' +
+    '<button type="button" class="bouton" onclick="document.getElementById(\'facture-iframe\').contentWindow.print()">Imprimer</button></div>' +
+    '<iframe id="facture-iframe" style="flex:1;border:0;width:100%"></iframe>';
+  document.body.appendChild(voile);
+  const iframe = document.getElementById('facture-iframe');
+  iframe.srcdoc = '<p style="font-family:Arial;padding:24px">Chargement…</p>';
+  try {
+    const res = (typeof appelAPIPost === 'function') ? await appelAPIPost('getFacturePublique', { ven_id: numeroF, jeton: jetonF }) : null;
+    if (res && res.success && res.html) iframe.srcdoc = res.html;
+    else iframe.srcdoc = '<p style="font-family:Arial;padding:24px">' + ((res && res.message) || 'Facture indisponible.') + '</p>';
+  } catch (e) {
+    iframe.srcdoc = '<p style="font-family:Arial;padding:24px">Erreur : ' + e.message + '</p>';
+  }
 }
 
 function afficherConnexion() {
