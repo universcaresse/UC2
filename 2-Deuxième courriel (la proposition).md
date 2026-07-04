@@ -372,3 +372,40 @@ modifier**. Le 2ᵉ courriel promettra « Modifier » → il faut bâtir une
 - **À faire :** au choix de Chantal — coder les 16 corrections (aucun code
   sans OK, trouve-et-remplace un seul à la fois) OU couvrir le 3ᵉ courriel
   (expédition / suivi de colis).
+  
+  
+  ---
+
+## 11. MISE À JOUR — 4 juillet 2026 (construction faite et PUBLIÉE)
+
+Les 16 corrections de la section 8 sont réglées, sauf la 16 :
+
+- **Posées et publiées :** 1 (lien Square fermé au retour « Merci » — 4 morceaux :
+  marqueur cmd+jeton dans l'URL de retour, porte `fermerLienSquareCommande`,
+  appel en arrière-plan depuis la page Merci), 2 (message « en traitement » au
+  statut « À expédier » + Écrivez-nous pré-rempli), 3 (vérification du lien
+  Square avant le paiement — porte `verifierLienSquareCommande` + page « délai
+  dépassé »), 4 (échec du formulaire d'adresse → Écrivez-nous), 5 (marqueur
+  `&prop=` dans les liens de proposition + `date_prop` retournée par
+  `getCommandePublique_v2` + page « une nouvelle proposition vous a été envoyée
+  le [date] », tolérance 60 s; les courriels sans marqueur restent inchangés),
+  7 (vraie page Modifier via la porte `&action=modifier` sur le bouton de la
+  proposition), 8 (au renvoi : lien Square fermé + statut « À retravailler »;
+  annulation client et stock ajustés; rangée et filtre admin ajoutés), 9
+  (renvoyer refusé si liste vide ou identique), 10 (avis courriel à Chantal
+  quand un client annule), 13 (statut « Question » retiré du filtre et du
+  tableau), 14 (code postal en lecture seule + note), 15 (filet serveur : lien
+  Square mort = payé → renvoi refusé « en traitement »).
+- **Déjà couvertes sans code :** 6 (bouton déjà gelé pendant l'envoi), 11
+  (idem), 12 (manuelle).
+- **Reste :** 16 (page « en route » + suivi de colis) — dépend du 3ᵉ courriel.
+
+**Côte à côte (correction 8) :** l'ancienne liste est gardée dans la sheet
+`Commandes_Versions` (créée toute seule au premier renvoi), affichée dans le
+formulaire « Créer la proposition » pour une commande « À retravailler », puis
+jetée quand la nouvelle proposition part.
+
+**Corrigé en passant :** `annulerLienSquare_v2` ne fermait pas vraiment le lien
+chez Square (simple mise à jour d'adresse) — remplacée par une vraie fermeture.
+
+**Publication :** faite le 4 juillet 2026 (déploiement Apps Script + site).

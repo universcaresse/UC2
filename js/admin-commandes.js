@@ -816,7 +816,8 @@ async function marquerExpediee(cmd_id) {
   const res = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: noTracage, facture: construireFactureCommande(cmd_id) });
   cacherChargement();
   if (res && res.success) {
-    afficherMsg('commandes', '✅ Commande expédiée, courriel envoyé.');
+    if (res.courriel_parti) afficherMsg('commandes', '✅ Commande expédiée, courriel envoyé.');
+    else afficherMsg('commandes', '⚠️ Commande expédiée, mais le courriel au client n\'est PAS parti — à renvoyer à la main.', 'erreur');
     fermerFicheCommande();
     chargerCommandes();
   } else {
@@ -1715,7 +1716,8 @@ async function genererEtiquette(cmd_id) {
 
   const res2 = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: res.no_tracage, facture: construireFactureCommande(cmd_id) });
   if (res2 && res2.success) {
-    afficherMsg('commandes', '✅ Étiquette générée, commande expédiée, courriel envoyé.');
+    if (res2.courriel_parti) afficherMsg('commandes', '✅ Étiquette générée, commande expédiée, courriel envoyé.');
+    else afficherMsg('commandes', '⚠️ Étiquette générée et commande expédiée, mais le courriel au client n\'est PAS parti — à renvoyer à la main.', 'erreur');
     fermerFicheCommande();
     chargerCommandes();
   } else {

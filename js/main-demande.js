@@ -620,6 +620,14 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       const bloque = document.getElementById('coupdecoeur-bloque');
       if (bloque) {
         bloque.classList.remove('cache');
+        if (res.statut === 'Terminée') {
+          const lienSuiviT = res.no_tracage ? 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage) : '';
+          bloque.innerHTML = '<p><strong>Votre commande est en route!</strong></p>' +
+            (lienSuiviT ? '<p><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + res.no_tracage + '</a></p>' : '') +
+            '<p><a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Une question? Écrivez-nous.</a></p>' +
+            '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+          return;
+        }
         const messageBloque = (res.statut === 'À expédier')
           ? 'Votre commande est en traitement — elle ne peut plus être modifiée.'
           : 'Cette commande ne peut plus être modifiée.';
