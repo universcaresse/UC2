@@ -728,7 +728,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       if (action === 'annuler') {
         zone.innerHTML = '<h2 class="titre">Vous souhaitez annuler?</h2>' +
           '<p>Cette action est définitive. Voulez-vous vraiment annuler cette commande?</p>' +
-          '<div class="form-group" style="margin:16px 0"><label class="form-label">Si vous voulez nous dire ce qui s\'est passé, nous lisons tout (c'est facultatif)</label>' +
+          '<div class="form-group" style="margin:16px 0"><label class="form-label">Si vous voulez nous dire ce qui s\'est passé, nous lisons tout (c\'est facultatif)</label>' +
           '<textarea id="coupdecoeur-raison" class="form-control" rows="3"></textarea></div>' +
           '<button type="button" class="bouton bouton-rouge" data-action="confirmer-annulation">Oui, annuler ma commande</button>' +
           '<button type="button" class="bouton bouton-contour" data-action="retour-liste" style="margin-top:8px">Non, revenir à ma liste</button>' +
