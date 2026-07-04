@@ -1904,6 +1904,9 @@ tr.cliquable { cursor: pointer; }
     font-size: 0.9rem;
     min-height: 56px;
   }
+  .fv-boutons-impression {
+    flex-direction: column;
+  }
 }
 #form-vente .form-panel-header {
   display: none;
