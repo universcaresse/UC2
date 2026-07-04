@@ -1761,7 +1761,7 @@ function construireFactureCommande(cmd_id) {
 
   return {
     numero: cmd_id,
-    date: new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' }),
+    date: c.date || new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' }),
     client: c.client || '',
     lignes: lignes,
     sous_total: formaterPrix(sousTotal),

@@ -975,6 +975,8 @@ async function sauvegarderCoordonnees() {
 }
 
 async function imprimerFacture() {
+  const btnFv = document.getElementById('btn-fv-imprimer');
+  if (btnFv) { btnFv.disabled = true; btnFv.dataset.texteOriginal = btnFv.innerHTML; btnFv.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
   afficherChargement();
   await sauvegarderCoordonnees();
 
@@ -1081,6 +1083,7 @@ async function imprimerFacture() {
   fenetre.document.close();
   fenetre.focus();
   cacherChargement();
+  if (btnFv) { btnFv.disabled = false; btnFv.innerHTML = btnFv.dataset.texteOriginal || 'Imprimer'; }
   setTimeout(() => fenetre.print(), 800);
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
 }
@@ -1102,7 +1105,9 @@ async function envoyerFactureCourriel() {
     return;
   }
   document.getElementById('apv-courriel').style.border = '';
- afficherChargement();
+  const btnFvC = document.getElementById('btn-fv-courriel');
+  if (btnFvC) { btnFvC.disabled = true; btnFvC.dataset.texteOriginal = btnFvC.innerHTML; btnFvC.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
+  afficherChargement();
   await sauvegarderCoordonnees();
 
   const client    = venClientSauvegarde || document.getElementById('ven-client').value;
@@ -1143,6 +1148,7 @@ async function envoyerFactureCourriel() {
     afficherMsg('ventes', '❌ Erreur : ' + (res?.message || 'inconnue'), 'erreur');
   }
   venEnvoiCourrielEnCours = false;
+  if (btnFvC) { btnFvC.disabled = false; btnFvC.innerHTML = btnFvC.dataset.texteOriginal || 'Courriel'; }
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
 }
 
@@ -1155,6 +1161,8 @@ async function envoyerFactureTexto() {
     return;
   }
   document.getElementById('apv-telephone').style.border = '';
+  const btnFvT = document.getElementById('btn-fv-texto');
+  if (btnFvT) { btnFvT.disabled = true; btnFvT.dataset.texteOriginal = btnFvT.innerHTML; btnFvT.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
   afficherChargement();
   await sauvegarderCoordonnees();
 
@@ -1163,6 +1171,7 @@ async function envoyerFactureTexto() {
   cacherChargement();
   if (!resJeton || !resJeton.success || !resJeton.jeton) {
     afficherMsg('ventes', '❌ Impossible de préparer le lien de la facture : ' + (resJeton?.message || 'erreur'), 'erreur');
+    if (btnFvT) { btnFvT.disabled = false; btnFvT.innerHTML = btnFvT.dataset.texteOriginal || 'Texto'; }
     return;
   }
   const lienFacture = 'https://universcaresse.ca/?facture=' + numeroTexto + '&jeton=' + resJeton.jeton;
@@ -1172,6 +1181,7 @@ async function envoyerFactureTexto() {
   texte += `Au plaisir,\nUnivers caresse — Savonnerie artisanale\nuniverscaresse.ca`;
 
   window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
+  if (btnFvT) { btnFvT.disabled = false; btnFvT.innerHTML = btnFvT.dataset.texteOriginal || 'Texto'; }
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
 }
 
