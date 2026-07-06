@@ -221,11 +221,11 @@ function demandeCreerModalListe() {
       '<div id="demande-vue-form" class="cache">' +
         '<button type="button" class="demande-retour" data-action="retour">← Retour à la liste</button>' +
         '<h2 class="demande-modal-titre">Coordonnées</h2>' +
-        '<p class="demande-form-intro">Inscrivez vos coordonnées, nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison avant tout engagement.</p>' +
+        '<p class="demande-form-intro">Inscrivez vos coordonnées, nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison.</p>' +
         '<div class="form-group"><label class="form-label">Prénom <span>*</span></label><input type="text" class="form-control" id="demande-prenom"></div>' +
         '<div class="form-group"><label class="form-label">Nom <span>*</span></label><input type="text" class="form-control" id="demande-nom"></div>' +
         '<div class="form-group"><label class="form-label">Courriel <span>*</span></label><input type="email" class="form-control" id="demande-courriel"></div>' +
-        '<div class="form-group"><label class="form-label">Cellulaire (pour texto) <span>*</span></label><input type="tel" class="form-control" id="demande-telephone" oninput="formaterTelephone(this)"></div>' +
+        '<div class="form-group"><label class="form-label">Cellulaire (pour confirmation par texto) <span>*</span></label><input type="tel" class="form-control" id="demande-telephone" oninput="formaterTelephone(this)"></div>' +
         '<div class="form-group"><label class="form-label">Code postal (pour Poste Canada)<span>*</span></label><input type="text" class="form-control" id="demande-code-postal"></div>' +
         '<div class="form-group"><label class="form-label">Message</label><textarea class="form-control" id="demande-message"></textarea></div>' +
         '<div id="demande-form-erreur" class="demande-form-erreur cache"></div>' +
