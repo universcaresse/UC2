@@ -267,6 +267,290 @@ function afficherModePublic() {
   if (lienAdmin)      lienAdmin.classList.add('cache');
 }
 
+// ─── RECHERCHE (loupe) ───
+function ouvrirRecherche() {
+  const overlay = document.getElementById('recherche-overlay');
+  if (!overlay) return;
+  if (typeof fermerModal === 'function') fermerModal();
+  overlay.classList.add('ouvert');
+  const champ = document.getElementById('recherche-champ');
+  if (champ) {
+    champ.focus();
+    if (champ.value.trim()) lancerRecherche();
+  }
+}
+
+function fermerRecherche() {
+  const overlay = document.getElementById('recherche-overlay');
+  const champ = document.getElementById('recherche-champ');
+  const resultats = document.getElementById('recherche-resultats');
+  if (champ) champ.value = '';
+  if (resultats) resultats.innerHTML = '';
+  if (overlay) overlay.classList.remove('ouvert');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') fermerRecherche();
+});
+document.addEventListener('click', e => {
+  const overlay = document.getElementById('recherche-overlay');
+  if (overlay && e.target === overlay) fermerRecherche();
+});
+
+function normaliserRecherche(texte) {
+  return String(texte || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function construireIndexRecherche() {
+  const index = [];
+  const d = donneesCatalogue || {};
+  const infoCollections = d.infoCollections || {};
+  const infoRegroupements = d.infoRegroupements || {};
+  const produits = d.produits || [];
+
+  Object.keys(infoCollections).forEach(col_id => {
+    const c = infoCollections[col_id];
+    index.push({ type: 'collection', id: col_id, nom: c.nom || '', rang: c.rang || 99,
+      texte: normaliserRecherche([c.nom, c.slogan, c.description, c.mots_cles].join(' ')) });
+  });
+
+  Object.keys(infoRegroupements).forEach(fra_id => {
+    const f = infoRegroupements[fra_id];
+    index.push({ type: 'univers', id: fra_id, nom: f.nom || '', rang: f.rang || 99,
+      texte: normaliserRecherche([f.nom, f.slogan, f.description, f.mots_cles].join(' ')) });
+  });
+
+  const gammesVues = {};
+  produits.forEach(p => {
+    if (p.gam_id && !gammesVues[p.gam_id]) {
+      gammesVues[p.gam_id] = true;
+      index.push({ type: 'gamme', id: p.gam_id, nom: p.nom_gamme || '', col_id: p.col_id,
+        texte: normaliserRecherche([p.nom_gamme, p.slogan_gamme, p.desc_gamme, p.mots_cles_gamme].join(' ')) });
+    }
+    const ings = (p.ingredients || []).map(i => i.nom_ingredient || '').join(' ');
+    index.push({ type: 'produit', id: p.pro_id, nom: p.nom || '', col_id: p.col_id, gam_id: p.gam_id,
+      texte: normaliserRecherche([p.nom, p.description, p.mots_cles, ings].join(' ')) });
+  });
+
+  indexerPagesRecherche(index);
+  return index;
+}
+
+function lancerRecherche() {
+  const champ = document.getElementById('recherche-champ');
+  const zone = document.getElementById('recherche-resultats');
+  if (!champ || !zone) return;
+  const requete = normaliserRecherche(champ.value);
+  if (requete.length < 2) { zone.innerHTML = ''; return; }
+  if (!donneesCatalogue || !donneesCatalogue.produits) {
+    zone.innerHTML = '<p class="description">Chargement…</p>';
+    appelAPI('getCatalogue').then(resCat => {
+      if (resCat && resCat.success && resCat.produits) { donneesCatalogue = resCat; lancerRecherche(); }
+    });
+    return;
+  }
+  const mots = requete.split(' ').filter(m => m);
+  const trouves = construireIndexRecherche().filter(item =>
+    mots.every(mot => item.texte.indexOf(mot) >= 0)
+  );
+  afficherResultatsRecherche(trouves, champ.value);
+}
+
+function afficherResultatsRecherche(trouves, texteBrut) {
+  const zone = document.getElementById('recherche-resultats');
+  if (!zone) return;
+  if (!trouves.length) {
+    zone.innerHTML = '<p class="description">Aucun résultat pour « ' + texteBrut + ' »</p>';
+    return;
+  }
+  const d = donneesCatalogue || {};
+  const infoCollections = d.infoCollections || {};
+  const infoRegroupements = d.infoRegroupements || {};
+  const produits = d.produits || [];
+  const parType = t => trouves.filter(x => x.type === t);
+  const colsT = parType('collection'), gammesT = parType('gamme'), prodsT = parType('produit');
+  const universT = parType('univers'), eduT = parType('edu'), basT = parType('bon-a-savoir');
+  let html = '';
+
+  const nbCol = colsT.length + gammesT.length + prodsT.length;
+  if (nbCol) {
+    html += '<div class="section-label">Collections (' + nbCol + ')</div>';
+    Object.keys(infoCollections)
+      .sort((a, b) => (infoCollections[a].rang || 99) - (infoCollections[b].rang || 99))
+      .forEach(col_id => {
+        const colTrouvee = colsT.some(t => t.id === col_id);
+        const gammesIci = gammesT.filter(t => t.col_id === col_id);
+        const prodsIci = prodsT.filter(t => t.col_id === col_id);
+        if (!colTrouvee && !gammesIci.length && !prodsIci.length) return;
+        const nomCol = infoCollections[col_id].nom || col_id;
+        const parGamme = {};
+        prodsIci.forEach(t => { (parGamme[t.gam_id] = parGamme[t.gam_id] || []).push({ id: t.id, nom: t.nom }); });
+        gammesIci.forEach(g => {
+          parGamme[g.id] = produits.filter(p => p.gam_id === g.id).map(p => ({ id: p.pro_id, nom: p.nom }));
+        });
+        const lesGammes = Object.keys(parGamme);
+        html += ligneRecherche(nomCol, colTrouvee ? "rechercheVersCollection('" + col_id + "')" : '');
+        if (!lesGammes.length) return;
+        html += '<div class="fab-collection-body">';
+        lesGammes.forEach(gam_id => {
+          const gammeTrouvee = gammesIci.some(g => g.id === gam_id);
+          const nomGamme = (produits.find(p => p.gam_id === gam_id) || {}).nom_gamme || '';
+          html += ligneRecherche(nomGamme, gammeTrouvee ? "rechercheVersGamme('" + col_id + "','" + gam_id + "')" : '');
+          html += '<div class="fab-collection-body">';
+          parGamme[gam_id].forEach(pr => {
+            html += ligneRecherche(pr.nom, "rechercheVersProduit('" + pr.id + "')");
+          });
+          html += '</div>';
+        });
+        html += '</div>';
+      });
+  }
+
+  const prodsSousUnivers = [];
+  Object.keys(infoRegroupements).forEach(fra_id => {
+    prodsT.forEach(t => {
+      const p = produits.find(x => x.pro_id === t.id);
+      if (p && produitDansUnivers(p, infoRegroupements[fra_id])) prodsSousUnivers.push({ fra_id: fra_id, id: t.id, nom: t.nom });
+    });
+  });
+  const nbUni = universT.length + prodsSousUnivers.length;
+  if (nbUni) {
+    html += '<div class="section-label">Univers (' + nbUni + ')</div>';
+    Object.keys(infoRegroupements)
+      .sort((a, b) => (infoRegroupements[a].rang || 99) - (infoRegroupements[b].rang || 99))
+      .forEach(fra_id => {
+        const uniTrouve = universT.some(t => t.id === fra_id);
+        const prodsIci = prodsSousUnivers.filter(x => x.fra_id === fra_id);
+        if (!uniTrouve && !prodsIci.length) return;
+        html += ligneRecherche(infoRegroupements[fra_id].nom || '', uniTrouve ? "rechercheVersUnivers('" + fra_id + "')" : '');
+        if (prodsIci.length) {
+          html += '<div class="fab-collection-body">';
+          prodsIci.forEach(pr => { html += ligneRecherche(pr.nom, "rechercheVersProduit('" + pr.id + "')"); });
+          html += '</div>';
+        }
+      });
+  }
+
+  if (eduT.length) {
+    html += '<div class="section-label">Le savon artisanal (' + eduT.length + ')</div>';
+    eduT.forEach(t => { html += ligneRecherche(t.nom, "rechercheVersEdu(" + t.id + ", '" + t.nom.replace(/'/g, "\\'") + "')"); });
+  }
+  if (basT.length) {
+    html += '<div class="section-label">Bon à savoir (' + basT.length + ')</div>';
+    basT.forEach(t => { html += ligneRecherche(t.nom, "rechercheVersBonASavoir('" + t.nom.replace(/'/g, "\\'") + "')"); });
+  }
+  zone.innerHTML = html;
+}
+
+function masquerPanneauRecherche() {
+  document.getElementById('recherche-overlay')?.classList.remove('ouvert');
+}
+
+function rechercheVersProduit(pro_id) {
+  const p = ((donneesCatalogue || {}).produits || []).find(x => String(x.pro_id) === String(pro_id));
+  if (p) ouvrirModal(p);
+}
+
+function rechercheVersCollection(col_id) {
+  masquerPanneauRecherche();
+  naviguer('catalogue');
+  filtrerApresChargement(col_id);
+}
+
+function rechercheVersGamme(col_id, gam_id) {
+  masquerPanneauRecherche();
+  naviguer('catalogue');
+  filtrerApresChargement(col_id);
+  setTimeout(() => filtrer(col_id, gam_id), 400);
+}
+
+function rechercheVersUnivers(fra_id) {
+  masquerPanneauRecherche();
+  naviguer('regroupements');
+  setTimeout(() => filtrerRegroupements(fra_id), 400);
+}
+
+function rechercheVersEdu(num, nom) {
+  masquerPanneauRecherche();
+  naviguer('educatif');
+  setTimeout(() => {
+    afficherEduSection(num);
+    const panneau = document.getElementById('edu-' + num);
+    const titre = Array.from(panneau ? panneau.querySelectorAll('.bonne-section-titre') : [])
+      .find(t => t.textContent.trim() === nom);
+    rechercheDescendreVers(titre);
+  }, 400);
+}
+
+function rechercheVersBonASavoir(nom) {
+  masquerPanneauRecherche();
+  naviguer('bon-a-savoir');
+  setTimeout(() => {
+    const titre = Array.from(document.querySelectorAll('#section-bon-a-savoir .bonne-section-titre'))
+      .find(t => t.textContent.trim() === nom);
+    rechercheDescendreVers(titre);
+  }, 400);
+}
+
+function rechercheDescendreVers(el) {
+  if (!el) return;
+  const navH = document.getElementById('nav')?.offsetHeight || 0;
+  const haut = el.getBoundingClientRect().top + window.scrollY - navH - 16;
+  window.scrollTo({ top: haut, behavior: 'smooth' });
+}
+
+function ligneRecherche(nom, action) {
+  if (action) return '<div class="item" onclick="' + action + '"><span class="item-nom">' + nom + '</span></div>';
+  return '<div class="valeur">' + nom + '</div>';
+}
+
+function produitDansUnivers(p, fra) {
+  if (fra.mode === 'manuel') {
+    return Array.isArray(fra.pro_ids) && fra.pro_ids.map(String).indexOf(String(p.pro_id)) >= 0;
+  }
+  const ings = p.ingredients || [];
+  if (fra.ing_id && !ings.some(i => i.ing_id === fra.ing_id)) return false;
+  if (Array.isArray(fra.categories_exclues) && fra.categories_exclues.length > 0 && ings.some(i => fra.categories_exclues.indexOf(i.cat_id) >= 0)) return false;
+  if (Array.isArray(fra.collections_exclues) && fra.collections_exclues.length > 0 && fra.collections_exclues.indexOf(p.col_id) >= 0) return false;
+  if (Array.isArray(fra.gammes_exclues) && fra.gammes_exclues.length > 0 && fra.gammes_exclues.indexOf(p.gam_id) >= 0) return false;
+  const aExclusion = (Array.isArray(fra.categories_exclues) && fra.categories_exclues.length > 0)
+                  || (Array.isArray(fra.collections_exclues) && fra.collections_exclues.length > 0)
+                  || (Array.isArray(fra.gammes_exclues) && fra.gammes_exclues.length > 0);
+  if (!fra.ing_id && !aExclusion) return false;
+  return true;
+}
+
+function indexerPagesRecherche(index) {
+  document.querySelectorAll('.edu-sous-section-panel').forEach(panneau => {
+    const num = parseInt((panneau.id || '').replace('edu-', '')) || 0;
+    if (!num) return;
+    const titreSousPage = (panneau.querySelector('.page-entete-titre')?.textContent || '').trim();
+    let texteSansTitre = '';
+    panneau.querySelectorAll(':scope > div').forEach(bloc => {
+      if (bloc.classList.contains('edu-pager-sticky')) return;
+      const titreEl = bloc.querySelector('.bonne-section-titre');
+      if (titreEl && titreEl.textContent.trim()) {
+        index.push({ type: 'edu', id: num, nom: titreEl.textContent.trim(),
+          texte: normaliserRecherche(bloc.textContent) });
+      } else {
+        texteSansTitre += ' ' + bloc.textContent;
+      }
+    });
+    index.push({ type: 'edu', id: num, nom: titreSousPage,
+      texte: normaliserRecherche(texteSansTitre) });
+  });
+
+  document.querySelectorAll('#section-bon-a-savoir .bonne-section').forEach(bloc => {
+    const titreEl = bloc.querySelector('.bonne-section-titre');
+    index.push({ type: 'bon-a-savoir', id: '', nom: (titreEl?.textContent || '').trim(),
+      texte: normaliserRecherche(bloc.textContent) });
+  });
+}
+
 // ─── NAVIGATION MOBILE ───
 function initNav() {
   let dernierScroll = 0;

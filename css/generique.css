@@ -154,6 +154,7 @@ h1, h2, h3 {
   padding: var(--espace-16);
 }
 .voile.ouvert { display: flex; }
+.voile-haut { align-items: flex-start; }
 
 .modale {
   background: var(--blancpur);
@@ -249,6 +250,17 @@ h1, h2, h3 {
   margin-left: auto;
 }
 
+.bouton-loupe {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primaire);
+  display: flex;
+  align-items: center;
+  padding: var(--espace-4);
+}
+.loupe-flottante { display: none; }
+
 .barremenu-burger {
   display: none;
   flex-direction: column;
@@ -300,6 +312,24 @@ h1, h2, h3 {
     justify-content: center;
     box-shadow: var(--ombre-forte);
   }
+  .loupe-flottante {
+    display: flex;
+    position: fixed;
+    top: var(--espace-16);
+    left: var(--espace-24);
+    z-index: 200;
+    width: var(--taille-48);
+    height: var(--taille-48);
+    border-radius: var(--rayon-1);
+    background: var(--primaire);
+    color: var(--blancpur);
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--ombre-forte);
+    border: none;
+    cursor: pointer;
+  }
+  .loupe-flottante.cache-scroll { opacity: 0; pointer-events: none; transform: translateY(calc(-1 * var(--espace-16))); }
 }
 
 /*═════════════════════════════════════════════════

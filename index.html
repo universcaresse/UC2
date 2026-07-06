@@ -58,11 +58,28 @@
     <li><a href="#contact" onclick="naviguer('contact')">Contact</a></li>
   </ul>
   <div class="nav-actions">
+    <button class="bouton-loupe" id="btn-recherche" onclick="ouvrirRecherche()" aria-label="Rechercher">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>
+    </button>
   </div>
 </nav>
 <button class="burger burger-flottant" id="burger" onclick="toggleMenu()">
   <span></span><span></span><span></span>
 </button>
+<button class="bouton-loupe loupe-flottante" id="loupe-mobile" onclick="ouvrirRecherche()" aria-label="Rechercher">
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>
+</button>
+
+<!-- RECHERCHE -->
+<div class="voile voile-haut" id="recherche-overlay">
+  <div class="modale">
+    <div class="modale-entete">
+      <input type="text" class="controle" id="recherche-champ" placeholder="Rechercher…" oninput="lancerRecherche()" aria-label="Rechercher dans le site">
+      <button class="boutons-fermer" onclick="fermerRecherche()" aria-label="Effacer et fermer">✕</button>
+    </div>
+    <div class="modale-corps" id="recherche-resultats"></div>
+  </div>
+</div>
 
 <!-- MODAL PRODUIT -->
 <div class="modal-overlay" id="modal-produit" onclick="fermerModalProduit(event)">
