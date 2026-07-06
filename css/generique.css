@@ -680,6 +680,15 @@ textarea.zonedetexte {
 }
 .controle:focus { border-color: var(--primaire); }
 textarea.controle { resize: vertical; min-height: var(--espace-120); line-height: var(--interligne-16); }
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--blancpur) inset;
+  -webkit-text-fill-color: var(--grise-foncee);
+}
+input:autofill {
+  box-shadow: 0 0 0 1000px var(--blancpur) inset;
+}
 
 .visuel {
   display: flex; flex-wrap: wrap; gap: var(--espace-16);

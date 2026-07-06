@@ -122,6 +122,11 @@ function ouvrirFormFamille() {
   document.getElementById('ff-desc').value        = '';
   document.getElementById('ff-photo-url').value   = '';
   document.getElementById('ff-photo-noel-url').value = '';
+  const ffCouleurVisibleN = document.getElementById('ff-couleur-visible');
+  if (ffCouleurVisibleN) {
+    ffCouleurVisibleN.value = '';
+    apercuCouleurUC(ffCouleurVisibleN, 'ff-couleur-apercu', 'ff-couleur');
+  }
   const previewFN1 = document.getElementById('ff-photo-preview');
   if (previewFN1) previewFN1.innerHTML = '';
   const previewFN2 = document.getElementById('ff-photo-noel-preview');
@@ -156,6 +161,11 @@ function modifierFamille(fam_id) {
     document.getElementById('ff-desc').value        = fam.description || '';
   document.getElementById('ff-photo-url').value   = fam.photo_url || '';
   document.getElementById('ff-photo-noel-url').value = fam.photo_noel_url || '';
+  const ffCouleurVisible = document.getElementById('ff-couleur-visible');
+  if (ffCouleurVisible) {
+    ffCouleurVisible.value = (fam.couleur_hex || '').replace('#', '');
+    apercuCouleurUC(ffCouleurVisible, 'ff-couleur-apercu', 'ff-couleur');
+  }
   const previewF = document.getElementById('ff-photo-preview');
   if (previewF) previewF.innerHTML = fam.photo_url ? `<img src="${fam.photo_url}">` : '';
   const previewFN = document.getElementById('ff-photo-noel-preview');
@@ -190,7 +200,7 @@ async function sauvegarderFamille() {
     rang:        positionChoisie + 1,
     nom,
     description: document.getElementById('ff-desc').value,
-    couleur_hex: '',
+    couleur_hex: document.getElementById('ff-couleur')?.value || '',
     photo_url:      document.getElementById('ff-photo-url').value,
     photo_noel_url: document.getElementById('ff-photo-noel-url').value,
   };

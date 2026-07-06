@@ -278,6 +278,10 @@ function demandeOuvrirModalListe() {
   demandeRetourListe();
   let modif = null;
   try { modif = JSON.parse(localStorage.getItem('uc_modif_cmd') || 'null'); } catch (e) {}
+  const merciP = overlay.querySelector('#demande-vue-merci p.demande-form-intro');
+  if (merciP) merciP.textContent = (modif && modif.cmd)
+    ? 'Merci! Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt avec une proposition ajustée.'
+    : 'Merci! Nous avons bien reçu vos Coups de coeur. Nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison. À bientôt!';
   const contBtn = overlay.querySelector('.demande-continuer');
   if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'S.V.P mettre à jour la commande' : 'Continuer';
   overlay.classList.add('ouvert');
@@ -620,20 +624,40 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       const bloque = document.getElementById('coupdecoeur-bloque');
       if (bloque) {
         bloque.classList.remove('cache');
+        const ouvrirContactBloque = function (e) {
+          if (e) e.preventDefault();
+          naviguer('contact');
+          const elP = document.getElementById('prenom');
+          const elN = document.getElementById('nom');
+          const elS = document.getElementById('sujet');
+          const elM = document.getElementById('message');
+          if (elP) elP.value = res.prenom || '';
+          if (elN) elN.value = res.nom || '';
+          if (elS) {
+            const opt = document.createElement('option');
+            opt.value = 'Question —  ' + numero;
+            opt.textContent = 'Question —  ' + numero;
+            opt.selected = true;
+            elS.appendChild(opt);
+          }
+          if (elM) elM.value = 'Bonjour, je vous écris au sujet de ma commande ' + numero + '.';
+        };
         if (res.statut === 'Terminée') {
           const lienSuiviT = res.no_tracage ? 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage) : '';
-          bloque.innerHTML = '<p><strong>Votre commande est en route!</strong></p>' +
-            (lienSuiviT ? '<p><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + res.no_tracage + '</a></p>' : '') +
-            '<p><a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Une question? Écrivez-nous.</a></p>' +
-            '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
-          return;
+          bloque.innerHTML = '<p style="margin-top:32px;margin-bottom:16px"><strong>Votre commande est en route!</strong></p>' +
+            (lienSuiviT ? '<p style="margin-bottom:16px"><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + res.no_tracage + '</a></p>' : '') +
+            '<p style="margin-bottom:24px"><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
+            '<button type="button" class="bouton bouton-contour" style="display:inline-flex;width:auto" onclick="naviguer(\'accueil\')">Fermer</button>';
+        } else {
+          const messageBloque = (res.statut === 'À expédier')
+            ? 'Votre commande est en traitement — elle ne peut plus être modifiée.'
+            : 'Cette commande ne peut plus être modifiée.';
+          bloque.innerHTML = '<p style="margin-top:32px;margin-bottom:16px">' + messageBloque + '</p>' +
+            '<p style="margin-bottom:24px"><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
+            '<button type="button" class="bouton bouton-contour" style="display:inline-flex;width:auto" onclick="naviguer(\'accueil\')">Fermer</button>';
         }
-        const messageBloque = (res.statut === 'À expédier')
-          ? 'Votre commande est en traitement — elle ne peut plus être modifiée.'
-          : 'Cette commande ne peut plus être modifiée.';
-        bloque.innerHTML = '<p>' + messageBloque + '</p>' +
-          '<p><a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Une question? Écrivez-nous.</a></p>' +
-          '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+        const lienEcrivez = document.getElementById('bloque-ecrivez');
+        if (lienEcrivez) lienEcrivez.addEventListener('click', ouvrirContactBloque);
       }
       return;
     }

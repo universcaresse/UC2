@@ -161,6 +161,19 @@ function onChangeModeRegroupement() {
   }
 }
 
+// ─── COULEUR HEX (carré d'aperçu + champ 6 caractères) — partagé univers/familles ───
+function apercuCouleurUC(input, idApercu, idCache) {
+  if (!input) return;
+  var val = (input.value || '').trim().replace('#', '');
+  val = val.replace(/[^0-9a-fA-F]/g, '').substring(0, 6);
+  input.value = val;
+  var hexComplet = /^[0-9a-fA-F]{6}$/.test(val) ? '#' + val : '';
+  var apercu = document.getElementById(idApercu);
+  if (apercu) apercu.style.background = hexComplet || 'var(--sable)';
+  var elHex = document.getElementById(idCache);
+  if (elHex) elHex.value = hexComplet;
+}
+
 function ouvrirFormRegroupement() {
   fermerFicheRegroupement();
   document.getElementById('form-regroupements-titre').textContent      = 'Nouveau regroupement';
@@ -172,6 +185,11 @@ function ouvrirFormRegroupement() {
   document.getElementById('freg-desc').value                           = '';
   document.getElementById('freg-photo-url').value                      = '';
   document.getElementById('freg-photo-noel-url').value                 = '';
+  const fregCouleurVisibleN = document.getElementById('freg-couleur-visible');
+  if (fregCouleurVisibleN) {
+    fregCouleurVisibleN.value = '';
+    apercuCouleurUC(fregCouleurVisibleN, 'freg-couleur-apercu', 'freg-couleur');
+  }
   const previewMainNew = document.getElementById('freg-photo-preview');
   if (previewMainNew) previewMainNew.innerHTML = '';
   const previewNoelNew = document.getElementById('freg-photo-noel-preview');
@@ -264,6 +282,11 @@ function modifierRegroupement(fra_id) {
   document.getElementById('freg-desc').value                           = fra.description || '';
   document.getElementById('freg-photo-url').value                      = fra.photo_url || '';
   document.getElementById('freg-photo-noel-url').value                 = fra.photo_noel_url || '';
+  const fregCouleurVisible = document.getElementById('freg-couleur-visible');
+  if (fregCouleurVisible) {
+    fregCouleurVisible.value = (fra.couleur_hex || '').replace('#', '');
+    apercuCouleurUC(fregCouleurVisible, 'freg-couleur-apercu', 'freg-couleur');
+  }
   const previewMain = document.getElementById('freg-photo-preview');
   if (previewMain) previewMain.innerHTML = fra.photo_url ? `<img src="${fra.photo_url}">` : '';
   const previewNoel = document.getElementById('freg-photo-noel-preview');
@@ -326,6 +349,7 @@ async function sauvegarderRegroupement() {
     photo_url:           document.getElementById('freg-photo-url').value,
     photo_noel_url:      document.getElementById('freg-photo-noel-url').value,
     mots_cles:           document.getElementById('freg-mots-cles')?.value || '',
+    couleur_hex:         document.getElementById('freg-couleur')?.value || '',
     categories_exclues:  categoriesExclues,
     collections_exclues: collectionsExclues,
     gammes_exclues:      gammesExclues,
