@@ -555,6 +555,16 @@
                   <button type="button" class="boutons boutons-vert" onclick="ouvrirMediatheque('ff-photo-noel-url', 'ff-photo-noel-preview', 'Famille Noël')">Médiathèque</button>
                 </div>
                 <div class="champ">
+                  <div id="ff-couleur-apercu" class="visuel-hex" style="border:1px solid var(--sable)"></div>
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <span style="font-size:1.1rem;color:var(--grise)">#</span>
+                    <input type="text" class="controle" id="ff-couleur-visible" maxlength="6" placeholder="6 caractères" oninput="apercuCouleurUC(this, 'ff-couleur-apercu', 'ff-couleur')" style="font-family:monospace;letter-spacing:0.05em;text-transform:uppercase">
+                  </div>
+                  <input type="hidden" id="ff-couleur">
+                </div>
+              </div>
+              <div class="visuel">
+                <div class="champ">
                   <div id="ff-rang-apercu" class="visuel-hex"></div>
                   <select class="controle" id="ff-position">
                     <option value="0">En premier</option>
@@ -578,15 +588,7 @@
                     <option value="">— Aucune —</option>
                   </select>
                 </div>
-                <div class="champ">
-                  <label class="libelle">Couleur HEX</label>
-                  <div id="ff-couleur-apercu" style="width:120px;height:120px;border:1px solid var(--sable);margin-bottom:8px"></div>
-                  <div style="display:flex;align-items:center;gap:6px">
-                    <span style="font-size:1.1rem;color:var(--grise)">#</span>
-                    <input type="text" class="controle" id="ff-couleur-visible" maxlength="6" placeholder="6 caractères" oninput="apercuCouleurUC(this, 'ff-couleur-apercu', 'ff-couleur')" style="font-family:monospace;letter-spacing:0.05em;text-transform:uppercase">
-                  </div>
-                  <input type="hidden" id="ff-couleur">
-                </div>
+                
                 <div class="champ champ-plein">
                   <label class="libelle">Description</label>
                   <textarea class="controle zonedetexte" id="ff-desc" rows="3" oninput="ajusterHauteurTextarea(this)"></textarea>
@@ -694,6 +696,16 @@
             <input type="hidden" id="freg-photo-noel-url">
           </div>
           <div class="champ">
+            <div id="freg-couleur-apercu" class="visuel-hex" style="border:1px solid var(--sable)"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:1.1rem;color:var(--grise)">#</span>
+              <input type="text" class="controle" id="freg-couleur-visible" maxlength="6" placeholder="6 caractères" oninput="apercuCouleurUC(this, 'freg-couleur-apercu', 'freg-couleur')" style="font-family:monospace;letter-spacing:0.05em;text-transform:uppercase">
+            </div>
+            <input type="hidden" id="freg-couleur">
+          </div>
+        </div>
+        <div class="visuel">
+          <div class="champ">
             <div id="freg-rang-apercu" class="visuel-hex"></div>
             <select class="controle" id="freg-position">
               <option value="0">En premier</option>
@@ -752,15 +764,7 @@
             <label class="libelle">Slogan</label>
             <input type="text" class="controle" id="freg-slogan">
           </div>
-          <div class="champ">
-            <label class="libelle">Couleur HEX</label>
-            <div id="freg-couleur-apercu" style="width:120px;height:120px;border:1px solid var(--sable);margin-bottom:8px"></div>
-            <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:1.1rem;color:var(--grise)">#</span>
-              <input type="text" class="controle" id="freg-couleur-visible" maxlength="6" placeholder="6 caractères" oninput="apercuCouleurUC(this, 'freg-couleur-apercu', 'freg-couleur')" style="font-family:monospace;letter-spacing:0.05em;text-transform:uppercase">
-            </div>
-            <input type="hidden" id="freg-couleur">
-          </div>
+          
           <div class="champ champ-plein">
             <label class="libelle">Mots-clés (recherche, invisibles sur le site)</label>
             <input type="text" class="controle" id="freg-mots-cles">
