@@ -103,6 +103,8 @@ function ouvrirFormGamme(col_id) {
   document.getElementById('fg-rang').value        = '';
   document.getElementById('fg-desc').value        = '';
   document.getElementById('fg-slogan').value      = '';
+  const mcGamNeuf = document.getElementById('fg-mots-cles');
+  if (mcGamNeuf) mcGamNeuf.value = '';
   document.getElementById('fg-photo-url').value   = '';
   document.getElementById('fg-photo-noel-url').value = '';
   const previewGN1 = document.getElementById('fg-photo-preview');
@@ -151,6 +153,7 @@ async function sauvegarderGamme2() {
     couleur_hex: '',
     photo_url:   document.getElementById('fg-photo-url').value,
     photo_noel_url: document.getElementById('fg-photo-noel-url').value,
+    mots_cles:   document.getElementById('fg-mots-cles')?.value || '',
     rowIndex:    rowIndex || null
   };
   const res = await appelAPIPost('saveGamme', d);
@@ -288,6 +291,8 @@ document.getElementById('btn-nouvelle-gamme').classList.add('cache');
    document.getElementById('fg-nom').value         = gam.nom || '';
    document.getElementById('fg-id').value          = gam.gam_id;
    document.getElementById('fg-slogan').value      = gam.slogan || '';
+   const mcGam = document.getElementById('fg-mots-cles');
+   if (mcGam) mcGam.value = gam.mots_cles || '';
    document.getElementById('fg-photo-url').value   = gam.photo_url || '';
    document.getElementById('fg-photo-noel-url').value = gam.photo_noel_url || '';
    const previewG = document.getElementById('fg-photo-preview');

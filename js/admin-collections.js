@@ -120,7 +120,7 @@ function ouvrirFormCollection() {
       selPos.appendChild(o);
     });
   }
-  ['fc-rang','fc-collection','fc-slogan','fc-desc-col','fc-couleur-hex','fc-photo-url']
+  ['fc-rang','fc-collection','fc-slogan','fc-desc-col','fc-couleur-hex','fc-photo-url','fc-mots-cles']
     .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
   ['fc-photo-preview','fc-photo-preview-noel'].forEach(id => {
     const e = document.getElementById(id); if (e) e.innerHTML = '';
@@ -165,6 +165,8 @@ async function modifierCollection(col_id) {
   }
   document.getElementById('fc-collection').value       = col.nom || '';
   document.getElementById('fc-slogan').value           = col.slogan || '';
+  const mcCol = document.getElementById('fc-mots-cles');
+  if (mcCol) mcCol.value = col.mots_cles || '';
   const descCol = document.getElementById('fc-desc-col');
   if (descCol) { descCol.value = col.description || ''; ajusterHauteurTextarea(descCol); }
   if (document.getElementById('fc-couleur-hex')) (document.getElementById('fc-couleur-hex') || {}).value = col.couleur_hex || '';
@@ -245,6 +247,7 @@ async function sauvegarderCollection() {
     couleur_hex: '',
     photo_url:   document.getElementById('fc-photo-url').value,
     photo_noel_url: document.getElementById('fc-photo-url-noel')?.value || '',
+    mots_cles:   document.getElementById('fc-mots-cles')?.value || '',
     rowIndex:    rowIndex || null
   };
   if (!d.nom) {

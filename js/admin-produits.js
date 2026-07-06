@@ -801,7 +801,7 @@ async function ouvrirFormProduit() {
 
   document.getElementById('form-recettes-titre').textContent = 'Nouveau produit';
   document.getElementById('fr-id').value = '';
-  ['fr-nom', 'fr-couleur', 'fr-cure', 'fr-description', 'fr-instructions', 'fr-notes', 'fr-surgras', 'fr-avertissement', 'fr-mode-emploi'].forEach(function(id) {
+  ['fr-nom', 'fr-couleur', 'fr-cure', 'fr-description', 'fr-instructions', 'fr-notes', 'fr-surgras', 'fr-avertissement', 'fr-mode-emploi', 'fr-mots-cles'].forEach(function(id) {
     var e = document.getElementById(id); if (e) e.value = '';
   });
   var elDescEmb = document.getElementById('fr-desc-emballage');
@@ -912,6 +912,8 @@ async function modifierProduit(pro_id) {
   if (elAvert) elAvert.value = pro.avertissement || '';
   var elMode = document.getElementById('fr-mode-emploi');
   if (elMode) elMode.value = pro.mode_emploi || '';
+  var elMc = document.getElementById('fr-mots-cles');
+  if (elMc) elMc.value = pro.mots_cles || '';
 
   injecterOptionArchive();
   document.getElementById('fr-statut').value = pro.statut || 'test';
@@ -1071,6 +1073,7 @@ async function sauvegarderRecette() {
       notes: document.getElementById('fr-notes').value,
       avertissement: (document.getElementById('fr-avertissement') || {}).value || '',
       mode_emploi: (document.getElementById('fr-mode-emploi') || {}).value || '',
+      mots_cles: (document.getElementById('fr-mots-cles') || {}).value || '',
       surgras: surgrasFinal,
       statut: document.getElementById('fr-statut').value || 'test',
       image_url: document.getElementById('fr-image-url').value,
@@ -1393,6 +1396,7 @@ function sauvegarderEtatFormulaire() {
     notes: (document.getElementById('fr-notes') || {}).value || '',
     avertissement: (document.getElementById('fr-avertissement') || {}).value || '',
     mode_emploi: (document.getElementById('fr-mode-emploi') || {}).value || '',
+    mots_cles: (document.getElementById('fr-mots-cles') || {}).value || '',
     cure: (document.getElementById('fr-cure') || {}).value || '',
     cure_na: !!(document.getElementById('fr-cure-na') || {}).checked,
     surgras: (document.getElementById('fr-surgras') || {}).value || '',
@@ -1419,6 +1423,7 @@ function restaurerEtatFormulaire() {
   if (document.getElementById('fr-notes')) document.getElementById('fr-notes').value = s.notes;
   if (document.getElementById('fr-avertissement')) document.getElementById('fr-avertissement').value = s.avertissement;
   if (document.getElementById('fr-mode-emploi')) document.getElementById('fr-mode-emploi').value = s.mode_emploi;
+  if (document.getElementById('fr-mots-cles')) document.getElementById('fr-mots-cles').value = s.mots_cles || '';
   if (document.getElementById('fr-cure')) document.getElementById('fr-cure').value = s.cure;
   if (document.getElementById('fr-cure-na')) document.getElementById('fr-cure-na').checked = s.cure_na;
   if (document.getElementById('fr-surgras')) document.getElementById('fr-surgras').value = s.surgras;

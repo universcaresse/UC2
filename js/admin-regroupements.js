@@ -167,6 +167,8 @@ function ouvrirFormRegroupement() {
   document.getElementById('freg-id').value                             = '';
   document.getElementById('freg-nom').value                            = '';
   document.getElementById('freg-slogan').value                         = '';
+  const mcFraNeuf = document.getElementById('freg-mots-cles');
+  if (mcFraNeuf) mcFraNeuf.value = '';
   document.getElementById('freg-desc').value                           = '';
   document.getElementById('freg-photo-url').value                      = '';
   document.getElementById('freg-photo-noel-url').value                 = '';
@@ -257,6 +259,8 @@ function modifierRegroupement(fra_id) {
   document.getElementById('freg-id').value                             = fra.fra_id;
   document.getElementById('freg-nom').value                            = fra.nom || '';
   document.getElementById('freg-slogan').value                         = fra.slogan || '';
+  const mcFra = document.getElementById('freg-mots-cles');
+  if (mcFra) mcFra.value = fra.mots_cles || '';
   document.getElementById('freg-desc').value                           = fra.description || '';
   document.getElementById('freg-photo-url').value                      = fra.photo_url || '';
   document.getElementById('freg-photo-noel-url').value                 = fra.photo_noel_url || '';
@@ -321,6 +325,7 @@ async function sauvegarderRegroupement() {
     ing_id,
     photo_url:           document.getElementById('freg-photo-url').value,
     photo_noel_url:      document.getElementById('freg-photo-noel-url').value,
+    mots_cles:           document.getElementById('freg-mots-cles')?.value || '',
     categories_exclues:  categoriesExclues,
     collections_exclues: collectionsExclues,
     gammes_exclues:      gammesExclues,
