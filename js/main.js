@@ -289,6 +289,7 @@ function ouvrirRecherche() {
   if (!overlay) return;
   if (typeof fermerModal === 'function') fermerModal();
   overlay.classList.add('ouvert');
+  document.getElementById('burger')?.classList.add('cache-scroll');
   const champ = document.getElementById('recherche-champ');
   if (champ) {
     champ.focus();
@@ -303,6 +304,7 @@ function fermerRecherche() {
   if (champ) champ.value = '';
   if (resultats) resultats.innerHTML = '';
   if (overlay) overlay.classList.remove('ouvert');
+  document.getElementById('burger')?.classList.remove('cache-scroll');
 }
 
 document.addEventListener('keydown', e => {
@@ -470,6 +472,7 @@ function afficherResultatsRecherche(trouves, texteBrut) {
 
 function masquerPanneauRecherche() {
   document.getElementById('recherche-overlay')?.classList.remove('ouvert');
+  document.getElementById('burger')?.classList.remove('cache-scroll');
 }
 
 function rechercheVersProduit(pro_id) {
