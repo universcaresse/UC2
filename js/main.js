@@ -426,7 +426,11 @@ function afficherResultatsRecherche(trouves, texteBrut) {
         if (!uniTrouve && !prodsIci.length) return;
         html += ligneRecherche(infoRegroupements[fra_id].nom || '', uniTrouve ? "rechercheVersUnivers('" + fra_id + "')" : '', 'titre');
         html += '<div class="fab-collection-body">';
-        prodsIci.forEach(pr => { html += ligneRecherche(pr.nom, "rechercheVersProduit('" + pr.id + "')", 'valeur'); });
+        prodsIci.forEach(pr => {
+          const p = produits.find(x => String(x.pro_id) === String(pr.id));
+          const nomAffiche = (p && p.nom_gamme ? p.nom_gamme + ' — ' : '') + pr.nom;
+          html += ligneRecherche(nomAffiche, "rechercheVersProduit('" + pr.id + "')", 'valeur');
+        });
         html += '</div>';
       });
   }
