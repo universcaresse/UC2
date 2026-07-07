@@ -629,10 +629,12 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           naviguer('contact');
           const elP = document.getElementById('prenom');
           const elN = document.getElementById('nom');
+          const elC = document.getElementById('courriel');
           const elS = document.getElementById('sujet');
           const elM = document.getElementById('message');
           if (elP) elP.value = res.prenom || '';
           if (elN) elN.value = res.nom || '';
+          if (elC) elC.value = res.courriel || '';
           if (elS) {
             const opt = document.createElement('option');
             opt.value = 'Question —  ' + numero;
@@ -640,7 +642,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
             opt.selected = true;
             elS.appendChild(opt);
           }
-          if (elM) elM.value = 'Bonjour, je vous écris au sujet de ma commande ' + numero + '.';
+          if (elM) elM.value = '';
         };
         if (res.statut === 'Terminée') {
           const lienSuiviT = res.no_tracage ? 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage) : '';
@@ -651,7 +653,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         } else {
           const messageBloque = (res.statut === 'À expédier')
             ? 'Votre commande est en traitement — elle ne peut plus être modifiée.'
-            : 'Cette commande ne peut plus être modifiée.';
+            : 'Cette commande ne peut plus être modifiée-annulée.';
           bloque.innerHTML = '<p style="margin-top:32px;margin-bottom:16px">' + messageBloque + '</p>' +
             '<p style="margin-bottom:24px"><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
             '<button type="button" class="bouton bouton-contour" style="display:inline-flex;width:auto" onclick="naviguer(\'accueil\')">Fermer</button>';
