@@ -92,6 +92,7 @@
   --interlettre-1:  0.1em;
   --interlettre-12: 0.12em;
   --interlettre-15: 0.15em;
+  --interlettre-25: 0.25em;
 
   /* Typo — poids */
   --poids-300: 300;
@@ -608,6 +609,12 @@ textarea.zonedetexte {
   font-family: var(--police-titre); font-style: italic;
   font-size: var(--texte-base); color: var(--secondaire); display: block; margin-top: var(--espace-6);
 }
+.accroche { 
+font-family:  var(--police-texte);
+font-size:    var(--texte-78 ); letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent);  font-weight: 500; min-height: 1.2rem; }
+
+
+
 .actions {
   display: flex; gap: var(--espace-10); flex-wrap: wrap;
 }

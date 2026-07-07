@@ -416,7 +416,7 @@ function afficherResultatsRecherche(trouves, texteBrut) {
           const gammeTrouvee = gammesIci.some(g => g.id === gam_id);
           const nomGamme = (produits.find(p => p.gam_id === gam_id) || {}).nom_gamme || '';
           html += '<div class="fab-collection-body">';
-          html += ligneRecherche(nomGamme, gammeTrouvee ? "rechercheVersGamme('" + col_id + "','" + gam_id + "')" : '', 'slogan');
+          html += ligneRecherche(nomGamme, gammeTrouvee ? "rechercheVersGamme('" + col_id + "','" + gam_id + "')" : '', 'accroche');
           html += '<div class="fab-collection-body">';
           parGamme[gam_id].forEach(pr => {
             html += ligneRecherche(pr.nom, "rechercheVersProduit('" + pr.id + "')", 'valeur');
@@ -673,7 +673,7 @@ function majuscules(texte) {
 // V2 : infoCollections est un objet indexé par col_id
 // getCataloguePublic_v2 retourne : produits, infoCollections { col_id: { rang, nom, slogan, couleur_hex, ... } }
 function afficherCollectionsPublic() {
-  if (!donneesCatalogue) { afficherCollectionsFallback(); return; }
+  if (!donneesCatalogue) return;
 
   // Construire la liste des collections triées par rang depuis infoCollections
   const infoCollections = donneesCatalogue.infoCollections || {};
@@ -739,35 +739,7 @@ async function afficherRegroupementsPublic() {
   });
 }
 
-function afficherCollectionsFallback() {
-  const collections = [
-    { nom: 'Saponica',    slogan: 'Simplement la nature qui prend soin de vous' },
-    { nom: 'Petit Nuage', slogan: 'Simplement la nature qui dorlote vos tout-petits' },
-    { nom: 'Caprin',      slogan: 'Simplement la nature et la douceur de la chèvre' },
-    { nom: 'Émolia',      slogan: 'Simplement la nature dédiée à votre bien-être' },
-    { nom: 'Épure',       slogan: 'Simplement la nature qui prend soin de vos mains' },
-    { nom: 'Kérys',       slogan: 'Simplement la nature qui dorlotte vos cheveux' },
-    { nom: 'Casa',        slogan: 'Simplement la nature qui prend soin de votre maison' },
-    { nom: 'Anima',       slogan: 'Simplement la nature pour pattes et museaux' }
-  ];
-  const strip = document.getElementById('collections-strip');
-  const count = document.getElementById('collections-count');
-  if (count) count.textContent = collections.length + ' collections';
-  if (!strip) return;
-  strip.innerHTML = '';
-  collections.forEach(col => {
-    const couleurs = couleurCollection(col.nom);
-    strip.innerHTML += `
-      <a href="#catalogue" onclick="naviguer('catalogue')" class="collection-tile" style="--col-hex-1: ${couleurs[0]}; --col-hex-2: ${couleurs[1]};">
-        <div class="collection-tile-bg"></div>
-        <div class="collection-tile-overlay"></div>
-        <div class="collection-tile-content">
-          <span class="collection-tile-name">${col.nom.toUpperCase()}</span>
-          <span class="collection-tile-slogan">${col.slogan}</span>
-        </div>
-      </a>`;
-  });
-}
+
 
 // ─── CATALOGUE ───
 let catalogueCharge = false;
