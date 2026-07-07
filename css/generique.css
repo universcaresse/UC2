@@ -387,6 +387,11 @@ h1, h2, h3 {
   margin-top: var(--espace-8);
 }
 
+/* Un bouton qui suit directement un paragraphe reçoit de l'air */
+p + .bouton {
+  margin-top: 24px;
+}
+
 /* ════════════════════════════════════════
    BARRE DE FILTRES — une seule, pareille partout
    Boutons à l'intérieur : .boutons-vert (actif) / .boutons-contour

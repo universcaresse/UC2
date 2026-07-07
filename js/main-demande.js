@@ -648,14 +648,14 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           const lienSuiviT = res.no_tracage ? 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage) : '';
           bloque.innerHTML = '<p style="margin-top:32px;margin-bottom:16px"><strong>Votre commande est en route!</strong></p>' +
             (lienSuiviT ? '<p style="margin-bottom:16px"><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + res.no_tracage + '</a></p>' : '') +
-            '<p style="margin-bottom:24px"><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
+            '<p><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
             '<button type="button" class="bouton bouton-contour" style="display:inline-flex;width:auto" onclick="naviguer(\'accueil\')">Fermer</button>';
         } else {
           const messageBloque = (res.statut === 'À expédier')
             ? 'Votre commande est en traitement — elle ne peut plus être modifiée.'
             : 'Cette commande ne peut plus être modifiée-annulée.';
           bloque.innerHTML = '<p style="margin-top:32px;margin-bottom:16px">' + messageBloque + '</p>' +
-            '<p style="margin-bottom:24px"><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
+            '<p><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
             '<button type="button" class="bouton bouton-contour" style="display:inline-flex;width:auto" onclick="naviguer(\'accueil\')">Fermer</button>';
         }
         const lienEcrivez = document.getElementById('bloque-ecrivez');
