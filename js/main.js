@@ -290,11 +290,11 @@ function fermerRecherche() {
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') fermerRecherche();
+  if (e.key === 'Escape') masquerPanneauRecherche();
 });
 document.addEventListener('click', e => {
   const overlay = document.getElementById('recherche-overlay');
-  if (overlay && e.target === overlay) fermerRecherche();
+  if (overlay && e.target === overlay) masquerPanneauRecherche();
 });
 
 function normaliserRecherche(texte) {
@@ -394,19 +394,14 @@ function afficherResultatsRecherche(trouves, texteBrut) {
         });
         const lesGammes = Object.keys(parGamme);
         html += ligneRecherche(nomCol, colTrouvee ? "rechercheVersCollection('" + col_id + "')" : '');
-        if (!lesGammes.length) return;
-        html += '<div class="fab-collection-body">';
         lesGammes.forEach(gam_id => {
           const gammeTrouvee = gammesIci.some(g => g.id === gam_id);
           const nomGamme = (produits.find(p => p.gam_id === gam_id) || {}).nom_gamme || '';
-          html += ligneRecherche(nomGamme, gammeTrouvee ? "rechercheVersGamme('" + col_id + "','" + gam_id + "')" : '');
-          html += '<div class="fab-collection-body">';
+          html += ligneRecherche(nomGamme, gammeTrouvee ? "rechercheVersGamme('" + col_id + "','" + gam_id + "')" : '', 1);
           parGamme[gam_id].forEach(pr => {
-            html += ligneRecherche(pr.nom, "rechercheVersProduit('" + pr.id + "')");
+            html += ligneRecherche(pr.nom, "rechercheVersProduit('" + pr.id + "')", 2);
           });
-          html += '</div>';
         });
-        html += '</div>';
       });
   }
 
@@ -427,11 +422,7 @@ function afficherResultatsRecherche(trouves, texteBrut) {
         const prodsIci = prodsSousUnivers.filter(x => x.fra_id === fra_id);
         if (!uniTrouve && !prodsIci.length) return;
         html += ligneRecherche(infoRegroupements[fra_id].nom || '', uniTrouve ? "rechercheVersUnivers('" + fra_id + "')" : '');
-        if (prodsIci.length) {
-          html += '<div class="fab-collection-body">';
-          prodsIci.forEach(pr => { html += ligneRecherche(pr.nom, "rechercheVersProduit('" + pr.id + "')"); });
-          html += '</div>';
-        }
+        prodsIci.forEach(pr => { html += ligneRecherche(pr.nom, "rechercheVersProduit('" + pr.id + "')", 1); });
       });
   }
 
@@ -503,9 +494,10 @@ function rechercheDescendreVers(el) {
   window.scrollTo({ top: haut, behavior: 'smooth' });
 }
 
-function ligneRecherche(nom, action) {
-  if (action) return '<div class="item" onclick="' + action + '"><span class="item-nom">' + nom + '</span></div>';
-  return '<div class="valeur">' + nom + '</div>';
+function ligneRecherche(nom, action, retrait) {
+  const classeRetrait = retrait ? ' recherche-retrait-' + retrait : '';
+  if (action) return '<div class="recherche-ligne' + classeRetrait + '"><span class="recherche-lien" onclick="' + action + '">' + nom + '</span></div>';
+  return '<div class="recherche-ligne' + classeRetrait + '"><span class="recherche-contexte">' + nom + '</span></div>';
 }
 
 function produitDansUnivers(p, fra) {
