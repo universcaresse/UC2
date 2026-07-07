@@ -456,7 +456,7 @@ select.form-control, select.form-ctrl { cursor: pointer; }
 .msg-succes, #msg-succes {
   background: rgba(90,138,58,0.08); border-left: 3px solid var(--primary);
   color: var(--gris-fonce); padding: 20px 24px; margin-top: 20px;
-  font-family: 'DM Sans', sans-serif; font-size: 0.88rem; line-height: 1.6; display: none;
+  font-family: 'DM Sans', sans-serif; font-size: 0.88rem; line-height: 1.6; display: block;
 }
 .msg-erreur, #msg-erreur {
   background: rgba(196,69,54,0.06); border-left: 3px solid var(--danger);
