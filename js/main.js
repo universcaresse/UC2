@@ -157,6 +157,22 @@ function afficherSection(id) {
 
 function naviguer(id) {
   if (id === 'educatif') afficherEduSection(1);
+  if (id === 'contact') {
+    const formC = document.getElementById('formulaire-contact');
+    const succesC = document.getElementById('msg-succes');
+    const erreurC = document.getElementById('msg-erreur');
+    const btnC = document.getElementById('btn-envoyer');
+    if (formC && formC.classList.contains('cache')) {
+      formC.classList.remove('cache');
+      ['prenom', 'nom', 'courriel', 'sujet', 'message'].forEach(function (idc) {
+        const el = document.getElementById(idc);
+        if (el) el.value = '';
+      });
+    }
+    if (succesC) succesC.classList.add('cache');
+    if (erreurC) erreurC.classList.add('cache');
+    if (btnC) { btnC.disabled = false; btnC.textContent = 'Envoyer le message'; }
+  }
   window.location.hash = id;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
