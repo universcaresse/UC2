@@ -155,11 +155,7 @@ h1, h2, h3 {
 }
 .voile.ouvert { display: flex; }
 .voile-haut { align-items: flex-start; z-index: 180; }
-.recherche-ligne { padding: var(--espace-4) 0; }
-.recherche-lien { color: var(--primaire); cursor: pointer; }
-.recherche-contexte { color: var(--grise); font-size: 0.85em; }
-.recherche-retrait-1 { padding-left: var(--espace-16); }
-.recherche-retrait-2 { padding-left: var(--espace-32); }
+.crochet { color: var(--primaire); }
 
 .modale {
   background: var(--blancpur);
