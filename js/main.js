@@ -510,7 +510,7 @@ function rechercheDescendreVers(el) {
 }
 
 function ligneRecherche(nom, action, classe) {
-  const contenu = action ? nom + ' <span class="crochet">✓</span>' : nom;
+  const contenu = action ? nom + ' <span class="crochet"> ✓</span>' : nom;
   const clic = action ? ' onclick="' + action + '" style="cursor:pointer"' : '';
   return '<div class="' + (classe || 'valeur') + '"' + clic + '>' + contenu + '</div>';
 }
