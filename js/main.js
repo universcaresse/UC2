@@ -426,10 +426,16 @@ function afficherResultatsRecherche(trouves, texteBrut) {
         if (!uniTrouve && !prodsIci.length) return;
         html += ligneRecherche(infoRegroupements[fra_id].nom || '', uniTrouve ? "rechercheVersUnivers('" + fra_id + "')" : '', 'titre');
         html += '<div class="fab-collection-body">';
+        const parGammeUni = {};
         prodsIci.forEach(pr => {
-          const p = produits.find(x => String(x.pro_id) === String(pr.id));
-          const nomAffiche = (p && p.nom_gamme ? p.nom_gamme + ' — ' : '') + pr.nom;
-          html += ligneRecherche(nomAffiche, "rechercheVersProduit('" + pr.id + "')", 'valeur');
+          const p = produits.find(x => String(x.pro_id) === String(pr.id)) || {};
+          (parGammeUni[p.nom_gamme || ''] = parGammeUni[p.nom_gamme || ''] || []).push(pr);
+        });
+        Object.keys(parGammeUni).forEach(nomGamme => {
+          if (nomGamme) html += ligneRecherche(nomGamme, '', 'slogan');
+          html += '<div class="fab-collection-body">';
+          parGammeUni[nomGamme].forEach(pr => { html += ligneRecherche(pr.nom, "rechercheVersProduit('" + pr.id + "')", 'valeur'); });
+          html += '</div>';
         });
         html += '</div>';
       });
