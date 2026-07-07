@@ -553,11 +553,14 @@ function initNav() {
     if (burger && window.innerWidth <= 900) {
       const scrollActuel = window.scrollY;
       const filtres = document.getElementById('filtres-bar');
+      const loupe = document.getElementById('loupe-mobile');
       if (scrollActuel > dernierScroll && scrollActuel > 60) {
         burger.classList.add('cache-scroll');
+        if (loupe) loupe.classList.add('cache-scroll');
         if (filtres) filtres.classList.add('cache-scroll');
       } else {
         burger.classList.remove('cache-scroll');
+        if (loupe) loupe.classList.remove('cache-scroll');
         if (filtres) filtres.classList.remove('cache-scroll');
       }
       dernierScroll = scrollActuel;
