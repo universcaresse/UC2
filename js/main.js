@@ -658,7 +658,7 @@ async function appelAPIPost(action, data = {}) {
     console.error('Erreur API POST:', err);
     return null;
   } finally {
-    voileCacher();
+    cacherVoile();
   }
 }
 
