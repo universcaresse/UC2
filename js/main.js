@@ -617,30 +617,16 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// ─── VOILE D'ATTENTE (pleine page pendant les appels serveur) ───
-let voileCompteur = 0;
-function voileMontrer() {
-  voileCompteur++;
-  let voile = document.getElementById('voile-attente');
-  if (!voile) {
-    voile = document.createElement('div');
-    voile.id = 'voile-attente';
-    voile.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>';
-    document.body.appendChild(voile);
-  }
-  voile.classList.remove('cache');
+// ─── VOILE DE CHARGEMENT (plein écran, appelé à la main sur les gestes du client) ───
+function montrerVoile() {
+  document.getElementById('voile-chargement')?.classList.remove('cache');
 }
-function voileCacher() {
-  voileCompteur = Math.max(0, voileCompteur - 1);
-  if (voileCompteur === 0) {
-    const voile = document.getElementById('voile-attente');
-    if (voile) voile.classList.add('cache');
-  }
+function cacherVoile() {
+  document.getElementById('voile-chargement')?.classList.add('cache');
 }
 
 // ─── APPEL APPS SCRIPT ───
 async function appelAPI(action, params = {}) {
-  voileMontrer();
   try {
     const url = new URL(CONFIG.APPS_SCRIPT_URL);
     url.searchParams.set('action', action);
@@ -1474,6 +1460,7 @@ async function envoyerFormulaire() {
   const btn = document.getElementById('btn-envoyer');
   btn.disabled = true;
   btn.textContent = 'Envoi en cours…';
+  montrerVoile();
 
   try {
     const result = await appelAPIPost('envoyerContact', {
@@ -1481,6 +1468,7 @@ async function envoyerFormulaire() {
       sujet: sujet || 'Non précisé',
       message
     });
+    cacherVoile();
     if (result && result.success) {
       msgSucces.classList.remove('cache');
       msgErreur.classList.add('cache');

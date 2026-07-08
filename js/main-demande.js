@@ -385,6 +385,7 @@ async function demandeEnvoyer() {
   erreurEl.classList.add('cache');
 
   if (btn) btn.disabled = true;
+  montrerVoile();
 
   const lignes = demandeListe.map(i => ({
     pro_id: i.pro_id,
@@ -415,6 +416,7 @@ async function demandeEnvoyer() {
     erreurEl.textContent = "Une erreur s'est produite. Veuillez réessayer ou nous écrire directement.";
     erreurEl.classList.remove('cache');
   }
+  cacherVoile();
   if (btn) btn.disabled = false;
 }
 
@@ -426,6 +428,7 @@ async function demandeRenvoyerModif() {
   const vueMerci = document.getElementById('demande-vue-merci');
   const btn = document.querySelector('.demande-continuer');
   if (btn) btn.disabled = true;
+  montrerVoile();
   const lignes = demandeListe.map(i => ({
     pro_id: i.pro_id, format_poids: i.format_poids, format_unite: i.format_unite,
     quantite: i.quantite, prix_unitaire: i.prix_unitaire
@@ -436,10 +439,12 @@ async function demandeRenvoyerModif() {
       : null;
     if (!r || !r.success) throw new Error((r && r.message) || 'échec');
     try { localStorage.removeItem('uc_modif_cmd'); } catch (e) {}
+    cacherVoile();
     demandeVider();
     if (vueListe) vueListe.classList.add('cache');
     if (vueMerci) vueMerci.classList.remove('cache');
   } catch (err) {
+    cacherVoile();
     if (btn) { btn.disabled = false; btn.textContent = 'Erreur — réessayer'; }
   }
 }
@@ -775,10 +780,12 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     if (action === 'confirmer-annulation') {
         const btn2 = ev.target.closest('[data-action]');
         if (btn2) btn2.disabled = true;
+        montrerVoile();
         const msg = document.getElementById('coupdecoeur-msg');
         const raison = (document.getElementById('coupdecoeur-raison') || {}).value || '';
         try {
           const r = await appelAPIPost('annulerCommandeClient', { cmd_id: numero, jeton: jeton, raison });
+          cacherVoile();
           if (r && r.success) {
             demandeVider();
             zone.innerHTML = '<h2 class="titre">Commande annulée</h2>' +
@@ -801,6 +808,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
             }
           }
         } catch (e) {
+          cacherVoile();
           let annuleeQuandMeme2 = false;
           try {
             const verif2 = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
@@ -832,6 +840,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           return;
         }
         btn.disabled = true;
+        montrerVoile();
         const msg = document.getElementById('coupdecoeur-msg');
         try {
           const lignes = demandeListe.map(i => ({
@@ -839,6 +848,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
             quantite: i.quantite, prix_unitaire: i.prix_unitaire
           }));
           const r = await appelAPIPost('renvoyerListeCoupdecoeur', { cmd_id: numero, lignes, jeton: jeton });
+          cacherVoile();
           if (r && r.success) {
             demandeVider();
             zone.innerHTML = '<h2 class="demande-modal-titre">Merci !</h2>' +
@@ -850,6 +860,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
             
           }
         } catch (e) {
+          cacherVoile();
           if (msg) { msg.textContent = 'Erreur : ' + e.message; msg.classList.remove('cache'); }
           btn.disabled = false;
         }
@@ -961,6 +972,7 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
 
     if (action === 'attendre-tout' || action === 'recevoir-pret') {
       btn.disabled = true;
+      montrerVoile();
       const msg = document.getElementById('coupdecoeur-msg');
       const temporairesGardes = temporaires
         .filter(l => reponses[l.pro_id + '|' + l.format_poids + '|' + l.format_unite] === 'garder')
@@ -970,6 +982,7 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
         const r = await appelAPIPost(action === 'recevoir-pret' ? 'recevoirPret' : 'attendreTout', {
           cmd_id, jeton, temporaires_gardes: temporairesGardes
         });
+        cacherVoile();
         if (r && r.success) {
           zone.removeEventListener('click', handler);
           if (action === 'recevoir-pret') {
@@ -982,6 +995,7 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
           btn.disabled = false;
         }
       } catch(e) {
+        cacherVoile();
         if (msg) { msg.textContent = 'Erreur : ' + e.message; msg.classList.remove('cache'); }
         btn.disabled = false;
       }

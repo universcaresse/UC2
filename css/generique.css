@@ -21,6 +21,7 @@
   --blancpur:       #ffffff;
   --blancpur-15:    rgba(255,255,255,0.15);
   --blancpur-95:    rgba(255,255,255,0.95);
+  --blancpur-85: 	rgba(255,255,255,0.85);
 
   --grise:          #8b8680;
   --grise-foncee:   #3d3b39;
@@ -336,8 +337,15 @@ h1, h2, h3 {
    Des boutons
    ════════════════════════════════════════════════ */
    
-   /* Voile pleine page pendant les appels au serveur */
-#voile-attente { display: none !important; }
+.voile-chargement {
+  position: fixed;
+  inset: 0;
+  background: var(--blancpur-85);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
    
    
    
