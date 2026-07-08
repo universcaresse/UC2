@@ -549,7 +549,7 @@ window.addEventListener('DOMContentLoaded', async function () {
           '<div class="form-group"><label class="form-label">Rue <span>*</span></label><input type="text" class="form-control" id="adr-rue" value="' + (r.rue || '') + '"></div>' +
           '<div class="form-group"><label class="form-label">Ville <span>*</span></label><input type="text" class="form-control" id="adr-ville" value="' + (r.ville || '') + '"></div>' +
           '<div class="form-group"><label class="form-label">Province <span>*</span></label><select class="form-control" id="adr-province"><option value="">— Choisir —</option>' + optionsProv + '</select></div>' +
-          '<div class="form-group"><label class="form-label">Code postal</label><input type="text" class="form-control" id="adr-code-postal" value="' + (r.code_postal || '') + '" readonly style="background:#f5f1ea;cursor:not-allowed"><p class="textes-discrets" style="margin-top:4px">Les frais de livraison sont calculés avec ce code postal. Pour le changer, écrivez-nous.</p></div>' +
+          '<div class="form-group"><label class="form-label">Code postal</label><input type="text" class="form-control" id="adr-code-postal" value="' + (r.code_postal || '') + '" readonly style="background:#f5f1ea;cursor:not-allowed"><p class="textes-discrets">Les frais de livraison sont calculés avec ce code postal. Pour le changer, écrivez-nous.</p></div>' +
           '<div class="form-group"><label class="form-label"><input type="checkbox" id="adr-infolettre"> Je souhaite recevoir l\'infolettre par courriel</label></div>' +
           '<div id="adr-erreur" class="demande-form-erreur cache"></div>' +
           '<button type="button" class="bouton bouton-grand" id="adr-continuer">Continuer vers le paiement</button>';
@@ -624,7 +624,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         '<p class="textes-discrets">Ce courriel n\'est plus à jour. Retrouvez la proposition la plus récente dans vos courriels, ou recevez-la à nouveau.</p>' +
         '<button type="button" class="bouton bouton-grand" id="prop-renvoyer2">Recevez à nouveau votre proposition</button>' +
         '<button type="button" class="bouton bouton-contour" style="margin-top:8px" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</button>' +
-        '<p class="textes-discrets cache" id="prop-renvoyer2-msg" style="margin-top:12px"></p>';
+        '<p class="textes-discrets cache" id="prop-renvoyer2-msg"></p>';
       var bR2 = document.getElementById('prop-renvoyer2');
       if (bR2) bR2.addEventListener('click', async function () {
         var msgR2 = document.getElementById('prop-renvoyer2-msg');
@@ -695,7 +695,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           '<p class="textes-discrets">Nous vous avons envoyé une proposition par courriel, avec les prix et la livraison. Si vous ne la retrouvez pas...</p>' +
           '<button type="button" class="bouton bouton-grand" id="prop-renvoyer">Recevez à nouveau votre proposition</button>' +
           '<button type="button" class="bouton bouton-contour" style="margin-top:8px" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</button>' +
-          '<p class="textes-discrets cache" id="prop-renvoyer-msg" style="margin-top:12px"></p>';
+          '<p class="textes-discrets cache" id="prop-renvoyer-msg"></p>';
         var bRenvoyer = document.getElementById('prop-renvoyer');
         if (bRenvoyer) bRenvoyer.addEventListener('click', async function () {
           var msgR = document.getElementById('prop-renvoyer-msg');
@@ -945,7 +945,7 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
   function section(titre, liste, avecBoutons, sousTitre) {
     if (!liste.length) return '';
     let h = '<div style="margin:20px 0 8px;font-size:0.7rem;letter-spacing:0.2em;color:#8b8680;text-transform:uppercase">' + titre + '</div>';
-    if (sousTitre) h += '<p class="textes-discrets" style="margin-bottom:8px">' + sousTitre + '</p>';
+    if (sousTitre) h += '<p class="textes-discrets">' + sousTitre + '</p>';
     liste.forEach(l => { h += rangee(l, avecBoutons); });
     return h;
   }

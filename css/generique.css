@@ -597,6 +597,7 @@ p + .bouton {
 .textes-discrets {
   color: var(--grise);
   font-size: var(--texte-85);
+  margin: var(--espace-12) 0 var(--espace-24);
 }
 
 .casesacocher {
