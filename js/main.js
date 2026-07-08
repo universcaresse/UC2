@@ -643,7 +643,7 @@ async function appelAPI(action, params = {}) {
 
 
 async function appelAPIPost(action, data = {}) {
-  voileMontrer();
+  montrerVoile();
   try {
     const payload = JSON.stringify({ action, ...data });
     const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
