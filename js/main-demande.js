@@ -205,25 +205,28 @@ function demandeCreerModalListe() {
   if (document.getElementById('demande-modal')) return;
   const overlay = document.createElement('div');
   overlay.id = 'demande-modal';
-  overlay.className = 'modal-overlay demande-modal-overlay';
+  overlay.className = 'voile';
   overlay.innerHTML =
-    '<div class="demande-modal">' +
-      '<button class="demande-modal-fermer" type="button" aria-label="Fermer">✕</button>' +
+    '<div class="modale">' +
+      '<div class="modale-entete">' +
+        '<span class="titre" id="demande-titre">Vos Coups de cœur</span>' +
+        '<button class="boutons-fermer demande-modal-fermer" type="button" aria-label="Fermer">✕</button>' +
+      '</div>' +
+      '<div class="modale-corps">' +
       '<div id="demande-vue-liste">' +
-        '<h2 class="demande-modal-titre">Vos Coups de cœur</h2>' +
         '<div class="demande-modal-liste" id="demande-modal-liste"></div>' +
-        '<div class="demande-modal-pied">' +
-          '<span class="demande-modal-total-label">Total avant les frais de livraison</span>' +
-          '<span class="demande-modal-total" id="demande-modal-total"></span>' +
+        '<div class="lignetotal">' +
+          '<span class="lignetotal-libelle">Total avant les frais de livraison</span>' +
+          '<span id="demande-modal-total"></span>' +
         '</div>' +
 		
-        '<button type="button" class="bouton bouton-contour demande-continuer" data-action="ajouter-produits" style="margin-bottom:8px">Ajouter d\'autres produits</button>' +
+        '<button type="button" class="boutons boutons-contour boutons-pleine-largeur demande-continuer" data-action="ajouter-produits">Ajouter d\'autres produits</button>' +
 		
-        '<button type="button" class="bouton bouton-grand demande-continuer" data-action="continuer">Continuer</button>' +
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur demande-continuer" data-action="continuer">Continuer</button>' +
       '</div>' +
       '<div id="demande-vue-form" class="cache">' +
         '<button type="button" class="demande-retour" data-action="retour">← Retour à la liste</button>' +
-        '<h2 class="demande-modal-titre">Coordonnées</h2>' +
+        
         '<p class="demande-form-intro">Inscrivez vos coordonnées, nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison.</p>' +
         '<div class="form-group"><label class="form-label">Prénom <span>*</span></label><input type="text" class="form-control" id="demande-prenom"></div>' +
         '<div class="form-group"><label class="form-label">Nom <span>*</span></label><input type="text" class="form-control" id="demande-nom"></div>' +
@@ -232,13 +235,14 @@ function demandeCreerModalListe() {
         '<div class="form-group"><label class="form-label">Code postal (pour Poste Canada)<span>*</span></label><input type="text" class="form-control" id="demande-code-postal"></div>' +
         '<div class="form-group"><label class="form-label">Message</label><textarea class="form-control" id="demande-message"></textarea></div>' +
         '<div id="demande-form-erreur" class="demande-form-erreur cache"></div>' +
-        '<button type="button" class="bouton bouton-grand demande-form-envoyer" data-action="envoyer">Envoyer vos Coups de coeur</button>' +
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur demande-form-envoyer" data-action="envoyer">Envoyer vos Coups de coeur</button>' +
       '</div>' +
       '<div id="demande-vue-merci" class="cache">' +
-        '<h2 class="demande-modal-titre">Merci de votre intérêt</h2>' +
+        
         '<p class="demande-form-intro">Merci! Nous avons bien reçu vos Coups de coeur. Nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison. À bientôt!</p>' +
         '<p class="demande-form-intro">Surveillez votre boîte de réception et pensez à vérifier vos pourriels, au cas où.</p>' +
-        '<button type="button" class="bouton bouton-grand demande-continuer" data-action="fermer">Fermer</button>' +
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur demande-continuer" data-action="fermer">Fermer</button>' +
+      '</div>' +
       '</div>' +
     '</div>';
   document.body.appendChild(overlay);
@@ -313,25 +317,21 @@ function demandeRendreListe() {
     const sousTotal = (i.prix_unitaire || 0) * (i.quantite || 1);
     const prix = (typeof formaterPrix === 'function') ? formaterPrix(sousTotal) : sousTotal.toFixed(2).replace('.', ',') + ' $';
     const photo = i.image_url
-      ? '<img src="' + i.image_url + '" alt="" class="demande-item-photo">'
-      : '<div class="demande-item-photo demande-item-photo-vide"></div>';
-    return '<div class="demande-item" data-cle="' + cle + '" data-pro-id="' + i.pro_id + '" data-poids="' + i.format_poids + '" data-unite="' + i.format_unite + '">' +
+      ? '<img src="' + i.image_url + '" alt="" class="rangeeitem-photo">'
+      : '<div class="rangeeitem-photo"></div>';
+    return '<div class="rangeeitem" data-cle="' + cle + '" data-pro-id="' + i.pro_id + '" data-poids="' + i.format_poids + '" data-unite="' + i.format_unite + '">' +
         photo +
-        '<div class="demande-item-infos">' +
-          (i.nom_collection ? '<span class="demande-item-collection">' + i.nom_collection + '</span>' : '') +
-          (i.nom_gamme ? '<span class="demande-item-gamme">' + i.nom_gamme + '</span>' : '') +
-          '<span class="demande-item-nom">' + (i.nom_produit || '') + '</span>' +
-          '<span class="demande-item-format">' +  i.format_poids + ' ' + i.format_unite + '</span>' +
+        '<div class="rangeeitem-info">' +
+          '<div class="rangeeitem-titre">' + (i.nom_produit || '') + '</div>' +
+          '<div class="rangeeitem-meta">' + (i.nom_collection ? i.nom_collection + ' · ' : '') + (i.nom_gamme ? i.nom_gamme + ' · ' : '') + i.format_poids + ' ' + i.format_unite + '</div>' +
         '</div>' +
-        '<div class="demande-item-droite">' +
-          '<div class="demande-item-qte">' +
-            '<button type="button" data-action="moins" aria-label="Enlever un">−</button>' +
-            '<span class="demande-item-qte-nb">' + (i.quantite || 1) + '</span>' +
-            '<button type="button" data-action="plus" aria-label="Ajouter un">+</button>' +
-          '</div>' +
-          '<span class="demande-item-soustotal">' + prix + '</span>' +
-          '<button type="button" class="demande-item-retirer" data-action="retirer">Retirer</button>' +
+        '<div class="compteur">' +
+          '<button type="button" class="compteur-btn" data-action="moins" aria-label="Enlever un">−</button>' +
+          '<span class="compteur-valeur">' + (i.quantite || 1) + '</span>' +
+          '<button type="button" class="compteur-btn" data-action="plus" aria-label="Ajouter un">+</button>' +
         '</div>' +
+        '<button type="button" class="boutons boutons-contour boutons-petit" data-action="retirer">Retirer</button>' +
+        '<span class="rangeeitem-valeur">' + prix + '</span>' +
       '</div>';
   }).join('');
   if (totalEl) totalEl.textContent = (typeof formaterPrix === 'function') ? formaterPrix(demandeSousTotal()) : demandeSousTotal().toFixed(2).replace('.', ',') + ' $';
@@ -345,6 +345,8 @@ function demandeAllerForm() {
   if (!vueListe || !vueForm) return;
   vueListe.classList.add('cache');
   vueForm.classList.remove('cache');
+  const titre = document.getElementById('demande-titre');
+  if (titre) titre.textContent = 'Coordonnées';
 }
 
 function demandeRetourListe() {
@@ -355,6 +357,8 @@ function demandeRetourListe() {
   vueForm.classList.add('cache');
   if (vueMerci) vueMerci.classList.add('cache');
   vueListe.classList.remove('cache');
+  const titre = document.getElementById('demande-titre');
+  if (titre) titre.textContent = 'Vos Coups de cœur';
 }
 
 async function demandeEnvoyer() {
@@ -414,6 +418,8 @@ async function demandeEnvoyer() {
     const vueMerci = document.getElementById('demande-vue-merci');
     if (vueForm)  vueForm.classList.add('cache');
     if (vueMerci) vueMerci.classList.remove('cache');
+    const titreM = document.getElementById('demande-titre');
+    if (titreM) titreM.textContent = 'Merci de votre intérêt';
   } catch (err) {
     erreurEl.textContent = "Une erreur s'est produite. Veuillez réessayer ou nous écrire à universcaresse@outlook.com.";
     erreurEl.classList.remove('cache');
@@ -445,6 +451,8 @@ async function demandeRenvoyerModif() {
     demandeVider();
     if (vueListe) vueListe.classList.add('cache');
     if (vueMerci) vueMerci.classList.remove('cache');
+    const titreR = document.getElementById('demande-titre');
+    if (titreR) titreR.textContent = 'Merci de votre intérêt';
   } catch (err) {
     cacherVoile();
     if (btn) { btn.disabled = false; btn.textContent = 'Erreur — réessayer'; }

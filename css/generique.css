@@ -63,6 +63,7 @@
   --taille-24:  24px;
   --taille-28:  28px;
   --taille-48:  48px;
+  --taille-64:  64px;
   --taille-72:  72px;
   --taille-80:  80px;
   --taille-180: 180px;
@@ -404,8 +405,12 @@ h1, h2, h3 {
   padding: var(--espace-10) var(--espace-16);
   font-size: var(--texte-68);
 }
-.boutons-ajout {
-  margin-top: var(--espace-8);
+.boutons-pleine-largeur {
+  display: flex;
+  width: 100%;
+}
+.boutons-pleine-largeur + .boutons-pleine-largeur {
+  margin-top: var(--espace-12);
 }
 
 /* Un bouton qui suit directement un paragraphe reçoit de l'air */
@@ -521,6 +526,18 @@ p + .bouton {
   color: var(--primaire);
   white-space: nowrap;
 }
+.rangeeitem-photo {
+  width: var(--taille-64);
+  height: var(--taille-64);
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--sable);
+}
+@media (max-width: 900px) {
+  .rangeeitem { flex-wrap: wrap; }
+  .rangeeitem-info { flex: 1 1 100%; }
+  .rangeeitem-valeur { margin-left: auto; }
+}
 
 .compteur {
   display: inline-flex;
@@ -567,6 +584,9 @@ p + .bouton {
   letter-spacing: var(--interlettre-15);
   text-transform: uppercase;
   color: var(--grise);
+}
+.lignetotal span:not(.lignetotal-libelle) {
+  white-space: nowrap;
 }
 
 .textes-discrets {
