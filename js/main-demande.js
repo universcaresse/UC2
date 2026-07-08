@@ -216,7 +216,7 @@ function demandeCreerModalListe() {
           '<span class="demande-modal-total-label">Total avant les frais de livraison</span>' +
           '<span class="demande-modal-total" id="demande-modal-total"></span>' +
         '</div>' +
-        '<button type="button" class="bouton bouton-contour" data-action="ajouter-produits" style="margin-bottom:8px">Ajouter d\'autres produits</button>' +
+        '<button type="button" class="bouton bouton-grand demande-continuer" data-action="ajouter-produits" style="margin-bottom:8px">Ajouter d\'autres produits</button>' +
         '<button type="button" class="bouton bouton-grand demande-continuer" data-action="continuer">Continuer</button>' +
       '</div>' +
       '<div id="demande-vue-form" class="cache">' +
