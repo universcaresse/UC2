@@ -2503,6 +2503,9 @@ textarea.fiches-ctrl {
   #section-coupdecoeur #coupdecoeur-bloque {
     padding: 0 16px 48px;
   }
+  .demande-modal {
+    padding: 32px 16px;
+  }
   #section-coupdecoeur .rangeeitem {
     flex-wrap: wrap;
   }
