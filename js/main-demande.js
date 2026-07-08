@@ -413,7 +413,7 @@ async function demandeEnvoyer() {
     if (vueForm)  vueForm.classList.add('cache');
     if (vueMerci) vueMerci.classList.remove('cache');
   } catch (err) {
-    erreurEl.textContent = "Une erreur s'est produite. Veuillez réessayer ou nous écrire directement.";
+    erreurEl.textContent = "Une erreur s'est produite. Veuillez réessayer ou nous écrire à universcaresse@outlook.com.";
     erreurEl.classList.remove('cache');
   }
   cacherVoile();
