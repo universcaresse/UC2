@@ -181,6 +181,10 @@ h1, h2, h3 {
 .modale-corps {
   padding: var(--espace-24) var(--espace-32);
 }
+@media (max-width: 900px) {
+  .modale-entete { padding: var(--espace-20) var(--espace-16); }
+  .modale-corps  { padding: var(--espace-20) var(--espace-16); }
+}
 
 /*═════════════════════════════════════════════════
    Du style créé par un claude imbécile. a corriger
