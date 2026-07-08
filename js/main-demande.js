@@ -434,7 +434,7 @@ async function demandeRenvoyerModif() {
   if (!modif || !modif.cmd) { demandeAllerForm(); return; }
   const vueListe = document.getElementById('demande-vue-liste');
   const vueMerci = document.getElementById('demande-vue-merci');
-  const btn = document.querySelector('.demande-continuer');
+  const btn = document.querySelector('#demande-vue-liste [data-action="continuer"]');
   if (btn) btn.disabled = true;
   montrerVoile();
   const lignes = demandeListe.map(i => ({
@@ -726,6 +726,8 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       afficherPageUniqueBloc2(res.lignes, numero, jeton);
     }
 
+    let coupdecoeurTouche = false;
+
     function coupdecoeurRendre() {
       if (!zone) return;
       if (!demandeListe.length) {
@@ -742,7 +744,11 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         const sous = (i.prix_unitaire || 0) * (i.quantite || 1);
         total += sous;
         const cle = i.pro_id + '|' + i.format_poids + '|' + i.format_unite;
+        const photo = i.image_url
+          ? '<img src="' + i.image_url + '" alt="" class="rangeeitem-photo">'
+          : '<div class="rangeeitem-photo"></div>';
         html += '<div class="rangeeitem" data-cle="' + cle + '">' +
+            photo +
             '<div class="rangeeitem-info">' +
               (i.nom_collection ? '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:2px">' + i.nom_collection + '</div>' : '') +
               '<div class="rangeeitem-titre">' + (i.nom_produit || i.pro_id) + '</div>' +
@@ -760,7 +766,9 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       html += '<div class="lignetotal"><span class="lignetotal-libelle">Total avant les frais de livraison</span>' +
         '<span>' + total.toFixed(2).replace('.', ',') + ' $</span></div>' +
         '<button type="button" class="bouton bouton-contour" onclick="naviguer(\'catalogue\')" style="margin-bottom:8px">Ajouter d\'autres produits</button>' +
-        '<button type="button" class="bouton bouton-grand" data-action="renvoyer">Renvoyer mes Coups de coeur</button>' +
+        (coupdecoeurTouche
+          ? '<button type="button" class="bouton bouton-grand" data-action="renvoyer">Retourner la commande modifiée</button>'
+          : '<button type="button" class="bouton bouton-grand" data-action="conserver">Conserver la commande</button>') +
         '<button type="button" class="bouton bouton-contour" data-action="annuler" style="margin-top:12px">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
         '<div id="coupdecoeur-msg" class="cache"></div>';
       zone.innerHTML = html;
@@ -837,6 +845,13 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         return;
       }
 
+      if (action === 'conserver') {
+        demandeVider();
+        try { localStorage.removeItem('uc_modif_cmd'); sessionStorage.removeItem('uc_modif_active'); } catch (e) {}
+        naviguer('accueil');
+        return;
+      }
+
       if (action === 'renvoyer') {
         const msg0 = document.getElementById('coupdecoeur-msg');
         if (!demandeListe.length) {
@@ -861,6 +876,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           cacherVoile();
           if (r && r.success) {
             demandeVider();
+            try { localStorage.removeItem('uc_modif_cmd'); sessionStorage.removeItem('uc_modif_active'); } catch (e) {}
             zone.innerHTML = '<h2 class="titre">Merci !</h2>' +
               '<p>Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt.</p>' +
               '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
@@ -880,6 +896,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       const ligne = btn.closest('[data-cle]');
       if (!ligne) return;
       const [pro_id, fp, fu] = ligne.dataset.cle.split('|');
+      coupdecoeurTouche = true;
       if (action === 'plus')    demandeChangerQuantite(pro_id, fp, fu, 1);
       if (action === 'moins')   demandeChangerQuantite(pro_id, fp, fu, -1);
       if (action === 'retirer') demandeRetirer(pro_id, fp, fu);
