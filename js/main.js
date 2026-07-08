@@ -1477,7 +1477,8 @@ async function envoyerFormulaire() {
       throw new Error('Échec envoi');
     }
   } catch (err) {
-    msgErreur.textContent = "Une erreur s'est produite. Veuillez réessayer ou nous écrire directement.";
+    cacherVoile();
+   msgErreur.textContent = "Une erreur s'est produite. Veuillez réessayer ou nous écrire à universcaresse@outlook.com.";
     msgErreur.classList.remove('cache');
     btn.disabled = false;
     btn.textContent = 'Envoyer le message';
