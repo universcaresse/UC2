@@ -617,8 +617,30 @@ document.addEventListener('click', function(e) {
   }
 });
 
+// ─── VOILE D'ATTENTE (pleine page pendant les appels serveur) ───
+let voileCompteur = 0;
+function voileMontrer() {
+  voileCompteur++;
+  let voile = document.getElementById('voile-attente');
+  if (!voile) {
+    voile = document.createElement('div');
+    voile.id = 'voile-attente';
+    voile.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>';
+    document.body.appendChild(voile);
+  }
+  voile.classList.remove('cache');
+}
+function voileCacher() {
+  voileCompteur = Math.max(0, voileCompteur - 1);
+  if (voileCompteur === 0) {
+    const voile = document.getElementById('voile-attente');
+    if (voile) voile.classList.add('cache');
+  }
+}
+
 // ─── APPEL APPS SCRIPT ───
 async function appelAPI(action, params = {}) {
+  voileMontrer();
   try {
     const url = new URL(CONFIG.APPS_SCRIPT_URL);
     url.searchParams.set('action', action);
@@ -635,6 +657,7 @@ async function appelAPI(action, params = {}) {
 
 
 async function appelAPIPost(action, data = {}) {
+  voileMontrer();
   try {
     const payload = JSON.stringify({ action, ...data });
     const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
@@ -648,6 +671,8 @@ async function appelAPIPost(action, data = {}) {
   } catch (err) {
     console.error('Erreur API POST:', err);
     return null;
+  } finally {
+    voileCacher();
   }
 }
 

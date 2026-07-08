@@ -216,6 +216,7 @@ function demandeCreerModalListe() {
           '<span class="demande-modal-total-label">Total avant les frais de livraison</span>' +
           '<span class="demande-modal-total" id="demande-modal-total"></span>' +
         '</div>' +
+        '<button type="button" class="bouton bouton-contour" data-action="ajouter-produits" style="margin-bottom:8px">Ajouter d\'autres produits</button>' +
         '<button type="button" class="bouton bouton-grand demande-continuer" data-action="continuer">Continuer</button>' +
       '</div>' +
       '<div id="demande-vue-form" class="cache">' +
@@ -255,6 +256,7 @@ function demandeCreerModalListe() {
       demandeAllerForm();
       return;
     }
+    if (action === 'ajouter-produits') { demandeFermerModalListe(); naviguer('catalogue'); return; }
     if (action === 'retour')    { demandeRetourListe(); return; }
     if (action === 'envoyer')   { demandeEnvoyer(); return; }
     if (action === 'fermer')    { demandeFermerModalListe(); return; }
@@ -382,7 +384,7 @@ async function demandeEnvoyer() {
   const codePostalFormate = cpNettoye.slice(0, 3) + ' ' + cpNettoye.slice(3);
   erreurEl.classList.add('cache');
 
-  if (btn) { btn.disabled = true; btn.style.position = 'relative'; btn.insertAdjacentHTML('beforeend', '<div id="demande-spinner-overlay" style="position:absolute;inset:0;background:var(--primary);display:flex;align-items:center;justify-content:center;"><span class=\'spinner\' style=\'margin-right:0\'><span></span><span></span><span></span><span></span><span></span></span></div>'); }
+  if (btn) btn.disabled = true;
 
   const lignes = demandeListe.map(i => ({
     pro_id: i.pro_id,
@@ -413,7 +415,7 @@ async function demandeEnvoyer() {
     erreurEl.textContent = "Une erreur s'est produite. Veuillez réessayer ou nous écrire directement.";
     erreurEl.classList.remove('cache');
   }
-  if (btn) { btn.disabled = false; const ov = document.getElementById('demande-spinner-overlay'); if (ov) ov.remove(); }
+  if (btn) btn.disabled = false;
 }
 
 async function demandeRenvoyerModif() {
@@ -445,16 +447,17 @@ async function demandeRenvoyerModif() {
 // ─── INITIALISATION ───
 document.addEventListener('DOMContentLoaded', () => {
   if (!DEMANDE_ACTIVE) return;
-  // Nettoyage du brouillon : si on n'arrive PAS par le lien d'une commande (?cmd=)
-  // mais qu'une modification de commande traînait encore en mémoire, on efface cette
-  // liste pour qu'elle ne réapparaisse pas comme une nouvelle liste sur le site public.
+  // Le repère de modification survit à la navigation dans le site (catalogue → bulle)
+  // grâce au drapeau de session « uc_modif_active ». Mais si ce drapeau est absent, c'est
+  // une visite fraîche (nouvel onglet, jours plus tard) : un vieux repère qui traînerait
+  // est alors une commande abandonnée, on l'efface pour repartir sur une demande neuve.
   try {
     const surUneCommande = new URLSearchParams(window.location.search).get('cmd');
-    if (!surUneCommande && localStorage.getItem('uc_modif_cmd')) {
+    if (!surUneCommande && !sessionStorage.getItem('uc_modif_active') && localStorage.getItem('uc_modif_cmd')) {
+      localStorage.removeItem('uc_modif_cmd');
       localStorage.removeItem(DEMANDE_STORAGE_KEY);
     }
   } catch (e) {}
-  try { localStorage.removeItem('uc_modif_cmd'); } catch (e) {}
   chargerDemandeListe();
   const bulle = document.createElement('div');
   bulle.id = 'demande-bulle';
@@ -695,7 +698,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         return;
       }
       // Bloc 1 — comportement existant
-      try { localStorage.setItem('uc_modif_cmd', JSON.stringify({ cmd: numero, jeton: jeton })); } catch (e) {}
+      try { localStorage.setItem('uc_modif_cmd', JSON.stringify({ cmd: numero, jeton: jeton })); sessionStorage.setItem('uc_modif_active', '1'); } catch (e) {}
       demandeListe = res.lignes.map(l => ({
         pro_id: l.pro_id, format_poids: l.format_poids, format_unite: l.format_unite,
         nom_produit: l.nom, prix_unitaire: l.prix_unitaire, image_url: l.image_url,
@@ -712,8 +715,10 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       if (!zone) return;
       if (!demandeListe.length) {
         zone.innerHTML = '<h2 class="titre">Vos Coups de cœur</h2>' +
-          '<p class="textes-discrets">Vous avez retiré tous les produits. Si c\'est une erreur, rechargez la page.</p>' +
-          '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+          '<p class="textes-discrets">Votre liste est vide pour le moment. Ajoutez au moins un produit pour nous l\'envoyer.</p>' +
+          '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'catalogue\')">Ajouter d\'autres produits</button>' +
+          '<button type="button" class="bouton bouton-contour" data-action="annuler" style="margin-top:8px">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
+          '<button type="button" class="bouton bouton-contour" onclick="naviguer(\'accueil\')" style="margin-top:8px">Fermer</button>';
         return;
       }
       let total = 0;
@@ -769,11 +774,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
 
     if (action === 'confirmer-annulation') {
         const btn2 = ev.target.closest('[data-action]');
-        if (btn2) {
-          btn2.disabled = true;
-          btn2.style.position = 'relative';
-          btn2.insertAdjacentHTML('beforeend', '<div id="annul-spinner-overlay" style="position:absolute;inset:0;background:var(--danger);display:flex;align-items:center;justify-content:center;"><span class=\'spinner\' style=\'margin-right:0\'><span></span><span></span><span></span><span></span><span></span></span></div>');
-        }
+        if (btn2) btn2.disabled = true;
         const msg = document.getElementById('coupdecoeur-msg');
         const raison = (document.getElementById('coupdecoeur-raison') || {}).value || '';
         try {
@@ -784,12 +785,36 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
               '<p>Votre commande a bien été annulée. Nous espérons vous revoir bientôt.</p>' +
               '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
           } else {
-            if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || 'échec'); msg.classList.remove('cache'); }
-            if (btn2) { btn2.disabled = false; const ov = document.getElementById('annul-spinner-overlay'); if (ov) ov.remove(); }
+            let annuleeQuandMeme = false;
+            try {
+              const verif = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
+              if (verif && verif.success && verif.statut === 'Annulée') annuleeQuandMeme = true;
+            } catch (eVerif) {}
+            if (annuleeQuandMeme) {
+              demandeVider();
+              zone.innerHTML = '<h2 class="titre">Commande annulée</h2>' +
+                '<p>Votre commande a bien été annulée. Nous espérons vous revoir bientôt.</p>' +
+                '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+            } else {
+              if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || 'échec'); msg.classList.remove('cache'); }
+              if (btn2) btn2.disabled = false;
+            }
           }
         } catch (e) {
-          if (msg) { msg.textContent = 'Erreur : ' + e.message; msg.classList.remove('cache'); }
-          if (btn2) { btn2.disabled = false; const ov = document.getElementById('annul-spinner-overlay'); if (ov) ov.remove(); }
+          let annuleeQuandMeme2 = false;
+          try {
+            const verif2 = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
+            if (verif2 && verif2.success && verif2.statut === 'Annulée') annuleeQuandMeme2 = true;
+          } catch (eVerif2) {}
+          if (annuleeQuandMeme2) {
+            demandeVider();
+            zone.innerHTML = '<h2 class="titre">Commande annulée</h2>' +
+              '<p>Votre commande a bien été annulée. Nous espérons vous revoir bientôt.</p>' +
+              '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+          } else {
+            if (msg) { msg.textContent = 'Erreur : ' + e.message; msg.classList.remove('cache'); }
+            if (btn2) btn2.disabled = false;
+          }
         }
         return;
       }
@@ -807,8 +832,6 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           return;
         }
         btn.disabled = true;
-        btn.style.position = 'relative';
-        btn.insertAdjacentHTML('beforeend', '<div id="demande-spinner-overlay" style="position:absolute;inset:0;background:var(--primary);display:flex;align-items:center;justify-content:center;"><span class=\'spinner\' style=\'margin-right:0\'><span></span><span></span><span></span><span></span><span></span></span></div>');
         const msg = document.getElementById('coupdecoeur-msg');
         try {
           const lignes = demandeListe.map(i => ({
@@ -824,12 +847,11 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           } else {
             if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || 'envoi échoué'); msg.classList.remove('cache'); }
             btn.disabled = false;
-            const ov = document.getElementById('demande-spinner-overlay'); if (ov) ov.remove();
+            
           }
         } catch (e) {
           if (msg) { msg.textContent = 'Erreur : ' + e.message; msg.classList.remove('cache'); }
           btn.disabled = false;
-          const ov = document.getElementById('demande-spinner-overlay'); if (ov) ov.remove();
         }
         return;
       }
@@ -939,8 +961,6 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
 
     if (action === 'attendre-tout' || action === 'recevoir-pret') {
       btn.disabled = true;
-      btn.style.position = 'relative';
-      btn.insertAdjacentHTML('beforeend', '<div id="demande-spinner-overlay" style="position:absolute;inset:0;background:var(--primary);display:flex;align-items:center;justify-content:center;"><span class=\'spinner\' style=\'margin-right:0\'><span></span><span></span><span></span><span></span><span></span></span></div>');
       const msg = document.getElementById('coupdecoeur-msg');
       const temporairesGardes = temporaires
         .filter(l => reponses[l.pro_id + '|' + l.format_poids + '|' + l.format_unite] === 'garder')

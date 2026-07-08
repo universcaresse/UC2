@@ -156,6 +156,9 @@ h1, h2, h3 {
 }
 .voile.ouvert { display: flex; }
 .voile-haut { align-items: flex-start; z-index: 180; }
+
+
+
 .crochet { color: var(--primaire); }
 
 .modale {
@@ -332,6 +335,25 @@ h1, h2, h3 {
 /*═════════════════════════════════════════════════
    Des boutons
    ════════════════════════════════════════════════ */
+   
+   /* Voile pleine page pendant les appels au serveur */
+#voile-attente {
+  position: fixed;
+  inset: 0;
+  background: rgba(249, 247, 244, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+#voile-attente.cache { display: none; }
+   
+   
+   
+   
+   
+   
+   
 
 .boutons {
   display: inline-flex;
