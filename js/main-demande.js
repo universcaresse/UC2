@@ -592,8 +592,9 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         return;
       }
       if (z) z.innerHTML = '<h2 class="titre">Paiement</h2>' +
-        '<p>Cette commande n\'est plus disponible pour le paiement.</p>' +
-        '<p><a href="#" class="lien-discret" onclick="naviguer(\'contact\');return false;">Une question?</a></p>';
+        '<p class="textes-discrets">Cette commande n\'est plus ouverte au paiement. Si vous souhaitez la reprendre, écrivez-nous : nous la préparerons à nouveau avec plaisir.</p>' +
+        '<p class="textes-discrets"><a href="#" class="lien-discret" onclick="naviguer(\'contact\');return false;">Une question? Écrivez-nous.</a></p>' +
+        '<button type="button" class="boutons boutons-contour" onclick="naviguer(\'accueil\')">Fermer</button>';
     } catch (e) {
       if (z) z.textContent = 'Erreur : ' + e.message;
     }
@@ -664,17 +665,17 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         };
         if (res.statut === 'Terminée') {
           const lienSuiviT = res.no_tracage ? 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage) : '';
-          bloque.innerHTML = '<p style="margin-top:32px;margin-bottom:16px"><strong>Votre commande est en route!</strong></p>' +
+          bloque.innerHTML = '<p class="titre">Votre commande est en route!</p>' +
             (lienSuiviT ? '<p style="margin-bottom:16px"><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + res.no_tracage + '</a></p>' : '') +
             '<p><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
-            '<button type="button" class="bouton bouton-contour" style="display:inline-flex;width:auto" onclick="naviguer(\'accueil\')">Fermer</button>';
+            '<button type="button" class="boutons boutons-contour" onclick="naviguer(\'accueil\')">Fermer</button>';
         } else {
           const messageBloque = (res.statut === 'À expédier')
             ? 'Votre commande est en traitement — elle ne peut plus être modifiée.'
             : 'Cette commande ne peut plus être modifiée-annulée.';
-          bloque.innerHTML = '<p style="margin-top:32px;margin-bottom:16px">' + messageBloque + '</p>' +
+          (lienSuiviT ? '<p class="textes-discrets"><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + res.no_tracage + '</a></p>' : '') +
             '<p><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
-            '<button type="button" class="bouton bouton-contour" style="display:inline-flex;width:auto" onclick="naviguer(\'accueil\')">Fermer</button>';
+            '<button type="button" class="boutons boutons-contour" onclick="naviguer(\'accueil\')">Fermer</button>';
         }
         const lienEcrivez = document.getElementById('bloque-ecrivez');
         if (lienEcrivez) lienEcrivez.addEventListener('click', ouvrirContactBloque);

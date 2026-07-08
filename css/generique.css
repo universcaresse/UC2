@@ -334,6 +334,34 @@ h1, h2, h3 {
 /*═════════════════════════════════════════════════
    Pied de page
    ════════════════════════════════════════════════ */
+.pieddepage {
+  background: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779274326/fond_fqehtk.png') center center / cover no-repeat;
+  padding: var(--espace-28) var(--bord-page);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--espace-16);
+  position: relative;
+}
+.pieddepage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--noir-50);
+}
+.pieddepage > * { position: relative; z-index: 1; }
+.pieddepage .titre,
+.pieddepage .textes-discrets { color: var(--blancpur); }
+.pieddepage .textes-discrets { margin: 0; }
+
+@media (max-width: 900px) {
+  .pieddepage {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--espace-20);
+    gap: var(--espace-6);
+  }
+}
 
 /*═════════════════════════════════════════════════
    LES FENETRES POUR DES QUESTIONS

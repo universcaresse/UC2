@@ -611,17 +611,7 @@ select.form-control, select.form-ctrl { cursor: pointer; }
 /* ═══════════════════════════════════════
    FOOTER
    ═══════════════════════════════════════ */
-footer { background: url('https://res.cloudinary.com/dfasrauyy/image/upload/v1779274326/fond_fqehtk.png') center center / cover no-repeat; color: var(--blanc-pur-75); padding: 28px var(--padding-page); display: flex; justify-content: space-between; align-items: center; font-family: 'DM Sans', sans-serif; font-size: var(--texte-82); letter-spacing: 0.06em; position: relative; }
 
-
-footer::before {
-  content: ''; position: absolute; inset: 0;
-  background: var(--gris-fonce-60);
-  z-index: 0;
-}
-footer > * { position: relative; z-index: 1; }
-.footer-logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: white; font-weight: 400; letter-spacing: 0.04em; }
-.footer-tagline { font-family: 'Birthstone', cursive; font-size: 1.1rem; margin-top: 4px; color: var(--accent); }
 .footer-tagline-right { font-family: 'Birthstone', cursive; font-size: 1.1rem; margin-top: 4px; color: var(--accent); }
 
 /* ═══════════════════════════════════════
@@ -1245,7 +1235,7 @@ tr.cliquable { cursor: pointer; }
   .collections-grille { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
   .total-final-row { flex-direction: column; align-items: flex-start; }
 
-  footer { padding: 32px var(--padding-mobile); flex-direction: column; gap: 16px; text-align: center; }
+  
 }
 
 @media (min-width: 600px) and (max-width: 900px) {
