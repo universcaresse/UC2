@@ -290,7 +290,7 @@ function demandeOuvrirModalListe() {
   if (merciP) merciP.textContent = (modif && modif.cmd)
     ? 'Merci! Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt avec une proposition ajustée.'
     : 'Merci! Nous avons bien reçu vos Coups de coeur. Nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison. À bientôt!';
-  const contBtn = overlay.querySelector('.demande-continuer');
+  const contBtn = overlay.querySelector('[data-action="continuer"]');
   if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'S.V.P mettre à jour la commande' : 'Continuer';
   overlay.classList.add('ouvert');
   document.body.style.overflow = 'hidden';

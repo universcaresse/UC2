@@ -517,7 +517,7 @@ select.form-control, select.form-ctrl { cursor: pointer; }
 .demande-bulle-nb { position: relative; z-index: 1; color: var(--blanc); font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: var(--texte-82); margin-top: -2px; }
 .demande-bulle:hover { transform: scale(1.08); }
 .demande-modal { background: var(--blanc); width: 92%; max-width: 540px; max-height: 88vh; overflow-y: auto; padding: 32px 28px; position: relative; animation: modalEntre 0.3s ease; }
-.demande-modal-fermer { position: absolute; top: 16px; right: 16px; background: none; border: none; cursor: pointer; font-size: 1.4rem; line-height: 1; color: var(--gris); padding: 4px 8px; }
+
 .demande-modal-titre { font-family: 'Playfair Display', serif; font-size: var(--texte-150); font-weight: 400; color: var(--gris-fonce); margin-bottom: 24px; padding-right: 32px; }
 .demande-modal-liste { display: flex; flex-direction: column; }
 .demande-modal-vide { font-family: 'DM Sans', sans-serif; font-size: var(--texte-90); color: var(--gris); padding: 24px 0; }
