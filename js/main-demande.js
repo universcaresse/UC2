@@ -308,7 +308,7 @@ function demandeRendreListe() {
   const totalEl = document.getElementById('demande-modal-total');
   if (!conteneur) return;
   if (!demandeListe.length) {
-    conteneur.innerHTML = '<p class="demande-modal-vide">Aucun produit choisi pour le moment.</p>';
+    conteneur.innerHTML = '<p class="textes-discrets">Aucun produit choisi pour le moment.</p>';
     if (totalEl) totalEl.textContent = '';
     return;
   }
@@ -861,7 +861,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           cacherVoile();
           if (r && r.success) {
             demandeVider();
-            zone.innerHTML = '<h2 class="demande-modal-titre">Merci !</h2>' +
+            zone.innerHTML = '<h2 class="titre">Merci !</h2>' +
               '<p>Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt.</p>' +
               '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
           } else {
