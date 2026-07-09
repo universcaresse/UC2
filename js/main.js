@@ -248,6 +248,7 @@ async function validerConnexion() {
   const res = await appelAPIPost('validerMotDePasse', { mdp });
   if (res && res.success) {
     sessionStorage.setItem('uc_admin', 'true');
+    if (res.cle) sessionStorage.setItem('uc_cle', res.cle);
     window.location.href = '/UC2/admin/';
   } else {
     document.getElementById('erreur-connexion').classList.remove('cache');
@@ -645,7 +646,9 @@ async function appelAPI(action, params = {}) {
 async function appelAPIPost(action, data = {}) {
   montrerVoile();
   try {
-    const payload = JSON.stringify({ action, ...data });
+    let cle = '';
+    try { cle = sessionStorage.getItem('uc_cle') || ''; } catch (e) {}
+    const payload = JSON.stringify(cle ? { action, cle, ...data } : { action, ...data });
     const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },

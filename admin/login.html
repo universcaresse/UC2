@@ -126,6 +126,7 @@
       const data = await res.json();
       if (data && data.success) {
         sessionStorage.setItem('uc_admin', 'true');
+        if (data.cle) sessionStorage.setItem('uc_cle', data.cle);
         window.location.href = '/admin/';
       } else {
         document.getElementById('erreur-mdp').textContent = 'Mot de passe incorrect.';

@@ -263,6 +263,7 @@ async function validerConnexionAdmin() {
   const res = await appelAPIPost('validerMotDePasse', { mdp });
   if (res && res.success) {
     sessionStorage.setItem('uc_admin', 'true');
+    if (res.cle) sessionStorage.setItem('uc_cle', res.cle);
     window.location.reload();
   } else {
     const err = document.getElementById('erreur-mdp-admin');
