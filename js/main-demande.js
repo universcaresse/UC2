@@ -784,7 +784,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" onclick="naviguer(\'catalogue\')">Ajouter d\'autres produits</button>' +
         (coupdecoeurTouche
           ? '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" data-action="renvoyer">Retourner la commande modifiée</button>'
-          : '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" data-action="conserver">Conserver la commande</button>') +
+          : '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" data-action="conserver">Conserver la demande</button>') +
         '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
         '<div id="coupdecoeur-msg" class="cache"></div>';
       zone.innerHTML = html;
