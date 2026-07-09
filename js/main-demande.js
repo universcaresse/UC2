@@ -312,7 +312,7 @@ function demandeOuvrirModalListe() {
     ? 'Merci! Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt avec une proposition ajustée.'
     : 'Merci! Nous avons bien reçu vos Coups de coeur. Nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison. À bientôt!';
   const contBtn = overlay.querySelector('[data-action="continuer"]');
-  if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'S.V.P mettre à jour la commande' : 'Continuer';
+  if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'S.V.P mettre à jour la demande' : 'Continuer';
   overlay.classList.add('ouvert');
   document.body.style.overflow = 'hidden';
 }
@@ -750,7 +750,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         zone.innerHTML = '<h2 class="titre">Vos Coups de cœur</h2>' +
           '<p class="textes-discrets">Votre liste est vide pour le moment. Ajoutez au moins un produit pour nous l\'envoyer.</p>' +
           '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'catalogue\')">Ajouter d\'autres produits</button>' +
-          '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
+          '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette demande s.v.p.</button>' +
           '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
         return;
       }
@@ -784,8 +784,8 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" onclick="naviguer(\'catalogue\')">Ajouter d\'autres produits</button>' +
         (coupdecoeurTouche
           ? '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" data-action="renvoyer">Retourner la commande modifiée</button>'
-          : '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" data-action="conserver">Conserver la commande</button>') +
-        '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
+          : '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" data-action="conserver">Conserver la demande</button>') +
+        '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette demande s.v.p.</button>' +
         '<div id="coupdecoeur-msg" class="cache"></div>';
       zone.innerHTML = html;
     }
