@@ -438,10 +438,14 @@ h1, h2, h3 {
   padding: var(--espace-10) var(--espace-16);
   font-size: var(--texte-68);
 }
+
 .boutons-minuscule {
   padding: var(--espace-4) var(--espace-10);
   font-size: var(--texte-68);
 }
+
+
+
 .boutons-pleine-largeur {
   display: flex;
   width: 100%;
@@ -454,6 +458,14 @@ h1, h2, h3 {
 p + .bouton {
   margin-top: 24px;
 }
+
+.separateur-haut {
+  margin-top: var(--espace-20);
+  padding-top: var(--espace-20);
+  border-top: var(--bordure-2) solid var(--sable);
+}
+
+
 
 /* ════════════════════════════════════════
    BARRE DE FILTRES — une seule, pareille partout
