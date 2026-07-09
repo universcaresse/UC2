@@ -455,8 +455,9 @@ h1, h2, h3 {
 }
 
 /* Un bouton qui suit directement un paragraphe reçoit de l'air */
-p + .bouton {
-  margin-top: 24px;
+p + .bouton,
+p + .boutons {
+  margin-top: var(--espace-24);
 }
 
 .separateur-haut {
