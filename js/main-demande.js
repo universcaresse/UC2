@@ -340,7 +340,7 @@ function demandeOuvrirModalListe() {
     ? 'Merci! Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt avec une proposition ajustée.'
     : 'Merci! Nous avons bien reçu vos Coups de coeur. Nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison. À bientôt!';
   const contBtn = overlay.querySelector('[data-action="continuer"]');
-  if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'S.V.P mettre à jour la demande' : 'Continuer';
+  if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'S.V.P mettre à jour la liste' : 'Continuer';
   overlay.classList.add('ouvert');
   document.body.style.overflow = 'hidden';
 }
