@@ -584,6 +584,10 @@ async function voirDetailCommande(cmd_id) {
       <div>${c.notes}</div>
     </div>` : ''}
     <div style="margin-bottom:16px">
+      <div class="form-label">Statut</div>
+      <div>${c.statut}</div>
+    </div>
+    <div class="separateur-haut">
       <div class="form-label">Items commandés</div>`;
 
   c.lignes.forEach(l => {
@@ -628,10 +632,6 @@ async function voirDetailCommande(cmd_id) {
         <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Paiement reçu</span><span>${formaterPrix(estPayee ? c.total_prevu : c.acompte)}</span></div>
         <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--beige);color:var(--primary);font-weight:600"><span>Solde à payer</span><span>${formaterPrix(estPayee ? 0 : c.solde)}</span></div>
       </div>
-    </div>
-    <div style="margin-top:16px">
-      <div class="form-label">Statut</div>
-      <div>${c.statut}</div>
     </div>`;
 
   document.getElementById('fiche-commande-contenu').innerHTML = html;
