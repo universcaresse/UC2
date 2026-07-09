@@ -1489,9 +1489,9 @@ async function envoyerPropositionV3() {
   // Ouvrir le texto tout de suite — doit partir du clic direct, avant les envois
   if (telephone) {
     let texteSms = 'Bonjour ' + ',\n\n';
-    texteSms += 'Votre proposition de commande Univers caresse Savonnerie artisanale Savonnerie artisanale vient de vous être envoyée par courriel.\n';
+    texteSms += 'Votre proposition de commande Univers caresse - Savonnerie artisanale vient de vous être envoyée par courriel.\n';
     texteSms += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
-    texteSms += 'Merci !\nUnivers caresse Savonnerie artisanale - Savonnerie artisanale';
+    texteSms += 'Merci !\nUnivers caresse - Savonnerie artisanale';
     window.open('sms:' + telephone + '?body=' + encodeURIComponent(texteSms));
   }
 
