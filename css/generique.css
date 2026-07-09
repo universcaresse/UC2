@@ -462,7 +462,7 @@ p + .bouton {
 .separateur-haut {
   margin-top: var(--espace-20);
   padding-top: var(--espace-20);
-  border-top: var(--bordure-2) solid var(--sable);
+  border-top: var(--bordure-2) solid var(--primaire);
 }
 
 
