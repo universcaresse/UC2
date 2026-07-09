@@ -840,7 +840,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           '<p class="textes-discrets">Cette action est définitive. Voulez-vous vraiment annuler cette commande?</p>' +
           '<div class="champ"><label class="libelle">Si vous voulez nous dire ce qui s\'est passé, nous lisons tout (c\'est facultatif)</label>' +
           '<textarea id="coupdecoeur-raison" class="controle" rows="3"></textarea></div>' +
-          '<button type="button" class="boutons boutons-rouge boutons-pleine-largeur" data-action="confirmer-annulation">Oui, annuler ma commande</button>' +
+          '<button type="button" class="boutons boutons-rouge boutons-pleine-largeur" data-action="confirmer-annulation">Oui, annuler s.v.p.</button>' +
           '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="retour-liste">Non, revenir à ma liste</button>' +
           '<div id="coupdecoeur-msg" class="cache"></div>';
         return;
