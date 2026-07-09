@@ -245,7 +245,7 @@ function demandeCreerModalListe() {
 		
         '<button type="button" class="boutons boutons-vert boutons-pleine-largeur demande-continuer" data-action="continuer">Continuer</button>' +
         '<button type="button" class="boutons boutons-contour boutons-pleine-largeur cache" data-action="annuler-modif">Je ne veux plus donner suite, annuler cette demande s.v.p.</button>' +
-        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur cache" data-action="fermer-modif">Fermer. Les coups de cœur ne seront pas modifiés</button>' +
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur cache" data-action="fermer-modif">Fermer. Vos coups de cœur ne seront pas modifiés</button>' +
       '</div>' +
       '<div id="demande-vue-form" class="cache">' +
         '<button type="button" class="demande-retour" data-action="retour">← Retour à la liste</button>' +
@@ -340,7 +340,7 @@ function demandeOuvrirModalListe() {
     ? 'Merci! Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt avec une proposition ajustée.'
     : 'Merci! Nous avons bien reçu vos Coups de coeur. Nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison. À bientôt!';
   const contBtn = overlay.querySelector('[data-action="continuer"]');
-  if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'S.V.P mettre à jour la demande' : 'Continuer';
+  if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'S.V.P mettre à jour la liste' : 'Continuer';
   overlay.classList.add('ouvert');
   document.body.style.overflow = 'hidden';
 }
@@ -791,7 +791,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           '<p class="textes-discrets">' + texteVide + '</p>' +
           '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'catalogue\')">Ajouter d\'autres produits</button>' +
           '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette demande s.v.p.</button>' +
-          '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer. Les coups de cœur ne seront pas modifiés</button>';
+          '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer. Vos coups de cœur ne seront pas modifiés</button>';
         return;
       }
       let total = 0;
@@ -840,7 +840,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           '<p class="textes-discrets">Cette action est définitive. Voulez-vous vraiment annuler cette commande?</p>' +
           '<div class="champ"><label class="libelle">Si vous voulez nous dire ce qui s\'est passé, nous lisons tout (c\'est facultatif)</label>' +
           '<textarea id="coupdecoeur-raison" class="controle" rows="3"></textarea></div>' +
-          '<button type="button" class="boutons boutons-rouge boutons-pleine-largeur" data-action="confirmer-annulation">Oui, annuler ma commande</button>' +
+          '<button type="button" class="boutons boutons-rouge boutons-pleine-largeur" data-action="confirmer-annulation">Oui, annuler s.v.p.</button>' +
           '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="retour-liste">Non, revenir à ma liste</button>' +
           '<div id="coupdecoeur-msg" class="cache"></div>';
         return;
