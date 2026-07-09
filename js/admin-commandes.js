@@ -599,8 +599,13 @@ async function voirDetailCommande(cmd_id) {
       stockCouleur = 'var(--danger)';
       stockTexte = 'Aucun stock prêt';
     }
+    const proLigne = (typeof donneesProduits !== 'undefined') ? donneesProduits.find(p => String(p.pro_id) === String(l.pro_id)) : null;
+    const colLigne = proLigne ? donneesCollections.find(c2 => String(c2.col_id) === String(proLigne.col_id)) : null;
+    const gamLigne = proLigne ? donneesGammes.find(g2 => String(g2.gam_id) === String(proLigne.gam_id)) : null;
+    const situation = [colLigne?.nom, gamLigne?.nom].filter(Boolean).join(' · ');
     html += `<div style="padding:8px 0;border-bottom:1px solid var(--beige)">
       <div>${l.nom} — ${l.format_poids} ${l.format_unite}</div>
+      ${situation ? `<div class="texte-secondaire">${situation}</div>` : ''}
       <div class="texte-secondaire">Qté : ${l.quantite} × ${formaterPrix(l.prix_unitaire)} = ${formaterPrix(l.prix_unitaire * l.quantite)}</div>
       <div style="color:${stockCouleur};font-size:0.78rem;font-weight:500;margin-top:2px">${stockTexte}</div>
     </div>`;

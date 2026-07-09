@@ -362,7 +362,10 @@ function demandeRendreListe() {
     conteneur.innerHTML = (mCmd && mCmd.cmd)
       ? '<p class="textes-discrets">Vous avez retiré tous les produits. Ajoutez-en au moins un pour nous envoyer votre liste, ou utilisez le bouton d\'annulation si vous ne souhaitez plus donner suite.</p>'
       : '<p class="textes-discrets">Aucun produit choisi pour le moment.</p>';
-    if (totalEl) totalEl.textContent = '';
+    if (totalEl) {
+      totalEl.textContent = '';
+      totalEl.closest('.lignetotal')?.classList.add('cache');
+    }
     return;
   }
   conteneur.innerHTML = demandeListe.map(i => {
