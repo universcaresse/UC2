@@ -245,7 +245,7 @@ function demandeCreerModalListe() {
 		
         '<button type="button" class="boutons boutons-vert boutons-pleine-largeur demande-continuer" data-action="continuer">Continuer</button>' +
         '<button type="button" class="boutons boutons-contour boutons-pleine-largeur cache" data-action="annuler-modif">Je ne veux plus donner suite, annuler cette demande s.v.p.</button>' +
-        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur cache" data-action="fermer-modif">Fermer. Les coups de cœur ne seront pas modifiés</button>' +
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur cache" data-action="fermer-modif">Fermer. Vos coups de cœur ne seront pas modifiés</button>' +
       '</div>' +
       '<div id="demande-vue-form" class="cache">' +
         '<button type="button" class="demande-retour" data-action="retour">← Retour à la liste</button>' +
@@ -791,7 +791,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           '<p class="textes-discrets">' + texteVide + '</p>' +
           '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'catalogue\')">Ajouter d\'autres produits</button>' +
           '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette demande s.v.p.</button>' +
-          '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer. Les coups de cœur ne seront pas modifiés</button>';
+          '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer. Vos coups de cœur ne seront pas modifiés</button>';
         return;
       }
       let total = 0;
