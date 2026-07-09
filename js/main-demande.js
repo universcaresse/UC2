@@ -244,6 +244,8 @@ function demandeCreerModalListe() {
         '<button type="button" class="boutons boutons-contour boutons-pleine-largeur demande-continuer" data-action="ajouter-produits">Ajouter d\'autres produits</button>' +
 		
         '<button type="button" class="boutons boutons-vert boutons-pleine-largeur demande-continuer" data-action="continuer">Continuer</button>' +
+        '<button type="button" class="boutons boutons-contour boutons-pleine-largeur cache" data-action="annuler-modif">Je ne veux plus donner suite, annuler cette demande s.v.p.</button>' +
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur cache" data-action="fermer-modif">Fermer. Les coups de cœur ne seront pas modifiés</button>' +
       '</div>' +
       '<div id="demande-vue-form" class="cache">' +
         '<button type="button" class="demande-retour" data-action="retour">← Retour à la liste</button>' +
@@ -287,6 +289,14 @@ function demandeCreerModalListe() {
     if (action === 'retour')    { demandeRetourListe(); return; }
     if (action === 'envoyer')   { demandeEnvoyer(); return; }
     if (action === 'fermer')    { demandeFermerModalListe(); return; }
+    if (action === 'annuler-modif') {
+      let m = null;
+      try { m = JSON.parse(localStorage.getItem('uc_modif_cmd') || 'null'); } catch (e) {}
+      demandeFermerModalListe();
+      if (m && m.cmd) location.href = location.pathname + '?cmd=' + encodeURIComponent(m.cmd) + '&jeton=' + encodeURIComponent(m.jeton);
+      return;
+    }
+    if (action === 'fermer-modif') { demandeFermerModalListe(); naviguer('accueil'); return; }
     const ligne = btn.closest('[data-cle]');
     if (!ligne) return;
     const pro_id = ligne.dataset.proId;
@@ -295,8 +305,20 @@ function demandeCreerModalListe() {
     if (action === 'moins')        demandeChangerQuantite(pro_id, poids, unite, -1);
     else if (action === 'plus')    demandeChangerQuantite(pro_id, poids, unite, 1);
     else if (action === 'retirer') demandeRetirer(pro_id, poids, unite);
-    if (demandeNombreItems() < 1) demandeFermerModalListe();
-    else demandeRendreListe();
+    if (demandeNombreItems() < 1) {
+      let m = null;
+      try { m = JSON.parse(localStorage.getItem('uc_modif_cmd') || 'null'); } catch (e) {}
+      if (!(m && m.cmd)) { demandeFermerModalListe(); return; }
+      demandeRendreListe();
+      const vue = document.getElementById('demande-vue-liste');
+      if (vue) {
+        vue.querySelector('[data-action="continuer"]').classList.add('cache');
+        vue.querySelector('[data-action="annuler-modif"]').classList.remove('cache');
+        vue.querySelector('[data-action="fermer-modif"]').classList.remove('cache');
+      }
+      return;
+    }
+    demandeRendreListe();
   });
 }
 
@@ -305,6 +327,12 @@ function demandeOuvrirModalListe() {
   if (!overlay) return;
   demandeRendreListe();
   demandeRetourListe();
+  const vueL = document.getElementById('demande-vue-liste');
+  if (vueL) {
+    vueL.querySelector('[data-action="continuer"]').classList.remove('cache');
+    vueL.querySelector('[data-action="annuler-modif"]').classList.add('cache');
+    vueL.querySelector('[data-action="fermer-modif"]').classList.add('cache');
+  }
   let modif = null;
   try { modif = JSON.parse(localStorage.getItem('uc_modif_cmd') || 'null'); } catch (e) {}
   const merciP = overlay.querySelector('#demande-vue-merci p.demande-form-intro');
@@ -329,7 +357,11 @@ function demandeRendreListe() {
   const totalEl = document.getElementById('demande-modal-total');
   if (!conteneur) return;
   if (!demandeListe.length) {
-    conteneur.innerHTML = '<p class="textes-discrets">Aucun produit choisi pour le moment.</p>';
+    let mCmd = null;
+    try { mCmd = JSON.parse(localStorage.getItem('uc_modif_cmd') || 'null'); } catch (e) {}
+    conteneur.innerHTML = (mCmd && mCmd.cmd)
+      ? '<p class="textes-discrets">Vous avez retiré tous les produits. Ajoutez-en au moins un pour nous envoyer votre liste, ou utilisez le bouton d\'annulation si vous ne souhaitez plus donner suite.</p>'
+      : '<p class="textes-discrets">Aucun produit choisi pour le moment.</p>';
     if (totalEl) totalEl.textContent = '';
     return;
   }
@@ -747,11 +779,14 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     function coupdecoeurRendre() {
       if (!zone) return;
       if (!demandeListe.length) {
+        const texteVide = coupdecoeurTouche
+          ? 'Vous avez retiré tous les produits. Ajoutez-en au moins un pour nous envoyer votre liste, ou utilisez le bouton d\'annulation si vous ne souhaitez plus donner suite.'
+          : 'Votre liste est vide pour le moment. Ajoutez au moins un produit pour nous l\'envoyer.';
         zone.innerHTML = '<h2 class="titre">Vos Coups de cœur</h2>' +
-          '<p class="textes-discrets">Votre liste est vide pour le moment. Ajoutez au moins un produit pour nous l\'envoyer.</p>' +
+          '<p class="textes-discrets">' + texteVide + '</p>' +
           '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'catalogue\')">Ajouter d\'autres produits</button>' +
           '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette demande s.v.p.</button>' +
-          '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
+          '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer. Les coups de cœur ne seront pas modifiés</button>';
         return;
       }
       let total = 0;
@@ -775,7 +810,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
               '<span class="compteur-valeur">' + (i.quantite || 1) + '</span>' +
               '<button type="button" class="compteur-btn" data-action="plus">+</button>' +
             '</div>' +
-            '<button type="button" class="bouton bouton-contour bouton-petit" data-action="retirer">Retirer</button>' +
+            '<button type="button" class="boutons boutons-contour boutons-minuscule" data-action="retirer">Retirer</button>' +
             '<div class="rangeeitem-valeur">' + sous.toFixed(2).replace('.', ',') + ' $</div>' +
           '</div>';
       });

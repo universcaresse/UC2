@@ -15,9 +15,17 @@
     return;
   }
 
-  var logo = overlay.querySelector(".uc-intro-logo");
+var logo = overlay.querySelector(".uc-intro-logo");
   var texte = overlay.querySelector(".uc-intro-welcome");
   var ferme = false;
+
+  var params = new URLSearchParams(window.location.search);
+  if (params.get("cmd") && texte) {
+    var action = params.get("action");
+    texte.textContent = (action === "payer")    ? "Vos Coups de cœur vous attendent"
+                      : (action === "modifier") ? "Revoyez vos Coups de cœur"
+                      : "Vos Coups de cœur";
+  }
 
   function demarrerSequence() {
     setTimeout(function() { logo.classList.add("uc-show"); }, 300);           // 1. logo arrive doucement (4.5s)
