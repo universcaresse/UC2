@@ -750,7 +750,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         zone.innerHTML = '<h2 class="titre">Vos Coups de cœur</h2>' +
           '<p class="textes-discrets">Votre liste est vide pour le moment. Ajoutez au moins un produit pour nous l\'envoyer.</p>' +
           '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'catalogue\')">Ajouter d\'autres produits</button>' +
-          '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
+          '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette demande s.v.p.</button>' +
           '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
         return;
       }
