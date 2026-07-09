@@ -192,6 +192,27 @@ function demandeInjecterCasesModal(produit) {
   hex.insertBefore(bloc, prixFormatEl || null);
 }
 
+// ─── CONTACT PRÉ-REMPLI (commande) ───
+function ouvrirContactCommande(res, numero) {
+  naviguer('contact');
+  const elP = document.getElementById('prenom');
+  const elN = document.getElementById('nom');
+  const elC = document.getElementById('courriel');
+  const elS = document.getElementById('sujet');
+  const elM = document.getElementById('message');
+  if (elP) elP.value = (res && res.prenom) || '';
+  if (elN) elN.value = (res && res.nom) || '';
+  if (elC) elC.value = (res && res.courriel) || '';
+  if (elS) {
+    const opt = document.createElement('option');
+    opt.value = 'Question —  ' + numero;
+    opt.textContent = 'Question —  ' + numero;
+    opt.selected = true;
+    elS.appendChild(opt);
+  }
+  if (elM) elM.value = '';
+}
+
 // ─── MODAL DE LA LISTE (étape 5) ───
 function formaterTelephone(input) {
   let d = input.value.replace(/\D/g, '').slice(0, 10);
@@ -538,7 +559,9 @@ window.addEventListener('DOMContentLoaded', async function () {
         if (verif && verif.success && verif.valide === false) {
           if (z) z.innerHTML = '<h2 class="titre">Paiement</h2>' +
             '<p>Cette proposition a dépassé son délai de validité. Comme les produits sont faits à la main et en petites quantités, les disponibilités changent — nous préférons revalider avec vous plutôt que de vous décevoir. Écrivez-nous et nous préparerons une proposition à jour.</p>' +
-            '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</button>';
+            '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" id="dep-ecrivez">Écrivez-nous</button>';
+          const bDep = document.getElementById('dep-ecrivez');
+          if (bDep) bDep.addEventListener('click', function () { ouvrirContactCommande(r, numero); });
           return;
         }
         const provinces = ['QC','ON','NB','NS','PE','NL','MB','SK','AB','BC','YT','NT','NU'];
@@ -549,7 +572,7 @@ window.addEventListener('DOMContentLoaded', async function () {
           '<div class="form-group"><label class="form-label">Rue <span>*</span></label><input type="text" class="form-control" id="adr-rue" value="' + (r.rue || '') + '"></div>' +
           '<div class="form-group"><label class="form-label">Ville <span>*</span></label><input type="text" class="form-control" id="adr-ville" value="' + (r.ville || '') + '"></div>' +
           '<div class="form-group"><label class="form-label">Province <span>*</span></label><select class="form-control" id="adr-province"><option value="">— Choisir —</option>' + optionsProv + '</select></div>' +
-          '<div class="form-group"><label class="form-label">Code postal</label><input type="text" class="form-control" id="adr-code-postal" value="' + (r.code_postal || '') + '" readonly style="background:#f5f1ea;cursor:not-allowed"><p class="textes-discrets">Les frais de livraison sont calculés avec ce code postal. Pour le changer, écrivez-nous.</p></div>' +
+          '<div class="champ"><label class="libelle">Code postal</label><input type="text" class="controle" id="adr-code-postal" value="' + (r.code_postal || '') + '" readonly><p class="textes-discrets">Les frais de livraison sont calculés avec ce code postal. Pour le changer, écrivez-nous.</p></div>' +
           '<div class="form-group"><label class="form-label"><input type="checkbox" id="adr-infolettre"> Je souhaite recevoir l\'infolettre par courriel</label></div>' +
           '<div id="adr-erreur" class="demande-form-erreur cache"></div>' +
           '<button type="button" class="bouton bouton-grand" id="adr-continuer">Continuer vers le paiement</button>';
@@ -575,12 +598,16 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     if (sav && sav.success) {
       window.location.href = r.lien_square;
     } else {
-      if (err) { err.innerHTML = 'Erreur : ' + ((sav && sav.message) || 'réessayez') + ' — <a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</a>'; err.classList.remove('cache'); }
+      if (err) { err.innerHTML = 'Erreur : ' + ((sav && sav.message) || 'réessayez') + ' — <a href="#" class="lien-discret" id="adr-ecrivez">Écrivez-nous</a>'; err.classList.remove('cache');
+        var aEcr = document.getElementById('adr-ecrivez');
+        if (aEcr) aEcr.addEventListener('click', function (ev) { ev.preventDefault(); ouvrirContactCommande(r, numero); }); }
       btnAdr.disabled = false; btnAdr.textContent = 'Continuer vers le paiement';
       champsAdr.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = false; });
     }
   } catch (e2) {
-    if (err) { err.innerHTML = 'Erreur : ' + e2.message + ' — <a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</a>'; err.classList.remove('cache'); }
+    if (err) { err.innerHTML = 'Erreur : ' + e2.message + ' — <a href="#" class="lien-discret" id="adr-ecrivez2">Écrivez-nous</a>'; err.classList.remove('cache');
+      var aEcr2 = document.getElementById('adr-ecrivez2');
+      if (aEcr2) aEcr2.addEventListener('click', function (ev) { ev.preventDefault(); ouvrirContactCommande(r, numero); }); }
     btnAdr.disabled = false; btnAdr.textContent = 'Continuer vers le paiement';
     champsAdr.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = false; });
   }
@@ -593,8 +620,8 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       }
       if (z) z.innerHTML = '<h2 class="titre">Paiement</h2>' +
         '<p class="textes-discrets">Cette commande n\'est plus ouverte au paiement. Si vous souhaitez la reprendre, écrivez-nous : nous la préparerons à nouveau avec plaisir.</p>' +
-        '<p class="textes-discrets"><a href="#" class="lien-discret" onclick="naviguer(\'contact\');return false;">Une question? Écrivez-nous.</a></p>' +
-        '<button type="button" class="boutons boutons-contour" onclick="naviguer(\'accueil\')">Fermer</button>';
+        '<p class="textes-discrets"><a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Une question? Écrivez-nous.</a></p>' +
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
     } catch (e) {
       if (z) z.textContent = 'Erreur : ' + e.message;
     }
@@ -623,9 +650,11 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       demandeVider();
       if (zone) zone.innerHTML = '<h2 class="titre">Une nouvelle proposition vous a été envoyée le ' + new Date(res.date_prop).toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' }) + '.</h2>' +
         '<p class="textes-discrets">Ce courriel n\'est plus à jour. Retrouvez la proposition la plus récente dans vos courriels, ou recevez-la à nouveau.</p>' +
-        '<button type="button" class="bouton bouton-grand" id="prop-renvoyer2">Recevez à nouveau votre proposition</button>' +
-        '<button type="button" class="bouton bouton-contour" style="margin-top:8px" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</button>' +
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" id="prop-renvoyer2">Recevez à nouveau votre proposition</button>' +
+        '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" id="prop-ecrivez2">Écrivez-nous</button>' +
         '<p class="textes-discrets cache" id="prop-renvoyer2-msg"></p>';
+      var bEcr2 = document.getElementById('prop-ecrivez2');
+      if (bEcr2) bEcr2.addEventListener('click', function () { ouvrirContactCommande(res, numero); });
       var bR2 = document.getElementById('prop-renvoyer2');
       if (bR2) bR2.addEventListener('click', async function () {
         var msgR2 = document.getElementById('prop-renvoyer2-msg');
@@ -645,37 +674,21 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         bloque.classList.remove('cache');
         const ouvrirContactBloque = function (e) {
           if (e) e.preventDefault();
-          naviguer('contact');
-          const elP = document.getElementById('prenom');
-          const elN = document.getElementById('nom');
-          const elC = document.getElementById('courriel');
-          const elS = document.getElementById('sujet');
-          const elM = document.getElementById('message');
-          if (elP) elP.value = res.prenom || '';
-          if (elN) elN.value = res.nom || '';
-          if (elC) elC.value = res.courriel || '';
-          if (elS) {
-            const opt = document.createElement('option');
-            opt.value = 'Question —  ' + numero;
-            opt.textContent = 'Question —  ' + numero;
-            opt.selected = true;
-            elS.appendChild(opt);
-          }
-          if (elM) elM.value = '';
+          ouvrirContactCommande(res, numero);
         };
         if (res.statut === 'Terminée') {
           const lienSuiviT = res.no_tracage ? 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage) : '';
           bloque.innerHTML = '<p class="titre">Votre commande est en route!</p>' +
-            (lienSuiviT ? '<p style="margin-bottom:16px"><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + res.no_tracage + '</a></p>' : '') +
+            (lienSuiviT ? '<p class="textes-discrets"><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + res.no_tracage + '</a></p>' : '') +
             '<p><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
-            '<button type="button" class="boutons boutons-contour" onclick="naviguer(\'accueil\')">Fermer</button>';
+            '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
         } else {
           const messageBloque = (res.statut === 'À expédier')
             ? 'Votre commande est en traitement — elle ne peut plus être modifiée.'
             : 'Cette commande ne peut plus être modifiée-annulée.';
           (lienSuiviT ? '<p class="textes-discrets"><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + res.no_tracage + '</a></p>' : '') +
             '<p><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
-            '<button type="button" class="boutons boutons-contour" onclick="naviguer(\'accueil\')">Fermer</button>';
+            '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
         }
         const lienEcrivez = document.getElementById('bloque-ecrivez');
         if (lienEcrivez) lienEcrivez.addEventListener('click', ouvrirContactBloque);
@@ -694,9 +707,11 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       if (res.statut === 'En attente de paiement' && params.get('action') !== 'modifier') {
         if (zone) zone.innerHTML = '<h2 class="titre">Une proposition vous a été envoyée pour cette commande.</h2>' +
           '<p class="textes-discrets">Nous vous avons envoyé une proposition par courriel, avec les prix et la livraison. Si vous ne la retrouvez pas...</p>' +
-          '<button type="button" class="bouton bouton-grand" id="prop-renvoyer">Recevez à nouveau votre proposition</button>' +
-          '<button type="button" class="bouton bouton-contour" style="margin-top:8px" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</button>' +
+          '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" id="prop-renvoyer">Recevez à nouveau votre proposition</button>' +
+          '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" id="prop-ecrivez">Écrivez-nous</button>' +
           '<p class="textes-discrets cache" id="prop-renvoyer-msg"></p>';
+        var bEcr = document.getElementById('prop-ecrivez');
+        if (bEcr) bEcr.addEventListener('click', function () { ouvrirContactCommande(res, numero); });
         var bRenvoyer = document.getElementById('prop-renvoyer');
         if (bRenvoyer) bRenvoyer.addEventListener('click', async function () {
           var msgR = document.getElementById('prop-renvoyer-msg');
@@ -734,9 +749,9 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       if (!demandeListe.length) {
         zone.innerHTML = '<h2 class="titre">Vos Coups de cœur</h2>' +
           '<p class="textes-discrets">Votre liste est vide pour le moment. Ajoutez au moins un produit pour nous l\'envoyer.</p>' +
-          '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'catalogue\')">Ajouter d\'autres produits</button>' +
-          '<button type="button" class="bouton bouton-contour" data-action="annuler" style="margin-top:8px">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
-          '<button type="button" class="bouton bouton-contour" onclick="naviguer(\'accueil\')" style="margin-top:8px">Fermer</button>';
+          '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'catalogue\')">Ajouter d\'autres produits</button>' +
+          '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
+          '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
         return;
       }
       let total = 0;
@@ -751,7 +766,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         html += '<div class="rangeeitem" data-cle="' + cle + '">' +
             photo +
             '<div class="rangeeitem-info">' +
-              (i.nom_collection ? '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:2px">' + i.nom_collection + '</div>' : '') +
+              (i.nom_collection ? '<div class="sur-titre">' + i.nom_collection + '</div>' : '') +
               '<div class="rangeeitem-titre">' + (i.nom_produit || i.pro_id) + '</div>' +
               '<div class="rangeeitem-meta">' + (i.nom_gamme ? i.nom_gamme + ' · ' : '') + i.format_poids + ' ' + i.format_unite + '</div>' +
             '</div>' +
@@ -766,11 +781,11 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       });
       html += '<div class="lignetotal"><span class="lignetotal-libelle">Total avant les frais de livraison</span>' +
         '<span>' + total.toFixed(2).replace('.', ',') + ' $</span></div>' +
-        '<button type="button" class="bouton bouton-contour" onclick="naviguer(\'catalogue\')" style="margin-bottom:8px">Ajouter d\'autres produits</button>' +
+        '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" onclick="naviguer(\'catalogue\')">Ajouter d\'autres produits</button>' +
         (coupdecoeurTouche
-          ? '<button type="button" class="bouton bouton-grand" data-action="renvoyer">Retourner la commande modifiée</button>'
-          : '<button type="button" class="bouton bouton-grand" data-action="conserver">Conserver la commande</button>') +
-        '<button type="button" class="bouton bouton-contour" data-action="annuler" style="margin-top:12px">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
+          ? '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" data-action="renvoyer">Retourner la commande modifiée</button>'
+          : '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" data-action="conserver">Conserver la commande</button>') +
+        '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="annuler">Je ne veux plus donner suite, annuler cette commande s.v.p.</button>' +
         '<div id="coupdecoeur-msg" class="cache"></div>';
       zone.innerHTML = html;
     }
@@ -782,11 +797,11 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
 
       if (action === 'annuler') {
         zone.innerHTML = '<h2 class="titre">Vous souhaitez annuler?</h2>' +
-          '<p>Cette action est définitive. Voulez-vous vraiment annuler cette commande?</p>' +
-          '<div class="form-group" style="margin:16px 0"><label class="form-label">Si vous voulez nous dire ce qui s\'est passé, nous lisons tout (c\'est facultatif)</label>' +
-          '<textarea id="coupdecoeur-raison" class="form-control" rows="3"></textarea></div>' +
-          '<button type="button" class="bouton bouton-rouge" data-action="confirmer-annulation">Oui, annuler ma commande</button>' +
-          '<button type="button" class="bouton bouton-contour" data-action="retour-liste" style="margin-top:8px">Non, revenir à ma liste</button>' +
+          '<p class="textes-discrets">Cette action est définitive. Voulez-vous vraiment annuler cette commande?</p>' +
+          '<div class="champ"><label class="libelle">Si vous voulez nous dire ce qui s\'est passé, nous lisons tout (c\'est facultatif)</label>' +
+          '<textarea id="coupdecoeur-raison" class="controle" rows="3"></textarea></div>' +
+          '<button type="button" class="boutons boutons-rouge boutons-pleine-largeur" data-action="confirmer-annulation">Oui, annuler ma commande</button>' +
+          '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="retour-liste">Non, revenir à ma liste</button>' +
           '<div id="coupdecoeur-msg" class="cache"></div>';
         return;
       }
@@ -809,7 +824,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
             demandeVider();
             zone.innerHTML = '<h2 class="titre">Commande annulée</h2>' +
               '<p>Votre commande a bien été annulée. Nous espérons vous revoir bientôt.</p>' +
-              '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+              '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
           } else {
             let annuleeQuandMeme = false;
             try {
@@ -820,7 +835,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
               demandeVider();
               zone.innerHTML = '<h2 class="titre">Commande annulée</h2>' +
                 '<p>Votre commande a bien été annulée. Nous espérons vous revoir bientôt.</p>' +
-                '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+                '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
             } else {
               if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || 'échec'); msg.classList.remove('cache'); }
               if (btn2) btn2.disabled = false;
@@ -837,7 +852,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
             demandeVider();
             zone.innerHTML = '<h2 class="titre">Commande annulée</h2>' +
               '<p>Votre commande a bien été annulée. Nous espérons vous revoir bientôt.</p>' +
-              '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+              '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
           } else {
             if (msg) { msg.textContent = 'Erreur : ' + e.message; msg.classList.remove('cache'); }
             if (btn2) btn2.disabled = false;
@@ -879,8 +894,8 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
             demandeVider();
             try { localStorage.removeItem('uc_modif_cmd'); sessionStorage.removeItem('uc_modif_active'); } catch (e) {}
             zone.innerHTML = '<h2 class="titre">Merci !</h2>' +
-              '<p>Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt.</p>' +
-              '<button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+              '<p class="textes-discrets">Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt.</p>' +
+              '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
           } else {
             if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || 'envoi échoué'); msg.classList.remove('cache'); }
             btn.disabled = false;
@@ -926,17 +941,17 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
   function rangee(l, avecBoutons) {
     const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
     const rep = reponses[cle];
-    let html = '<div class="rangeeitem" data-cle="' + cle + '" style="margin-bottom:8px">';
+    let html = '<div class="rangeeitem" data-cle="' + cle + '">';
     html += '<div class="rangeeitem-info">';
-    if (l.nom_collection) html += '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:2px">' + l.nom_collection + '</div>';
+    if (l.nom_collection) html += '<div class="sur-titre">' + l.nom_collection + '</div>';
     html += '<div class="rangeeitem-titre">' + (l.nom || l.pro_id) + '</div>';
     html += '<div class="rangeeitem-meta">' + (l.nom_gamme ? l.nom_gamme + ' · ' : '') + l.format_poids + ' ' + l.format_unite;
     if (l.date_dispo) html += ' &nbsp;·&nbsp; disponible vers ' + l.date_dispo;
     html += '</div></div>';
     if (avecBoutons) {
-      html += '<div style="display:flex;gap:8px;margin-top:6px">';
-      html += '<button type="button" class="bouton bouton-petit' + (rep === 'garder' ? ' bouton-or' : ' bouton-contour') + '" data-action="garder" data-cle="' + cle + '">Garder</button>';
-      html += '<button type="button" class="bouton bouton-petit' + (rep === 'laisser' ? ' bouton-rouge' : ' bouton-contour') + '" data-action="laisser" data-cle="' + cle + '">Laisser tomber</button>';
+      html += '<div class="actions">';
+      html += '<button type="button" class="boutons boutons-petit' + (rep === 'garder' ? ' boutons-accent' : ' boutons-contour') + '" data-action="garder" data-cle="' + cle + '">Garder</button>';
+      html += '<button type="button" class="boutons boutons-petit' + (rep === 'laisser' ? ' boutons-rouge' : ' boutons-contour') + '" data-action="laisser" data-cle="' + cle + '">Laisser tomber</button>';
       html += '</div>';
     }
     html += '</div>';
@@ -945,7 +960,7 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
 
   function section(titre, liste, avecBoutons, sousTitre) {
     if (!liste.length) return '';
-    let h = '<div style="margin:20px 0 8px;font-size:0.7rem;letter-spacing:0.2em;color:#8b8680;text-transform:uppercase">' + titre + '</div>';
+    let h = '<div class="sur-titre">' + titre + '</div>';
     if (sousTitre) h += '<p class="textes-discrets">' + sousTitre + '</p>';
     liste.forEach(l => { h += rangee(l, avecBoutons); });
     return h;
@@ -963,13 +978,13 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
   if (tousRepondus || !temporaires.length) {
     const aGardes = temporaires.some(l => reponses[l.pro_id + '|' + l.format_poids + '|' + l.format_unite] === 'garder');
     if (prets.length || aGardes) {
-      html += '<button type="button" class="bouton bouton-grand" data-action="recevoir-pret" style="margin-top:16px">Recevoir ce qui est prêt</button>';
+      html += '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" data-action="recevoir-pret">Recevoir ce qui est prêt</button>';
     }
-    html += '<button type="button" class="bouton bouton-contour" data-action="attendre-tout" style="margin-top:8px">Attendre que tout soit prêt</button>';
+    html += '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="attendre-tout">Attendre que tout soit prêt</button>';
   }
 
-  html += '<button type="button" class="bouton bouton-contour" data-action="modifier-bloc2" style="margin-top:8px">Modifier</button>';
-  html += '<a href="#" class="lien-discret" onclick="naviguer(\'contact\');return false;" style="display:block;margin-top:8px;text-align:center">J\'ai une question</a>';
+  html += '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="modifier-bloc2">Modifier</button>';
+  html += '<p class="textes-discrets"><a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + cmd_id + '.\'; } return false;">J\'ai une question</a></p>';
   html += '<div id="coupdecoeur-msg" class="cache"></div>';
 
   zone.innerHTML = html;
@@ -1014,9 +1029,9 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
         if (r && r.success) {
           zone.removeEventListener('click', handler);
           if (action === 'recevoir-pret') {
-            zone.innerHTML = '<h2 class="titre">Merci!</h2><p>Ce qui est prêt est en route. Nous vous recontacterons pour le reste.</p><button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+            zone.innerHTML = '<h2 class="titre">Merci!</h2><p class="textes-discrets">Ce qui est prêt est en route. Nous vous recontacterons pour le reste.</p><button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
           } else {
-            zone.innerHTML = '<h2 class="titre">Noté!</h2><p>Nous vous recontacterons quand tout sera prêt.</p><button type="button" class="bouton bouton-grand" onclick="naviguer(\'accueil\')">Fermer</button>';
+            zone.innerHTML = '<h2 class="titre">Noté!</h2><p class="textes-discrets">Nous vous recontacterons quand tout sera prêt.</p><button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
           }
         } else {
           if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || 'échec'); msg.classList.remove('cache'); }
