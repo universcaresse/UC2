@@ -110,6 +110,13 @@ if (resGam && resGam.success) {
     donneesRegroupements = resRegro.items || [];
   }
 
+  const resCmdAccueil = await appelAPI('getCommandesEntete');
+  const spanEntrantes = document.getElementById('accueil-commandes-entrantes');
+  if (spanEntrantes && resCmdAccueil && resCmdAccueil.success) {
+    const nbEntrantes = (resCmdAccueil.items || []).filter(c => c.statut === 'En attente').length;
+    spanEntrantes.textContent = nbEntrantes ? nbEntrantes + (nbEntrantes > 1 ? ' entrantes' : ' entrante') : '';
+  }
+
   const nbPublics = donneesProduits.filter(p => p.statut === 'public').length;
   const statCol   = document.getElementById('admin-stat-collections');
   const statProd  = document.getElementById('admin-stat-produits');
