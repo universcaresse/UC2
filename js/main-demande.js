@@ -588,6 +588,8 @@ window.addEventListener('DOMContentLoaded', async function () {
     try {
       if (typeof appelAPIPost !== 'function') { if (z) z.textContent = 'appelAPIPost absent'; return; }
       const r = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
+      window.ucCommandeVue = r;
+      window.ucCommandeNumero = numero;
       if (r && r.success && r.statut === 'En attente de paiement' && r.lien_square) {
         // Avant d'offrir le paiement : vérifier que le lien Square est encore vivant.
         const verif = await appelAPIPost('verifierLienSquareCommande', { cmd_id: numero, jeton: jeton });
@@ -655,7 +657,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       }
       if (z) z.innerHTML = '<h2 class="titre">Paiement</h2>' +
         '<p class="textes-discrets">Cette commande n\'est plus ouverte au paiement. Si vous souhaitez la reprendre, écrivez-nous : nous la préparerons à nouveau avec plaisir.</p>' +
-        '<p class="textes-discrets"><a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Une question? Écrivez-nous.</a></p>' +
+        '<p class="textes-discrets"><a href="#" class="lien-discret" onclick="ouvrirContactCommande(window.ucCommandeVue, window.ucCommandeNumero); return false;">Une question? Écrivez-nous.</a></p>' +
         '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
     } catch (e) {
       if (z) z.textContent = 'Erreur : ' + e.message;
@@ -676,7 +678,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     if (!res.success) {
       if (zone) zone.innerHTML = '<h2 class="titre">Merci de votre intérêt</h2>' +
         '<p class="textes-discrets">Nous n\'avons pas pu ouvrir votre commande. Écrivez-nous et nous allons vous aider.</p>' +
-        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + numero + '.\'; } return false;">Écrivez-nous</button>';
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="ouvrirContactCommande(null, \'' + numero + '\'); return false;">Écrivez-nous</button>';
       return;
     }
 
@@ -1024,7 +1026,7 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
   }
 
   html += '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="modifier-bloc2">Modifier</button>';
-  html += '<p class="textes-discrets"><a href="#" class="lien-discret" onclick="naviguer(\'contact\'); var m = document.getElementById(\'message\'); if (m) { m.value = \'Bonjour, je vous écris au sujet de ma commande ' + cmd_id + '.\'; } return false;">J\'ai une question</a></p>';
+  html += '<p class="textes-discrets"><a href="#" class="lien-discret" onclick="ouvrirContactCommande(null, \'' + cmd_id + '\'); return false;">J\'ai une question</a></p>';
   html += '<div id="coupdecoeur-msg" class="cache"></div>';
 
   zone.innerHTML = html;
