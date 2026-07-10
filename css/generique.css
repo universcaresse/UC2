@@ -552,6 +552,14 @@ p + .boutons {
   cursor: pointer;
 }
 
+.sur-titre.gris { color: var(--grise); }
+.sur-titre.primaire { color: var(--primaire);}
+.sur-titre.secondaire { color: var(--secondaire); }
+
+
+
+
+
 .rangeeitem {
   display: flex;
   align-items: center;
