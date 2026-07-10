@@ -774,18 +774,21 @@ function ouvrirApercuFacture() {
   }
 
   cacherChargement();
+  document.getElementById('modal-facture-vente').dataset.venId = venIdEnCours || '';
   document.getElementById('modal-facture-vente').classList.add('ouvert');
 }
 
 function fermerApercuFacture() {
   document.getElementById('modal-facture-vente').classList.remove('ouvert');
+  document.getElementById('modal-facture-vente').dataset.venId = '';
   venCacherSpinnerSquare();
 }
 
-function fermerModalApresVente() {
-  document.body.appendChild(document.getElementById('modal-apres-vente'));
-  document.getElementById('modal-apres-vente').classList.remove('ouvert');
-  document.getElementById('modal-facture-vente').classList.remove('ouvert');
+const courriel = enteteData[ligne - 1][3] || '';
+    const prenom   = enteteData[ligne - 1][16] || '';
+    const numero   = enteteData[ligne - 1][0] || '';
+    const venLien  = enteteData[ligne - 1][10] || '';
+    lock.releaseLock();
   venPanier        = [];
   venIdEnCours     = null;
   venNumeroAffiche = '';
@@ -962,6 +965,7 @@ async function finaliserVente(modePaiement) {
   document.getElementById('apv-infolettre').checked = infolettre === '1';
 
   document.body.appendChild(document.getElementById('modal-apres-vente'));
+  document.getElementById('modal-apres-vente').dataset.venId = ven_id;
   document.getElementById('modal-apres-vente').classList.add('ouvert');
 
   chargerVentes();
@@ -980,7 +984,8 @@ async function sauvegarderCoordonnees() {
   }
 }
 
-async function imprimerFacture() {
+async function imprimerFacture(venIdRecu) {
+  if (!venIdRecu || venIdRecu !== venIdEnCours) { afficherMsg('ventes', "❌ Aucune vente identifiée — rien n'a été imprimé.", 'erreur'); return; }
   const btnFv = document.getElementById('btn-fv-imprimer');
   if (btnFv) { btnFv.disabled = true; btnFv.dataset.texteOriginal = btnFv.innerHTML; btnFv.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
   afficherChargement();
@@ -1094,7 +1099,8 @@ async function imprimerFacture() {
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
 }
 
-async function envoyerFactureCourriel() {
+async function envoyerFactureCourriel(venIdRecu) {
+  if (!venIdRecu || venIdRecu !== venIdEnCours) { afficherMsg('ventes', "❌ Aucune vente identifiée — rien n'a été envoyé.", 'erreur'); return; }
   if (venEnvoiCourrielEnCours) return;
   venEnvoiCourrielEnCours = true;
   const champFvCourriel = document.getElementById('fv-courriel');
@@ -1167,7 +1173,8 @@ async function envoyerFactureCourriel() {
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
 }
 
-async function envoyerFactureTexto() {
+async function envoyerFactureTexto(venIdRecu) {
+  if (!venIdRecu) { afficherMsg('ventes', "❌ Aucune vente identifiée — rien n'a été envoyé.", 'erreur'); return; }
   const champApv = document.getElementById('apv-telephone');
   const champFv  = document.getElementById('fv-telephone');
   const ficheOuverte = document.getElementById('modal-facture-vente').classList.contains('ouvert');
@@ -1187,8 +1194,8 @@ async function envoyerFactureTexto() {
   afficherChargement();
   await sauvegarderCoordonnees();
 
-  const numeroTexto = venNumeroAffiche.replace('VEN-','').replace('ven-','');
-  const resJeton = await appelAPIPost('getJetonVente', { ven_id: venIdEnCours });
+  const numeroTexto = String(venIdRecu).replace('VEN-','').replace('ven-','');
+  const resJeton = await appelAPIPost('getJetonVente', { ven_id: venIdRecu });
   cacherChargement();
   if (!resJeton || !resJeton.success || !resJeton.jeton) {
     afficherMsg('ventes', '❌ Impossible de préparer le lien de la facture : ' + (resJeton?.message || 'erreur'), 'erreur');
@@ -1444,6 +1451,7 @@ async function confirmerPaiementSquare(ven_id) {
     document.getElementById('apv-courriel').value     = pending.courriel || '';
     document.getElementById('apv-telephone').value    = pending.telephone || '';
     document.getElementById('apv-infolettre').checked = false;
+    document.getElementById('modal-apres-vente').dataset.venId = pending.ven_id;
     document.getElementById('modal-apres-vente').classList.add('ouvert');
     afficherMsg('ventes', '✅ Paiement Square confirmé. Vente finalisée.');
     chargerVentes();

@@ -45,6 +45,17 @@ async function chargerCommandes() {
 }
 
   toutesCommandes = res.items;
+
+  // Frais de livraison impayés depuis 14 jours : le lien Square est caduc, retour à « À livrer »
+  for (const c of toutesCommandes) {
+    if (c.statut !== 'Frais à payer' || !c.date_frais) continue;
+    const partsF = String(c.date_frais).split('/');
+    const dateF  = new Date(partsF[2], partsF[1] - 1, partsF[0]);
+    if (Math.floor((new Date() - dateF) / 86400000) < 15) continue;
+    await appelAPIPost('updateStatutCommande', { cmd_id: c.cmd_id, statut: 'À livrer' });
+    c.statut = 'À livrer';
+  }
+
   if (vide) vide.classList.add('cache');
   afficherTableauCommandes(toutesCommandes);
 }
@@ -447,6 +458,8 @@ function afficherTableauCommandes(items) {
     { titre: 'EN ATTENTE DE RÉAPPROVISIONNEMENT', statuts: ['En attente de réapprovisionnement'] },
     { titre: 'À RETRAVAILLER',                  statuts: ['À retravailler'] },
     { titre: 'À EXPÉDIER',                      statuts: ['À expédier'] },
+    { titre: 'À LIVRER',                        statuts: ['À livrer'] },
+    { titre: 'FRAIS À PAYER',                   statuts: ['Frais à payer'] },
     { titre: 'TERMINÉES',                       statuts: ['Terminée'] },
     { titre: 'ANNULÉES',                        statuts: ['Annulée'] }
   ];
@@ -455,6 +468,13 @@ function afficherTableauCommandes(items) {
 
   function calculerPastilleStock(cmd_id) {
     const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+
+    // Pastille délai pour « Frais à payer » — 14 jours
+    if (c && c.statut === 'Frais à payer' && c.date_frais) {
+      const partsF = String(c.date_frais).split('/');
+      const dateF  = new Date(partsF[2], partsF[1] - 1, partsF[0]);
+      return (Math.floor((new Date() - dateF) / 86400000) >= 14) ? 'var(--accent)' : '';
+    }
 
     // Pastille délai pour « En attente de paiement »
     if (c && c.statut === 'En attente de paiement' && c.date_proposition) {
@@ -653,13 +673,32 @@ async function voirDetailCommande(cmd_id) {
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
   }
   if (c.statut === 'À expédier') {
+    actionsHTML += `<button class="bouton bouton-or" id="btn-choix-poste-${c.cmd_id}" onclick="choisirPosteCanada('${c.cmd_id}')">Envoi par Poste Canada</button>`;
+    actionsHTML += `<button class="bouton bouton-contour" id="btn-choix-personne-${c.cmd_id}" onclick="livrerEnPersonne('${c.cmd_id}')">Livrée en personne</button>`;
+    actionsHTML += `<div id="bloc-poste-${c.cmd_id}" class="cache">`;
     actionsHTML += `<div style="background:#fff4e6;border:1px solid #f0c98b;border-radius:6px;padding:10px 12px;margin-bottom:10px;font-size:0.85rem;color:#7a5a2a">⚠️ Attention, générer l'étiquette achète l'envoi chez Poste Canada et facture votre compte.</div>`;
     actionsHTML += `<div class="form-label">Poids du colis (g, boîte incluse)</div>`;
     actionsHTML += `<input id="etiq-poids-${c.cmd_id}" type="number" min="1" value="${c.poids_colis || ''}" placeholder="ex. 250" style="width:100%;padding:10px;border:1px solid var(--primary);border-radius:6px;margin-bottom:10px">`;
     actionsHTML += `<button class="bouton bouton-or" onclick="genererEtiquette('${c.cmd_id}')">Générer l'étiquette</button>`;
-    actionsHTML += `<button class="bouton bouton-contour" onclick="marquerExpediee('${c.cmd_id}')">Marquer comme expédiée</button>`;
+    actionsHTML += `</div>`;
   }
  
+  if (c.statut === 'À livrer') {
+    actionsHTML += `<input type="file" accept="image/*" capture="environment" id="photo-liv-${c.cmd_id}" class="cache" onchange="envoyerPhotoLivraison('${c.cmd_id}', this)">`;
+    actionsHTML += `<button class="bouton bouton-or" onclick="document.getElementById('photo-liv-${c.cmd_id}').click()">Prendre la photo de livraison</button>`;
+    actionsHTML += `<button class="bouton bouton-contour" onclick="livreeSansPhoto('${c.cmd_id}')">Livrée sans photo</button>`;
+    actionsHTML += `<button class="bouton bouton-contour" onclick="facturerFrais('${c.cmd_id}')">Le client veut la poste — facturer les frais</button>`;
+    actionsHTML += `<button class="bouton bouton-contour" onclick="retourAExpedier('${c.cmd_id}')">Retour à « À expédier »</button>`;
+  }
+  if (c.statut === 'Frais à payer') {
+    actionsHTML += `<button class="bouton bouton-or" onclick="fraisPayes('${c.cmd_id}')">Frais payés</button>`;
+    actionsHTML += `<button class="bouton bouton-contour" onclick="retourALivrer('${c.cmd_id}')">Retour à « À livrer »</button>`;
+  }
+  if (c.statut === 'Terminée') {
+    actionsHTML += `<input type="file" accept="image/*" capture="environment" id="photo-liv-${c.cmd_id}" class="cache" onchange="envoyerPhotoLivraison('${c.cmd_id}', this)">`;
+    actionsHTML += `<button class="bouton bouton-contour" onclick="document.getElementById('photo-liv-${c.cmd_id}').click()">Reprendre la photo de livraison</button>`;
+    actionsHTML += `<button class="bouton bouton-contour" onclick="renvoyerCourrielLivraison('${c.cmd_id}')">Renvoyer le courriel</button>`;
+  }
   if (c.statut === 'Modifiée') {
     actionsHTML += `<button class="bouton bouton-or" onclick="modifierProduitsCommande('${c.cmd_id}')">Revoir et re-proposer</button>`;
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
@@ -799,36 +838,6 @@ async function modifierCommande(cmd_id) {
 // ═══════════════════════════════════════
 // CHANGER LE STATUT D'UNE COMMANDE
 // ═══════════════════════════════════════
-
-async function marquerExpediee(cmd_id) {
-  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
-  if (!c) return;
-
-  const noTracage = (prompt('Numéro de traçage Postes Canada :') || '').trim();
-  if (!noTracage) return;
-
-  const telephone = c.telephone || '';
-  if (telephone) {
-    const lienSuivi = 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(noTracage);
-    let texteSms = 'Bonjour ' + (c.client || '') + ',\n\n';
-    texteSms += 'Bonne nouvelle, votre commande ' + cmd_id + ' est en route!\n';
-    texteSms += 'Suivez votre colis ici : ' + lienSuivi + '\n\n';
-    texteSms += 'Merci !\nUnivers caresse Savonnerie artisanale';
-    window.open('sms:' + telephone + '?body=' + encodeURIComponent(texteSms));
-  }
-
-  afficherChargement();
-  const res = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: noTracage, facture: construireFactureCommande(cmd_id) });
-  cacherChargement();
-  if (res && res.success) {
-    if (res.courriel_parti) afficherMsg('commandes', '✅ Commande expédiée, courriel envoyé.');
-    else afficherMsg('commandes', '⚠️ Commande expédiée, mais le courriel au client n\'est PAS parti — à renvoyer à la main.', 'erreur');
-    fermerFicheCommande();
-    chargerCommandes();
-  } else {
-    afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
-  }
-}
 
 
 async function changerStatutCommande(cmd_id, nouveauStatut) {
@@ -1677,16 +1686,185 @@ function renvoyerPropositionV3(cmd_id) {
 }
 
 
-async function genererEtiquette(cmd_id) {
+function renvoyerCourrielLivraison(cmd_id) {
+  confirmerAction('Renvoyer au client le courriel de livraison avec sa facture?', async function() {
+    afficherChargement();
+    const res = await appelAPIPost('renvoyerCourrielLivraison', { cmd_id });
+    cacherChargement();
+    if (res && res.success) afficherMsg('commandes', '✅ Courriel renvoyé.');
+    else afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+  });
+}
+
+function envoyerPhotoLivraison(cmd_id, champ) {
+  const fichier = champ.files && champ.files[0];
+  if (!fichier) return;
+  const lecteur = new FileReader();
+  lecteur.onload = async function() {
+    const base64 = String(lecteur.result).split(',')[1];
+    afficherChargement();
+    const res = await appelAPIPost('sauverPhotoLivraison', { cmd_id, image: base64 });
+    cacherChargement();
+    champ.value = '';
+    if (res && res.success) {
+      afficherMsg('commandes', '✅ Photo enregistrée, commande terminée.');
+      fermerFicheCommande();
+      chargerCommandes();
+    } else {
+      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    }
+  };
+  lecteur.readAsDataURL(fichier);
+}
+
+async function facturerFrais(cmd_id) {
   const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
   if (!c) return;
+  if (!c.code_postal) { afficherMsg('commandes', 'Aucun code postal pour cette commande.', 'erreur'); return; }
 
+  afficherChargement();
+  const resF = await appelAPI('getProduitsFormats');
+  const poidsParFormat = {};
+  if (resF && resF.success) {
+    (resF.items || []).forEach(f => {
+      poidsParFormat[String(f.pro_id) + '|' + String(f.poids) + '|' + String(f.unite)] = parseFloat(f.poste_gr) || 0;
+    });
+  }
+  let poids = 0;
+  toutesCommandesLignes.filter(l => l.cmd_id === cmd_id).forEach(l => {
+    poids += (poidsParFormat[String(l.pro_id) + '|' + String(l.format_poids) + '|' + String(l.format_unite)] || 0) * (parseInt(l.quantite) || 0);
+  });
+  poids = Math.round(poids);
+  if (poids <= 0) { cacherChargement(); afficherMsg('commandes', 'Poids introuvable pour ces produits.', 'erreur'); return; }
+
+  const resT = await appelAPI('calculerTarifPosteCanada', { code_postal: c.code_postal, poids: poids });
+  cacherChargement();
+  if (!(resT && resT.success)) { afficherMsg('commandes', '❌ ' + (resT?.message || 'Poste Canada n\'a pas répondu.'), 'erreur'); return; }
+
+  confirmerAction('Facturer ' + formaterPrix(resT.montant) + ' de frais de livraison à ' + (c.client || 'ce client') + ' (colis de ' + poids + ' g)?', async function() {
+    afficherChargement();
+    const res = await appelAPIPost('facturerFraisLivraison', { cmd_id, montant: resT.montant });
+    cacherChargement();
+    if (!(res && res.success)) { afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur'); return; }
+    const telephone = c.telephone || '';
+    if (telephone) {
+      let sms = 'Bonjour ' + (c.client || '') + ',\n\n';
+      sms += 'Voici les frais de livraison pour votre commande ' + cmd_id + ' : ' + formaterPrix(resT.montant) + '.\n';
+      sms += 'Payez ici : ' + res.url + '\n\nMerci !\nUnivers caresse Savonnerie artisanale';
+      window.open('sms:' + telephone + '?body=' + encodeURIComponent(sms));
+    }
+    if (res.courriel_parti) afficherMsg('commandes', '✅ Frais facturés, courriel envoyé.');
+    else afficherMsg('commandes', "⚠️ Frais facturés, mais le courriel n'est PAS parti — à renvoyer à la main.", 'erreur');
+    fermerFicheCommande();
+    chargerCommandes();
+  });
+}
+
+function fraisPayes(cmd_id) {
+  confirmerAction('Confirmer que les frais de livraison sont payés?', async function() {
+    afficherChargement();
+    const res = await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'À expédier' });
+    cacherChargement();
+    if (res && res.success) {
+      afficherMsg('commandes', '✅ Commande revenue à « À expédier ».');
+      fermerFicheCommande();
+      chargerCommandes();
+    } else {
+      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    }
+  });
+}
+
+function retourALivrer(cmd_id) {
+  confirmerAction("Ramener cette commande à « À livrer »?", async function() {
+    afficherChargement();
+    const res = await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'À livrer' });
+    cacherChargement();
+    if (res && res.success) {
+      afficherMsg('commandes', '✅ Commande revenue à « À livrer ».');
+      fermerFicheCommande();
+      chargerCommandes();
+    } else {
+      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    }
+  });
+}
+
+function livreeSansPhoto(cmd_id) {
+  confirmerAction('Fermer cette commande sans photo de livraison?', async function() {
+    afficherChargement();
+    const res = await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'Terminée' });
+    cacherChargement();
+    if (res && res.success) {
+      afficherMsg('commandes', '✅ Commande terminée.');
+      fermerFicheCommande();
+      chargerCommandes();
+    } else {
+      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    }
+  });
+}
+
+function retourAExpedier(cmd_id) {
+  confirmerAction("Ramener cette commande à « À expédier »?", async function() {
+    afficherChargement();
+    const res = await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'À expédier' });
+    cacherChargement();
+    if (res && res.success) {
+      afficherMsg('commandes', '✅ Commande revenue à « À expédier ».');
+      fermerFicheCommande();
+      chargerCommandes();
+    } else {
+      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    }
+  });
+}
+
+function livrerEnPersonne(cmd_id) {
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  if (!c) return;
+  confirmerAction('Prévenir ' + (c.client || 'ce client') + " que sa commande sera livrée aujourd'hui?", async function() {
+    afficherChargement();
+    const res = await appelAPIPost('livrerEnPersonne', { cmd_id });
+    cacherChargement();
+    if (!(res && res.success)) {
+      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+      return;
+    }
+    const telephone = c.telephone || '';
+    if (telephone) {
+      let sms = 'Bonjour ' + (c.client || '') + ',\n\n';
+      sms += "Votre commande " + cmd_id + " vous sera livrée aujourd'hui.\n";
+      if (res.lien_facture) sms += 'Votre facture : ' + res.lien_facture + '\n';
+      sms += '\nMerci !\nUnivers caresse Savonnerie artisanale';
+      window.open('sms:' + telephone + '?body=' + encodeURIComponent(sms));
+    }
+    if (res.courriel_parti) afficherMsg('commandes', '✅ Commande à livrer, courriel envoyé.');
+    else afficherMsg('commandes', "⚠️ Commande à livrer, mais le courriel au client n'est PAS parti — à renvoyer à la main.", 'erreur');
+    fermerFicheCommande();
+    chargerCommandes();
+  });
+}
+
+function choisirPosteCanada(cmd_id) {
+  document.getElementById('bloc-poste-' + cmd_id)?.classList.remove('cache');
+  document.getElementById('btn-choix-poste-' + cmd_id)?.classList.add('cache');
+  document.getElementById('btn-choix-personne-' + cmd_id)?.classList.add('cache');
+}
+
+function genererEtiquette(cmd_id) {
   const champPoids = document.getElementById('etiq-poids-' + cmd_id);
   const poids = parseFloat(champPoids ? champPoids.value : '');
   if (!poids || poids <= 0) {
     afficherMsg('commandes', 'Entre le poids du colis en grammes avant de générer.', 'erreur');
     return;
   }
+  confirmerAction("Acheter l'étiquette chez Poste Canada maintenant? Votre compte Poste Canada sera facturé, sans retour possible.", function() { genererEtiquetteConfirmee(cmd_id, poids); });
+}
+
+async function genererEtiquetteConfirmee(cmd_id, poids) {
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  if (!c) return;
 
   const fenetrePdf = window.open('', '_blank');
 
@@ -1710,16 +1888,18 @@ async function genererEtiquette(cmd_id) {
 
   if (fenetrePdf) fenetrePdf.location = await rognerEtiquetteEnUrl(res.pdf_base64);
 
+  const res2 = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: res.no_tracage });
+
   const telephone = c.telephone || '';
   if (telephone) {
     const lienSuivi = 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage);
     let sms = 'Bonjour ' + (c.client || '') + ',\n\n';
     sms += 'Bonne nouvelle, votre commande ' + cmd_id + ' est en route!\n';
-    sms += 'Suivez votre colis ici : ' + lienSuivi + '\n\nMerci !\nUnivers caresse Savonnerie artisanale';
+    sms += 'Suivez votre colis ici : ' + lienSuivi + '\n';
+    if (res2 && res2.lien_facture) sms += 'Votre facture : ' + res2.lien_facture + '\n';
+    sms += '\nMerci !\nUnivers caresse Savonnerie artisanale';
     window.open('sms:' + telephone + '?body=' + encodeURIComponent(sms));
   }
-
-  const res2 = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: res.no_tracage, facture: construireFactureCommande(cmd_id) });
   if (res2 && res2.success) {
     if (res2.courriel_parti) afficherMsg('commandes', '✅ Étiquette générée, commande expédiée, courriel envoyé.');
     else afficherMsg('commandes', '⚠️ Étiquette générée et commande expédiée, mais le courriel au client n\'est PAS parti — à renvoyer à la main.', 'erreur');

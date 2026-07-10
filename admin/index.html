@@ -2324,6 +2324,8 @@
       <option value="À retravailler">À retravailler</option>
       <option value="En attente de paiement">En attente de paiement</option>
       <option value="À expédier">À expédier</option>
+      <option value="À livrer">À livrer</option>
+      <option value="Frais à payer">Frais à payer</option>
       <option value="Terminée">Terminée</option>
       <option value="Annulée">Annulée</option>
     </select>
@@ -3730,9 +3732,9 @@
   <input type="text" inputmode="tel" class="form-ctrl" id="fv-telephone" placeholder="Téléphone">
 </div>
 <div id="fv-boutons-impression" class="fv-boutons-impression">
-  <button class="bouton fv-btn-imprimer" id="btn-fv-imprimer" onclick="imprimerFacture()">Imprimer</button>
-  <button class="bouton fv-btn-courriel" id="btn-fv-courriel" onclick="envoyerFactureCourriel()">Courriel</button>
-  <button class="bouton fv-btn-texto" id="btn-fv-texto" onclick="envoyerFactureTexto()">Texto</button>
+  <button class="bouton fv-btn-imprimer" id="btn-fv-imprimer" onclick="imprimerFacture(this.closest('.modal-admin-overlay').dataset.venId)">Imprimer</button>
+  <button class="bouton fv-btn-courriel" id="btn-fv-courriel" onclick="envoyerFactureCourriel(this.closest('.modal-admin-overlay').dataset.venId)">Courriel</button>
+  <button class="bouton fv-btn-texto" id="btn-fv-texto" onclick="envoyerFactureTexto(this.closest('.modal-admin-overlay').dataset.venId)">Texto</button>
 </div>
 
 
@@ -3808,9 +3810,9 @@
     </div>
     <div class="modal-admin-body">
       <div class="apv-boutons">
-        <button class="bouton bouton-plein-largeur fv-btn-texto" onclick="envoyerFactureTexto()">Envoyer par texto</button>
-        <button class="bouton bouton-plein-largeur fv-btn-courriel" onclick="envoyerFactureCourriel()">Envoyer par courriel</button>
-        <button class="bouton bouton-plein-largeur fv-btn-imprimer" onclick="imprimerFacture()">Imprimer / PDF</button>
+        <button class="bouton bouton-plein-largeur fv-btn-texto" onclick="envoyerFactureTexto(this.closest('.modal-admin-overlay').dataset.venId)">Envoyer par texto</button>
+        <button class="bouton bouton-plein-largeur fv-btn-courriel" onclick="envoyerFactureCourriel(this.closest('.modal-admin-overlay').dataset.venId)">Envoyer par courriel</button>
+        <button class="bouton bouton-plein-largeur fv-btn-imprimer" onclick="imprimerFacture(this.closest('.modal-admin-overlay').dataset.venId)">Imprimer / PDF</button>
         <button class="bouton bouton-plein-largeur fv-btn-ne-pas-envoyer" onclick="fermerModalApresVente()">Ne pas envoyer</button>
       </div>
     </div>
