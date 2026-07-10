@@ -114,7 +114,11 @@ if (resGam && resGam.success) {
   const spanEntrantes = document.getElementById('accueil-commandes-entrantes');
   if (spanEntrantes && resCmdAccueil && resCmdAccueil.success) {
     const nbEntrantes = (resCmdAccueil.items || []).filter(c => c.statut === 'En attente').length;
-    spanEntrantes.textContent = nbEntrantes ? nbEntrantes + (nbEntrantes > 1 ? ' entrantes' : ' entrante') : '';
+    const nbExpedier  = (resCmdAccueil.items || []).filter(c => c.statut === 'À expédier').length;
+    const bouts = [];
+    if (nbEntrantes) bouts.push(nbEntrantes + (nbEntrantes > 1 ? ' entrantes' : ' entrante'));
+    if (nbExpedier)  bouts.push(nbExpedier + ' à expédier');
+    spanEntrantes.textContent = bouts.join(' · ');
   }
 
   const nbPublics = donneesProduits.filter(p => p.statut === 'public').length;
