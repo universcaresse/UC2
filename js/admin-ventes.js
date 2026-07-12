@@ -784,14 +784,6 @@ function fermerApercuFacture() {
   venCacherSpinnerSquare();
 }
 
-  venPanier        = [];
-  venIdEnCours     = null;
-  venNumeroAffiche = '';
-  venModeReprise   = false;
-  fermerFormVente();
-  chargerVentes();
-}
-
 // ═══════════════════════════════════════
 // PAIEMENT PAR SQUARE
 // ═══════════════════════════════════════
