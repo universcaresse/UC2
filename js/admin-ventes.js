@@ -784,11 +784,6 @@ function fermerApercuFacture() {
   venCacherSpinnerSquare();
 }
 
-const courriel = enteteData[ligne - 1][3] || '';
-    const prenom   = enteteData[ligne - 1][16] || '';
-    const numero   = enteteData[ligne - 1][0] || '';
-    const venLien  = enteteData[ligne - 1][10] || '';
-    lock.releaseLock();
   venPanier        = [];
   venIdEnCours     = null;
   venNumeroAffiche = '';
