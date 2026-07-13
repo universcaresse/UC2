@@ -178,6 +178,7 @@ function afficherTableauFabrication(lots, cibleId, blocs) {
     return `
       <tr class="ligne-cliquable" onclick="fabToggleLot('${l.lot_id}')">
         <td>${pro?.nom || l.pro_id}</td>
+        <td>${l.format_poids || l.format_unite ? formaterFormat(l.format_poids, l.format_unite) : '—'}</td>
         <td>${l.date_fabrication}</td>
         <td>${l.date_disponibilite}</td>
         <td>${l.nb_unites}</td>
@@ -185,7 +186,7 @@ function afficherTableauFabrication(lots, cibleId, blocs) {
         <td>${l.cout_par_unite ? parseFloat(l.cout_par_unite).toFixed(2) + ' $' : '—'}</td>
       </tr>
       <tr class="fab-lot-detail cache" id="fab-detail-${l.lot_id}">
-        <td colspan="5">
+        <td colspan="7">
           <div class="form-grille">
             <div class="form-groupe">
               <label class="form-label">Nb unités</label>
@@ -249,7 +250,7 @@ function afficherTableauFabrication(lots, cibleId, blocs) {
           </div>
           <div class="form-body cache">
             <table class="tableau-admin">
-              <thead><tr><th>Produit</th><th>Fabriqué le</th><th>Disponible le</th><th>Unités</th><th>Vendus</th><th>Coût/unité</th></tr></thead>
+              <thead><tr><th>Produit</th><th>Format</th><th>Fabriqué le</th><th>Disponible le</th><th>Unités</th><th>Vendus</th><th>Coût/unité</th></tr></thead>
               <tbody>${g.lots.map(rendreLot).join('')}</tbody>
             </table>
           </div>

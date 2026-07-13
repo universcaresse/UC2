@@ -101,6 +101,7 @@ async function chargerCacheProduits() {
       if (!formatsMap[f.pro_id]) formatsMap[f.pro_id] = [];
       formatsMap[f.pro_id].push({
         format_id: f.format_id,
+        actif: f.actif !== false,
         poids: f.poids,
         unite: f.unite,
         prix_vente: f.prix_vente,
@@ -967,7 +968,8 @@ async function modifierProduit(pro_id) {
       prix: f.prix_vente,
       desc: '',
       nb_unites: f.nb_unites || 0,
-      poste_gr: f.poste_gr || ''
+      poste_gr: f.poste_gr || '',
+      actif: f.actif !== false
     };
   });
   
@@ -1091,7 +1093,8 @@ async function sauvegarderRecette() {
           unite: f.unite,
           prix_vente: f.prix,
           nb_unites: f.nb_unites || 0,
-          poste_gr: f.poste_gr || 0
+          poste_gr: f.poste_gr || 0,
+          actif: f.actif !== false
         };
       })
     };
@@ -1265,7 +1268,7 @@ function supprimerOuArchiverProduit(pro_id) {
           return { ing_id: i.ing_id, nom_ingredient: i.nom_ingredient, quantite_g: i.quantite_g };
         });
         d.formats = (prodCache.formats[pro_id] || []).map(function(f) {
-          return { format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix_vente, nb_unites: f.nb_unites };
+          return { format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix_vente, nb_unites: f.nb_unites, poste_gr: f.poste_gr || 0, actif: f.actif !== false };
         });
         var res = await appelAPIPost('saveProduit', d);
         if (res && res.success) {
@@ -1766,6 +1769,7 @@ function rafraichirListeFormatsRecette() {
     return '<div class="form-panel visible">' +
       '<div class="form-panel-header">' +
         '<span class="form-panel-titre">Format ' + (i + 1) + '</span>' +
+        '<label class="form-label"><input type="checkbox" ' + (f.actif !== false ? 'checked' : '') + ' onchange="formatsRecette[' + i + '].actif=this.checked"> En vente</label>' +
         '<button class="bouton bouton-petit bouton-rouge" onclick="supprimerFormatRecette(' + i + ')">✕</button>' +
       '</div>' +
       '<div class="form-body">' +
