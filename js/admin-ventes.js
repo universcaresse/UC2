@@ -467,7 +467,7 @@ function venMettreAJourPromos() {
   if (!sel) return;
 
   const valActuelle = sel.value;
-  sel.innerHTML = '<option value="">— Aucune —</option>';
+  sel.innerHTML = '<option value="">Promotion (aucune si rien de choisi)</option>';
 
   // Ajouter les promos programmées
   const totalPanier = venPanier.reduce((s, l) => s + l.quantite, 0);

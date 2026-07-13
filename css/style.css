@@ -1885,6 +1885,8 @@ tr.cliquable { cursor: pointer; }
 #form-vente .form-panel-header {
   display: none;
 }
+#form-vente .form-panel { margin-bottom: 10px; }
+#form-vente .form-body { padding: 12px; }
 .ven-resume-produits {
   font-size: 0.75rem;
   font-style: italic;
