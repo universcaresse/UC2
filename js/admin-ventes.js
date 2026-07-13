@@ -139,7 +139,7 @@ function venAfficherEtape() {
   else if (venEtape === 'produit')    venAfficherProduits();
   document.querySelectorAll('#ven-grille .ven-tile').forEach(t => {
     const c = (t.style.getPropertyValue('--col-hex') || '').trim();
-    if (typeof couleurTexteContraste === 'function' && couleurTexteContraste(c) === 'carte-infos-fonce') t.classList.add('ven-tile-fonce');
+    if (typeof couleurTexteContraste === 'function' && couleurTexteContraste(assombrirCouleur(c)) === 'carte-infos-fonce') t.classList.add('ven-tile-fonce');
   });
   venMettreAJourBreadcrumb();
   document.querySelector('.admin-contenu')?.scrollTo({ top: 0, behavior: 'smooth' });
