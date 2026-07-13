@@ -971,6 +971,11 @@ async function sauvegarderCoordonnees() {
   }
 }
 
+async function fermerModalApresVente() {
+  await sauvegarderCoordonnees();
+  document.getElementById('modal-apres-vente').classList.remove('ouvert');
+}
+
 async function imprimerFacture(venIdRecu) {
   if (!venIdRecu || venIdRecu !== venIdEnCours) { afficherMsg('ventes', "❌ Aucune vente identifiée — rien n'a été imprimé.", 'erreur'); return; }
   const btnFv = document.getElementById('btn-fv-imprimer');
