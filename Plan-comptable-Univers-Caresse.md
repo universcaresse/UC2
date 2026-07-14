@@ -1,5 +1,5 @@
 # PLAN COMPTABLE — Univers Caresse
-### État : la page de gestion du plan comptable existe dans l'admin (Comptes_v2, Ecritures_v2). Aucune écriture automatique encore. Aucun code sans le OK de Chantal.
+### État : achats BRANCHÉS à la comptabilité (construit le 2026-07-14, à tester après déploiement). Page plan comptable en place. Ventes et fabrication : pas encore branchées.
 > Plan **ouvert** : des comptes restent à ajouter. Ce fichier suffit à reprendre
 > sans reposer les questions déjà tranchées.
 
@@ -129,6 +129,48 @@
 ### Fabrication (à dérouler plus tard)
 - À la fabrication d'un lot : sortie du stock 1305 → entrée inventaire 1310.
 - Le compte_vente de la catégorie sert à la **vente** (détail du 5100).
+
+---
+
+## CONSTRUIT le 2026-07-14 (à tester)
+
+### Catégories UC — 2 comptes
+- `Code.gs` : getCategoriesUC_v2 lit compte_achat (col 4) + compte_vente (col 5);
+  saveCategorieUC_v2 enregistre les deux; **création refusée sans les 2 comptes**.
+- `js/admin-inci.js` : 2 champs par carte + validation.
+- Modales rapides (admin/index.html + js/admin-achats.js + js/admin-produits.js) :
+  2 champs ajoutés, vidés à l'ouverture, envoyés à la création.
+
+### Achats — mode de paiement et crédit
+- Barre de finalisation (admin/index.html) : champs « Crédit ($) » (id ef-credit)
+  et « Mode de paiement » (id ef-mode-paiement : visa / interac / comptant / banque).
+- Total affiché = sous-total + taxes + livraison − crédit (ce que Chantal paie).
+- `finaliserAchat_v2` : **refuse sans mode**; enregistre mode (col 12) et crédit
+  (col 13) dans Achats_Entete_v2 (en-têtes mode_paiement / credit ajoutés par Chantal).
+- La colonne total de la feuille reste le coût complet (facteur inchangé).
+
+### Écritures automatiques (`Code.gs`)
+- Colonne 10 **beneficiaire** ajoutée à Ecritures_v2 (par Chantal) : fournisseur
+  pour un achat, client pour une vente (à venir). La contre-passation reprend
+  le bénéficiaire d'origine.
+- `inscrireEcriture_v2(date, libelle, reference, lignes, beneficiaire)` :
+  réutilisable partout; génère no_ecriture et id_ligne; **refuse toute écriture
+  non balancée**.
+- Écriture d'achat à la finalisation : débit par compte_achat de catégorie
+  (prix_total × facteur, le dernier montant absorbe l'arrondi); crédit au compte
+  du mode (total − crédit, note « payé <mode> »); crédit 1225 si crédit fournisseur
+  (note « crédit fournisseur »). Référence = ach_id, bénéficiaire = nom du fournisseur.
+  Erreur claire si une catégorie n'a pas de compte à l'achat.
+- `contrePasserReference_v2(reference, libelle)` : inverse le solde net des
+  écritures d'une référence; ne fait rien s'il n'y a pas de trace. Appelée :
+  au début de chaque finalisation (couvre re-finalisation et changement de mode)
+  et à la suppression d'un achat finalisé.
+
+### À tester par Chantal (nouveau déploiement Apps Script + republier le site)
+- Créer une cat UC (page INCI + les 2 modales) avec et sans comptes.
+- Finaliser un achat (avec et sans crédit) → vérifier Ecritures_v2.
+- Supprimer puis re-finaliser un achat → vérifier les contre-passations.
+- Corriger dans la feuille : compte_achat 1035 → **1305** (fait?).
 
 ---
 
