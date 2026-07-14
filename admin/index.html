@@ -1293,7 +1293,7 @@
           <!-- Totaux + Finaliser — une ligne -->
           <div class="form-panel visible" style="margin-top:24px">
             <div class="form-body">
-              <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr auto; gap:12px 16px; align-items:end;">
+              <div style="display:grid; grid-template-columns:repeat(7, 1fr) auto; gap:12px 16px; align-items:end;">
 
                 <div class="form-groupe">
                   <label class="form-label">Sous-total</label>
@@ -1313,6 +1313,22 @@
                 <div class="form-groupe">
                   <label class="form-label">Livraison ($)</label>
                   <input type="text" inputmode="decimal" id="ef-livraison" class="form-ctrl" oninput="efCalculerTotal()" autocomplete="off">
+                </div>
+
+                <div class="form-groupe">
+                  <label class="form-label">Crédit ($)</label>
+                  <input type="text" inputmode="decimal" id="ef-credit" class="form-ctrl" oninput="efCalculerTotal()" autocomplete="off">
+                </div>
+
+                <div class="form-groupe">
+                  <label class="form-label">Mode de paiement</label>
+                  <select id="ef-mode-paiement" class="form-ctrl">
+                    <option value="">— Choisir —</option>
+                    <option value="visa">Visa</option>
+                    <option value="interac">Interac</option>
+                    <option value="comptant">Comptant</option>
+                    <option value="banque">Compte bancaire</option>
+                  </select>
                 </div>
 
                 <div class="form-groupe">
@@ -1408,6 +1424,14 @@
       <div class="form-groupe">
         <label class="form-label">Nom de la catégorie</label>
         <input type="text" class="form-ctrl" id="modal-ef-nouvelle-cat-uc-valeur" placeholder="Ex: Huiles essentielles" autocomplete="off">
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Compte à l'achat</label>
+        <input type="text" class="form-ctrl" id="modal-ef-nouvelle-cat-uc-achat" placeholder="Ex: 1305" autocomplete="off">
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Compte à la vente</label>
+        <input type="text" class="form-ctrl" id="modal-ef-nouvelle-cat-uc-vente" placeholder="Ex: 5020" autocomplete="off">
       </div>
     </div>
     <div class="modal-admin-body">

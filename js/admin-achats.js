@@ -444,8 +444,9 @@ function efCalculerTotal() {
   var tps = efParseFlt(document.getElementById('ef-tps')?.value);
   var tvq = efParseFlt(document.getElementById('ef-tvq')?.value);
   var liv = efParseFlt(document.getElementById('ef-livraison')?.value);
+  var credit = efParseFlt(document.getElementById('ef-credit')?.value);
   var el = document.getElementById('ef-total');
-  if (el) el.value = formaterPrix(sousTotal + tps + tvq + liv);
+  if (el) el.value = formaterPrix(sousTotal + tps + tvq + liv - credit);
 }
 
 // ─── LIGNE DE SAISIE ───
@@ -986,6 +987,12 @@ async function efFinaliser() {
     return;
   }
 
+  var mode = document.getElementById('ef-mode-paiement')?.value;
+  if (!mode) {
+    afficherMsg('ef-final', 'Choisir le mode de paiement avant de finaliser.', 'erreur');
+    return;
+  }
+
   var btn = document.getElementById('ef-btn-finaliser');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
 
@@ -993,10 +1000,12 @@ async function efFinaliser() {
   var tps = efParseFlt(document.getElementById('ef-tps')?.value);
   var tvq = efParseFlt(document.getElementById('ef-tvq')?.value);
   var liv = efParseFlt(document.getElementById('ef-livraison')?.value);
+  var credit = efParseFlt(document.getElementById('ef-credit')?.value);
 
   var res = await appelAPIPost('finaliserAchat', {
     ach_id: ef.factureActive.ach_id,
-    sous_total: sousTotal, tps: tps, tvq: tvq, livraison: liv
+    sous_total: sousTotal, tps: tps, tvq: tvq, livraison: liv,
+    credit: credit, mode_paiement: mode
   });
 
   if (!res || !res.success) {
@@ -1015,7 +1024,7 @@ function efReinitialiserApresFinalisation() {
   ef.editIdx = null;
   efResetSaisie();
 
-  var champs = ['ef-fournisseur', 'ef-numero', 'ef-tps', 'ef-tvq', 'ef-livraison', 'ef-soustotal', 'ef-total'];
+  var champs = ['ef-fournisseur', 'ef-numero', 'ef-tps', 'ef-tvq', 'ef-livraison', 'ef-credit', 'ef-mode-paiement', 'ef-soustotal', 'ef-total'];
   champs.forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.value = '';
@@ -1183,6 +1192,8 @@ function efOuvrirModalNouvelleCatUC() {
   var modal = document.getElementById('modal-ef-nouvelle-cat-uc');
   if (!modal) return;
   document.getElementById('modal-ef-nouvelle-cat-uc-valeur').value = '';
+  document.getElementById('modal-ef-nouvelle-cat-uc-achat').value = '';
+  document.getElementById('modal-ef-nouvelle-cat-uc-vente').value = '';
   modal.classList.add('ouvert');
   setTimeout(function() { document.getElementById('modal-ef-nouvelle-cat-uc-valeur').focus(); }, 100);
 }
@@ -1194,8 +1205,12 @@ function efFermerModalNouvelleCatUC() {
 
 async function efConfirmerModalNouvelleCatUC() {
   var val = document.getElementById('modal-ef-nouvelle-cat-uc-valeur')?.value?.trim();
+  var achat = document.getElementById('modal-ef-nouvelle-cat-uc-achat')?.value?.trim();
+  var vente = document.getElementById('modal-ef-nouvelle-cat-uc-vente')?.value?.trim();
   if (!val) { document.getElementById('modal-ef-nouvelle-cat-uc-valeur').focus(); return; }
-  var res = await appelAPIPost('saveCategorieUC', { nom: val });
+  if (!achat) { document.getElementById('modal-ef-nouvelle-cat-uc-achat').focus(); return; }
+  if (!vente) { document.getElementById('modal-ef-nouvelle-cat-uc-vente').focus(); return; }
+  var res = await appelAPIPost('saveCategorieUC', { nom: val, compte_achat: achat, compte_vente: vente });
   if (!res || !res.success) {
     afficherMsg('ef', 'Erreur création catégorie.', 'erreur');
     return;

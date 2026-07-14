@@ -1467,6 +1467,10 @@ function ouvrirModalNouvelleCategorieUC(rangeeIdx) {
     modal = document.getElementById('modal-nouvelle-cat-produit');
   }
   document.getElementById('modal-nouvelle-cat-produit-valeur').value = '';
+  var inpAchat = document.getElementById('modal-nouvelle-cat-produit-achat');
+  var inpVente = document.getElementById('modal-nouvelle-cat-produit-vente');
+  if (inpAchat) inpAchat.value = '';
+  if (inpVente) inpVente.value = '';
   modal.classList.add('ouvert');
   setTimeout(function() { document.getElementById('modal-nouvelle-cat-produit-valeur').focus(); }, 100);
 }
@@ -1479,8 +1483,12 @@ function fermerModalNouvelleCategorieUC() {
 
 async function confirmerModalNouvelleCategorieUC() {
   var val = (document.getElementById('modal-nouvelle-cat-produit-valeur').value || '').trim();
+  var achat = (document.getElementById('modal-nouvelle-cat-produit-achat')?.value || '').trim();
+  var vente = (document.getElementById('modal-nouvelle-cat-produit-vente')?.value || '').trim();
   if (!val) { document.getElementById('modal-nouvelle-cat-produit-valeur').focus(); return; }
-  var res = await appelAPIPost('saveCategorieUC', { nom: val });
+  if (!achat) { document.getElementById('modal-nouvelle-cat-produit-achat').focus(); return; }
+  if (!vente) { document.getElementById('modal-nouvelle-cat-produit-vente').focus(); return; }
+  var res = await appelAPIPost('saveCategorieUC', { nom: val, compte_achat: achat, compte_vente: vente });
   if (!res || !res.success) {
     afficherMsg('recettes', 'Erreur création catégorie.', 'erreur');
     return;
@@ -1516,6 +1524,14 @@ function creerModalNouvelleCategorieUC() {
         '<div class="form-groupe">' +
           '<label class="form-label">Nom de la catégorie</label>' +
           '<input type="text" class="form-ctrl" id="modal-nouvelle-cat-produit-valeur" placeholder="Ex: Huiles essentielles">' +
+        '</div>' +
+        '<div class="form-groupe">' +
+          '<label class="form-label">Compte à l\'achat</label>' +
+          '<input type="text" class="form-ctrl" id="modal-nouvelle-cat-produit-achat" placeholder="Ex: 1305">' +
+        '</div>' +
+        '<div class="form-groupe">' +
+          '<label class="form-label">Compte à la vente</label>' +
+          '<input type="text" class="form-ctrl" id="modal-nouvelle-cat-produit-vente" placeholder="Ex: 5020">' +
         '</div>' +
       '</div>' +
       '<div class="modal-admin-body">' +

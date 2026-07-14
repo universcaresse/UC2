@@ -206,6 +206,8 @@ function inciRendreUC() {
       <div class="carte-admin">
         <div class="carte-admin-entete">
           <input type="text" class="form-ctrl" id="uc-cat-${i}" value="${(c.nom || '').replace(/"/g, '&quot;')}">
+          <input type="text" class="form-ctrl" id="uc-cat-achat-${i}" value="${c.compte_achat || ''}" placeholder="Compte à l'achat" style="max-width:130px">
+          <input type="text" class="form-ctrl" id="uc-cat-vente-${i}" value="${c.compte_vente || ''}" placeholder="Compte à la vente" style="max-width:130px">
           <div class="td-actions">
             <button class="btn-edit" onclick="inciModifierUC(${i}, '${c.cat_id}')">Modifier</button>
             ${utilise.length === 0 ? `<button class="btn-suppr" onclick="inciSupprimerUC('${c.cat_id}')">Supprimer</button>` : ''}
@@ -232,8 +234,11 @@ function inciAjouterUC() {
 async function inciModifierUC(i, cat_id) {
   const input = document.getElementById(`uc-cat-${i}`);
   const nom   = (input?.value || '').trim();
+  const compte_achat = (document.getElementById(`uc-cat-achat-${i}`)?.value || '').trim();
+  const compte_vente = (document.getElementById(`uc-cat-vente-${i}`)?.value || '').trim();
   if (!nom) { afficherMsg('inci', 'Le nom est requis.', 'erreur'); return; }
-  const res = await appelAPIPost('saveCategorieUC', { cat_id, nom });
+  if (!compte_achat || !compte_vente) { afficherMsg('inci', 'Les deux comptes sont requis.', 'erreur'); return; }
+  const res = await appelAPIPost('saveCategorieUC', { cat_id, nom, compte_achat, compte_vente });
   if (res && res.success) {
     afficherMsg('inci', cat_id ? 'Catégorie mise à jour.' : 'Catégorie ajoutée.');
     await chargerInci();
