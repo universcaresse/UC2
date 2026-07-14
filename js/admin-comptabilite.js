@@ -43,34 +43,38 @@ function pcRendre(sections, comptes) {
   ).join('');
 
   let html = `
-    <div class="form-actions" style="gap:32px;align-items:flex-start;flex-wrap:wrap;margin-bottom:32px">
-      <div style="min-width:260px">
-        <div class="page-entete-eyebrow" style="margin-bottom:8px">Ajouter une section</div>
-        <div class="form-groupe">
-          <label class="form-label">Numéro</label>
-          <input type="text" class="form-ctrl" id="pc-sec-numero" placeholder="ex. 1100">
+    <div class="grille">
+      <div>
+        <div class="section-label">Ajouter une section</div>
+        <div class="champ">
+          <label class="libelle">Numéro</label>
+          <input type="text" class="controle" id="pc-sec-numero" placeholder="ex. 1100">
         </div>
-        <div class="form-groupe">
-          <label class="form-label">Nom</label>
-          <input type="text" class="form-ctrl" id="pc-sec-nom" placeholder="ex. Encaisse">
+        <div class="champ">
+          <label class="libelle">Nom</label>
+          <input type="text" class="controle" id="pc-sec-nom" placeholder="ex. Encaisse">
         </div>
-        <button class="bouton" onclick="pcAjouterSection()">Ajouter la section</button>
+        <div class="champ">
+          <button class="boutons boutons-vert" onclick="pcAjouterSection()">Ajouter la section</button>
+        </div>
       </div>
-      <div style="min-width:260px">
-        <div class="page-entete-eyebrow" style="margin-bottom:8px">Ajouter un compte</div>
-        <div class="form-groupe">
-          <label class="form-label">Section</label>
-          <select class="form-ctrl" id="pc-cpt-section">${optionsSections}</select>
+      <div>
+        <div class="section-label">Ajouter un compte</div>
+        <div class="champ">
+          <label class="libelle">Section</label>
+          <select class="controle" id="pc-cpt-section">${optionsSections}</select>
         </div>
-        <div class="form-groupe">
-          <label class="form-label">Numéro</label>
-          <input type="text" class="form-ctrl" id="pc-cpt-numero" placeholder="ex. 1105">
+        <div class="champ">
+          <label class="libelle">Numéro</label>
+          <input type="text" class="controle" id="pc-cpt-numero" placeholder="ex. 1105">
         </div>
-        <div class="form-groupe">
-          <label class="form-label">Nom</label>
-          <input type="text" class="form-ctrl" id="pc-cpt-nom" placeholder="ex. Fond de caisse">
+        <div class="champ">
+          <label class="libelle">Nom</label>
+          <input type="text" class="controle" id="pc-cpt-nom" placeholder="ex. Fond de caisse">
         </div>
-        <button class="bouton" onclick="pcAjouterCompte()">Ajouter le compte</button>
+        <div class="champ">
+          <button class="boutons boutons-vert" onclick="pcAjouterCompte()">Ajouter le compte</button>
+        </div>
       </div>
     </div>
   `;
@@ -83,18 +87,18 @@ function pcRendre(sections, comptes) {
       const classe = pcNomClasse(s.numero);
       if (classe !== classeActuelle) {
         classeActuelle = classe;
-        html += `<h2 style="font-family:Georgia,serif;color:var(--primary);border-bottom:2px solid var(--primary);padding-bottom:6px;margin:28px 0 12px">${String(s.numero).charAt(0)}000 — ${classe}</h2>`;
+        html += `<div class="section-label">${String(s.numero).charAt(0)}000 — ${classe}</div>`;
       }
-      html += `<div style="margin:0 0 18px">
-        <div style="font-family:'DM Sans',sans-serif;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">${s.numero} · ${s.nom}</div>`;
+      html += `<div>
+        <div class="accroche">${s.numero} · ${s.nom}</div>`;
       const dedans = comptes
         .filter(c => String(c.section) === String(s.numero))
         .sort((a, b) => String(a.numero).localeCompare(String(b.numero)));
       if (!dedans.length) {
-        html += `<div style="color:var(--beige-fonce);font-style:italic;padding:2px 0 2px 16px">aucun compte</div>`;
+        html += `<div class="textes-discrets">aucun compte</div>`;
       } else {
         dedans.forEach(c => {
-          html += `<div style="padding:3px 0 3px 16px;color:var(--primary)"><span style="color:var(--accent);font-variant-numeric:tabular-nums">${c.numero}</span> &nbsp; ${c.nom}</div>`;
+          html += `<div class="valeur"><span class="numero">${c.numero}</span>${c.nom}</div>`;
         });
       }
       html += `</div>`;

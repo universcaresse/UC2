@@ -653,6 +653,12 @@ p + .boutons {
   margin: var(--espace-12) 0 var(--espace-24);
 }
 
+.numero {
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+  min-width: var(--taille-64);
+}
+
 .casesacocher {
   display: flex;
   flex-wrap: wrap;
