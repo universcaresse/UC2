@@ -98,7 +98,7 @@
       <li class="nav-admin-item">
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">comptabilité<svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
-           <button class="nav-dropdown-item bientot">plan comptable</button>
+           <button class="nav-dropdown-item" onclick="afficherSection('plan-comptable', null)">plan comptable</button>
           <button class="nav-dropdown-item bientot">journal général</button>
 		  <button class="nav-dropdown-item bientot">grand livre</button>
 		  <button class="nav-dropdown-item bientot">bilan</button>
@@ -196,7 +196,7 @@
       <div class="sidebar-groupe">
      <div class="sidebar-titre" onclick="toggleGroupe(this)">comptabilité</div>
 		 
-		  <button class="sidebar-lien bientot">plan comptable</button>
+		  <button class="sidebar-lien" onclick="afficherSection('plan-comptable', this)">plan comptable</button>
           <button class="sidebar-lien bientot">journal général</button>
 		  <button class="sidebar-lien bientot">grand livre</button>
 		  <button class="sidebar-lien bientot">bilan</button>
@@ -2376,7 +2376,19 @@
 	  
 	  
     <!-- CONTENU DU SITE -->
-        <div class="section-admin" id="section-contenu-site">
+        <div class="section-admin" id="section-plan-comptable">
+  <div class="page-entete fade-in">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Comptabilité</div>
+      <div class="page-entete-titre">Plan <em>comptable</em></div>
+    </div>
+  </div>
+  <div class="msg-zone" id="msg-plan-comptable"></div>
+  <div class="chargement" id="loading-plan-comptable"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+  <div id="contenu-plan-comptable"></div>
+</div>
+
+<div class="section-admin" id="section-contenu-site">
         <div class="page-entete fade-in">
           <div>
             <div class="page-entete-eyebrow">Textes affichés sur le site public</div>
@@ -3959,6 +3971,7 @@
 <script src="../js/catalogue-builder.js"></script>
 <script src="../js/admin-liste-prix.js"></script>
 <script src="../js/admin-references.js"></script>
+<script src="../js/admin-comptabilite.js"></script>
 
 <div class="modal-admin-overlay" id="modal-ref-saisie">
   <div class="modal-admin">

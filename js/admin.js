@@ -225,6 +225,7 @@ if (id === 'fournisseurs')   afficherFournisseurs();
 if (id === 'redaction')      redInit();
   if (id === 'mediatheque')    chargerMediatheque();
   if (id === 'references')     chargerReferences();
+  if (id === 'plan-comptable') chargerPlanComptable();
   if (id === 'inventaire-production') {
     if (!donneesProduits || donneesProduits.length === 0) {
       Promise.all([appelAPI('getProduits'), appelAPI('getProduitsFormats')]).then(([resPro, resFmt]) => {
