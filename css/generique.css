@@ -460,6 +460,11 @@ p + .boutons {
   margin-top: var(--espace-24);
 }
 
+/* Des boutons qui suivent un champ reçoivent de l'air */
+.champ + .actions {
+  margin-top: var(--espace-16);
+}
+
 .separateur-haut {
   margin-top: var(--espace-20);
   padding-top: var(--espace-20);
@@ -657,6 +662,10 @@ p + .boutons {
   font-variant-numeric: tabular-nums;
   display: inline-block;
   min-width: var(--taille-64);
+}
+
+.bloc {
+  margin-bottom: var(--espace-24);
 }
 
 .casesacocher {

@@ -54,7 +54,7 @@ function pcRendre(sections, comptes) {
           <label class="libelle">Nom</label>
           <input type="text" class="controle" id="pc-sec-nom" placeholder="ex. Encaisse">
         </div>
-        <div class="champ">
+        <div class="actions">
           <button class="boutons boutons-vert" onclick="pcAjouterSection()">Ajouter la section</button>
         </div>
       </div>
@@ -72,7 +72,7 @@ function pcRendre(sections, comptes) {
           <label class="libelle">Nom</label>
           <input type="text" class="controle" id="pc-cpt-nom" placeholder="ex. Fond de caisse">
         </div>
-        <div class="champ">
+        <div class="actions">
           <button class="boutons boutons-vert" onclick="pcAjouterCompte()">Ajouter le compte</button>
         </div>
       </div>
@@ -89,7 +89,7 @@ function pcRendre(sections, comptes) {
         classeActuelle = classe;
         html += `<div class="section-label">${String(s.numero).charAt(0)}000 — ${classe}</div>`;
       }
-      html += `<div>
+      html += `<div class="bloc">
         <div class="accroche">${s.numero} · ${s.nom}</div>`;
       const dedans = comptes
         .filter(c => String(c.section) === String(s.numero))
