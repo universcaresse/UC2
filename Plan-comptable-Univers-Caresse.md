@@ -1,5 +1,5 @@
 # PLAN COMPTABLE — Univers Caresse
-### État : achats BRANCHÉS à la comptabilité (construit le 2026-07-14, à tester après déploiement). Page plan comptable en place. Ventes et fabrication : pas encore branchées.
+### État : achats et FABRICATION branchés à la comptabilité (2026-07-14, à tester après déploiement). Ventes : pas encore branchées (arbre partiellement déroulé).
 > Plan **ouvert** : des comptes restent à ajouter. Ce fichier suffit à reprendre
 > sans reposer les questions déjà tranchées.
 
@@ -126,9 +126,22 @@
 - **Achats finalisés avant cette nouveauté** : Chantal les entrera à la main
   (page manuelle) pour qu'ils soient dans la comptabilité.
 
-### Fabrication (à dérouler plus tard)
-- À la fabrication d'un lot : sortie du stock 1305 → entrée inventaire 1310.
-- Le compte_vente de la catégorie sert à la **vente** (détail du 5100).
+### Fabrication (arbre validé et CONSTRUIT le 2026-07-14, à tester)
+- Lot créé (saveLot_v2) → écriture : débit **1310** / crédit **1305** du coût de
+  revient total (ingrédients + emballages du format, déjà calculé par saveLot).
+  Référence = lot_id, bénéficiaire = nom du produit, libellé « Fabrication lot X ».
+- Lot modifié (updateLot_v2) → contre-passation + nouvelle écriture « (corrigé) ».
+- Lot supprimé (deleteLot_v2) → contre-passation.
+- Coût 0 → aucune écriture. Anciens lots : Chantal les entrera à la main.
+
+### Ventes (décisions prises, PAS construit)
+- Ordre logique retenu : achats → fabrication → ventes.
+- Vente finalisée → écriture automatique (modèle du md); modif/suppression →
+  contre-passation; remboursement → inverse au prorata.
+- **Coût des marchandises vendues → un seul compte 5001** (pas de détail par
+  catégorie à la vente). Les 5010-5036 restent au plan, inutilisés.
+- Le compte_vente des catégories reste en place (pourrait servir à autre chose).
+- Bénéficiaire = client, mode de paiement en notes (même principe que les achats).
 
 ---
 
@@ -170,6 +183,8 @@
 - Créer une cat UC (page INCI + les 2 modales) avec et sans comptes.
 - Finaliser un achat (avec et sans crédit) → vérifier Ecritures_v2.
 - Supprimer puis re-finaliser un achat → vérifier les contre-passations.
+- Fabriquer un lot → vérifier l'écriture 1310/1305; modifier puis supprimer
+  le lot → vérifier les contre-passations.
 - Corriger dans la feuille : compte_achat 1035 → **1305** (fait?).
 
 ---
