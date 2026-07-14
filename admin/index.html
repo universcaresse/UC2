@@ -101,8 +101,7 @@
            <button class="nav-dropdown-item" onclick="afficherSection('plan-comptable', null)">plan comptable</button>
           <button class="nav-dropdown-item bientot">journal général</button>
 		  <button class="nav-dropdown-item bientot">grand livre</button>
-		  <button class="nav-dropdown-item bientot">bilan</button>
-		  <button class="nav-dropdown-item bientot">état des résultats</button>
+		  <button class="nav-dropdown-item" onclick="afficherSection('bilan-resultats', null)">bilan et résultat</button>
         </div>
       </li>
 	  
@@ -199,8 +198,7 @@
 		  <button class="sidebar-lien" onclick="afficherSection('plan-comptable', this)">plan comptable</button>
           <button class="sidebar-lien bientot">journal général</button>
 		  <button class="sidebar-lien bientot">grand livre</button>
-		  <button class="sidebar-lien bientot">bilan</button>
-		  <button class="sidebar-lien bientot">état des résultats</button>
+		  <button class="sidebar-lien" onclick="afficherSection('bilan-resultats', this)">bilan et résultat</button>
 	 
        
 	
@@ -2410,6 +2408,18 @@
   <div class="msg-zone" id="msg-plan-comptable"></div>
   <div class="chargement" id="loading-plan-comptable"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
   <div id="contenu-plan-comptable"></div>
+</div>
+
+<div class="section-admin" id="section-bilan-resultats">
+  <div class="page-entete fade-in">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Comptabilité</div>
+      <div class="page-entete-titre">Bilan <em>et résultat</em></div>
+    </div>
+  </div>
+  <div class="msg-zone" id="msg-bilan-resultats"></div>
+  <div class="chargement" id="loading-bilan-resultats"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+  <div id="contenu-bilan-resultats"></div>
 </div>
 
 <div class="section-admin" id="section-contenu-site">

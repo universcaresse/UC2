@@ -134,6 +134,17 @@
 - Lot supprimé (deleteLot_v2) → contre-passation.
 - Coût 0 → aucune écriture. Anciens lots : Chantal les entrera à la main.
 
+### Bogue trouvé et corrigé (2026-07-14) : numéros de lot en double
+- L'écran calculait le prochain numéro à partir de la liste affichée → deux lots
+  différents ont reçu LOT-0160 (dont un « fantôme » : écriture sans ligne dans
+  Lots_v2, cause exacte jamais élucidée).
+- Correction : **le numéro de lot est donné par le serveur** (saveLot_v2, sous
+  verrou), en prenant le max de Lots_v2 **et** des références LOT- d'Ecritures_v2
+  — un numéro déjà passé en comptabilité ne ressort jamais, même lot supprimé.
+  Le frontend (sauvegarderLot) n'envoie plus de lot_id.
+- Ménage : suppression de LOT-0160 et LOT-0161 dans l'app → contre-passations
+  automatiques (pas d'environnement de test, vraies écritures).
+
 ### Ventes (décisions prises, PAS construit)
 - Ordre logique retenu : achats → fabrication → ventes.
 - Vente finalisée → écriture automatique (modèle du md); modif/suppression →
@@ -142,6 +153,11 @@
   catégorie à la vente). Les 5010-5036 restent au plan, inutilisés.
 - Le compte_vente des catégories reste en place (pourrait servir à autre chose).
 - Bénéficiaire = client, mode de paiement en notes (même principe que les achats).
+- 🔴 **Branche obligatoire de l'arbre des ventes : les pannes** (leçon du lot
+  fantôme). À dérouler avant de coder : appel interrompu à moitié, double-clic
+  qui crée deux ventes, écriture inscrite sans la vente (ou l'inverse), numéro
+  donné par le serveur (jamais par l'écran), et comment détecter puis réparer
+  chaque cas.
 
 ---
 
