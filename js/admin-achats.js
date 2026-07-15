@@ -749,6 +749,22 @@ async function efAjouterLigne() {
   var prixTotal   = quantiteNum * prixUnitNum;
   var four_id     = ef.factureActive.four_id;
 
+  if (ef.editIdx !== null && ef.lignes[ef.editIdx]) {
+    var ancienne = ef.lignes[ef.editIdx];
+    var resDel = await appelAPIPost('deleteAchatLigne', {
+      ach_id: ef.factureActive.ach_id,
+      ing_id: ancienne.ing_id,
+      format_qte: ancienne.formatQte,
+      format_unite: ancienne.formatUnite
+    });
+    if (!resDel || !resDel.success) {
+      efBloquerLigneSaisie(false);
+      if (btn) btn.innerHTML = '✓';
+      afficherMsg('ef-items', 'Erreur : l\'ancienne ligne n\'a pas pu être remplacée. Réessayez.', 'erreur');
+      return;
+    }
+  }
+
   var res = await appelAPIPost('addAchatLigne', {
     ach_id:        ef.factureActive.ach_id,
     ing_id:        ing_id,
@@ -880,15 +896,6 @@ function efRendreLignesSauvegardees() {
 async function efEditerLigne(idx) {
   var l = ef.lignes[idx];
   if (!l) return;
-
-  if (l.rowIndex) {
-    await appelAPIPost('deleteAchatLigne', {
-      ach_id: ef.factureActive.ach_id,
-      ing_id: l.ing_id,
-      format_qte: l.formatQte,
-      format_unite: l.formatUnite
-    });
-  }
 
   ef.editIdx = idx;
   efRendreLignesSauvegardees();
