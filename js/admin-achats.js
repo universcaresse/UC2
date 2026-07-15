@@ -18,7 +18,7 @@ var ef = {
   saisieEnCours:    { qte: '', prix: '', formatVal: '', formatText: '' }
 };
 
-var EF_SCRAPING_CODES = ['PA', 'MH', 'Arbressence', 'DE'];
+var EF_SCRAPING_IDS = ['FOUR-001', 'FOUR-002', 'FOUR-003', 'FOUR-004'];
 
 // ─── HELPERS ───
 function efParseFlt(val) {
@@ -26,8 +26,8 @@ function efParseFlt(val) {
   return parseFloat(String(val).replace(/\s/g, '').replace(',', '.')) || 0;
 }
 
-function efAScraping(four_code) {
-  return EF_SCRAPING_CODES.indexOf(four_code) >= 0;
+function efAScraping(four_id) {
+  return EF_SCRAPING_IDS.indexOf(four_id) >= 0;
 }
 
 function efGrammesDuFormat(qte, unite, cat_id) {
@@ -266,7 +266,7 @@ async function efVerifierFactureEnCours() {
     fournisseur: fourNom,
     four_id:     enCours.four_id,
     four_code:   fourCode,
-    a_scraping:  efAScraping(fourCode)
+    a_scraping:  efAScraping(enCours.four_id)
   };
 }
 
@@ -401,7 +401,7 @@ async function efCreerFacture() {
   ef.factureActive = {
     ach_id: ach_id, numero: numero, date: date,
     fournisseur: fourNom, four_id: four_id, four_code: fourCode,
-    a_scraping: efAScraping(fourCode)
+    a_scraping: efAScraping(four_id)
   };
   ef.lignes = [];
   ef.editIdx = null;
@@ -1165,6 +1165,7 @@ async function efConfirmerModalIngredient() {
       ing_id: ing_id, cat_id: cat_id, nom_UC: nouveauNom,
       statut: statut, inci: '',
       source: ef.factureActive ? ef.factureActive.four_code : '',
+      four_id: ef.factureActive ? ef.factureActive.four_id : '',
       nom_fournisseur: nomFourn
     });
     if (!res || !res.success) {
