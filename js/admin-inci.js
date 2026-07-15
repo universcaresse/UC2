@@ -1,16 +1,22 @@
 var inciDonnees      = [];
 var inciCategoriesUC = [];
+var inciPrixParIng   = {};
 
 async function chargerInci() {
   afficherChargement();
   document.getElementById('loading-inci').classList.remove('cache');
   document.getElementById('inci-accordeons').innerHTML = '';
 
-  // V2 : getIngredientsInci + getCategoriesUC
-  const [resInci, resUC] = await Promise.all([
+  // V2 : getIngredientsInci + getCategoriesUC + getStock (prix au g)
+  const [resInci, resUC, resStock] = await Promise.all([
     appelAPI('getIngredientsInci'),
-    appelAPI('getCategoriesUC')
+    appelAPI('getCategoriesUC'),
+    appelAPI('getStock')
   ]);
+  inciPrixParIng = {};
+  if (resStock && resStock.success) {
+    (resStock.items || []).forEach(s => { inciPrixParIng[s.ing_id] = s.prix_par_g_reel; });
+  }
 
   if (resInci && resInci.success) {
     listesDropdown.fullData = resInci.items || [];
@@ -69,9 +75,9 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
 
   inciDonnees.forEach(l => {
     if (recherche && !(l.nom_UC || '').toLowerCase().includes(recherche)) return;
-    if (!inciCatRequiert(l.cat_id)) return;
-    if (filtreStatut === 'a-valider' && l.inci) return;
+    if (filtreStatut === 'a-valider' && (l.inci || !inciCatRequiert(l.cat_id))) return;
     if (filtreStatut === 'valide'    && !l.inci) return;
+    if (filtreStatut === 'sans-prix' && inciPrixParIng[l.ing_id] > 0) return;
     if (filtreSource !== 'tout'      && l.source !== filtreSource) return;
     const catObj = inciCategoriesUC.find(c => c.cat_id === l.cat_id);
     const cat = catObj?.nom || l.cat_id || 'Sans catégorie';
@@ -91,7 +97,8 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
   cats.forEach((cat, idx) => {
     const lignes     = parCat[cat];
     const nbInci     = lignes.filter(l => l.inci).length;
-    const nbSansInci = lignes.length - nbInci;
+    const nbSansInci = inciCatRequiert(lignes[0].cat_id) ? lignes.length - nbInci : 0;
+    const nbSansPrix = lignes.filter(l => !(inciPrixParIng[l.ing_id] > 0)).length;
 
     const bloc = document.createElement('div');
     bloc.className = 'form-panel visible';
@@ -101,6 +108,7 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
         <div class="form-panel-titre">${cat}</div>
         <div style="display:flex;gap:8px;align-items:center">
           ${nbSansInci > 0 ? `<span class="badge-statut-cours">${nbSansInci} 🔴</span>` : ''}
+          ${nbSansPrix > 0 ? `<span class="badge-statut-cours">${nbSansPrix} 💲</span>` : ''}
           <span class="badge-statut-ok">${nbInci} ✅</span>
         </div>
       </div>
@@ -128,10 +136,11 @@ function inciRendreLigne(l, cat, uid) {
       <td>${l.nom_UC || l.ing_id}</td>
      <td>${l.source || ''}</td>
       <td>${l.inci || ''}</td>
-      <td><span>${statutLabel}</span></td>
+      <td>${inciPrixParIng[l.ing_id] > 0 ? formaterPrix(inciPrixParIng[l.ing_id] * 100) + '/100 g' : '💲'}</td>
+      <td><span>${inciCatRequiert(l.cat_id) ? statutLabel : ''}</span></td>
     </tr>
     <tr class="accordeon-detail cache" id="${id}-detail" data-ing-id="${l.ing_id || ''}">
-      <td colspan="4">
+      <td colspan="5">
         <div class="form-groupe">
           <label class="form-label">INCI</label>
           <textarea class="form-ctrl" id="${id}-inci" rows="3">${(l.inci || '').replace(/</g, '&lt;')}</textarea>
