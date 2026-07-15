@@ -19,7 +19,6 @@ var ef = {
 };
 
 var EF_SCRAPING_CODES = ['PA', 'MH', 'Arbressence', 'DE'];
-var EF_CATS_SANS_INCI = ['CAT-014', 'CAT-015', 'CAT-016', 'CAT-017'];
 
 // ─── HELPERS ───
 function efParseFlt(val) {
@@ -129,6 +128,7 @@ async function efInit() {
       (res[2].items || []).forEach(function(c) {
         listesDropdown.categoriesMap[c.cat_id] = c.nom;
       });
+      memoriserCatsInci(res[2].items);
     }
     if (res[3] && res[3].success) ef.catsFourn  = res[3].items || [];
     if (res[4] && res[4].success) ef.prodsFourn = res[4].items || [];
@@ -1154,7 +1154,7 @@ async function efConfirmerModalIngredient() {
     }, 0);
     ing_id = 'ING-' + String(dernierNum + 1).padStart(3, '0');
 
-    var statut = EF_CATS_SANS_INCI.indexOf(cat_id) >= 0 ? 'valide' : 'a-valider';
+    var statut = catRequiertInci(cat_id) ? 'a-valider' : 'valide';
 
     var selNomFourn = document.getElementById('ef-nom-fourn');
     var nomFourn = (selNomFourn && selNomFourn.value && selNomFourn.value !== '__nouveau__')
@@ -1199,8 +1199,11 @@ function efOuvrirModalNouvelleCatUC() {
   var modal = document.getElementById('modal-ef-nouvelle-cat-uc');
   if (!modal) return;
   document.getElementById('modal-ef-nouvelle-cat-uc-valeur').value = '';
-  document.getElementById('modal-ef-nouvelle-cat-uc-achat').value = '';
-  document.getElementById('modal-ef-nouvelle-cat-uc-vente').value = '';
+  var champCompte = document.getElementById('modal-ef-nouvelle-cat-uc-compte');
+  if (champCompte) champCompte.value = '';
+  var caseInci = document.getElementById('modal-ef-nouvelle-cat-uc-inci');
+  if (caseInci) caseInci.checked = false;
+  
   modal.classList.add('ouvert');
   setTimeout(function() { document.getElementById('modal-ef-nouvelle-cat-uc-valeur').focus(); }, 100);
 }
@@ -1212,18 +1215,19 @@ function efFermerModalNouvelleCatUC() {
 
 async function efConfirmerModalNouvelleCatUC() {
   var val = document.getElementById('modal-ef-nouvelle-cat-uc-valeur')?.value?.trim();
-  var achat = document.getElementById('modal-ef-nouvelle-cat-uc-achat')?.value?.trim();
-  var vente = document.getElementById('modal-ef-nouvelle-cat-uc-vente')?.value?.trim();
+  var achat = document.getElementById('modal-ef-nouvelle-cat-uc-compte')?.value?.trim();
+  var inci = document.getElementById('modal-ef-nouvelle-cat-uc-inci')?.checked || false;
   if (!val) { document.getElementById('modal-ef-nouvelle-cat-uc-valeur').focus(); return; }
-  if (!achat) { document.getElementById('modal-ef-nouvelle-cat-uc-achat').focus(); return; }
-  if (!vente) { document.getElementById('modal-ef-nouvelle-cat-uc-vente').focus(); return; }
-  var res = await appelAPIPost('saveCategorieUC', { nom: val, compte_achat: achat, compte_vente: vente });
+  if (!achat) { document.getElementById('modal-ef-nouvelle-cat-uc-compte').focus(); return; }
+  var res = await appelAPIPost('saveCategorieUC', { nom: val, compte_achat: achat, inci: inci });
   if (!res || !res.success) {
     afficherMsg('ef', 'Erreur création catégorie.', 'erreur');
     return;
   }
   var cat_id = res.cat_id;
   listesDropdown.categoriesMap[cat_id] = val;
+  if (!listesDropdown.catsInci) listesDropdown.catsInci = {};
+  listesDropdown.catsInci[cat_id] = inci;
   var sel = document.getElementById('ef-cat-uc');
   if (sel) {
     var opt = document.createElement('option');

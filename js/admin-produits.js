@@ -543,7 +543,7 @@ function ouvrirFicheProduit(pro_id) {
   var nbSansInci = 0;
   ings.forEach(function(i) {
     var inciObj = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; });
-    if (!inciObj || !inciObj.inci) nbSansInci++;
+    if ((!inciObj || !inciObj.inci) && catRequiertInci(inciObj ? inciObj.cat_id : '')) nbSansInci++;
   });
   var avertissementInciHtml = nbSansInci > 0
     ? '<div class="avertissement-inci" style="background:#fff4e6;border-left:4px solid var(--or);padding:14px 18px;margin:0 0 20px;border-radius:4px;color:var(--gris-fonce);font-size:0.9rem">' +
@@ -555,7 +555,7 @@ function ouvrirFicheProduit(pro_id) {
     ? ings.slice().sort(function(a, b) { return b.quantite_g - a.quantite_g; }).map(function(i) {
         var inciObj  = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; });
         var inciCode = (inciObj && inciObj.inci) || '';
-        var sansInci = !inciCode;
+        var sansInci = !inciCode && catRequiertInci(inciObj ? inciObj.cat_id : '');
         var s2 = stock.find(function(st) { return st.ing_id === i.ing_id; });
         var prixParG = (s2 && s2.prix_par_g_reel) || 0;
         var coutIng = prixParG > 0 ? (i.quantite_g * prixParG).toFixed(2) + ' $' : '⚠';
@@ -1468,9 +1468,9 @@ function ouvrirModalNouvelleCategorieUC(rangeeIdx) {
   }
   document.getElementById('modal-nouvelle-cat-produit-valeur').value = '';
   var inpAchat = document.getElementById('modal-nouvelle-cat-produit-achat');
-  var inpVente = document.getElementById('modal-nouvelle-cat-produit-vente');
   if (inpAchat) inpAchat.value = '';
-  if (inpVente) inpVente.value = '';
+  var caseInci = document.getElementById('modal-nouvelle-cat-produit-inci');
+  if (caseInci) caseInci.checked = false;
   modal.classList.add('ouvert');
   setTimeout(function() { document.getElementById('modal-nouvelle-cat-produit-valeur').focus(); }, 100);
 }
@@ -1484,11 +1484,10 @@ function fermerModalNouvelleCategorieUC() {
 async function confirmerModalNouvelleCategorieUC() {
   var val = (document.getElementById('modal-nouvelle-cat-produit-valeur').value || '').trim();
   var achat = (document.getElementById('modal-nouvelle-cat-produit-achat')?.value || '').trim();
-  var vente = (document.getElementById('modal-nouvelle-cat-produit-vente')?.value || '').trim();
+  var inci = document.getElementById('modal-nouvelle-cat-produit-inci')?.checked || false;
   if (!val) { document.getElementById('modal-nouvelle-cat-produit-valeur').focus(); return; }
   if (!achat) { document.getElementById('modal-nouvelle-cat-produit-achat').focus(); return; }
-  if (!vente) { document.getElementById('modal-nouvelle-cat-produit-vente').focus(); return; }
-  var res = await appelAPIPost('saveCategorieUC', { nom: val, compte_achat: achat, compte_vente: vente });
+  var res = await appelAPIPost('saveCategorieUC', { nom: val, compte_achat: achat, inci: inci });
   if (!res || !res.success) {
     afficherMsg('recettes', 'Erreur création catégorie.', 'erreur');
     return;
@@ -1496,6 +1495,8 @@ async function confirmerModalNouvelleCategorieUC() {
   var cat_id = res.cat_id;
   if (!listesDropdown.categoriesMap) listesDropdown.categoriesMap = {};
   listesDropdown.categoriesMap[cat_id] = val;
+  if (!listesDropdown.catsInci) listesDropdown.catsInci = {};
+  listesDropdown.catsInci[cat_id] = inci;
 
   var modal = document.getElementById('modal-nouvelle-cat-produit');
   if (modal) modal.classList.remove('ouvert');
@@ -1530,8 +1531,7 @@ function creerModalNouvelleCategorieUC() {
           '<input type="text" class="form-ctrl" id="modal-nouvelle-cat-produit-achat" placeholder="Ex: 1305">' +
         '</div>' +
         '<div class="form-groupe">' +
-          '<label class="form-label">Compte à la vente</label>' +
-          '<input type="text" class="form-ctrl" id="modal-nouvelle-cat-produit-vente" placeholder="Ex: 5020">' +
+          '<label class="form-label" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="modal-nouvelle-cat-produit-inci">INCI requis</label>' +
         '</div>' +
       '</div>' +
       '<div class="modal-admin-body">' +
@@ -1587,8 +1587,7 @@ async function confirmerModalNouvelIngredient() {
   }, 0);
   var ing_id = 'ING-' + String(dernierNum + 1).padStart(3, '0');
 
-  var CATS_SANS_INCI_LOCAL = ['CAT-014', 'CAT-015', 'CAT-016', 'CAT-017'];
-  var statut = CATS_SANS_INCI_LOCAL.indexOf(cat_id) >= 0 ? 'valide' : 'a-valider';
+  var statut = catRequiertInci(cat_id) ? 'a-valider' : 'valide';
 
   var res = await appelAPIPost('createIngredientInci', {
     ing_id: ing_id, cat_id: cat_id, nom_UC: nom, statut: statut, inci: '', source: ''

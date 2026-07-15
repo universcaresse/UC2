@@ -18,6 +18,7 @@ async function chargerInci() {
     inciDonnees = resInci.items;
   }
   inciCategoriesUC = (resUC && resUC.success) ? resUC.items : [];
+  memoriserCatsInci(inciCategoriesUC);
 
   document.getElementById('loading-inci').classList.add('cache');
   cacherChargement();
@@ -30,6 +31,10 @@ function inciAppliquerFiltres(btn, groupe) {
     btn.classList.add('actif');
   }
   inciConstruireAccordeons();
+}
+
+function inciCatRequiert(cat_id) {
+  return catRequiertInci(cat_id);
 }
 
 function inciGetFiltres() {
@@ -64,10 +69,9 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
 
   inciDonnees.forEach(l => {
     if (recherche && !(l.nom_UC || '').toLowerCase().includes(recherche)) return;
-    const catsSansInci = CATS_SANS_INCI;
-    const exempteSansInci = catsSansInci.includes(l.cat_id);
-    if (filtreStatut === 'a-valider' && (l.inci || exempteSansInci)) return;
-    if (filtreStatut === 'valide'    && !l.inci && !exempteSansInci) return;
+    if (!inciCatRequiert(l.cat_id)) return;
+    if (filtreStatut === 'a-valider' && l.inci) return;
+    if (filtreStatut === 'valide'    && !l.inci) return;
     if (filtreSource !== 'tout'      && l.source !== filtreSource) return;
     const catObj = inciCategoriesUC.find(c => c.cat_id === l.cat_id);
     const cat = catObj?.nom || l.cat_id || 'Sans catégorie';
@@ -86,7 +90,7 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
 
   cats.forEach((cat, idx) => {
     const lignes     = parCat[cat];
-    const nbInci     = lignes.filter(l => l.inci || CATS_SANS_INCI.includes(l.cat_id)).length;
+    const nbInci     = lignes.filter(l => l.inci).length;
     const nbSansInci = lignes.length - nbInci;
 
     const bloc = document.createElement('div');
@@ -114,8 +118,7 @@ const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.datas
 }
 
 function inciRendreLigne(l, cat, uid) {
-  const catsSansInci2 = CATS_SANS_INCI;
-  const aInci      = !!l.inci || catsSansInci2.includes(l.cat_id);
+  const aInci      = !!l.inci;
   const statutLabel = aInci ? '✅' : '🔴';
   const id         = `inci-${uid}`;
   const nomSafe    = (l.nom_UC || '').replace(/'/g, "\\'");
@@ -207,7 +210,7 @@ function inciRendreUC() {
         <div class="carte-admin-entete">
           <input type="text" class="form-ctrl" id="uc-cat-${i}" value="${(c.nom || '').replace(/"/g, '&quot;')}">
           <input type="text" class="form-ctrl" id="uc-cat-achat-${i}" value="${c.compte_achat || ''}" placeholder="Compte à l'achat" style="max-width:130px">
-          <input type="text" class="form-ctrl" id="uc-cat-vente-${i}" value="${c.compte_vente || ''}" placeholder="Compte à la vente" style="max-width:130px">
+          <label class="form-label" style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input type="checkbox" id="uc-cat-inci-${i}" ${c.inci ? 'checked' : ''}>INCI requis</label>
           <div class="td-actions">
             <button class="btn-edit" onclick="inciModifierUC(${i}, '${c.cat_id}')">Modifier</button>
             ${utilise.length === 0 ? `<button class="btn-suppr" onclick="inciSupprimerUC('${c.cat_id}')">Supprimer</button>` : ''}
@@ -235,10 +238,10 @@ async function inciModifierUC(i, cat_id) {
   const input = document.getElementById(`uc-cat-${i}`);
   const nom   = (input?.value || '').trim();
   const compte_achat = (document.getElementById(`uc-cat-achat-${i}`)?.value || '').trim();
-  const compte_vente = (document.getElementById(`uc-cat-vente-${i}`)?.value || '').trim();
+  const inci = document.getElementById(`uc-cat-inci-${i}`)?.checked || false;
   if (!nom) { afficherMsg('inci', 'Le nom est requis.', 'erreur'); return; }
-  if (!compte_achat || !compte_vente) { afficherMsg('inci', 'Les deux comptes sont requis.', 'erreur'); return; }
-  const res = await appelAPIPost('saveCategorieUC', { cat_id, nom, compte_achat, compte_vente });
+  if (!compte_achat) { afficherMsg('inci', 'Le compte à l\'achat est requis.', 'erreur'); return; }
+  const res = await appelAPIPost('saveCategorieUC', { cat_id, nom, compte_achat, inci });
   if (res && res.success) {
     afficherMsg('inci', cat_id ? 'Catégorie mise à jour.' : 'Catégorie ajoutée.');
     await chargerInci();

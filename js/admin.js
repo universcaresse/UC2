@@ -95,6 +95,7 @@ if (resGam && resGam.success) {
   if (resCats && resCats.success) {
     listesDropdown.categoriesMap = {};
     (resCats.items || []).forEach(c => { listesDropdown.categoriesMap[c.cat_id] = c.nom; });
+    memoriserCatsInci(resCats.items);
   }
   if (resCfg && resCfg.success) {
     listesDropdown.config = {};
@@ -377,8 +378,18 @@ function fermerModalConfirm() {
 
 var squareAppId = '';
 
-var listesDropdown = { types: [], fullData: [], config: {}, fournisseurs: [], formats: [] };
-const CATS_SANS_INCI = ['CAT-014', 'CAT-015', 'CAT-016', 'CAT-017'];
+var listesDropdown = { types: [], fullData: [], config: {}, fournisseurs: [], formats: [], catsInci: null };
+
+// Garde en mémoire quelles catégories exigent un INCI (rempli à chaque lecture des catégories)
+function memoriserCatsInci(items) {
+  listesDropdown.catsInci = {};
+  (items || []).forEach(c => { listesDropdown.catsInci[c.cat_id] = !!c.inci; });
+}
+// Catégorie inconnue ou mémoire vide = INCI requis, par prudence
+function catRequiertInci(cat_id) {
+  if (!listesDropdown.catsInci) return true;
+  return listesDropdown.catsInci[cat_id] !== false;
+}
 
 function afficherChargement() {
   document.getElementById('overlay-chargement')?.classList.remove('cache');
