@@ -357,7 +357,7 @@ async function enregistrerCommande() {
       return;
     }
   } else {
-    // Création : entête puis lignes
+    // Création : entête et lignes en une seule opération, total calculé par le serveur
     const resCreate = await appelAPIPost('createCommande', {
       cmd_id,
       client,
@@ -366,26 +366,14 @@ async function enregistrerCommande() {
       courriel,
       telephone,
       code_postal,
-      total_prevu: totalPrevu,
       acompte,
-      solde,
-      notes
+      notes,
+      lignes: lignesPayload
     });
     if (!resCreate || !resCreate.success) {
       cacherChargement();
-      afficherMsg('commandes', 'Erreur lors de la création.', 'erreur');
+      afficherMsg('commandes', 'Erreur lors de la création : ' + (resCreate?.message || ''), 'erreur');
       return;
-    }
-    const cmdIdReel = resCreate.cmd_id || cmd_id;
-    for (const l of cmdLignes) {
-      await appelAPIPost('addCommandeLigne', {
-        cmd_id: cmdIdReel,
-        pro_id: l.pro_id,
-        format_poids: l.poids,
-        format_unite: l.unite,
-        quantite: l.quantite,
-        prix_unitaire: l.prix_unitaire
-      });
     }
   }
 
@@ -1538,7 +1526,6 @@ async function envoyerPropositionV3() {
     courriel: courriel,
     telephone: telephone,
     code_postal: c.code_postal,
-    total_prevu: totalAvec,
     acompte: c.acompte || 0,
     solde: totalAvec - (c.acompte || 0),
     note_proposition: note,
