@@ -262,9 +262,10 @@ function brRendreClasse(chiffre, titre, montants) {
 
   let html = `<div class="section-label">${titre}</div>`;
 
-  sections.filter(s => String(s.numero).charAt(0) === chiffre).forEach(s => {
+  const sectionsPleines = sections.filter(s => String(s.numero).charAt(0) === chiffre && dansClasse.some(c => String(c.section) === String(s.numero)));
+
+  sectionsPleines.forEach(s => {
     const dedans = dansClasse.filter(c => String(c.section) === String(s.numero));
-    if (!dedans.length) return;
     let sousTotal = 0, lignes = '';
     dedans.forEach(c => {
       vus.add(c.numero);
@@ -273,8 +274,9 @@ function brRendreClasse(chiffre, titre, montants) {
       lignes += ligneCompte(c, m);
     });
     totalClasse += sousTotal;
-    html += `<div class="bloc"><div class="accroche">${s.numero} · ${s.nom}</div>${lignes}
-      <div class="rangeeitem"><div class="rangeeitem-info"><div class="rangeeitem-titre">Sous-total</div></div><span class="rangeeitem-valeur">${formaterPrix(sousTotal)}</span></div></div>`;
+    const ligneSousTotal = sectionsPleines.length < 2 ? '' :
+      `<div class="lignetotal"><span class="lignetotal-libelle moyen">Sous-total ${s.nom}</span><span>${formaterPrix(sousTotal)}</span></div>`;
+    html += `<div class="bloc"><div class="accroche">${s.nom}</div>${lignes}${ligneSousTotal}</div>`;
   });
 
   const restants = dansClasse.filter(c => !vus.has(c.numero));
@@ -288,7 +290,7 @@ function brRendreClasse(chiffre, titre, montants) {
     html += `<div class="bloc">${lignes}</div>`;
   }
 
-  html += `<div class="lignetotal"><span class="lignetotal-libelle">Total ${titre}</span><span>${formaterPrix(totalClasse)}</span></div>`;
+  html += `<div class="lignetotal"><span class="lignetotal-libelle grand">Total ${titre}</span><span>${formaterPrix(totalClasse)}</span></div>`;
   return { html, total: totalClasse };
 }
 
@@ -311,7 +313,7 @@ function brAfficher() {
 
   let html = `<div class="titre separateur-haut">Bilan au ${fin}</div>` +
     actif.html + passif.html + avoir.html +
-    `<div class="lignetotal"><span class="lignetotal-libelle">Actif = Passif + Avoir</span>
+    `<div class="lignetotal"><span class="lignetotal-libelle grand">Actif = Passif + Avoir</span>
      <span>${formaterPrix(actif.total)} / ${formaterPrix(passif.total + avoir.total)} ${balance ? '✅' : '⚠️'}</span></div>`;
 
   if (r.inconnus.length) {
@@ -321,7 +323,7 @@ function brAfficher() {
 
   html += `<div class="titre separateur-haut">État des résultats du ${debut} au ${fin}</div>` +
     revenus.html + depenses.html +
-    `<div class="lignetotal"><span class="lignetotal-libelle">Bénéfice net de la période</span><span>${formaterPrix(revenus.total - depenses.total)}</span></div>`;
+    `<div class="lignetotal"><span class="lignetotal-libelle grand">Bénéfice net de la période</span><span>${formaterPrix(revenus.total - depenses.total)}</span></div>`;
 
   zone.innerHTML = html;
 }

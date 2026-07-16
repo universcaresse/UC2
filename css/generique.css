@@ -648,6 +648,9 @@ p + .boutons {
   text-transform: uppercase;
   color: var(--grise);
 }
+.lignetotal-libelle.moyen { font-size: var(--texte-88); color: var(--grise-foncee); }
+.lignetotal-libelle.grand { font-size: var(--texte-105); color: var(--primaire); font-weight: var(--poids-550); }
+
 .lignetotal span:not(.lignetotal-libelle) {
   white-space: nowrap;
 }
