@@ -102,14 +102,18 @@
 - **Pas de mode = finalisation bloquée.**
 - Mode changé après finalisation → contre-passation + nouvelle écriture, automatique.
 
-### Catégories UC : 2 colonnes de compte (feuille déjà remplie par Chantal)
+### Catégories UC : UN SEUL compte (corrigé le 2026-07-16)
 - **compte_achat** (« Compte à l'achat ») : où va l'argent à l'achat.
   1305 pour tout ce qui entre au stock; dépense directe pour le reste
   (Fourniture 5325, Divers 5332).
-- **compte_vente** (« Compte à la vente ») : la dépense quand ça se vend (5010-5036).
-- **Les deux comptes sont obligatoires** pour créer une cat UC.
+- **Le compte de vente a été retiré** (2026-07-15) — tout passe par 5001 à la vente.
+  La colonne E de Categories_UC_v2 porte maintenant le drapeau **inci** (« oui » = INCI requis).
 - Pas de compte sur les noms UC — la catégorie suffit.
 - ⚠️ Dans la feuille, corriger compte_achat 1035 → **1305**.
+- 🔴 **Une catégorie UC complète = 5 morceaux** : nom + compte à l'achat + INCI requis
+  + **densité** + **marge de perte**. Ces deux dernières vivent dans Config_v2 : sans elles,
+  la densité vaut 1 et la marge 0 **en silence** → prix au gramme faux.
+  Arbre validé et travail à faire : voir ITEM-categories-UC-dans-le-plan-comptable.md
 
 ### Écriture à la finalisation d'un achat
 - **Chaque ligne** va au débit du compte_achat de sa catégorie,
