@@ -378,28 +378,8 @@ async function efCreerFacture() {
     }
   }
 
-  var btn = document.getElementById('ef-btn-creer');
-  if (btn) { btn.disabled = true; btn.textContent = '…'; }
-
-  var dernierNum = (resAch?.items || []).reduce(function(max, a) {
-    var n = parseInt((a.ach_id || '').replace('ACH-', '')) || 0;
-    return n > max ? n : max;
-  }, 0);
-  var ach_id = 'ACH-' + String(dernierNum + 1).padStart(4, '0');
-
-  var res = await appelAPIPost('createAchatEntete', {
-    ach_id: ach_id, date: date, four_id: four_id, numero_facture: numero
-  });
-
-  if (btn) { btn.disabled = false; btn.textContent = 'Créer'; }
-
-  if (!res || !res.success) {
-    afficherMsg('ef', (res && res.message) || 'Erreur création facture.', 'erreur');
-    return;
-  }
-
   ef.factureActive = {
-    ach_id: ach_id, numero: numero, date: date,
+    ach_id: '', numero: numero, date: date,
     fournisseur: fourNom, four_id: four_id, four_code: fourCode,
     a_scraping: efAScraping(four_id)
   };
@@ -576,10 +556,6 @@ async function efOnChangeNomFourn() {
 
   if (!sel.value) return;
 
-  // Recharger le mapping depuis le serveur pour être sûr d'avoir les derniers
-  var resMap = await appelAPI('getMappingFournisseurs');
-  if (resMap && resMap.success) ef.mapping = resMap.items || [];
-
   var mapping = ef.mapping.find(function(m) {
     return String(m.four_id) === String(ef.factureActive.four_id) &&
            String(m.prod_fourn_id) === String(sel.value);
@@ -729,6 +705,7 @@ async function efAjouterLigne() {
   var quantite = document.getElementById('ef-qte')?.value?.trim();
 
   function erreur(msg) {
+    if (btnTest) btnTest.disabled = false;
     afficherMsg('ef-items', msg, 'erreur');
   }
   if (aScraping && !cat_fourn_id)  return erreur('Catégorie fournisseur requise.');
@@ -739,50 +716,12 @@ async function efAjouterLigne() {
   if (!prixUnit)  return erreur('Prix unitaire requis.');
   if (!quantite)  return erreur('Quantité requise.');
 
-  // Bloquer la ligne pendant la sauvegarde
-  efBloquerLigneSaisie(true);
-  var btn = document.getElementById('ef-btn-ajouter');
-  if (btn) btn.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>';
-
   var prixUnitNum = efParseFlt(prixUnit);
   var quantiteNum = efParseFlt(quantite);
   var prixTotal   = quantiteNum * prixUnitNum;
   var four_id     = ef.factureActive.four_id;
 
-  if (ef.editIdx !== null && ef.lignes[ef.editIdx]) {
-    var ancienne = ef.lignes[ef.editIdx];
-    var resDel = await appelAPIPost('deleteAchatLigne', {
-      ach_id: ef.factureActive.ach_id,
-      ing_id: ancienne.ing_id,
-      format_qte: ancienne.formatQte,
-      format_unite: ancienne.formatUnite
-    });
-    if (!resDel || !resDel.success) {
-      efBloquerLigneSaisie(false);
-      if (btn) btn.innerHTML = '✓';
-      afficherMsg('ef-items', 'Erreur : l\'ancienne ligne n\'a pas pu être remplacée. Réessayez.', 'erreur');
-      return;
-    }
-  }
-
-  var res = await appelAPIPost('addAchatLigne', {
-    ach_id:        ef.factureActive.ach_id,
-    ing_id:        ing_id,
-    format_qte:    efParseFlt(formatQte),
-    format_unite:  formatUnite,
-    prix_unitaire: prixUnitNum,
-    quantite:      quantiteNum,
-    four_id:       four_id
-  });
-
-  if (!res || !res.success) {
-    efBloquerLigneSaisie(false);
-    if (btn) btn.innerHTML = '+';
-    afficherMsg('ef-items', (res && res.message) || 'Erreur ajout ligne.', 'erreur');
-    return;
-  }
-
-  await efAssurerMapping(four_id, cat_fourn_id, prod_fourn_id, ing_id);
+  efAssurerMapping(four_id, cat_fourn_id, prod_fourn_id, ing_id);
   efAssurerFormatLocal(ing_id, four_id, formatQte, formatUnite);
 
   var nomUC = (listesDropdown.fullData.find(function(d) { return d.ing_id === ing_id; }) || {}).nom_UC || '';
@@ -798,7 +737,6 @@ async function efAjouterLigne() {
   }
 
   var ligne = {
-    rowIndex: res.rowIndex || 0,
     ing_id: ing_id, nomUC: nomUC, cat_id: cat_id, catUC: catUC,
     cat_fourn_id: cat_fourn_id, prod_fourn_id: prod_fourn_id,
     catFournNom: catFournNom, prodFournNom: prodFournNom,
@@ -828,13 +766,13 @@ async function efAssurerMapping(four_id, cat_fourn_id, prod_fourn_id, ing_id) {
   });
   if (existe) return;
 
-  await appelAPIPost('saveMappingFournisseur', {
+  ef.mapping.push({
     four_id: four_id,
     cat_fourn_id: cat_fourn_id || '',
     prod_fourn_id: prod_fourn_id || '',
     ing_id: ing_id
   });
-  ef.mapping.push({
+  await appelAPIPost('saveMappingFournisseur', {
     four_id: four_id,
     cat_fourn_id: cat_fourn_id || '',
     prod_fourn_id: prod_fourn_id || '',
@@ -945,7 +883,10 @@ async function efEditerLigne(idx) {
 
 function efAnnulerEdit() {
   ef.editIdx = null;
-  efRechargerLignes();
+  efResetSaisie();
+  efRendreLignesSauvegardees();
+  efRendreLigneSaisie();
+  efMajBanniere();
 }
 
 async function efRechargerLignes() {
@@ -966,17 +907,7 @@ async function efRechargerLignes() {
 function efSupprimerLigne(idx) {
   var ligne = ef.lignes[idx];
   if (!ligne) return;
-  confirmerAction('Supprimer cette ligne ?', async function() {
-    var res = await appelAPIPost('deleteAchatLigne', {
-      ach_id: ef.factureActive.ach_id,
-      ing_id: ligne.ing_id,
-      format_qte: ligne.formatQte,
-      format_unite: ligne.formatUnite
-    });
-    if (!res || !res.success) {
-      afficherMsg('ef-items', (res && res.message) || 'Erreur suppression.', 'erreur');
-      return;
-    }
+  confirmerAction('Supprimer cette ligne ?', function() {
     ef.lignes.splice(idx, 1);
     efRendreLignesSauvegardees();
     efMajBanniere();
@@ -1009,8 +940,24 @@ async function efFinaliser() {
   var liv = efParseFlt(document.getElementById('ef-livraison')?.value);
   var credit = efParseFlt(document.getElementById('ef-credit')?.value);
 
-  var res = await appelAPIPost('finaliserAchat', {
-    ach_id: ef.factureActive.ach_id,
+  if (ef.factureActive.ach_id) {
+    await appelAPIPost('deleteAchat', { ach_id: ef.factureActive.ach_id });
+    ef.factureActive.ach_id = '';
+  }
+
+  var res = await appelAPIPost('finaliserAchatComplet', {
+    date: ef.factureActive.date,
+    four_id: ef.factureActive.four_id,
+    numero_facture: ef.factureActive.numero,
+    lignes: ef.lignes.map(function(l) {
+      return {
+        ing_id: l.ing_id,
+        format_qte: l.formatQte,
+        format_unite: l.formatUnite,
+        prix_unitaire: l.prixUnitaire,
+        quantite: l.quantite
+      };
+    }),
     sous_total: sousTotal, tps: tps, tvq: tvq, livraison: liv,
     credit: credit, mode_paiement: mode
   });
@@ -1053,15 +1000,17 @@ function efReinitialiserApresFinalisation() {
 function efAnnulerFactureActive() {
   if (!ef.factureActive) return;
   confirmerAction('Annuler cette facture et supprimer toutes les lignes ?', async function() {
-    afficherChargement();
-    var res = await appelAPIPost('deleteAchat', { ach_id: ef.factureActive.ach_id });
-    cacherChargement();
-    if (res && res.success) {
-      efReinitialiserApresFinalisation();
-      afficherMsg('ef', '✅ Facture annulée.');
-    } else {
-      afficherMsg('ef', (res && res.message) || 'Erreur annulation.', 'erreur');
+    if (ef.factureActive.ach_id) {
+      afficherChargement();
+      var res = await appelAPIPost('deleteAchat', { ach_id: ef.factureActive.ach_id });
+      cacherChargement();
+      if (!res || !res.success) {
+        afficherMsg('ef', (res && res.message) || 'Erreur annulation.', 'erreur');
+        return;
+      }
     }
+    efReinitialiserApresFinalisation();
+    afficherMsg('ef', '✅ Facture annulée.');
   });
 }
 
