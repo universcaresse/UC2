@@ -111,7 +111,6 @@
        
 	   <div class="nav-dropdown">
 		<button class="nav-dropdown-item" onclick="afficherSection('inci', null)">INCI</button>
-		<button class="nav-dropdown-item" onclick="afficherSection('densites', null)">densité</button>
 		<button class="nav-dropdown-item" onclick="afficherSection('references', null)">Utilitaires</button>
 <div class="nav-dropdown-sep"></div>
 		<button class="nav-dropdown-item" onclick="afficherSection('contenu-site', null)">contenu du site</button>
@@ -209,7 +208,6 @@
      <div class="sidebar-groupe">
        <div class="sidebar-titre" onclick="toggleGroupe(this)">système</div>
         <button class="sidebar-lien" onclick="afficherSection('inci', this)">INCI</button>
-        <button class="sidebar-lien" onclick="afficherSection('densites', this)">densité</button>
           <button class="sidebar-lien" onclick="afficherSection('references', this)">Utilitaires</button>
 		  <button class="sidebar-lien" onclick="afficherSection('contenu-site', this)">contenu du site</button>
 		<button class="sidebar-lien" onclick="afficherSection('redaction', this)">rédaction</button>
@@ -1425,8 +1423,32 @@
         <input type="text" class="form-ctrl" id="modal-ef-nouvelle-cat-uc-valeur" placeholder="Ex: Huiles essentielles" autocomplete="off">
       </div>
       <div class="form-groupe">
+        <label class="form-label">Classe</label>
+        <select class="form-ctrl" id="modal-ef-nouvelle-cat-uc-classe" onchange="efCatChangerClasse()">
+          <option value="">— choisir —</option>
+          <option value="1">1000 — Actif</option>
+          <option value="2">2000 — Passif</option>
+          <option value="3">3000 — Avoir</option>
+          <option value="4">4000 — Revenus</option>
+          <option value="5">5000 — Dépenses</option>
+        </select>
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Section</label>
+        <select class="form-ctrl" id="modal-ef-nouvelle-cat-uc-section" onchange="efCatChangerSection()" disabled></select>
+      </div>
+      <div class="form-groupe">
         <label class="form-label">Compte à l'achat</label>
-        <input type="text" class="form-ctrl" id="modal-ef-nouvelle-cat-uc-compte" placeholder="Ex: 1305" autocomplete="off">
+        <select class="form-ctrl" id="modal-ef-nouvelle-cat-uc-compte" disabled></select>
+        <label class="form-label" style="cursor:pointer" onclick="efAllerPlanComptable()">Le compte n'existe pas? Ajoutez-le au plan comptable →</label>
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Densité (g/ml)</label>
+        <input type="number" step="0.01" class="form-ctrl" id="modal-ef-nouvelle-cat-uc-densite" placeholder="Ex: 0.92" autocomplete="off">
+      </div>
+      <div class="form-groupe">
+        <label class="form-label">Marge de perte (%)</label>
+        <input type="number" step="0.1" class="form-ctrl" id="modal-ef-nouvelle-cat-uc-marge" placeholder="Ex: 2" autocomplete="off">
       </div>
       <div class="form-groupe">
         <label class="form-label" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="modal-ef-nouvelle-cat-uc-inci">INCI requis</label>
@@ -2773,65 +2795,7 @@
         </div>
       </div>
 
-      <!-- DENSITÉS -->
-      <div class="section-admin" id="section-densites">
-        <div class="page-entete fade-in">
-          <div>
-            <div class="page-entete-eyebrow">Facteurs de conversion ml → g par type d'ingrédient</div>
-            <div class="page-entete-titre">Densités</div>
-          </div>
-          <button class="bouton" id="btn-nouvelle-densite" onclick="ouvrirFormDensite()">+ Nouveau type</button>
-        </div>
-        <div class="msg-zone" id="msg-densites"></div>
-       <div class="form-panel" id="form-densites">
-          <button class="btn-fermer-panneau" onclick="fermerFormDensite()" title="Fermer">✕</button>
-          <div class="form-panel-header">
-            <div class="form-panel-titre" id="form-densites-titre">Nouveau type</div>
-          </div>
-          <div class="form-body">
-            <input type="hidden" id="fd-mode">
-            <div class="form-grille">
-			          <div class="form-groupe">
-                <label class="form-label">Type d'ingrédient</label>
-                <select class="form-ctrl" id="fd-type"></select>
-              </div>
-              <div class="form-groupe">
-                <label class="form-label">Densité (g/ml)</label>
-                <input type="text" inputmode="decimal" class="form-ctrl" id="fd-densite" placeholder="">
-              </div>
-              <div class="form-groupe">
-                <label class="form-label">Unité source</label>
-                <select class="form-ctrl" id="fd-unite">
-                  <option value="ml">ml</option>
-                  <option value="g">g</option>
-                  <option value="L">L</option>
-                  <option value="kg">kg</option>
-                </select>
-              </div>
-			   <div class="form-groupe">
-                <label class="form-label">Marge de perte (%)</label>
-                <input type="text" inputmode="decimal" class="form-ctrl" id="fd-marge-perte">
-              </div>
-            </div>
-            <hr class="separateur">
-            <div class="form-actions">
-            
-              <button class="bouton bouton-vert-pale" onclick="fermerFormDensite()">Annuler</button>
-			    <button class="bouton" onclick="sauvegarderDensite()">Enregistrer</button>
-            </div>
-          </div>
-        </div>
-        <div class="chargement" id="loading-densites"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
-        <table id="tableau-densites" class="cache">
-          <thead>
-            <tr><th>Type d'ingrédient</th><th>Densité (g/ml)</th><th>Unité source</th><th>Marge perte (%)</th><th></th></tr>
-          </thead>
-          <tbody id="tbody-densites"></tbody>
-        </table>
-       <div class="vide cache" id="vide-densites">
-          <div class="vide-titre">Aucune densité</div>
-        </div>
-      </div>
+      
 
 
    <!-- RÉDACTION -->
@@ -3998,7 +3962,6 @@
 <script src="../js/admin-familles.js"></script>
 <script src="../js/admin-inventaire.js"></script>
 <script src="../js/admin-promotions.js"></script>
-<script src="../js/admin-densites.js"></script>
 <script src="../js/admin-mediatheque.js"></script>
 <script src="../js/admin-contenu-site.js"></script>
 <script src="../js/admin-redaction.js"></script>

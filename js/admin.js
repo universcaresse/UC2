@@ -216,7 +216,6 @@ function afficherSection(id, bouton) {
 if (id === 'familles')       afficherFamilles();
   if (id === 'produits')       { reinitialiserFiltresRecettes(); if (!prodCache.charge) chargerProduitsData(); else afficherProduits(); }
   if (id === 'inci')           { const r = document.getElementById('inci-recherche'); if (r) r.value = ''; chargerInci(); }
-  if (id === 'densites')       chargerDensites();
   if (id === 'promotions')     chargerPromotions();
   if (id === 'regroupements')  afficherRegroupements();
   if (id === 'inventaire')     { const r = document.getElementById('inv-recherche'); if (r) r.value = ''; chargerInventaire(); }

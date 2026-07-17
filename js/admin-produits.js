@@ -1347,8 +1347,7 @@ function rafraichirListeIngredientsRecette() {
         cats.map(function(t) {
           return '<option value="' + t + '" ' + (ing.type === t ? 'selected' : '') + '>' + ((listesDropdown.categoriesMap || {})[t] || t) + '</option>';
         }).join('') +
-        '<option value="__nouvelle_cat__">+ Nouvelle catégorie...</option>' +
-      '</select>' +
+        '</select>' +
       '<select class="form-ctrl ing-nom" onchange="onChangeIngredientNom(' + i + ', this.value)">' +
         '<option value="">— Ingrédient —</option>' +
         ingsDeType.map(function(d) {
@@ -1364,11 +1363,6 @@ function rafraichirListeIngredientsRecette() {
 }
 
 function onChangeIngredientType(i, val) {
-  if (val === '__nouvelle_cat__') {
-    sauvegarderEtatFormulaire();
-    ouvrirModalNouvelleCategorieUC(i);
-    return;
-  }
   ingredientsRecette[i].type = val;
   ingredientsRecette[i].nom = '';
   ingredientsRecette[i].ing_id = '';
@@ -1456,93 +1450,7 @@ function restaurerEtatFormulaire() {
 
 // ─── MODALES NOUVELLE CATÉGORIE / NOUVEL INGRÉDIENT ───
 var _modalNouveauIngIdx = null;
-var _modalNouvelleCatIdx = null;
 var _modalNouveauIngEmballage = null;  // { format_id, idx } pour emballages
-
-function ouvrirModalNouvelleCategorieUC(rangeeIdx) {
-  _modalNouvelleCatIdx = rangeeIdx;
-  var modal = document.getElementById('modal-nouvelle-cat-produit');
-  if (!modal) {
-    creerModalNouvelleCategorieUC();
-    modal = document.getElementById('modal-nouvelle-cat-produit');
-  }
-  document.getElementById('modal-nouvelle-cat-produit-valeur').value = '';
-  var inpAchat = document.getElementById('modal-nouvelle-cat-produit-achat');
-  if (inpAchat) inpAchat.value = '';
-  var caseInci = document.getElementById('modal-nouvelle-cat-produit-inci');
-  if (caseInci) caseInci.checked = false;
-  modal.classList.add('ouvert');
-  setTimeout(function() { document.getElementById('modal-nouvelle-cat-produit-valeur').focus(); }, 100);
-}
-
-function fermerModalNouvelleCategorieUC() {
-  var modal = document.getElementById('modal-nouvelle-cat-produit');
-  if (modal) modal.classList.remove('ouvert');
-  restaurerEtatFormulaire();
-}
-
-async function confirmerModalNouvelleCategorieUC() {
-  var val = (document.getElementById('modal-nouvelle-cat-produit-valeur').value || '').trim();
-  var achat = (document.getElementById('modal-nouvelle-cat-produit-achat')?.value || '').trim();
-  var inci = document.getElementById('modal-nouvelle-cat-produit-inci')?.checked || false;
-  if (!val) { document.getElementById('modal-nouvelle-cat-produit-valeur').focus(); return; }
-  if (!achat) { document.getElementById('modal-nouvelle-cat-produit-achat').focus(); return; }
-  var res = await appelAPIPost('saveCategorieUC', { nom: val, compte_achat: achat, inci: inci });
-  if (!res || !res.success) {
-    afficherMsg('recettes', 'Erreur création catégorie.', 'erreur');
-    return;
-  }
-  var cat_id = res.cat_id;
-  if (!listesDropdown.categoriesMap) listesDropdown.categoriesMap = {};
-  listesDropdown.categoriesMap[cat_id] = val;
-  if (!listesDropdown.catsInci) listesDropdown.catsInci = {};
-  listesDropdown.catsInci[cat_id] = inci;
-
-  var modal = document.getElementById('modal-nouvelle-cat-produit');
-  if (modal) modal.classList.remove('ouvert');
-  restaurerEtatFormulaire();
-  // Pré-sélectionner la nouvelle catégorie pour la rangée concernée
-  if (_modalNouvelleCatIdx !== null && ingredientsRecette[_modalNouvelleCatIdx]) {
-    ingredientsRecette[_modalNouvelleCatIdx].type = cat_id;
-    ingredientsRecette[_modalNouvelleCatIdx].nom = '';
-    ingredientsRecette[_modalNouvelleCatIdx].ing_id = '';
-    rafraichirListeIngredientsRecette();
-  }
-  _modalNouvelleCatIdx = null;
-}
-
-function creerModalNouvelleCategorieUC() {
-  var modal = document.createElement('div');
-  modal.className = 'modal-admin-overlay';
-  modal.id = 'modal-nouvelle-cat-produit';
-  modal.innerHTML =
-    '<div class="modal-admin">' +
-      '<div class="modal-admin-header">' +
-        '<div class="modal-admin-titre">Nouvelle catégorie UC</div>' +
-        '<button class="btn-fermer-panneau" onclick="fermerModalNouvelleCategorieUC()" title="Fermer">✕</button>' +
-      '</div>' +
-      '<div class="modal-admin-body">' +
-        '<div class="form-groupe">' +
-          '<label class="form-label">Nom de la catégorie</label>' +
-          '<input type="text" class="form-ctrl" id="modal-nouvelle-cat-produit-valeur" placeholder="Ex: Huiles essentielles">' +
-        '</div>' +
-        '<div class="form-groupe">' +
-          '<label class="form-label">Compte à l\'achat</label>' +
-          '<input type="text" class="form-ctrl" id="modal-nouvelle-cat-produit-achat" placeholder="Ex: 1305">' +
-        '</div>' +
-        '<div class="form-groupe">' +
-          '<label class="form-label" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="modal-nouvelle-cat-produit-inci">INCI requis</label>' +
-        '</div>' +
-      '</div>' +
-      '<div class="modal-admin-body">' +
-        '<div class="form-actions">' +
-          '<button class="bouton bouton-petit bouton-contour" onclick="fermerModalNouvelleCategorieUC()">Annuler</button>' +
-          '<button class="bouton bouton-petit" onclick="confirmerModalNouvelleCategorieUC()">Confirmer</button>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  document.body.appendChild(modal);
-}
 
 function ouvrirModalNouvelIngredient(rangeeIdx) {
   _modalNouveauIngIdx = rangeeIdx;

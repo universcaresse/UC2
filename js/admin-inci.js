@@ -53,21 +53,6 @@ function inciConstruireAccordeons() {
   const container = document.getElementById('inci-accordeons');
   container.innerHTML = '';
 
-  // Accordéon 1 — Catégories UC
-  const blocUC = document.createElement('div');
-  blocUC.className = 'form-panel visible';
-  blocUC.innerHTML = `
-    <div class="form-panel-header" onclick="inciToggleAccordeon(this)" style="cursor:pointer">
-      <div class="form-panel-titre">Catégories Univers Caresse</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span class="badge-statut-ok">${inciCategoriesUC.length} catégories</span>
-      </div>
-    </div>
-    <div class="form-body inci-accord-body cache" id="inci-uc-body">
-      ${inciRendreUC()}
-    </div>`;
-  container.appendChild(blocUC);
-
   // Regrouper par cat_id
   const parCat = {};
 const filtreStatut = document.querySelector('[data-filtre-statut].actif')?.dataset?.filtreStatut || 'tout';
@@ -207,69 +192,7 @@ async function inciValider(id, nom_UC, cat_id, ing_id) {
   }
 }
 
-function inciRendreUC() {
-  if (inciCategoriesUC.length === 0) {
-    return `<p class="form-valeur">Aucune catégorie définie.</p>
-      <button class="bouton bouton-petit bouton-vert-pale" onclick="inciAjouterUC()">+ Ajouter une catégorie</button>`;
-  }
-  const cartes = [...inciCategoriesUC].sort((a, b) => (a.nom || '').localeCompare(b.nom || '', 'fr')).map((c, i) => {
-    const utilise = (listesDropdown.fullData || []).filter(d => d.cat_id === c.cat_id);
-    return `
-      <div class="carte-admin">
-        <div class="carte-admin-entete">
-          <input type="text" class="form-ctrl" id="uc-cat-${i}" value="${(c.nom || '').replace(/"/g, '&quot;')}">
-          <input type="text" class="form-ctrl" id="uc-cat-achat-${i}" value="${c.compte_achat || ''}" placeholder="Compte à l'achat" style="max-width:130px">
-          <label class="form-label" style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input type="checkbox" id="uc-cat-inci-${i}" ${c.inci ? 'checked' : ''}>INCI requis</label>
-          <div class="td-actions">
-            <button class="btn-edit" onclick="inciModifierUC(${i}, '${c.cat_id}')">Modifier</button>
-            ${utilise.length === 0 ? `<button class="btn-suppr" onclick="inciSupprimerUC('${c.cat_id}')">Supprimer</button>` : ''}
-          </div>
-        </div>
-        <div class="texte-secondaire">${utilise.length} ingrédient(s)</div>
-      </div>`;
-  }).join('');
-  return `
-    ${cartes}
-    <hr class="separateur">
-    <div class="form-actions">
-      <button class="bouton bouton-petit bouton-vert-pale" onclick="inciAjouterUC()">+ Ajouter une catégorie</button>
-    </div>`;
-}
 
-function inciAjouterUC() {
-  inciCategoriesUC.push({ cat_id: null, nom: '' });
-  document.getElementById('inci-uc-body').innerHTML = inciRendreUC();
-  const input = document.getElementById(`uc-cat-${inciCategoriesUC.length - 1}`);
-  if (input) input.focus();
-}
-
-async function inciModifierUC(i, cat_id) {
-  const input = document.getElementById(`uc-cat-${i}`);
-  const nom   = (input?.value || '').trim();
-  const compte_achat = (document.getElementById(`uc-cat-achat-${i}`)?.value || '').trim();
-  const inci = document.getElementById(`uc-cat-inci-${i}`)?.checked || false;
-  if (!nom) { afficherMsg('inci', 'Le nom est requis.', 'erreur'); return; }
-  if (!compte_achat) { afficherMsg('inci', 'Le compte à l\'achat est requis.', 'erreur'); return; }
-  const res = await appelAPIPost('saveCategorieUC', { cat_id, nom, compte_achat, inci });
-  if (res && res.success) {
-    afficherMsg('inci', cat_id ? 'Catégorie mise à jour.' : 'Catégorie ajoutée.');
-    await chargerInci();
-  } else {
-    afficherMsg('inci', res?.message || 'Erreur.', 'erreur');
-  }
-}
-
-async function inciSupprimerUC(cat_id) {
-	confirmerAction('Supprimer cette catégorie ?', async () => {
-    const res = await appelAPIPost('deleteCategorieUC', { cat_id });
-    if (res && res.success) {
-      afficherMsg('inci', 'Catégorie supprimée.');
-      await chargerInci();
-    } else {
-      afficherMsg('inci', res?.message || 'Erreur.', 'erreur');
-    }
-  });
-}
 
 function inciRendreCorrespondance()    { return ''; }
 function inciAjouterCorrespondance()   {}

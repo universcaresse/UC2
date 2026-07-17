@@ -10,7 +10,11 @@ async function chargerPlanComptable() {
   if (loading) loading.style.display = '';
   if (contenu) contenu.innerHTML = '';
 
-  const res = await appelAPI('getPlanComptable');
+  const [res, resCats, resConfig] = await Promise.all([
+    appelAPI('getPlanComptable'),
+    appelAPI('getCategoriesUC'),
+    appelAPI('getConfig')
+  ]);
   if (loading) loading.style.display = 'none';
 
   if (!res || !res.success) {
@@ -20,7 +24,9 @@ async function chargerPlanComptable() {
 
   const sections = (res.sections || []).slice().sort((a, b) => String(a.numero).localeCompare(String(b.numero)));
   const comptes  = (res.comptes || []);
-  pcRendre(sections, comptes);
+  const cats     = (resCats && resCats.success) ? (resCats.items || []) : [];
+  const config   = (resConfig && resConfig.success) ? (resConfig.items || []) : [];
+  pcRendre(sections, comptes, cats, config);
 }
 
 // Nom de la classe selon le premier chiffre du numéro
@@ -34,9 +40,20 @@ function pcNomClasse(numero) {
   return 'Autre';
 }
 
-function pcRendre(sections, comptes) {
+var pcSections = [];
+var pcComptes  = [];
+var pcCats     = [];
+var pcConfig   = [];
+var pcCatEditId = null;
+
+function pcRendre(sections, comptes, cats, config) {
   const contenu = document.getElementById('contenu-plan-comptable');
   if (!contenu) return;
+  pcSections = sections;
+  pcComptes  = comptes;
+  pcCats     = cats || [];
+  pcConfig   = config || [];
+  pcCatEditId = null;
 
   const optionsSections = sections.map(s =>
     `<option value="${s.numero}">${s.numero} — ${s.nom}</option>`
@@ -76,6 +93,46 @@ function pcRendre(sections, comptes) {
           <button class="boutons boutons-vert" onclick="pcAjouterCompte()">Ajouter le compte</button>
         </div>
       </div>
+      <div>
+        <div class="section-label">Ajouter une catégorie UC</div>
+        <div class="champ">
+          <label class="libelle">Nom</label>
+          <input type="text" class="controle" id="pc-cat-nom" placeholder="ex. Huiles">
+        </div>
+        <div class="champ">
+          <label class="libelle">Classe</label>
+          <select class="controle" id="pc-cat-classe" onchange="pcCatChangerClasse()">
+            <option value="">— choisir —</option>
+            <option value="1">1000 — Actif</option>
+            <option value="2">2000 — Passif</option>
+            <option value="3">3000 — Avoir</option>
+            <option value="4">4000 — Revenus</option>
+            <option value="5">5000 — Dépenses</option>
+          </select>
+        </div>
+        <div class="champ">
+          <label class="libelle">Section</label>
+          <select class="controle" id="pc-cat-section" onchange="pcCatChangerSection()" disabled></select>
+        </div>
+        <div class="champ">
+          <label class="libelle">Compte à l'achat</label>
+          <select class="controle" id="pc-cat-compte" disabled></select>
+        </div>
+        <div class="champ">
+          <label class="libelle">Densité (g/ml)</label>
+          <input type="number" step="0.01" class="controle" id="pc-cat-densite" placeholder="ex. 0.92">
+        </div>
+        <div class="champ">
+          <label class="libelle">Marge de perte (%)</label>
+          <input type="number" step="0.1" class="controle" id="pc-cat-marge" placeholder="ex. 2">
+        </div>
+        <div class="champ">
+          <label class="libelle"><input type="checkbox" id="pc-cat-inci"> INCI requis</label>
+        </div>
+        <div class="actions">
+          <button class="boutons boutons-vert" onclick="pcCatAjouter()">Ajouter la catégorie</button>
+        </div>
+      </div>
     </div>
   `;
 
@@ -105,7 +162,74 @@ function pcRendre(sections, comptes) {
     });
   }
 
+  html += `<div class="section-label">Catégories Univers Caresse</div>`;
+  if (!cats.length) {
+    html += `<div class="vide"><div class="vide-titre">Aucune catégorie</div><div class="vide-desc">Créez une catégorie ci-dessus.</div></div>`;
+  } else {
+    const configParCat = {};
+    (config || []).forEach(c => { configParCat[c.cat_id] = c; });
+    cats.forEach(cat => {
+      const compte = comptes.find(c => String(c.numero) === String(cat.compte_achat));
+      const cfg = configParCat[cat.cat_id];
+      html += `<div class="bloc">
+        <div class="accroche">${cat.nom}${cat.inci ? ' · INCI requis' : ''}</div>`;
+      if (compte) {
+        html += `<div class="valeur"><span class="numero">${compte.numero}</span>${compte.nom}</div>`;
+      } else if (cat.compte_achat) {
+        html += `<div class="valeur">⚠️ compte ${cat.compte_achat} absent du plan</div>`;
+      } else {
+        html += `<div class="valeur">⚠️ aucun compte à l'achat</div>`;
+      }
+      if (cfg) {
+        html += `<div class="textes-discrets">densité ${cfg.densite} · marge de perte ${cfg.marge_perte_pct} %</div>`;
+      } else {
+        html += `<div class="textes-discrets">⚠️ densité manquante — prix au gramme faussé</div>`;
+      }
+      const utilise = (listesDropdown.fullData || []).filter(d => d.cat_id === cat.cat_id);
+      html += `<div class="textes-discrets">${utilise.length} ingrédient(s)</div>
+      <div class="actions">
+        <button class="boutons" onclick="pcCatModifier('${cat.cat_id}')">Modifier</button>
+        ${utilise.length === 0 ? `<button class="boutons" onclick="pcCatSupprimer('${cat.cat_id}')">Supprimer</button>` : ''}
+      </div>`;
+      html += `</div>`;
+    });
+  }
+
   contenu.innerHTML = html;
+}
+
+// ─── Entonnoir de la carte catégorie : classe → section → compte ───
+function pcCatChangerClasse() {
+  const classe = document.getElementById('pc-cat-classe').value;
+  const selSection = document.getElementById('pc-cat-section');
+  const selCompte  = document.getElementById('pc-cat-compte');
+  selCompte.innerHTML = '';
+  selCompte.disabled = true;
+  if (!classe) {
+    selSection.innerHTML = '';
+    selSection.disabled = true;
+    return;
+  }
+  const dedans = pcSections.filter(s => String(s.numero).charAt(0) === classe);
+  selSection.innerHTML = '<option value="">— choisir —</option>' +
+    dedans.map(s => `<option value="${s.numero}">${s.numero} — ${s.nom}</option>`).join('');
+  selSection.disabled = false;
+}
+
+function pcCatChangerSection() {
+  const section = document.getElementById('pc-cat-section').value;
+  const selCompte = document.getElementById('pc-cat-compte');
+  if (!section) {
+    selCompte.innerHTML = '';
+    selCompte.disabled = true;
+    return;
+  }
+  const dedans = pcComptes
+    .filter(c => String(c.section) === String(section))
+    .sort((a, b) => String(a.numero).localeCompare(String(b.numero)));
+  selCompte.innerHTML = '<option value="">— choisir —</option>' +
+    dedans.map(c => `<option value="${c.numero}">${c.numero} — ${c.nom}</option>`).join('');
+  selCompte.disabled = false;
 }
 
 // ─── Ajouter une section ───
@@ -137,6 +261,78 @@ async function pcAjouterCompte() {
   const res = await appelAPIPost('ajouterCompteComptable', { numero, nom, section });
   if (res && res.success) {
     afficherMsg('plan-comptable', 'Compte ajouté.', 'succes');
+    chargerPlanComptable();
+  } else {
+    afficherMsg('plan-comptable', (res && res.message) || 'Erreur.', 'erreur');
+  }
+}
+
+// ─── Modifier / supprimer une catégorie UC ───
+function pcCatModifier(cat_id) {
+  const cat = pcCats.find(c => String(c.cat_id) === String(cat_id));
+  if (!cat) return;
+  const cfg = pcConfig.find(c => String(c.cat_id) === String(cat_id));
+  pcCatEditId = cat_id;
+  document.getElementById('pc-cat-nom').value = cat.nom || '';
+  document.getElementById('pc-cat-densite').value = cfg ? cfg.densite : '';
+  document.getElementById('pc-cat-marge').value = cfg ? cfg.marge_perte_pct : '';
+  document.getElementById('pc-cat-inci').checked = !!cat.inci;
+  const compte = pcComptes.find(c => String(c.numero) === String(cat.compte_achat));
+  if (compte) {
+    document.getElementById('pc-cat-classe').value = String(compte.section).charAt(0);
+    pcCatChangerClasse();
+    document.getElementById('pc-cat-section').value = String(compte.section);
+    pcCatChangerSection();
+    document.getElementById('pc-cat-compte').value = String(compte.numero);
+  } else {
+    document.getElementById('pc-cat-classe').value = '';
+    pcCatChangerClasse();
+    afficherMsg('plan-comptable', cat.compte_achat
+      ? '⚠️ Compte ' + cat.compte_achat + ' absent du plan — choisissez un compte.'
+      : '⚠️ Aucun compte à l\'achat — choisissez un compte.', 'erreur');
+  }
+  document.getElementById('pc-cat-nom').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function pcCatSupprimer(cat_id) {
+  confirmerAction('Supprimer cette catégorie ?', async () => {
+    const res = await appelAPIPost('deleteCategorieUC', { cat_id });
+    if (res && res.success) {
+      if (listesDropdown.categoriesMap) delete listesDropdown.categoriesMap[cat_id];
+      if (listesDropdown.catsInci) delete listesDropdown.catsInci[cat_id];
+      if (listesDropdown.config) listesDropdown.config = listesDropdown.config.filter(c => String(c.cat_id) !== String(cat_id));
+      afficherMsg('plan-comptable', 'Catégorie supprimée.', 'succes');
+      chargerPlanComptable();
+    } else {
+      afficherMsg('plan-comptable', (res && res.message) || 'Erreur.', 'erreur');
+    }
+  });
+}
+
+// ─── Ajouter une catégorie UC (5 morceaux, un seul appel) ───
+async function pcCatAjouter() {
+  const nom     = (document.getElementById('pc-cat-nom').value || '').trim();
+  const compte  = document.getElementById('pc-cat-compte').value;
+  const densite = parseFloat(document.getElementById('pc-cat-densite').value);
+  const marge   = parseFloat(document.getElementById('pc-cat-marge').value) || 0;
+  const inci    = document.getElementById('pc-cat-inci').checked;
+  if (!nom || !compte || !(densite > 0)) {
+    afficherMsg('plan-comptable', 'Nom, compte et densité obligatoires.', 'erreur');
+    return;
+  }
+  const res = await appelAPIPost('saveCategorieUC', {
+    cat_id: pcCatEditId || undefined,
+    nom, compte_achat: compte, densite, marge_perte_pct: marge, inci
+  });
+  if (res && res.success) {
+    const id = pcCatEditId || res.cat_id;
+    if (listesDropdown.categoriesMap) listesDropdown.categoriesMap[id] = nom;
+    if (listesDropdown.catsInci) listesDropdown.catsInci[id] = !!inci;
+    if (listesDropdown.config) {
+      listesDropdown.config = listesDropdown.config.filter(c => String(c.cat_id) !== String(id));
+      listesDropdown.config.push({ cat_id: id, densite, unite: 'g', marge_perte_pct: marge });
+    }
+    afficherMsg('plan-comptable', pcCatEditId ? 'Catégorie mise à jour.' : 'Catégorie ajoutée.', 'succes');
     chargerPlanComptable();
   } else {
     afficherMsg('plan-comptable', (res && res.message) || 'Erreur.', 'erreur');

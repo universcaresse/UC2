@@ -1145,17 +1145,61 @@ async function efConfirmerModalIngredient() {
 }
 
 // ─── MODALES — NOUVELLE CAT UC ───
-function efOuvrirModalNouvelleCatUC() {
+var efPlanSections = [];
+var efPlanComptes  = [];
+
+async function efOuvrirModalNouvelleCatUC() {
   var modal = document.getElementById('modal-ef-nouvelle-cat-uc');
   if (!modal) return;
   document.getElementById('modal-ef-nouvelle-cat-uc-valeur').value = '';
-  var champCompte = document.getElementById('modal-ef-nouvelle-cat-uc-compte');
-  if (champCompte) champCompte.value = '';
   var caseInci = document.getElementById('modal-ef-nouvelle-cat-uc-inci');
   if (caseInci) caseInci.checked = false;
-  
+  document.getElementById('modal-ef-nouvelle-cat-uc-densite').value = '';
+  document.getElementById('modal-ef-nouvelle-cat-uc-marge').value = '';
+  document.getElementById('modal-ef-nouvelle-cat-uc-classe').value = '';
+  efCatChangerClasse();
+
+  var resPlan = await appelAPI('getPlanComptable');
+  if (resPlan && resPlan.success) {
+    efPlanSections = resPlan.sections || [];
+    efPlanComptes  = resPlan.comptes || [];
+  }
+
   modal.classList.add('ouvert');
   setTimeout(function() { document.getElementById('modal-ef-nouvelle-cat-uc-valeur').focus(); }, 100);
+}
+
+function efCatChangerClasse() {
+  var classe = document.getElementById('modal-ef-nouvelle-cat-uc-classe').value;
+  var selSection = document.getElementById('modal-ef-nouvelle-cat-uc-section');
+  var selCompte  = document.getElementById('modal-ef-nouvelle-cat-uc-compte');
+  selCompte.innerHTML = '';
+  selCompte.disabled = true;
+  if (!classe) {
+    selSection.innerHTML = '';
+    selSection.disabled = true;
+    return;
+  }
+  var dedans = efPlanSections.filter(function(s) { return String(s.numero).charAt(0) === classe; });
+  selSection.innerHTML = '<option value="">— choisir —</option>' +
+    dedans.map(function(s) { return '<option value="' + s.numero + '">' + s.numero + ' — ' + s.nom + '</option>'; }).join('');
+  selSection.disabled = false;
+}
+
+function efCatChangerSection() {
+  var section = document.getElementById('modal-ef-nouvelle-cat-uc-section').value;
+  var selCompte = document.getElementById('modal-ef-nouvelle-cat-uc-compte');
+  if (!section) {
+    selCompte.innerHTML = '';
+    selCompte.disabled = true;
+    return;
+  }
+  var dedans = efPlanComptes
+    .filter(function(c) { return String(c.section) === String(section); })
+    .sort(function(a, b) { return String(a.numero).localeCompare(String(b.numero)); });
+  selCompte.innerHTML = '<option value="">— choisir —</option>' +
+    dedans.map(function(c) { return '<option value="' + c.numero + '">' + c.numero + ' — ' + c.nom + '</option>'; }).join('');
+  selCompte.disabled = false;
 }
 
 function efFermerModalNouvelleCatUC() {
@@ -1163,13 +1207,21 @@ function efFermerModalNouvelleCatUC() {
   efRestaurerSaisie();
 }
 
+function efAllerPlanComptable() {
+  document.getElementById('modal-ef-nouvelle-cat-uc')?.classList.remove('ouvert');
+  afficherSection('plan-comptable', null);
+}
+
 async function efConfirmerModalNouvelleCatUC() {
   var val = document.getElementById('modal-ef-nouvelle-cat-uc-valeur')?.value?.trim();
-  var achat = document.getElementById('modal-ef-nouvelle-cat-uc-compte')?.value?.trim();
+  var achat = document.getElementById('modal-ef-nouvelle-cat-uc-compte')?.value;
   var inci = document.getElementById('modal-ef-nouvelle-cat-uc-inci')?.checked || false;
+  var densite = parseFloat(document.getElementById('modal-ef-nouvelle-cat-uc-densite')?.value);
+  var marge = parseFloat(document.getElementById('modal-ef-nouvelle-cat-uc-marge')?.value) || 0;
   if (!val) { document.getElementById('modal-ef-nouvelle-cat-uc-valeur').focus(); return; }
-  if (!achat) { document.getElementById('modal-ef-nouvelle-cat-uc-compte').focus(); return; }
-  var res = await appelAPIPost('saveCategorieUC', { nom: val, compte_achat: achat, inci: inci });
+  if (!achat) { document.getElementById('modal-ef-nouvelle-cat-uc-classe').focus(); return; }
+  if (!(densite > 0)) { document.getElementById('modal-ef-nouvelle-cat-uc-densite').focus(); return; }
+  var res = await appelAPIPost('saveCategorieUC', { nom: val, compte_achat: achat, inci: inci, densite: densite, marge_perte_pct: marge });
   if (!res || !res.success) {
     afficherMsg('ef', 'Erreur création catégorie.', 'erreur');
     return;
@@ -1178,6 +1230,8 @@ async function efConfirmerModalNouvelleCatUC() {
   listesDropdown.categoriesMap[cat_id] = val;
   if (!listesDropdown.catsInci) listesDropdown.catsInci = {};
   listesDropdown.catsInci[cat_id] = inci;
+  if (!listesDropdown.config) listesDropdown.config = [];
+  listesDropdown.config.push({ cat_id: cat_id, densite: densite, unite: 'g', marge_perte_pct: marge });
   var sel = document.getElementById('ef-cat-uc');
   if (sel) {
     var opt = document.createElement('option');
