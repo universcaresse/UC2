@@ -471,6 +471,15 @@ p + .boutons {
   border-top: var(--bordure-2) solid var(--primaire);
 }
 
+.collant {
+  position: sticky;
+  top: var(--espace-16);
+  align-self: start;
+}
+@media (max-width: 900px) {
+  .collant { position: static; }
+}
+
 
 
 /* ════════════════════════════════════════

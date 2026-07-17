@@ -46,6 +46,27 @@ var pcCats     = [];
 var pcConfig   = [];
 var pcCatEditId = null;
 
+// ─── Un seul accordéon ouvert à gauche ───
+function pcOuvrirAccordeon(nom) {
+  ['sections', 'comptes', 'cats'].forEach(n => {
+    const corps = document.getElementById('pc-acc-' + n);
+    if (corps) corps.classList.toggle('cache', n !== nom);
+  });
+}
+
+// ─── Un seul volet (formulaire) ouvert à droite; ouvre son accordéon ───
+function pcOuvrirVolet(nom) {
+  ['section', 'compte', 'categorie'].forEach(n => {
+    const volet = document.getElementById('pc-volet-' + n);
+    if (volet) volet.classList.toggle('cache', n !== nom);
+  });
+  pcOuvrirAccordeon(nom === 'section' ? 'sections' : nom === 'compte' ? 'comptes' : 'cats');
+  if (window.innerWidth <= 900) {
+    const volet = document.getElementById('pc-volet-' + nom);
+    if (volet) volet.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
 function pcRendre(sections, comptes, cats, config) {
   const contenu = document.getElementById('contenu-plan-comptable');
   if (!contenu) return;
@@ -59,9 +80,14 @@ function pcRendre(sections, comptes, cats, config) {
     `<option value="${s.numero}">${s.numero} — ${s.nom}</option>`
   ).join('');
 
-  let html = `
-    <div class="grille">
-      <div>
+  const droite = `
+    <div class="collant">
+      <div class="actions">
+        <button class="boutons boutons-contour" onclick="pcOuvrirVolet('section')">Ajouter une section</button>
+        <button class="boutons boutons-contour" onclick="pcOuvrirVolet('compte')">Ajouter un compte</button>
+        <button class="boutons boutons-contour" onclick="pcOuvrirVolet('categorie')">Ajouter une catégorie UC</button>
+      </div>
+      <div id="pc-volet-section" class="cache">
         <div class="section-label">Ajouter une section</div>
         <div class="champ">
           <label class="libelle">Numéro</label>
@@ -75,7 +101,7 @@ function pcRendre(sections, comptes, cats, config) {
           <button class="boutons boutons-vert" onclick="pcAjouterSection()">Ajouter la section</button>
         </div>
       </div>
-      <div>
+      <div id="pc-volet-compte" class="cache">
         <div class="section-label">Ajouter un compte</div>
         <div class="champ">
           <label class="libelle">Section</label>
@@ -93,7 +119,7 @@ function pcRendre(sections, comptes, cats, config) {
           <button class="boutons boutons-vert" onclick="pcAjouterCompte()">Ajouter le compte</button>
         </div>
       </div>
-      <div>
+      <div id="pc-volet-categorie" class="cache">
         <div class="section-label">Ajouter une catégorie UC</div>
         <div class="champ">
           <label class="libelle">Nom</label>
@@ -136,8 +162,11 @@ function pcRendre(sections, comptes, cats, config) {
     </div>
   `;
 
+  let html = '';
+
+  html += `<div class="sur-titre primaire" onclick="pcOuvrirAccordeon('sections')">Sections</div><div id="pc-acc-sections" class="cache">`;
   if (!sections.length) {
-    html += `<div class="vide"><div class="vide-titre">Aucune section</div><div class="vide-desc">Ajoutez une section pour commencer.</div></div>`;
+    html += `<div class="vide"><div class="vide-titre">Aucune section</div><div class="vide-desc">Ajoutez-en une à droite.</div></div>`;
   } else {
     let classeActuelle = '';
     sections.forEach(s => {
@@ -146,8 +175,23 @@ function pcRendre(sections, comptes, cats, config) {
         classeActuelle = classe;
         html += `<div class="section-label">${String(s.numero).charAt(0)}000 — ${classe}</div>`;
       }
-      html += `<div class="bloc">
-        <div class="accroche">${s.numero} · ${s.nom}</div>`;
+      html += `<div class="rangeeitem"><div class="rangeeitem-info"><span class="rangeeitem-titre"><span class="numero">${s.numero}</span>${s.nom}</span></div></div>`;
+    });
+  }
+  html += `</div>`;
+
+  html += `<div class="sur-titre primaire" onclick="pcOuvrirAccordeon('comptes')">Comptes</div><div id="pc-acc-comptes" class="cache">`;
+  if (!sections.length) {
+    html += `<div class="vide"><div class="vide-titre">Aucune section</div><div class="vide-desc">Ajoutez-en une à droite.</div></div>`;
+  } else {
+    let classeActuelle2 = '';
+    sections.forEach(s => {
+      const classe = pcNomClasse(s.numero);
+      if (classe !== classeActuelle2) {
+        classeActuelle2 = classe;
+        html += `<div class="section-label">${String(s.numero).charAt(0)}000 — ${classe}</div>`;
+      }
+      html += `<div class="accroche">${s.numero} · ${s.nom}</div>`;
       const dedans = comptes
         .filter(c => String(c.section) === String(s.numero))
         .sort((a, b) => String(a.numero).localeCompare(String(b.numero)));
@@ -155,47 +199,49 @@ function pcRendre(sections, comptes, cats, config) {
         html += `<div class="textes-discrets">aucun compte</div>`;
       } else {
         dedans.forEach(c => {
-          html += `<div class="valeur"><span class="numero">${c.numero}</span>${c.nom}</div>`;
+          html += `<div class="rangeeitem"><div class="rangeeitem-info"><span class="rangeeitem-titre"><span class="numero">${c.numero}</span>${c.nom}</span></div></div>`;
         });
       }
-      html += `</div>`;
     });
   }
+  html += `</div>`;
 
-  html += `<div class="section-label">Catégories Univers Caresse</div>`;
+  html += `<div class="sur-titre primaire" onclick="pcOuvrirAccordeon('cats')">Catégories Univers Caresse</div><div id="pc-acc-cats" class="cache">`;
   if (!cats.length) {
-    html += `<div class="vide"><div class="vide-titre">Aucune catégorie</div><div class="vide-desc">Créez une catégorie ci-dessus.</div></div>`;
+    html += `<div class="vide"><div class="vide-titre">Aucune catégorie</div><div class="vide-desc">Ajoutez-en une à droite.</div></div>`;
   } else {
     const configParCat = {};
     (config || []).forEach(c => { configParCat[c.cat_id] = c; });
     cats.forEach(cat => {
       const compte = comptes.find(c => String(c.numero) === String(cat.compte_achat));
       const cfg = configParCat[cat.cat_id];
-      html += `<div class="bloc">
-        <div class="accroche">${cat.nom}${cat.inci ? ' · INCI requis' : ''}</div>`;
+      let meta = '';
       if (compte) {
-        html += `<div class="valeur"><span class="numero">${compte.numero}</span>${compte.nom}</div>`;
+        meta = `<span class="numero">${compte.numero}</span>${compte.nom}`;
       } else if (cat.compte_achat) {
-        html += `<div class="valeur">⚠️ compte ${cat.compte_achat} absent du plan</div>`;
+        meta = `⚠️ compte ${cat.compte_achat} absent du plan`;
       } else {
-        html += `<div class="valeur">⚠️ aucun compte à l'achat</div>`;
+        meta = `⚠️ aucun compte à l'achat`;
       }
-      if (cfg) {
-        html += `<div class="textes-discrets">densité ${cfg.densite} · marge de perte ${cfg.marge_perte_pct} %</div>`;
-      } else {
-        html += `<div class="textes-discrets">⚠️ densité manquante — prix au gramme faussé</div>`;
-      }
+      meta += cfg
+        ? ` · densité ${cfg.densite} · marge ${cfg.marge_perte_pct} %`
+        : ` · ⚠️ densité manquante — prix au gramme faussé`;
       const utilise = (listesDropdown.fullData || []).filter(d => d.cat_id === cat.cat_id);
-      html += `<div class="textes-discrets">${utilise.length} ingrédient(s)</div>
-      <div class="actions">
-        <button class="boutons" onclick="pcCatModifier('${cat.cat_id}')">Modifier</button>
-        ${utilise.length === 0 ? `<button class="boutons" onclick="pcCatSupprimer('${cat.cat_id}')">Supprimer</button>` : ''}
+      html += `<div class="rangeeitem">
+        <div class="rangeeitem-info">
+          <span class="rangeeitem-titre">${cat.nom}${cat.inci ? ' · INCI requis' : ''}</span>
+          <span class="rangeeitem-meta">${meta}</span>
+        </div>
+        <span class="rangeeitem-valeur">
+          <button class="boutons boutons-minuscule boutons-contour" onclick="pcCatModifier('${cat.cat_id}')">Modifier</button>
+          ${utilise.length === 0 ? `<button class="boutons boutons-minuscule boutons-rouge" onclick="pcCatSupprimer('${cat.cat_id}')">Supprimer</button>` : ''}
+        </span>
       </div>`;
-      html += `</div>`;
     });
   }
+  html += `</div>`;
 
-  contenu.innerHTML = html;
+  contenu.innerHTML = `<div class="grille"><div>${html}</div>${droite}</div>`;
 }
 
 // ─── Entonnoir de la carte catégorie : classe → section → compte ───
@@ -243,7 +289,8 @@ async function pcAjouterSection() {
   const res = await appelAPIPost('ajouterSectionComptable', { numero, nom });
   if (res && res.success) {
     afficherMsg('plan-comptable', 'Section ajoutée.', 'succes');
-    chargerPlanComptable();
+    await chargerPlanComptable();
+    pcOuvrirVolet('section');
   } else {
     afficherMsg('plan-comptable', (res && res.message) || 'Erreur.', 'erreur');
   }
@@ -261,7 +308,8 @@ async function pcAjouterCompte() {
   const res = await appelAPIPost('ajouterCompteComptable', { numero, nom, section });
   if (res && res.success) {
     afficherMsg('plan-comptable', 'Compte ajouté.', 'succes');
-    chargerPlanComptable();
+    await chargerPlanComptable();
+    pcOuvrirVolet('compte');
   } else {
     afficherMsg('plan-comptable', (res && res.message) || 'Erreur.', 'erreur');
   }
@@ -273,6 +321,7 @@ function pcCatModifier(cat_id) {
   if (!cat) return;
   const cfg = pcConfig.find(c => String(c.cat_id) === String(cat_id));
   pcCatEditId = cat_id;
+  pcOuvrirVolet('categorie');
   document.getElementById('pc-cat-nom').value = cat.nom || '';
   document.getElementById('pc-cat-densite').value = cfg ? cfg.densite : '';
   document.getElementById('pc-cat-marge').value = cfg ? cfg.marge_perte_pct : '';
@@ -333,7 +382,8 @@ async function pcCatAjouter() {
       listesDropdown.config.push({ cat_id: id, densite, unite: 'g', marge_perte_pct: marge });
     }
     afficherMsg('plan-comptable', pcCatEditId ? 'Catégorie mise à jour.' : 'Catégorie ajoutée.', 'succes');
-    chargerPlanComptable();
+    await chargerPlanComptable();
+    pcOuvrirVolet('categorie');
   } else {
     afficherMsg('plan-comptable', (res && res.message) || 'Erreur.', 'erreur');
   }
