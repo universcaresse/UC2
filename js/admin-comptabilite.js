@@ -67,6 +67,108 @@ function pcOuvrirVolet(nom) {
   }
 }
 
+// ─── Boutons de l'entête : ouvre un volet vierge en mode ajout ───
+function pcNouveau(nom) {
+  if (!document.getElementById('pc-volet-' + nom)) return;
+  if (nom === 'section') {
+    document.getElementById('pc-sec-titre').textContent = 'Ajouter une section';
+    const num = document.getElementById('pc-sec-numero');
+    const nomC = document.getElementById('pc-sec-nom');
+    num.value = ''; num.disabled = false;
+    nomC.value = ''; nomC.disabled = false;
+    document.getElementById('pc-sec-actions').innerHTML =
+      '<button class="boutons boutons-vert" onclick="pcAjouterSection()">Ajouter la section</button>';
+  } else if (nom === 'compte') {
+    document.getElementById('pc-cpt-titre').textContent = 'Ajouter un compte';
+    const sec = document.getElementById('pc-cpt-section');
+    const num = document.getElementById('pc-cpt-numero');
+    const nomC = document.getElementById('pc-cpt-nom');
+    sec.disabled = false;
+    num.value = ''; num.disabled = false;
+    nomC.value = ''; nomC.disabled = false;
+    document.getElementById('pc-cpt-actions').innerHTML =
+      '<button class="boutons boutons-vert" onclick="pcAjouterCompte()">Ajouter le compte</button>';
+  } else {
+    pcCatEditId = null;
+    document.getElementById('pc-cat-titre').textContent = 'Ajouter une catégorie UC';
+    ['pc-cat-nom', 'pc-cat-densite', 'pc-cat-marge'].forEach(id => {
+      const c = document.getElementById(id); c.value = ''; c.disabled = false;
+    });
+    document.getElementById('pc-cat-classe').disabled = false;
+    document.getElementById('pc-cat-classe').value = '';
+    pcCatChangerClasse();
+    document.getElementById('pc-cat-actions').innerHTML =
+      '<button class="boutons boutons-vert" onclick="pcCatAjouter()">Ajouter la catégorie</button>';
+  }
+  pcOuvrirVolet(nom);
+}
+
+// ─── Consultation d'une section (numéro verrouillé pour toujours) ───
+function pcVoirSection(numero) {
+  const s = pcSections.find(x => String(x.numero) === String(numero));
+  if (!s) return;
+  document.getElementById('pc-sec-titre').textContent = 'Section ' + s.numero;
+  const num = document.getElementById('pc-sec-numero');
+  const nom = document.getElementById('pc-sec-nom');
+  num.value = s.numero; num.disabled = true;
+  nom.value = s.nom;    nom.disabled = true;
+  document.getElementById('pc-sec-actions').innerHTML =
+    '<button class="boutons boutons-contour" onclick="pcSecActiverModif()">Modifier</button>';
+  pcOuvrirVolet('section');
+}
+function pcSecActiverModif() {
+  document.getElementById('pc-sec-nom').disabled = false;
+  document.getElementById('pc-sec-actions').innerHTML =
+    '<button class="boutons boutons-vert" onclick="pcModifierSection()">Enregistrer</button>';
+}
+async function pcModifierSection() {
+  const numero = (document.getElementById('pc-sec-numero').value || '').trim();
+  const nom    = (document.getElementById('pc-sec-nom').value || '').trim();
+  if (!nom) { afficherMsg('plan-comptable', 'Le nom est obligatoire.', 'erreur'); return; }
+  const res = await appelAPIPost('modifierSectionComptable', { numero, nom });
+  if (res && res.success) {
+    afficherMsg('plan-comptable', 'Section corrigée.', 'succes');
+    await chargerPlanComptable();
+    pcOuvrirAccordeon('sections');
+  } else {
+    afficherMsg('plan-comptable', (res && res.message) || 'Erreur.', 'erreur');
+  }
+}
+
+// ─── Consultation d'un compte (numéro verrouillé pour toujours) ───
+function pcVoirCompte(numero) {
+  const c = pcComptes.find(x => String(x.numero) === String(numero));
+  if (!c) return;
+  document.getElementById('pc-cpt-titre').textContent = 'Compte ' + c.numero;
+  const sec = document.getElementById('pc-cpt-section');
+  const num = document.getElementById('pc-cpt-numero');
+  const nom = document.getElementById('pc-cpt-nom');
+  sec.value = String(c.section); sec.disabled = true;
+  num.value = c.numero; num.disabled = true;
+  nom.value = c.nom;    nom.disabled = true;
+  document.getElementById('pc-cpt-actions').innerHTML =
+    '<button class="boutons boutons-contour" onclick="pcCptActiverModif()">Modifier</button>';
+  pcOuvrirVolet('compte');
+}
+function pcCptActiverModif() {
+  document.getElementById('pc-cpt-nom').disabled = false;
+  document.getElementById('pc-cpt-actions').innerHTML =
+    '<button class="boutons boutons-vert" onclick="pcModifierCompte()">Enregistrer</button>';
+}
+async function pcModifierCompte() {
+  const numero = (document.getElementById('pc-cpt-numero').value || '').trim();
+  const nom    = (document.getElementById('pc-cpt-nom').value || '').trim();
+  if (!nom) { afficherMsg('plan-comptable', 'Le nom est obligatoire.', 'erreur'); return; }
+  const res = await appelAPIPost('modifierCompteComptable', { numero, nom });
+  if (res && res.success) {
+    afficherMsg('plan-comptable', 'Compte corrigé.', 'succes');
+    await chargerPlanComptable();
+    pcOuvrirAccordeon('comptes');
+  } else {
+    afficherMsg('plan-comptable', (res && res.message) || 'Erreur.', 'erreur');
+  }
+}
+
 function pcRendre(sections, comptes, cats, config) {
   const contenu = document.getElementById('contenu-plan-comptable');
   if (!contenu) return;
@@ -82,13 +184,8 @@ function pcRendre(sections, comptes, cats, config) {
 
   const droite = `
     <div class="collant">
-      <div class="actions">
-        <button class="boutons boutons-contour" onclick="pcOuvrirVolet('section')">Ajouter une section</button>
-        <button class="boutons boutons-contour" onclick="pcOuvrirVolet('compte')">Ajouter un compte</button>
-        <button class="boutons boutons-contour" onclick="pcOuvrirVolet('categorie')">Ajouter une catégorie UC</button>
-      </div>
       <div id="pc-volet-section" class="cache">
-        <div class="section-label">Ajouter une section</div>
+        <div class="section-label" id="pc-sec-titre">Ajouter une section</div>
         <div class="champ">
           <label class="libelle">Numéro</label>
           <input type="text" class="controle" id="pc-sec-numero" placeholder="ex. 1100">
@@ -97,12 +194,12 @@ function pcRendre(sections, comptes, cats, config) {
           <label class="libelle">Nom</label>
           <input type="text" class="controle" id="pc-sec-nom" placeholder="ex. Encaisse">
         </div>
-        <div class="actions">
+        <div class="actions" id="pc-sec-actions">
           <button class="boutons boutons-vert" onclick="pcAjouterSection()">Ajouter la section</button>
         </div>
       </div>
       <div id="pc-volet-compte" class="cache">
-        <div class="section-label">Ajouter un compte</div>
+        <div class="section-label" id="pc-cpt-titre">Ajouter un compte</div>
         <div class="champ">
           <label class="libelle">Section</label>
           <select class="controle" id="pc-cpt-section">${optionsSections}</select>
@@ -115,12 +212,12 @@ function pcRendre(sections, comptes, cats, config) {
           <label class="libelle">Nom</label>
           <input type="text" class="controle" id="pc-cpt-nom" placeholder="ex. Fond de caisse">
         </div>
-        <div class="actions">
+        <div class="actions" id="pc-cpt-actions">
           <button class="boutons boutons-vert" onclick="pcAjouterCompte()">Ajouter le compte</button>
         </div>
       </div>
       <div id="pc-volet-categorie" class="cache">
-        <div class="section-label">Ajouter une catégorie UC</div>
+        <div class="section-label" id="pc-cat-titre">Ajouter une catégorie UC</div>
         <div class="champ">
           <label class="libelle">Nom</label>
           <input type="text" class="controle" id="pc-cat-nom" placeholder="ex. Huiles">
@@ -144,18 +241,17 @@ function pcRendre(sections, comptes, cats, config) {
           <label class="libelle">Compte à l'achat</label>
           <select class="controle" id="pc-cat-compte" disabled></select>
         </div>
-        <div class="champ">
-          <label class="libelle">Densité (g/ml)</label>
-          <input type="number" step="0.01" class="controle" id="pc-cat-densite" placeholder="ex. 0.92">
+        <div class="grille">
+          <div class="champ">
+            <label class="libelle">Densité (g/ml)</label>
+            <input type="number" step="0.01" class="controle" id="pc-cat-densite" placeholder="ex. 0.92">
+          </div>
+          <div class="champ">
+            <label class="libelle">Marge de perte (%)</label>
+            <input type="number" step="0.1" class="controle" id="pc-cat-marge" placeholder="ex. 2">
+          </div>
         </div>
-        <div class="champ">
-          <label class="libelle">Marge de perte (%)</label>
-          <input type="number" step="0.1" class="controle" id="pc-cat-marge" placeholder="ex. 2">
-        </div>
-        <div class="champ">
-          <label class="libelle"><input type="checkbox" id="pc-cat-inci"> INCI requis</label>
-        </div>
-        <div class="actions">
+        <div class="actions" id="pc-cat-actions">
           <button class="boutons boutons-vert" onclick="pcCatAjouter()">Ajouter la catégorie</button>
         </div>
       </div>
@@ -164,7 +260,7 @@ function pcRendre(sections, comptes, cats, config) {
 
   let html = '';
 
-  html += `<div class="sur-titre primaire" onclick="pcOuvrirAccordeon('sections')">Sections</div><div id="pc-acc-sections" class="cache">`;
+  html += `<div class="titre" onclick="pcOuvrirAccordeon('sections')">Sections</div><div id="pc-acc-sections" class="cache">`;
   if (!sections.length) {
     html += `<div class="vide"><div class="vide-titre">Aucune section</div><div class="vide-desc">Ajoutez-en une à droite.</div></div>`;
   } else {
@@ -175,12 +271,12 @@ function pcRendre(sections, comptes, cats, config) {
         classeActuelle = classe;
         html += `<div class="section-label">${String(s.numero).charAt(0)}000 — ${classe}</div>`;
       }
-      html += `<div class="rangeeitem"><div class="rangeeitem-info"><span class="rangeeitem-titre"><span class="numero">${s.numero}</span>${s.nom}</span></div></div>`;
+      html += `<div class="rangeeitem" onclick="pcVoirSection('${s.numero}')"><div class="rangeeitem-info"><span class="rangeeitem-titre">${s.numero} — ${s.nom}</span></div></div>`;
     });
   }
   html += `</div>`;
 
-  html += `<div class="sur-titre primaire" onclick="pcOuvrirAccordeon('comptes')">Comptes</div><div id="pc-acc-comptes" class="cache">`;
+  html += `<div class="titre" onclick="pcOuvrirAccordeon('comptes')">Comptes</div><div id="pc-acc-comptes" class="cache">`;
   if (!sections.length) {
     html += `<div class="vide"><div class="vide-titre">Aucune section</div><div class="vide-desc">Ajoutez-en une à droite.</div></div>`;
   } else {
@@ -191,7 +287,7 @@ function pcRendre(sections, comptes, cats, config) {
         classeActuelle2 = classe;
         html += `<div class="section-label">${String(s.numero).charAt(0)}000 — ${classe}</div>`;
       }
-      html += `<div class="accroche">${s.numero} · ${s.nom}</div>`;
+      html += `<div class="accroche">${s.numero} — ${s.nom}</div>`;
       const dedans = comptes
         .filter(c => String(c.section) === String(s.numero))
         .sort((a, b) => String(a.numero).localeCompare(String(b.numero)));
@@ -199,14 +295,14 @@ function pcRendre(sections, comptes, cats, config) {
         html += `<div class="textes-discrets">aucun compte</div>`;
       } else {
         dedans.forEach(c => {
-          html += `<div class="rangeeitem"><div class="rangeeitem-info"><span class="rangeeitem-titre"><span class="numero">${c.numero}</span>${c.nom}</span></div></div>`;
+          html += `<div class="rangeeitem" onclick="pcVoirCompte('${c.numero}')"><div class="rangeeitem-info"><span class="rangeeitem-titre">${c.numero} — ${c.nom}</span></div></div>`;
         });
       }
     });
   }
   html += `</div>`;
 
-  html += `<div class="sur-titre primaire" onclick="pcOuvrirAccordeon('cats')">Catégories Univers Caresse</div><div id="pc-acc-cats" class="cache">`;
+  html += `<div class="titre" onclick="pcOuvrirAccordeon('cats')">Catégories Univers Caresse</div><div id="pc-acc-cats" class="cache">`;
   if (!cats.length) {
     html += `<div class="vide"><div class="vide-titre">Aucune catégorie</div><div class="vide-desc">Ajoutez-en une à droite.</div></div>`;
   } else {
@@ -217,7 +313,7 @@ function pcRendre(sections, comptes, cats, config) {
       const cfg = configParCat[cat.cat_id];
       let meta = '';
       if (compte) {
-        meta = `<span class="numero">${compte.numero}</span>${compte.nom}`;
+        meta = `${compte.numero} — ${compte.nom}`;
       } else if (cat.compte_achat) {
         meta = `⚠️ compte ${cat.compte_achat} absent du plan`;
       } else {
@@ -226,16 +322,11 @@ function pcRendre(sections, comptes, cats, config) {
       meta += cfg
         ? ` · densité ${cfg.densite} · marge ${cfg.marge_perte_pct} %`
         : ` · ⚠️ densité manquante — prix au gramme faussé`;
-      const utilise = (listesDropdown.fullData || []).filter(d => d.cat_id === cat.cat_id);
-      html += `<div class="rangeeitem">
+      html += `<div class="rangeeitem" onclick="pcCatModifier('${cat.cat_id}')">
         <div class="rangeeitem-info">
           <span class="rangeeitem-titre">${cat.nom}${cat.inci ? ' · INCI requis' : ''}</span>
           <span class="rangeeitem-meta">${meta}</span>
         </div>
-        <span class="rangeeitem-valeur">
-          <button class="boutons boutons-minuscule boutons-contour" onclick="pcCatModifier('${cat.cat_id}')">Modifier</button>
-          ${utilise.length === 0 ? `<button class="boutons boutons-minuscule boutons-rouge" onclick="pcCatSupprimer('${cat.cat_id}')">Supprimer</button>` : ''}
-        </span>
       </div>`;
     });
   }
@@ -322,10 +413,17 @@ function pcCatModifier(cat_id) {
   const cfg = pcConfig.find(c => String(c.cat_id) === String(cat_id));
   pcCatEditId = cat_id;
   pcOuvrirVolet('categorie');
+  document.getElementById('pc-cat-titre').textContent = 'Catégorie ' + (cat.nom || '');
+  ['pc-cat-nom', 'pc-cat-classe', 'pc-cat-densite', 'pc-cat-marge'].forEach(id => {
+    document.getElementById(id).disabled = true;
+  });
+  const utilise = (listesDropdown.fullData || []).filter(d => d.cat_id === cat_id);
+  document.getElementById('pc-cat-actions').innerHTML =
+    '<button class="boutons boutons-contour" onclick="pcCatActiverModif()">Modifier</button>' +
+    (utilise.length === 0 ? ' <button class="boutons boutons-rouge" onclick="pcCatSupprimer(\'' + cat_id + '\')">Supprimer</button>' : '');
   document.getElementById('pc-cat-nom').value = cat.nom || '';
   document.getElementById('pc-cat-densite').value = cfg ? cfg.densite : '';
   document.getElementById('pc-cat-marge').value = cfg ? cfg.marge_perte_pct : '';
-  document.getElementById('pc-cat-inci').checked = !!cat.inci;
   const compte = pcComptes.find(c => String(c.numero) === String(cat.compte_achat));
   if (compte) {
     document.getElementById('pc-cat-classe').value = String(compte.section).charAt(0);
@@ -340,7 +438,16 @@ function pcCatModifier(cat_id) {
       ? '⚠️ Compte ' + cat.compte_achat + ' absent du plan — choisissez un compte.'
       : '⚠️ Aucun compte à l\'achat — choisissez un compte.', 'erreur');
   }
-  document.getElementById('pc-cat-nom').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('pc-cat-section').disabled = true;
+  document.getElementById('pc-cat-compte').disabled = true;
+}
+
+function pcCatActiverModif() {
+  ['pc-cat-nom', 'pc-cat-classe', 'pc-cat-section', 'pc-cat-compte', 'pc-cat-densite', 'pc-cat-marge'].forEach(id => {
+    document.getElementById(id).disabled = false;
+  });
+  document.getElementById('pc-cat-actions').innerHTML =
+    '<button class="boutons boutons-vert" onclick="pcCatAjouter()">Enregistrer</button>';
 }
 
 function pcCatSupprimer(cat_id) {
@@ -364,7 +471,7 @@ async function pcCatAjouter() {
   const compte  = document.getElementById('pc-cat-compte').value;
   const densite = parseFloat(document.getElementById('pc-cat-densite').value);
   const marge   = parseFloat(document.getElementById('pc-cat-marge').value) || 0;
-  const inci    = document.getElementById('pc-cat-inci').checked;
+  const inci    = String(compte) === '1305';
   if (!nom || !compte || !(densite > 0)) {
     afficherMsg('plan-comptable', 'Nom, compte et densité obligatoires.', 'erreur');
     return;
