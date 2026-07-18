@@ -271,7 +271,7 @@ function pcRendre(sections, comptes, cats, config) {
         classeActuelle = classe;
         html += `<div class="section-label">${String(s.numero).charAt(0)}000 — ${classe}</div>`;
       }
-      html += `<div class="rangeeitem" onclick="pcVoirSection('${s.numero}')"><div class="rangeeitem-info"><span class="rangeeitem-titre">${s.numero} — ${s.nom}</span></div></div>`;
+      html += `<div class="rangeeitem" onclick="pcVoirSection('${s.numero}')"><div class="rangeeitem-info"><div class="rangeeitem-titre"><span class="numero">${s.numero}</span>${s.nom}</div></div></div>`;
     });
   }
   html += `</div>`;
