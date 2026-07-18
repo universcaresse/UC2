@@ -260,7 +260,7 @@ function pcRendre(sections, comptes, cats, config) {
 
   let html = '';
 
-  html += `<div class="titre" onclick="pcOuvrirAccordeon('sections')">Sections</div><div id="pc-acc-sections" class="cache">`;
+  html += `<div class="titre separateur-haut" onclick="pcOuvrirAccordeon('sections')">Sections</div><div id="pc-acc-sections" class="cache">`;
   if (!sections.length) {
     html += `<div class="vide"><div class="vide-titre">Aucune section</div><div class="vide-desc">Ajoutez-en une à droite.</div></div>`;
   } else {
@@ -276,7 +276,7 @@ function pcRendre(sections, comptes, cats, config) {
   }
   html += `</div>`;
 
-  html += `<div class="titre" onclick="pcOuvrirAccordeon('comptes')">Comptes</div><div id="pc-acc-comptes" class="cache">`;
+  html += `<div class="titre separateur-haut" onclick="pcOuvrirAccordeon('comptes')">Comptes</div><div id="pc-acc-comptes" class="cache">`;
   if (!sections.length) {
     html += `<div class="vide"><div class="vide-titre">Aucune section</div><div class="vide-desc">Ajoutez-en une à droite.</div></div>`;
   } else {
@@ -302,7 +302,7 @@ function pcRendre(sections, comptes, cats, config) {
   }
   html += `</div>`;
 
-  html += `<div class="titre" onclick="pcOuvrirAccordeon('cats')">Catégories Univers Caresse</div><div id="pc-acc-cats" class="cache">`;
+  html += `<div class="titre separateur-haut" onclick="pcOuvrirAccordeon('cats')">Catégories Univers Caresse</div><div id="pc-acc-cats" class="cache">`;
   if (!cats.length) {
     html += `<div class="vide"><div class="vide-titre">Aucune catégorie</div><div class="vide-desc">Ajoutez-en une à droite.</div></div>`;
   } else {
