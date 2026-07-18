@@ -287,7 +287,7 @@ function pcRendre(sections, comptes, cats, config) {
         classeActuelle2 = classe;
         html += `<div class="section-label">${String(s.numero).charAt(0)}000 — ${classe}</div>`;
       }
-      html += `<div class="accroche">${s.numero} — ${s.nom}</div>`;
+      html += `<div class="sur-titre secondaire">${s.numero} — ${s.nom}</div>`;
       const dedans = comptes
         .filter(c => String(c.section) === String(s.numero))
         .sort((a, b) => String(a.numero).localeCompare(String(b.numero)));
