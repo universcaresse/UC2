@@ -129,7 +129,7 @@ async function pcModifierSection() {
   if (res && res.success) {
     afficherMsg('plan-comptable', 'Section corrigée.', 'succes');
     await chargerPlanComptable();
-    pcOuvrirAccordeon('sections');
+    pcVoirSection(numero);
   } else {
     afficherMsg('plan-comptable', (res && res.message) || 'Erreur.', 'erreur');
   }
@@ -163,7 +163,7 @@ async function pcModifierCompte() {
   if (res && res.success) {
     afficherMsg('plan-comptable', 'Compte corrigé.', 'succes');
     await chargerPlanComptable();
-    pcOuvrirAccordeon('comptes');
+    pcVoirCompte(numero);
   } else {
     afficherMsg('plan-comptable', (res && res.message) || 'Erreur.', 'erreur');
   }
@@ -456,7 +456,7 @@ function pcCatSupprimer(cat_id) {
     if (res && res.success) {
       if (listesDropdown.categoriesMap) delete listesDropdown.categoriesMap[cat_id];
       if (listesDropdown.catsInci) delete listesDropdown.catsInci[cat_id];
-      if (listesDropdown.config) listesDropdown.config = listesDropdown.config.filter(c => String(c.cat_id) !== String(cat_id));
+      if (listesDropdown.config) delete listesDropdown.config[cat_id];
       afficherMsg('plan-comptable', 'Catégorie supprimée.', 'succes');
       chargerPlanComptable();
     } else {
@@ -485,12 +485,12 @@ async function pcCatAjouter() {
     if (listesDropdown.categoriesMap) listesDropdown.categoriesMap[id] = nom;
     if (listesDropdown.catsInci) listesDropdown.catsInci[id] = !!inci;
     if (listesDropdown.config) {
-      listesDropdown.config = listesDropdown.config.filter(c => String(c.cat_id) !== String(id));
-      listesDropdown.config.push({ cat_id: id, densite, unite: 'g', marge_perte_pct: marge });
+      listesDropdown.config[id] = { densite, unite: 'g', margePertePct: marge };
     }
-    afficherMsg('plan-comptable', pcCatEditId ? 'Catégorie mise à jour.' : 'Catégorie ajoutée.', 'succes');
+    const etaitModif = !!pcCatEditId;
+    afficherMsg('plan-comptable', etaitModif ? 'Catégorie mise à jour.' : 'Catégorie ajoutée.', 'succes');
     await chargerPlanComptable();
-    pcOuvrirVolet('categorie');
+    if (etaitModif) pcCatModifier(id); else pcNouveau('categorie');
   } else {
     afficherMsg('plan-comptable', (res && res.message) || 'Erreur.', 'erreur');
   }
