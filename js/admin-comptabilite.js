@@ -287,7 +287,7 @@ function pcRendre(sections, comptes, cats, config) {
         classeActuelle2 = classe;
         html += `<div class="section-label">${String(s.numero).charAt(0)}000 — ${classe}</div>`;
       }
-      html += `<div class="sur-titre secondaire">${s.numero} — ${s.nom}</div>`;
+      html += `<div class="bloc"><div class="accroche">${s.numero} · ${s.nom}</div>`;
       const dedans = comptes
         .filter(c => String(c.section) === String(s.numero))
         .sort((a, b) => String(a.numero).localeCompare(String(b.numero)));
@@ -295,9 +295,10 @@ function pcRendre(sections, comptes, cats, config) {
         html += `<div class="textes-discrets">aucun compte</div>`;
       } else {
         dedans.forEach(c => {
-          html += `<div class="rangeeitem" onclick="pcVoirCompte('${c.numero}')"><div class="rangeeitem-info"><span class="rangeeitem-titre">${c.numero} — ${c.nom}</span></div></div>`;
+          html += `<div class="rangeeitem" onclick="pcVoirCompte('${c.numero}')"><div class="rangeeitem-info"><div class="rangeeitem-titre"><span class="numero">${c.numero}</span>${c.nom}</div></div></div>`;
         });
       }
+      html += `</div>`;
     });
   }
   html += `</div>`;
