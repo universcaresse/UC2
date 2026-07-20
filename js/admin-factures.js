@@ -1,6 +1,4 @@
 var toutesFactures = [];
-
-var toutesFactures = [];
 var toutesLignesAchats = [];
 
 async function chargerFactures() {

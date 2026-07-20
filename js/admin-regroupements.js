@@ -26,7 +26,7 @@ function afficherRegroupements() {
 
 function ouvrirFicheRegroupement(fra_id) {
   const fra = donneesRegroupements.find(f => f.fra_id === fra_id);
-  if (!fra) { console.log('Regroupement introuvable:', fra_id, donneesRegroupements); return; }
+  if (!fra) return;
   document.getElementById('fiche-regroupement-titre').textContent      = (fra.nom || '').toUpperCase();
   document.getElementById('fiche-regroupement-desc').textContent       = fra.description || '—';
   document.getElementById('fiche-regroupement-slogan').textContent     = fra.slogan || '—';
@@ -86,7 +86,7 @@ function ouvrirFicheRegroupement(fra_id) {
   
   
   
-  document.getElementById('fiche-regroupement-modifier').onclick = () => { console.log('modifier cliqué', fra_id); fermerFicheRegroupement(); modifierRegroupement(fra_id); };
+  document.getElementById('fiche-regroupement-modifier').onclick = () => { fermerFicheRegroupement(); modifierRegroupement(fra_id); };
   document.getElementById('btn-supprimer-regroupement').onclick  = () => supprimerRegroupement(fra_id);
   document.getElementById('contenu-regroupements').classList.add('cache');
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
@@ -212,7 +212,6 @@ function ouvrirFormRegroupement() {
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
   document.getElementById('form-regroupements').classList.remove('cache');
   document.getElementById('form-regroupements').classList.add('visible');
-  console.log('classes form:', document.getElementById('form-regroupements').className);
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
   document.getElementById('form-regroupements').scrollIntoView({ behavior: 'smooth' });
@@ -271,7 +270,6 @@ function majApercuRangRegroupement() {
 
 function modifierRegroupement(fra_id) {
   const fra = donneesRegroupements.find(f => f.fra_id === fra_id);
-  console.log('fra trouvé:', fra);
   if (!fra) return;
   document.getElementById('form-regroupements-titre').textContent      = 'Modifier l\'univers';
   document.getElementById('freg-id').value                             = fra.fra_id;
@@ -309,8 +307,6 @@ function modifierRegroupement(fra_id) {
   document.getElementById('btn-nouveau-regroupement').classList.add('cache');
   document.getElementById('form-regroupements').classList.remove('cache');
   document.getElementById('form-regroupements').classList.add('visible');
-  console.log('classes form:', document.getElementById('form-regroupements').className);
-  console.log('classes fiche:', document.getElementById('fiche-regroupement').className);
   window.scrollTo(0, 0);
   document.querySelector('.admin-contenu')?.scrollTo(0, 0);
   document.getElementById('form-regroupements').scrollIntoView({ behavior: 'smooth' });

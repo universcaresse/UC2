@@ -3,11 +3,7 @@
    V2 — 6 avril 2026
    ═══════════════════════════════════════ */
 
-// ─── CONFIGURATION ───
-const CONFIG = {
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec'
-};
-
+// ─── CONFIGURATION : voir js/config.js (chargé avant ce fichier) ───
 
 // ─── COULEURS COLLECTIONS (fallback si pas de couleur_hex dans la sheet) ───
 const COULEURS_COLLECTIONS = {

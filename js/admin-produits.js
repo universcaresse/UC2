@@ -14,7 +14,7 @@ var filtreProGamId = '';
 var formatsRecette      = [];   // [ {format_id, poids, unite, prix, nb_unites} ]
 var ingredientsRecette  = [];   // [ {ing_id, type, nom, quantite} ]
 var emballagesRecette   = {};   // { format_id: [ {ing_id, cat_id, nom, quantite, nb_par_unite} ] }
-var gammesIngs          = [];
+var gammesIngsProduit   = [];
 
 // Sauvegarde temporaire de l'état complet du formulaire pour ne rien perdre lors d'un modal
 var saisieProduitEnCours = null;
@@ -77,7 +77,7 @@ function produitsViderEtatFormulaire() {
   formatsRecette     = [];
   ingredientsRecette = [];
   emballagesRecette  = {};
-  gammesIngs         = [];
+  gammesIngsProduit  = [];
   saisieProduitEnCours = null;
 }
 
@@ -1590,9 +1590,9 @@ async function chargerIngredientsBaseRecette() {
   var idActuel = document.getElementById('fr-id').value;
   if (idActuel) return; // Ne pas toucher en modification
   var gam_id = document.getElementById('fr-ligne').value;
-  if (!gam_id) { gammesIngs = []; return; }
+  if (!gam_id) { gammesIngsProduit = []; return; }
   var res = await appelAPI('getGammesIngredients', { gam_id: gam_id });
-  gammesIngs = (res && res.success ? res.items : []).map(function(i) {
+  gammesIngsProduit = (res && res.success ? res.items : []).map(function(i) {
     return {
       ing_id: i.ing_id,
       type: ((listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id; }) || {}).cat_id) || '',
@@ -1600,7 +1600,7 @@ async function chargerIngredientsBaseRecette() {
       quantite: i.quantite_g
     };
   });
-  ingredientsRecette = gammesIngs.slice();
+  ingredientsRecette = gammesIngsProduit.slice();
   rafraichirListeIngredientsRecette();
 }
 

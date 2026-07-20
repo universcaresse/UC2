@@ -1113,7 +1113,11 @@ function fermerFormCompleter() {
   if (!window.cmdCompleterEnvoiEnCours && cmdCompleterIdEnCours) {
     const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
     if (c && c.statut === 'Verrouillée') {
-      appelAPIPost('updateStatutCommande', { cmd_id: cmdCompleterIdEnCours, statut: 'En attente' });
+      appelAPIPost('updateStatutCommande', { cmd_id: cmdCompleterIdEnCours, statut: 'En attente' }).then(function (r) {
+        if (!r || !r.success) {
+          afficherMsg('commandes', 'Le déverrouillage de la commande a échoué — vérifiez la connexion.', 'erreur');
+        }
+      });
       c.statut = 'En attente';
     }
   }
@@ -1231,7 +1235,11 @@ async function cmdCompleterCalculerTarif() {
       ? '<br><span style="color:var(--primary)">✓ Une remise s\'applique.</span>'
       : '<br><span style="color:var(--accent)">Aucune remise dans le détail — ce serait le tarif régulier.</span>';
     detail.innerHTML = lignesDetail;
-    appelAPIPost('updateCommandeEntete', { cmd_id: cmdCompleterIdEnCours, poids_colis: poids });
+    appelAPIPost('updateCommandeEntete', { cmd_id: cmdCompleterIdEnCours, poids_colis: poids }).then(function (r) {
+      if (!r || !r.success) {
+        afficherMsg('commandes', 'Le poids du colis n\'a pas pu être enregistré — vérifiez la connexion.', 'erreur');
+      }
+    });
     afficherMsg('commandes', '✅ Tarif calculé : ' + formaterPrix(res.montant));
   } else {
     afficherMsg('commandes', '❌ ' + (res?.message || 'Poste Canada n\'a pas répondu. Réessaie.'), 'erreur');

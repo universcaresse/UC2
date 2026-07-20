@@ -107,6 +107,7 @@
     <p id="erreur-mdp" class="erreur"></p>
   </div>
 
+  <script src="../js/config.js"></script>
   <script>
     if (sessionStorage.getItem('uc_admin') === 'true') {
       window.location.href = '/admin/';
@@ -117,7 +118,7 @@
       btn.disabled = true;
       document.getElementById('overlay').classList.add('visible');
       const mdp = document.getElementById('input-mdp').value;
-      const res = await fetch('https://script.google.com/macros/s/AKfycbyZYLb_LWaaJ0kQRTdvJHuOamYI4OrO0fdaJjDAFk-UTOXIRF6OK67QiA6DjKUcBSU9/exec', {
+      const res = await fetch(CONFIG.APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ action: 'validerMotDePasse', mdp }),
