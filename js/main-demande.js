@@ -1,10 +1,8 @@
 /* ═══════════════════════════════════════
    UNIVERS CARESSE — demande.js
    Système de demande de commande (étape 2)
-   Activé par le flag ?test=1 dans l'URL
    ═══════════════════════════════════════ */
 
-// ─── DÉTECTION DU FLAG TEST ───
 const DEMANDE_ACTIVE = true;
 
 // ─── ÉTAT GLOBAL ───

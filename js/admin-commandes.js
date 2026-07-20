@@ -976,7 +976,12 @@ function ouvrirFormCompleter(cmd_id) {
 
   // Verrou : le client ne peut plus toucher la commande pendant qu'on prépare la proposition
   if (c.statut === 'En attente') {
-    appelAPIPost('updateStatutCommande', { cmd_id: cmd_id, statut: 'Verrouillée' });
+    appelAPIPost('updateStatutCommande', { cmd_id: cmd_id, statut: 'Verrouillée' }).then(function (r) {
+      if (!r || !r.success) {
+        c.statut = 'En attente';
+        afficherMsg('commandes', 'Le verrouillage de la commande a échoué — vérifiez la connexion.', 'erreur');
+      }
+    });
     c.statut = 'Verrouillée';
   }
 
@@ -1005,9 +1010,9 @@ function ouvrirFormCompleter(cmd_id) {
       zoneRecap.insertAdjacentHTML('beforeend', blocV);
     });
   }
-  let recap = '<div style="margin-bottom:12px"><strong>' + (c.client || '—') + '</strong>';
-  if (c.courriel)  recap += '<br><span class="texte-secondaire">' + c.courriel + '</span>';
-  if (c.telephone) recap += '<br><span class="texte-secondaire">' + c.telephone + '</span>';
+  let recap = '<div style="margin-bottom:12px"><strong>' + (echapperHtml(c.client) || '—') + '</strong>';
+  if (c.courriel)  recap += '<br><span class="texte-secondaire">' + echapperHtml(c.courriel) + '</span>';
+  if (c.telephone) recap += '<br><span class="texte-secondaire">' + echapperHtml(c.telephone) + '</span>';
   recap += '</div><div class="form-label">Items</div>';
 
   lignes.forEach(l => {

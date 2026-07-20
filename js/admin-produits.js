@@ -182,12 +182,14 @@ async function actualiserProduits() {
 }
 
 // ─── AFFICHAGE GRILLE ───
-async function afficherProduits() {
+async function afficherProduits(conserverFiltre) {
   produitsAfficherVue('grille');
   produitActif = null;
   produitsViderEtatFormulaire();
-  filtreProColId = '';
-  filtreProGamId = '';
+  if (!conserverFiltre) {
+    filtreProColId = '';
+    filtreProGamId = '';
+  }
 
   var loading = document.getElementById('loading-produits');
   var grille  = document.getElementById('grille-produits');
@@ -319,6 +321,29 @@ async function afficherProduits() {
   });
 
   peuplerFiltresRecettes();
+  if (conserverFiltre) {
+    reconstruireBarreFiltresGammes();
+    filtrerRecettes();
+  }
+}
+
+function reconstruireBarreFiltresGammes() {
+  var bar = document.getElementById('filtre-recette-ligne-bar');
+  if (!bar) return;
+  bar.innerHTML = '';
+  if (!filtreProColId) { bar.classList.add('cache'); return; }
+  var col = donneesCollections.find(function(c) { return c.col_id === filtreProColId; });
+  var gammes = col ? donneesGammes.filter(function(g) { return g.col_id === col.col_id; }) : [];
+  if (gammes.length > 1) {
+    bar.classList.remove('cache');
+    var html = '<button class="boutons ' + (!filtreProGamId ? 'boutons-vert' : 'boutons-contour') + '" onclick="onFiltreGammeBtn(\'\')">Toutes</button>';
+    gammes.sort(function(a, b) { return (a.rang || 99) - (b.rang || 99); }).forEach(function(g) {
+      html += '<button class="boutons ' + (filtreProGamId === g.gam_id ? 'boutons-vert' : 'boutons-contour') + '" onclick="onFiltreGammeBtn(\'' + g.gam_id + '\')">' + g.nom + '</button>';
+    });
+    bar.innerHTML = html;
+  } else {
+    bar.classList.add('cache');
+  }
 }
 
 function injecterBoutonActualiser() {
@@ -666,6 +691,7 @@ function construireTableauFormats(formats, embItems, stock, coutIngsTotal, CAT_C
       else if (ing && CATS_EMBALLAGE.indexOf(ing.cat_id) >= 0) coutEmballage += prix;
     });
     var coutTotal = coutIngParUnite + coutContenant + coutEmballage;
+    var coutLot = coutTotal * nbUnites;
     var marge = (f.prix_vente && coutTotal > 0)
       ? ((f.prix_vente - coutTotal) / f.prix_vente * 100).toFixed(1) + ' %' : '—';
     var margeNum = (f.prix_vente && coutTotal > 0) ? (f.prix_vente - coutTotal) / f.prix_vente * 100 : null;
@@ -676,7 +702,7 @@ function construireTableauFormats(formats, embItems, stock, coutIngsTotal, CAT_C
       '<td style="padding:14px 8px;text-align:right">' + (coutIngParUnite > 0 ? formaterPrix(coutIngParUnite) : '—') + '</td>' +
       '<td style="padding:14px 8px;text-align:right">' + (coutContenant > 0 ? formaterPrix(coutContenant) : '—') + '</td>' +
       '<td style="padding:14px 8px;text-align:right">' + (coutEmballage > 0 ? formaterPrix(coutEmballage) : '—') + '</td>' +
-      '<td style="padding:14px 8px;text-align:right;font-weight:500">' + (coutTotal > 0 ? formaterPrix(coutTotal) : '—') + '</td>' +
+      '<td style="padding:14px 8px;text-align:right;font-weight:500">' + (coutLot > 0 ? formaterPrix(coutLot) : '—') + '</td>' +
       '<td style="padding:14px 8px;text-align:right">' + (coutTotal > 0 ? formaterPrix(coutTotal) : '—') + '</td>' +
       '<td style="padding:14px 8px;text-align:right;color:var(--primary);font-weight:500">' + (f.prix_vente ? formaterPrix(f.prix_vente) : '—') + '</td>' +
       '<td style="padding:14px 8px;text-align:right;font-weight:500;' + margeCouleur + '">' + marge + '</td>' +
@@ -1163,7 +1189,7 @@ async function sauvegarderRecette() {
     fermerFormProduit();
 
     // Après sauvegarde → ouvrir la fiche pour vérifier le résultat (selon LOGIQUE-PRODUITS.md)
-    afficherProduits();
+    afficherProduits(true);
     setTimeout(function() {
       ouvrirFicheProduit(d.pro_id);
     }, 100);
@@ -1277,7 +1303,7 @@ function supprimerOuArchiverProduit(pro_id) {
           if (idx >= 0) donneesProduits[idx].statut = 'archive';
           cacherChargement();
           fermerFicheProduit();
-          afficherProduits();
+          afficherProduits(true);
           afficherMsg('recettes', 'Produit archivé.');
         } else {
           cacherChargement();
@@ -1297,7 +1323,7 @@ function supprimerOuArchiverProduit(pro_id) {
         delete prodCache.emballages[pro_id];
         cacherChargement();
         fermerFicheProduit();
-        afficherProduits();
+        afficherProduits(true);
         afficherMsg('recettes', 'Produit supprimé.');
       } else {
         cacherChargement();

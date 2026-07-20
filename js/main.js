@@ -249,7 +249,7 @@ async function validerConnexion() {
   if (res && res.success) {
     sessionStorage.setItem('uc_admin', 'true');
     if (res.cle) sessionStorage.setItem('uc_cle', res.cle);
-    window.location.href = '/UC2/admin/';
+    window.location.href = '/admin/';
   } else {
     document.getElementById('erreur-connexion').classList.remove('cache');
     document.getElementById('input-mdp').value = '';
