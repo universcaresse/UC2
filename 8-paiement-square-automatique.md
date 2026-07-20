@@ -138,5 +138,35 @@ de confirmation et ne passe pas par les commandes. **On n'y touche pas.**
 ## 5. OÙ ON EN EST
 
 - ✅ Arbre complet, 12 branches validées (10 juillet 2026).
-- ⬜ Rien de codé.
-- Prochaine étape : Chantal choisit par quoi on commence.
+- ✅ **Tout est codé (20 juillet 2026)**, avec un changement décidé par Chantal :
+  **la facture n'est JAMAIS créée automatiquement** — elle reste son geste,
+  pour pouvoir la personnaliser. À la place, la commande payée prend le
+  nouveau statut **« Payée — facture à faire »** (nouveau bloc dans la liste),
+  avec un bouton « Créer la facture » qui ouvre le flux manuel habituel.
+
+### Ce qui a été bâti
+1. `Code.gs` → `etatPaiementSquare` : demande à Square l'état d'un lien
+   (payé, combien, remboursé). Retombe sur le numéro de commande Square
+   (`order_id_square`, gardé à la création du lien) si le lien est mort.
+2. `Code.gs` → `verifierPaiementCommande` : applique la réponse à la
+   commande. Payé au complet → « Payée — facture à faire », lien fermé.
+   Trop payé / payé en partie / remboursé → notes dans deux nouvelles
+   colonnes (`probleme_paiement`, `montant_paye_square`). Facture déjà
+   liée → ne touche à rien (le geste de Chantal reste maître).
+3. `Code.gs` → `verifierPaiementCommandeClient` : la même vérification,
+   déclenchée par le client à son retour du paiement, protégée par le
+   jeton de son lien (action publique).
+4. `Code.gs` → `verifierFraisCommande` : les frais de livraison payés →
+   la commande passe toute seule à « À expédier », lien fermé.
+5. `js/main.js` → `verifierRetourPaiement` : au retour `?paiement=recu`,
+   la vérification part en silence (branche 1).
+6. `js/admin-commandes.js` → `chargerCommandes` : à l'ouverture de la
+   liste, vérification des commandes « En attente de paiement » et
+   « Frais à payer » (branches 2 et 6). Pastilles rouge (trop payé,
+   remboursé) et orange (payé en partie), note affichée dans la fiche.
+7. `creerVenteDepuisCommande_v2` accepte le nouveau statut pour la
+   création manuelle de la facture.
+
+### Reste à faire
+- ⬜ Publier : nouveau déploiement Apps Script + republier le site.
+- ⬜ Tester avec un vrai paiement.

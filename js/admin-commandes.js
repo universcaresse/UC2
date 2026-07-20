@@ -46,6 +46,23 @@ async function chargerCommandes() {
 
   toutesCommandes = res.items;
 
+  // Paiement Square : demander à Square si les commandes en attente sont payées.
+  // Si Square ne répond pas, rien ne bouge et rien ne s'affiche (branche 7 de l'arbre).
+  for (const c of toutesCommandes) {
+    if (c.statut === 'En attente de paiement') {
+      const r = await appelAPIPost('verifierPaiementCommande', { cmd_id: c.cmd_id });
+      if (r && r.success && r.statut) {
+        c.statut = r.statut;
+        if (r.note === 'trop_paye')      c.probleme_paiement = 'Trop payé — à rembourser';
+        else if (r.note === 'partiel')   c.probleme_paiement = c.probleme_paiement || 'Payé en partie';
+        else if (r.note === 'rembourse') c.probleme_paiement = 'Remboursé chez Square';
+      }
+    } else if (c.statut === 'Frais à payer') {
+      const rf = await appelAPIPost('verifierFraisCommande', { cmd_id: c.cmd_id });
+      if (rf && rf.success && rf.statut) c.statut = rf.statut;
+    }
+  }
+
   // Frais de livraison impayés depuis 14 jours : le lien Square est caduc, retour à « À livrer »
   for (const c of toutesCommandes) {
     if (c.statut !== 'Frais à payer' || !c.date_frais) continue;
@@ -443,6 +460,7 @@ function afficherTableauCommandes(items) {
     { titre: 'MODIFIÉES',                       statuts: ['Modifiée'] },
     { titre: 'À RETRAVAILLER',                  statuts: ['À retravailler'] },
     { titre: 'EN ATTENTE DE PAIEMENT',          statuts: ['En attente de paiement'] },
+    { titre: 'PAYÉES — FACTURE À FAIRE',        statuts: ['Payée — facture à faire'] },
     { titre: 'EN ATTENTE DE RÉAPPROVISIONNEMENT', statuts: ['En attente de réapprovisionnement'] },
     { titre: 'À RETRAVAILLER',                  statuts: ['À retravailler'] },
     { titre: 'À EXPÉDIER',                      statuts: ['À expédier'] },
@@ -456,6 +474,12 @@ function afficherTableauCommandes(items) {
 
   function calculerPastilleStock(cmd_id) {
     const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+
+    // Pastille paiement : rouge « trop payé / remboursé », orange « payé en partie »
+    if (c && c.probleme_paiement) {
+      if (c.probleme_paiement.indexOf('Payé en partie') === 0) return 'var(--accent)';
+      return 'var(--danger)';
+    }
 
     // Pastille délai pour « Frais à payer » — 14 jours
     if (c && c.statut === 'Frais à payer' && c.date_frais) {
@@ -594,6 +618,7 @@ async function voirDetailCommande(cmd_id) {
     <div style="margin-bottom:16px">
       <div class="form-label">Statut</div>
       <div>${c.statut}</div>
+      ${c.probleme_paiement ? `<div style="margin-top:4px;font-weight:500;color:${c.probleme_paiement.indexOf('Payé en partie') === 0 ? 'var(--accent)' : 'var(--danger)'}">⚠ ${echapperHtml(c.probleme_paiement)}</div>` : ''}
     </div>
     <div class="separateur-haut">
       <div class="form-label">Items commandés</div>`;
@@ -658,6 +683,10 @@ async function voirDetailCommande(cmd_id) {
     actionsHTML += `<button class="bouton bouton-contour" onclick="renvoyerPropositionV3('${c.cmd_id}')">Renvoyer la proposition</button>`;
     actionsHTML += `<button class="bouton bouton-contour" onclick="textoProposition('${c.cmd_id}')">Texto au client</button>`;
     actionsHTML += `<button class="bouton" onclick="modifierProduitsCommande('${c.cmd_id}')">Modifier les produits</button>`;
+    actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
+  }
+  if (c.statut === 'Payée — facture à faire') {
+    actionsHTML += `<button class="bouton bouton-or" onclick="paiementRecu('${c.cmd_id}')">Créer la facture</button>`;
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
   }
   if (c.statut === 'À expédier') {

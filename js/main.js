@@ -198,6 +198,19 @@ function verifierRetourPaiement() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('paiement') === 'recu' || window.location.hash === '#merci') {
     window.location.hash = 'merci';
+    // Le client revient du paiement : on demande à Square tout de suite, en silence.
+    // Si ça échoue, rien ne s'affiche — la liste des commandes revérifiera de toute façon.
+    const cmdRetour = params.get('cmd');
+    const jetonRetour = params.get('jeton');
+    if (cmdRetour && jetonRetour) {
+      try {
+        fetch(CONFIG.APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'verifierPaiementCommandeClient', cmd_id: cmdRetour, jeton: jetonRetour })
+        }).catch(function() {});
+      } catch (e) {}
+    }
   }
   // Facture publique (texto) : ?facture=0042&jeton=...
   if (params.get('facture')) afficherFacturePublique(params.get('facture'), params.get('jeton') || '');
