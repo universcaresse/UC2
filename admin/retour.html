@@ -133,12 +133,22 @@
   </div>
 
   <script>
+    function echapperHtml(texte) {
+      if (texte === null || texte === undefined) return '';
+      return String(texte)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function afficherInfos() {
       const params = new URLSearchParams(window.location.search);
-      const referenceId = params.get('referenceId');
-      const orderId = params.get('orderId');
-      const transactionId = params.get('transactionId');
-      const checkoutId = params.get('checkoutId');
+      const referenceId = echapperHtml(params.get('referenceId'));
+      const orderId = echapperHtml(params.get('orderId'));
+      const transactionId = echapperHtml(params.get('transactionId'));
+      const checkoutId = echapperHtml(params.get('checkoutId'));
       const conteneur = document.getElementById('info-commande');
 
       if (!referenceId && !orderId && !transactionId && !checkoutId) {

@@ -670,6 +670,16 @@ function formaterPrix(montant) {
   return parseFloat(montant).toFixed(2).replace('.', ',') + ' $';
 }
 
+function echapperHtml(texte) {
+  if (texte === null || texte === undefined) return '';
+  return String(texte)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function couleurTexteContraste(hex) {
   if (!hex || !hex.startsWith('#')) return 'carte-infos-clair';
   const r = parseInt(hex.slice(1,3), 16);

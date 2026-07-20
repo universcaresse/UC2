@@ -580,16 +580,16 @@ async function voirDetailCommande(cmd_id) {
       <div style="flex:1 1 260px;min-width:260px">
     <div style="margin-bottom:16px">
       <div class="form-label">Client</div>
-      <div>${c.client || '—'}</div>
-      ${c.courriel ? `<div class="texte-secondaire">${c.courriel}</div>` : ''}
-      ${c.telephone ? `<div class="texte-secondaire">${c.telephone}</div>` : ''}
-      ${c.code_postal ? `<div class="texte-secondaire">${c.code_postal}</div>` : ''}
-      ${(c.rue || c.ville || c.province) ? `<div class="texte-secondaire">${[c.rue, c.ville, c.province].filter(Boolean).join(', ')}</div>` : ''}
+      <div>${echapperHtml(c.client) || '—'}</div>
+      ${c.courriel ? `<div class="texte-secondaire">${echapperHtml(c.courriel)}</div>` : ''}
+      ${c.telephone ? `<div class="texte-secondaire">${echapperHtml(c.telephone)}</div>` : ''}
+      ${c.code_postal ? `<div class="texte-secondaire">${echapperHtml(c.code_postal)}</div>` : ''}
+      ${(c.rue || c.ville || c.province) ? `<div class="texte-secondaire">${echapperHtml([c.rue, c.ville, c.province].filter(Boolean).join(', '))}</div>` : ''}
       <button class="bouton bouton-contour bouton-petit" style="margin-top:6px" onclick="modifierAdresseCommande('${c.cmd_id}')">Modifier l'adresse</button>
     </div>
     ${c.notes ? `<div style="margin-bottom:16px">
       <div class="form-label">Notes</div>
-      <div>${c.notes}</div>
+      <div>${echapperHtml(c.notes)}</div>
     </div>` : ''}
     <div style="margin-bottom:16px">
       <div class="form-label">Statut</div>
