@@ -227,6 +227,7 @@ if (id === 'redaction')      redInit();
   if (id === 'references')     chargerReferences();
   if (id === 'plan-comptable') chargerPlanComptable();
   if (id === 'bilan-resultats') chargerBilanResultats();
+  if (id === 'journal-general') chargerJournalGeneral();
   if (id === 'inventaire-production') {
     if (!donneesProduits || donneesProduits.length === 0) {
       Promise.all([appelAPI('getProduits'), appelAPI('getProduitsFormats')]).then(([resPro, resFmt]) => {

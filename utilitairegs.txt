@@ -1,0 +1,474 @@
+function getSS() {
+  return SpreadsheetApp.openById(SS_ID);
+}
+
+function toGrammes(formatQte, formatUnite, densite) {
+  const qte = parseFloat(formatQte) || 0;
+  if (formatUnite === 'kg')    return qte * 1000;
+  if (formatUnite === 'lbs')   return qte * 453.592;
+  if (formatUnite === 'ml')    return qte * densite;
+  if (formatUnite === 'L')     return qte * 1000 * densite;
+  if (formatUnite === 'l')     return qte * 1000 * densite;
+  if (formatUnite === 'unité') return qte;
+  return qte;
+}
+
+function averageHexColors(hexColors, saturationBoost) {
+  if (saturationBoost === undefined) saturationBoost = 0.2;
+  if (!hexColors || hexColors.length === 0) return '#c44536';
+  const valides = hexColors.filter(function(h) { return h && /^#[0-9a-fA-F]{6}$/.test(h); });
+  if (valides.length === 0) return '#c44536';
+  const rgbs = valides.map(function(hex) {
+    var h = hex.replace('#', '');
+    return { r: parseInt(h.substring(0,2),16), g: parseInt(h.substring(2,4),16), b: parseInt(h.substring(4,6),16) };
+  });
+  const avg = {
+    r: Math.round(rgbs.reduce(function(s,c){return s+c.r;},0) / rgbs.length),
+    g: Math.round(rgbs.reduce(function(s,c){return s+c.g;},0) / rgbs.length),
+    b: Math.round(rgbs.reduce(function(s,c){return s+c.b;},0) / rgbs.length)
+  };
+  const r = avg.r/255, g = avg.g/255, b = avg.b/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  var h, s, l = (max+min)/2;
+  const d = max - min;
+  s = d === 0 ? 0 : d / (1 - Math.abs(2*l - 1));
+  if (d !== 0) {
+    if      (max === r) h = ((g-b)/d + (g<b?6:0)) / 6;
+    else if (max === g) h = ((b-r)/d + 2) / 6;
+    else                h = ((r-g)/d + 4) / 6;
+  } else { h = 0; }
+  s = Math.min(1, s + saturationBoost);
+  const c2 = (1 - Math.abs(2*l-1)) * s;
+  const x  = c2 * (1 - Math.abs((h*6) % 2 - 1));
+  const m  = l - c2/2;
+  var rr, gg, bb;
+  if      (h < 1/6) { rr=c2; gg=x;  bb=0;  }
+  else if (h < 2/6) { rr=x;  gg=c2; bb=0;  }
+  else if (h < 3/6) { rr=0;  gg=c2; bb=x;  }
+  else if (h < 4/6) { rr=0;  gg=x;  bb=c2; }
+  else if (h < 5/6) { rr=x;  gg=0;  bb=c2; }
+  else              { rr=c2; gg=0;  bb=x;  }
+  const fr = Math.round((rr+m)*255), fg = Math.round((gg+m)*255), fb = Math.round((bb+m)*255);
+  return '#' + fr.toString(16).padStart(2,'0') + fg.toString(16).padStart(2,'0') + fb.toString(16).padStart(2,'0');
+}
+
+function recalculerHexGamme_v2(gam_id) {
+  try {
+    if (!gam_id) return;
+    const ss            = getSS();
+    const produitsSheet = ss.getSheetByName('Produits_v2');
+    const gammesSheet   = ss.getSheetByName('Gammes_v2');
+    if (!produitsSheet || !gammesSheet) return;
+    const prodData = produitsSheet.getDataRange().getValues();
+    const hexs = [];
+    for (var i = 1; i < prodData.length; i++) {
+      if (String(prodData[i][2]) === String(gam_id) && prodData[i][7]) hexs.push(prodData[i][7]);
+    }
+    if (hexs.length === 0) return;
+    const hex = averageHexColors(hexs);
+    const gamRows = gammesSheet.getDataRange().getValues();
+    for (var j = 1; j < gamRows.length; j++) {
+      if (String(gamRows[j][0]) === String(gam_id)) {
+        gammesSheet.getRange(j+1, 6).setValue(hex);
+        break;
+      }
+    }
+  } catch(e) { Logger.log('recalculerHexGamme_v2 erreur : ' + e.message); }
+}
+
+function recalculerHexCollection_v2(col_id) {
+  try {
+    if (!col_id) return;
+    const ss               = getSS();
+    const gammesSheet      = ss.getSheetByName('Gammes_v2');
+    const collectionsSheet = ss.getSheetByName('Collections_v2');
+    if (!gammesSheet || !collectionsSheet) return;
+    const gamRows = gammesSheet.getDataRange().getValues();
+    const hexs = [];
+    for (var i = 1; i < gamRows.length; i++) {
+      if (String(gamRows[i][1]) === String(col_id) && gamRows[i][5]) hexs.push(gamRows[i][5]);
+    }
+    if (hexs.length === 0) return;
+    const hex = averageHexColors(hexs);
+    const colRows = collectionsSheet.getDataRange().getValues();
+    for (var j = 1; j < colRows.length; j++) {
+      if (String(colRows[j][0]) === String(col_id)) {
+        collectionsSheet.getRange(j+1, 6).setValue(hex);
+        break;
+      }
+    }
+  } catch(e) { Logger.log('recalculerHexCollection_v2 erreur : ' + e.message); }
+}
+
+function recalculerTousLesHex_v2() {
+  try {
+    const ss          = getSS();
+    const gammesSheet = ss.getSheetByName('Gammes_v2');
+    const colSheet    = ss.getSheetByName('Collections_v2');
+    if (!gammesSheet || !colSheet) return { success: false, message: 'Sheet introuvable' };
+    const gamRows = gammesSheet.getDataRange().getValues();
+    const colRows = colSheet.getDataRange().getValues();
+    const gamIds = [], colIds = [];
+    for (var i = 1; i < gamRows.length; i++) { if (gamRows[i][0]) gamIds.push(gamRows[i][0]); }
+    for (var j = 1; j < colRows.length; j++) { if (colRows[j][0]) colIds.push(colRows[j][0]); }
+    gamIds.forEach(function(gam_id) { recalculerHexGamme_v2(gam_id); });
+    colIds.forEach(function(col_id) { recalculerHexCollection_v2(col_id); });
+    return { success: true };
+  } catch(e) { return { success: false, message: e.message }; }
+}
+
+function recalculerHexRegroupement_v2(fra_id) {
+  try {
+    if (!fra_id) return;
+    const ss               = getSS();
+    const regroSheet       = ss.getSheetByName('Regroupements_v2');
+    const produitsSheet    = ss.getSheetByName('Produits_v2');
+    const produitsIngSheet = ss.getSheetByName('Produits_Ingredients_v2');
+    if (!regroSheet || !produitsSheet || !produitsIngSheet) return;
+
+    // Trouver l'ing_id du regroupement
+    const regroRows = regroSheet.getDataRange().getValues();
+    let ing_id = '', ligneFra = -1;
+    for (let i = 1; i < regroRows.length; i++) {
+      if (String(regroRows[i][0]) === String(fra_id)) {
+        ing_id   = String(regroRows[i][5]);
+        ligneFra = i + 1;
+        break;
+      }
+    }
+    if (!ing_id || ligneFra < 0) return;
+
+    // Trouver tous les pro_id qui contiennent cet ing_id
+    const ingRows = produitsIngSheet.getDataRange().getValues();
+    const proIds  = new Set();
+    for (let i = 1; i < ingRows.length; i++) {
+      if (String(ingRows[i][1]) === ing_id) proIds.add(String(ingRows[i][0]));
+    }
+    if (proIds.size === 0) return;
+
+    // Récupérer les couleur_hex des produits publics
+    const prodRows = produitsSheet.getDataRange().getValues();
+    const hexs     = [];
+    for (let i = 1; i < prodRows.length; i++) {
+      if (!prodRows[i][0]) continue;
+      if (!proIds.has(String(prodRows[i][0]))) continue;
+      if (prodRows[i][15] === 'test' || prodRows[i][15] === 'archive') continue;
+      if (prodRows[i][7]) hexs.push(prodRows[i][7]);
+    }
+    if (hexs.length === 0) return;
+
+    regroSheet.getRange(ligneFra, 9).setValue(averageHexColors(hexs));
+  } catch(e) {
+    Logger.log('recalculerHexRegroupement_v2 erreur : ' + e.message);
+  }
+}
+
+function getConfig_v2() {
+  try {
+    const sheet = getSS().getSheetByName('Config_v2');
+    if (!sheet) return { success: false, message: 'Config_v2 introuvable' };
+    const data  = sheet.getDataRange().getValues();
+    const items = [];
+    for (let i = 1; i < data.length; i++) {
+      if (!data[i][0]) continue;
+    items.push({
+  cat_id:          data[i][0],
+  densite:         parseFloat(data[i][2]) || 1,
+  unite:           data[i][3] || 'g',
+  marge_perte_pct: parseFloat(data[i][4]) || 0
+  });
+    }
+    return { success: true, items };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function saveConfig_v2(data) {
+  try {
+    const sheet = getSS().getSheetByName('Config_v2');
+    if (!sheet) return { success: false, message: 'Config_v2 introuvable' };
+    const rows = sheet.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if (String(rows[i][0]) === String(data.cat_id)) {
+       sheet.getRange(i + 1, 3).setValue(data.densite);
+        if (data.unite !== undefined) sheet.getRange(i + 1, 4).setValue(data.unite);
+      sheet.getRange(i + 1, 5).setValue(data.marge_perte_pct || 0);
+      return { success: true };
+      }
+    }
+    // Type inexistant — on crée
+  sheet.appendRow([data.cat_id, '', data.densite, data.unite || '', data.marge_perte_pct || 0]);
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function validerMotDePasse_v2(data) {
+  const props = PropertiesService.getScriptProperties();
+  const mdp   = props.getProperty('MOT_DE_PASSE');
+  if (!mdp) return { success: false, message: 'Mot de passe non configuré.' };
+  if (data.mdp !== mdp) return { success: false, message: 'Mot de passe incorrect.' };
+  return { success: true, cle: props.getProperty('CLE_ADMIN') || '' };
+}
+
+function envoyerContact_v2(data) {
+  try {
+    const prenom   = data.prenom   || '';
+    const nom      = data.nom      || '';
+    const courriel = data.courriel || '';
+    const sujet    = data.sujet    || 'Message du site';
+    const message  = data.message  || '';
+    if (!prenom || !nom || !courriel || !message) return { success: false, message: 'Champs obligatoires manquants.' };
+    MailApp.sendEmail({
+      to:      'universcaresse@outlook.com',
+      subject: `[Univers Caresse] ${sujet} — ${prenom} ${nom}`,
+      body:    `Prénom : ${prenom}\nNom : ${nom}\nCourriel : ${courriel}\nSujet : ${sujet}\n\n${message}`
+    });
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.message };
+  }
+}
+
+function sauvegarderQuotidien_v2() {
+  try {
+    const NOM_DOSSIER  = 'Univers Caresse — Sauvegardes';
+    const COURRIEL     = 'universcaresse@gmail.com';
+    const JOURS_GARDER = 30;
+
+    // 1. Trouver le dossier de sauvegarde
+    const dossiers = DriveApp.getFoldersByName(NOM_DOSSIER);
+    if (!dossiers.hasNext()) {
+      Logger.log('Dossier "' + NOM_DOSSIER + '" introuvable');
+      return { success: false, message: 'Dossier introuvable' };
+    }
+    const dossier = dossiers.next();
+
+    // 2. Créer une copie de la sheet dans le dossier
+    const aujourd_hui = Utilities.formatDate(new Date(), 'America/Toronto', 'yyyy-MM-dd');
+    const nomCopie   = 'UC_Sauvegarde_' + aujourd_hui;
+    const fichierOrig = DriveApp.getFileById(SS_ID);
+    const copie       = fichierOrig.makeCopy(nomCopie, dossier);
+
+    // 3. Exporter la sheet en Excel pour la pièce jointe
+    const url = 'https://docs.google.com/spreadsheets/d/' + SS_ID + '/export?format=xlsx';
+    const token = ScriptApp.getOAuthToken();
+    const blob = UrlFetchApp.fetch(url, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).getBlob().setName(nomCopie + '.xlsx');
+
+    // 4. Envoyer le courriel
+    MailApp.sendEmail({
+      to:      COURRIEL,
+      subject: 'Sauvegarde Univers Caresse — ' + aujourd_hui,
+      body:    'Sauvegarde quotidienne de la base de données.\n\n' +
+               'Fichier sur Google Drive : ' + copie.getUrl() + '\n\n' +
+               'Pièce jointe : ' + nomCopie + '.xlsx',
+      attachments: [blob]
+    });
+
+    // 5. Supprimer les sauvegardes de plus de 30 jours
+    const limite = new Date();
+    limite.setDate(limite.getDate() - JOURS_GARDER);
+    const fichiers = dossier.getFiles();
+    while (fichiers.hasNext()) {
+      const f = fichiers.next();
+      if (f.getName().indexOf('UC_Sauvegarde_') === 0 && f.getDateCreated() < limite) {
+        f.setTrashed(true);
+      }
+    }
+
+    return { success: true, url: copie.getUrl() };
+  } catch(e) {
+    Logger.log('sauvegarderQuotidien_v2 erreur : ' + e.message);
+    MailApp.sendEmail({
+      to:      'universcaresse@gmail.com',
+      subject: '⚠ ERREUR sauvegarde Univers Caresse',
+      body:    'La sauvegarde a échoué : ' + e.message
+    });
+    return { success: false, message: e.message };
+  }
+}
+
+function exporterTextesSite_v2() {
+  const ss = getSS();
+  const colSheet  = ss.getSheetByName('Collections_v2');
+  const gamSheet  = ss.getSheetByName('Gammes_v2');
+  const famSheet  = ss.getSheetByName('Familles_v2');
+  const proSheet  = ss.getSheetByName('Produits_v2');
+  const cntSheet  = ss.getSheetByName('Contenu_v2');
+  const ingSheet  = ss.getSheetByName('Produits_Ingredients_v2');
+  const inciSheet = ss.getSheetByName('Ingredients_INCI_v2');
+  const fraSheet  = ss.getSheetByName('Regroupements_v2');
+
+  const cols  = colSheet.getDataRange().getValues();
+  const gams  = gamSheet.getDataRange().getValues();
+  const fams  = famSheet.getDataRange().getValues();
+  const pros  = proSheet.getDataRange().getValues();
+  const cnts  = cntSheet.getDataRange().getValues();
+  const ings  = ingSheet.getDataRange().getValues();
+  const incis = inciSheet.getDataRange().getValues();
+  const fras  = fraSheet.getDataRange().getValues();
+
+  // Map ing_id → { nom_UC, note_olfactive }
+  const inciMap = {};
+  for (let i = 1; i < incis.length; i++) {
+    if (!incis[i][0]) continue;
+    inciMap[String(incis[i][0])] = {
+      nom_UC:         incis[i][3] || '',
+      note_olfactive: incis[i][7] || ''
+    };
+  }
+
+  // Map pro_id → [{ nom_UC, note_olfactive }]
+  const ingMap = {};
+  for (let i = 1; i < ings.length; i++) {
+    if (!ings[i][0]) continue;
+    const pro_id = String(ings[i][0]);
+    const ing_id = String(ings[i][1]);
+    const info   = inciMap[ing_id] || {};
+    if (!ingMap[pro_id]) ingMap[pro_id] = [];
+    ingMap[pro_id].push({
+      nom_UC:         info.nom_UC || ings[i][2] || '',
+      note_olfactive: info.note_olfactive || ''
+    });
+  }
+
+  let txt = '========================================\n';
+  txt += 'UNIVERS CARESSE — TEXTES DU SITE\n';
+  txt += '========================================\n\n';
+
+  // CONTENU SITE
+  txt += '=== CONTENU SITE ===\n';
+  for (let i = 1; i < cnts.length; i++) {
+    if (!cnts[i][0] || !cnts[i][1]) continue;
+    txt += `${cnts[i][0]} : ${cnts[i][1]}\n`;
+  }
+  txt += '\n';
+
+  // COLLECTIONS
+  const colItems = [];
+  for (let i = 1; i < cols.length; i++) {
+    if (!cols[i][0]) continue;
+    colItems.push({ col_id: cols[i][0], rang: cols[i][1], nom: cols[i][2], slogan: cols[i][3], description: cols[i][4], couleur_hex: cols[i][5] });
+  }
+  colItems.sort((a, b) => a.rang - b.rang);
+
+  colItems.forEach(col => {
+    txt += `=== COLLECTION : ${col.nom} ===\n`;
+    txt += `Slogan : ${col.slogan || '—'}\n`;
+    txt += `Description : ${col.description || '—'}\n`;
+    txt += `Couleur HEX : ${col.couleur_hex || '—'}\n\n`;
+
+    const gamItems = [];
+    for (let i = 1; i < gams.length; i++) {
+      if (!gams[i][0] || String(gams[i][1]) !== String(col.col_id)) continue;
+      gamItems.push({ gam_id: gams[i][0], rang: gams[i][2], nom: gams[i][3], description: gams[i][4], couleur_hex: gams[i][5] });
+    }
+    gamItems.sort((a, b) => a.rang - b.rang);
+
+    gamItems.forEach(gam => {
+      txt += `  --- GAMME : ${gam.nom} ---\n`;
+      txt += `  Description : ${gam.description || '—'}\n`;
+      txt += `  Couleur HEX : ${gam.couleur_hex || '—'}\n\n`;
+
+      const famItems = [];
+      for (let i = 1; i < fams.length; i++) {
+        if (!fams[i][0] || String(fams[i][1]) !== String(col.col_id) || String(fams[i][8]) !== String(gam.gam_id)) continue;
+        famItems.push({ fam_id: fams[i][0], rang: fams[i][2], nom: fams[i][3], description: fams[i][4], couleur_hex: fams[i][5] });
+      }
+      famItems.sort((a, b) => a.rang - b.rang);
+
+      famItems.forEach(fam => {
+        txt += `    --- FAMILLE : ${fam.nom} ---\n`;
+        txt += `    Description : ${fam.description || '—'}\n`;
+        txt += `    Couleur HEX : ${fam.couleur_hex || '—'}\n\n`;
+        ajouterProduits(fam.fam_id, null, null);
+      });
+
+      ajouterProduits(null, gam.gam_id, col.col_id);
+    });
+  });
+
+  function ajouterProduits(fam_id, gam_id, col_id) {
+    const proItems = [];
+    for (let i = 1; i < pros.length; i++) {
+      if (!pros[i][0]) continue;
+      if (fam_id && String(pros[i][3]) !== String(fam_id)) continue;
+      if (gam_id && String(pros[i][2]) !== String(gam_id)) continue;
+      if (col_id && String(pros[i][1]) !== String(col_id)) continue;
+      proItems.push({
+        pro_id:         String(pros[i][0]),
+        nom:            pros[i][4],
+        statut:         pros[i][15] || 'test',
+        description:    pros[i][5],
+        desc_emballage: pros[i][6],
+        couleur_hex:    pros[i][7],
+        avertissement:  pros[i][17],
+        mode_emploi:    pros[i][18]
+      });
+    }
+    proItems.forEach(pro => {
+      const ingredients = (ingMap[pro.pro_id] || []);
+      const ingTexte = ingredients.length
+        ? ingredients.map(i => i.note_olfactive ? `${i.nom_UC} (${i.note_olfactive})` : i.nom_UC).join(', ')
+        : '—';
+      const indent = fam_id ? '      ' : '    ';
+      txt += `${indent}PRODUIT [${pro.statut}] : ${pro.nom}\n`;
+      txt += `${indent}Ingrédients : ${ingTexte}\n`;
+      txt += `${indent}Description : ${pro.description || '—'}\n`;
+      txt += `${indent}Emballage : ${pro.desc_emballage || '—'}\n`;
+      txt += `${indent}Couleur HEX : ${pro.couleur_hex || '—'}\n`;
+      txt += `${indent}Avertissement : ${pro.avertissement || '—'}\n`;
+      txt += `${indent}Mode d'emploi : ${pro.mode_emploi || '—'}\n\n`;
+    });
+  }
+
+  // REGROUPEMENTS
+  const fraItems = [];
+  for (let i = 1; i < fras.length; i++) {
+    if (!fras[i][0]) continue;
+    fraItems.push({
+      fra_id:              fras[i][0],
+      rang:                fras[i][1],
+      nom:                 fras[i][2],
+      description:         fras[i][3],
+      cat_id:              fras[i][4],
+      ing_id:              fras[i][5],
+      photo_url:           fras[i][6],
+      photo_noel_url:      fras[i][7],
+      couleur_hex:         fras[i][8],
+      slogan:              fras[i][9],
+      categories_exclues:  fras[i][10],
+      collections_exclues: fras[i][11],
+      gammes_exclues:      fras[i][12],
+      mode:                fras[i][13]
+    });
+  }
+  fraItems.sort((a, b) => a.rang - b.rang);
+
+  txt += '=== REGROUPEMENTS ===\n\n';
+  fraItems.forEach(fra => {
+    txt += `  --- REGROUPEMENT : ${fra.nom} ---\n`;
+    txt += `  Slogan : ${fra.slogan || '—'}\n`;
+    txt += `  Description : ${fra.description || '—'}\n`;
+    txt += `  Couleur HEX : ${fra.couleur_hex || '—'}\n`;
+    txt += `  Mode : ${fra.mode || '—'}\n`;
+    txt += `  cat_id : ${fra.cat_id || '—'}\n`;
+    txt += `  ing_id : ${fra.ing_id || '—'}\n`;
+    txt += `  Photo URL : ${fra.photo_url || '—'}\n`;
+    txt += `  Photo Noël URL : ${fra.photo_noel_url || '—'}\n`;
+    txt += `  Catégories exclues : ${fra.categories_exclues || '—'}\n`;
+    txt += `  Collections exclues : ${fra.collections_exclues || '—'}\n`;
+    txt += `  Gammes exclues : ${fra.gammes_exclues || '—'}\n\n`;
+  });
+
+  const fileName = 'UC_Textes_Site_' + Utilities.formatDate(new Date(), 'America/Toronto', 'yyyyMMdd') + '.txt';
+  const file = DriveApp.createFile(fileName, txt, MimeType.PLAIN_TEXT);
+  return { success: true, url: file.getUrl(), nom: fileName };
+}
+
+
+

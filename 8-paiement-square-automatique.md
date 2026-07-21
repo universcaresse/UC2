@@ -1,5 +1,6 @@
 # ITEM 8 — Le paiement Square appliqué tout seul à la commande
-### Arbre validé par Chantal le 10 juillet 2026. RIEN N'EST CODÉ.
+### Arbre validé le 10 juillet 2026. ✅ **CODÉ** (2026-07-20) — **pas déployé**. Il ne reste que « Reste à faire » en bas (publier + tester).
+> ⚠️ Note ajoutée le 2026-07-21 : la suite de ce flux (créer la facture/vente à partir de la commande) **n'inscrivait aucune écriture comptable** — l'argent des coups de cœur n'entrait jamais dans 1210. Bouché le 2026-07-21 dans `creerVenteDepuisCommande_v2`. Détail dans `ITEM-ventes-comptabilite.md`.
 > Lire `METHODE.md` d'abord. Aucun code sans le OK de Chantal.
 > Trouve-et-remplace un seul à la fois, preuve Vérifié/Impacts avant chaque
 > proposition.

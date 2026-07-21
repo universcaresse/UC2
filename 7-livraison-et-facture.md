@@ -1,8 +1,7 @@
 # ITEM — Livraison (Poste Canada ou en personne) + facture
-### Arbre validé par Chantal le 9 juillet 2026. RIEN N'EST CODÉ.
+### Arbre validé le 9 juillet 2026. ✅ **CODÉ** — vérifié dans le code le 2026-07-21 : la faille du texto (section 0) est corrigée et les **10 morceaux** de la section 3 sont tous présents.
 > Lire `METHODE.md` d'abord. Aucun code sans le OK de Chantal.
-> Trouve-et-remplace un seul à la fois, preuve Vérifié/Impacts avant chaque
-> proposition. Chantal a dit : **pas de code ce soir**.
+> Reste seulement le test du poids (branche 9) que Chantal voulait refaire.
 
 ---
 
@@ -192,6 +191,6 @@ possible. **Il faut lui facturer les frais de livraison :**
 ## 5. OÙ ON EN EST
 
 - ✅ Arbre complet, 16 branches validées (9 juillet 2026).
-- ✅ Faille du texto diagnostiquée (section 0).
-- ⬜ Rien de codé. Chantal refait un test pour le poids (branche 9).
-- Prochaine étape : Chantal choisit par quoi on commence.
+- ✅ **Faille du texto CORRIGÉE** : `imprimerFacture`, `envoyerFactureCourriel` et `envoyerFactureTexto` reçoivent maintenant l'id de la vente **en paramètre** (`venIdRecu`), et les deux fenêtres (`modal-apres-vente`, `modal-facture-vente`) le passent depuis le DOM au lieu de la mémoire globale. Plus de facture d'un autre client.
+- ✅ **Les 10 morceaux de la section 3 sont codés** (vérifié le 2026-07-21) : lien de facture à la place du PDF, choix Poste Canada / en personne, statut « À livrer », photo de livraison, « Livrée sans photo », « Renvoyer le courriel », retour arrière (`retourAExpedier`), frais de livraison refacturés, « Frais payés », point orange à 14 jours.
+- ⬜ **Reste** : le test du poids (branche 9, `c.poids_colis`) que Chantal voulait refaire — c'est un test, pas du code.

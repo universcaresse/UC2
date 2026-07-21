@@ -10,10 +10,11 @@ async function chargerPlanComptable() {
   if (loading) loading.style.display = '';
   if (contenu) contenu.innerHTML = '';
 
-  const [res, resCats, resConfig] = await Promise.all([
+  const [res, resCats, resConfig, resCoh] = await Promise.all([
     appelAPI('getPlanComptable'),
     appelAPI('getCategoriesUC'),
-    appelAPI('getConfig')
+    appelAPI('getConfig'),
+    appelAPI('verifierCoherenceComptable')
   ]);
   if (loading) loading.style.display = 'none';
 
@@ -22,11 +23,33 @@ async function chargerPlanComptable() {
     return;
   }
 
+  pcRendreAlarme((resCoh && resCoh.success) ? (resCoh.anomalies || []) : null);
+
   const sections = (res.sections || []).slice().sort((a, b) => String(a.numero).localeCompare(String(b.numero)));
   const comptes  = (res.comptes || []);
   const cats     = (resCats && resCats.success) ? (resCats.items || []) : [];
   const config   = (resConfig && resConfig.success) ? (resConfig.items || []) : [];
   pcRendre(sections, comptes, cats, config);
+}
+
+// ─── Alarme de cohérence comptable (branche 4) : montre, ne répare rien ───
+function pcRendreAlarme(anomalies) {
+  const zone = document.getElementById('alarme-comptable');
+  if (!zone) return;
+  if (!anomalies || !anomalies.length) { zone.innerHTML = ''; return; }
+
+  let html = '<div style="border:1px solid var(--rouge);border-radius:6px;padding:12px 14px;margin:10px 0;background:rgba(200,60,60,0.06)">'
+    + '<div style="font-weight:600;color:var(--rouge);margin-bottom:8px">⚠️ ' + anomalies.length + ' anomalie' + (anomalies.length > 1 ? 's' : '') + ' de cohérence à vérifier</div>'
+    + '<ul style="margin:0;padding-left:20px;font-size:0.9rem;line-height:1.6">';
+  anomalies.forEach(a => {
+    if (a.type === 'sans-ecriture') {
+      html += '<li>' + echapperHtml(a.famille) + ' <strong>' + echapperHtml(a.id) + '</strong> — finalisé <strong>sans écriture</strong></li>';
+    } else {
+      html += '<li>Écriture <strong>' + echapperHtml(a.id) + '</strong> (' + echapperHtml(a.famille) + ') — <strong>sans sa pièce</strong></li>';
+    }
+  });
+  html += '</ul><div style="margin-top:8px;font-size:0.82rem;color:var(--gris)">Rien ne se répare tout seul — à corriger à la main.</div></div>';
+  zone.innerHTML = html;
 }
 
 // Nom de la classe selon le premier chiffre du numéro

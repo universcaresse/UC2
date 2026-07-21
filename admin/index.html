@@ -99,7 +99,7 @@
         <button class="nav-admin-btn" onclick="toggleDropdownAdmin(this)">comptabilité<svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>
         <div class="nav-dropdown">
            <button class="nav-dropdown-item" onclick="afficherSection('plan-comptable', null)">gestion comptable</button>
-          <button class="nav-dropdown-item bientot">journal général</button>
+          <button class="nav-dropdown-item" onclick="afficherSection('journal-general', null)">journal général</button>
 		  <button class="nav-dropdown-item bientot">grand livre</button>
 		  <button class="nav-dropdown-item" onclick="afficherSection('bilan-resultats', null)">bilan et résultat</button>
         </div>
@@ -195,7 +195,7 @@
      <div class="sidebar-titre" onclick="toggleGroupe(this)">comptabilité</div>
 		 
 		  <button class="sidebar-lien" onclick="afficherSection('plan-comptable', this)">gestion comptable</button>
-          <button class="sidebar-lien bientot">journal général</button>
+          <button class="sidebar-lien" onclick="afficherSection('journal-general', this)">journal général</button>
 		  <button class="sidebar-lien bientot">grand livre</button>
 		  <button class="sidebar-lien" onclick="afficherSection('bilan-resultats', this)">bilan et résultat</button>
 	 
@@ -1950,99 +1950,69 @@
       </div>
     </div>
 
-    <!-- TYPE DE REMBOURSEMENT -->
-    <div class="form-panel">
+    <!-- ÉTAPE 1 — CHOISIR LA VENTE -->
+    <div class="form-panel" id="rem-vente-panel">
       <div class="form-panel-header">
-        <span class="form-panel-titre">Type de remboursement</span>
+        <span class="form-panel-titre">Partir d'une vente</span>
       </div>
       <div class="form-body">
-        <div class="form-groupe">
-          <select class="form-ctrl" id="rem-type" onchange="remChangerType()">
-            <option value="">— Choisir —</option>
-            <option value="avec-retour">Avec retour de produit (le stock remonte)</option>
-            <option value="sans-retour">Sans retour (juste un montant)</option>
-          </select>
+        <div class="filtres-bar">
+          <input type="text" class="form-ctrl filtre-recherche" id="rem-vente-rech-client" placeholder="Par nom de client…" oninput="remFiltrerVentes()">
+          <input type="text" class="form-ctrl filtre-recherche" id="rem-vente-rech-produit" placeholder="Par produit…" oninput="remFiltrerVentes()">
+          <input type="date" class="form-ctrl filtre-select" id="rem-vente-date-debut" onchange="remFiltrerVentes()" title="Date début">
+          <input type="date" class="form-ctrl filtre-select" id="rem-vente-date-fin" onchange="remFiltrerVentes()" title="Date fin">
         </div>
+        <div id="rem-vente-liste"></div>
       </div>
     </div>
 
-    <!-- SAISIE PRODUIT (avec retour) -->
-    <div id="rem-saisie-produit" class="form-panel cache">
+    <!-- ÉTAPE 2 — ARTICLES DE LA VENTE -->
+    <div id="rem-articles-panel" class="form-panel cache">
       <div class="form-panel-header">
-        <span class="form-panel-titre">Produit retourné</span>
+        <span class="form-panel-titre">Articles de la vente</span>
+        <button class="bouton bouton-petit bouton-contour" onclick="remChangerVente()">Changer de vente</button>
+      </div>
+      <div class="form-body">
+        <div id="rem-vente-info" class="texte-secondaire" style="margin-bottom:12px"></div>
+        <button class="bouton bouton-plein-largeur" onclick="remRembourserTout()" style="margin-bottom:12px">Rembourser tout</button>
+        <div id="rem-articles-liste"></div>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 3 — MONTANT LIBRE -->
+    <div id="rem-libre-panel" class="form-panel cache">
+      <div class="form-panel-header">
+        <span class="form-panel-titre">Montant libre (optionnel)</span>
       </div>
       <div class="form-body">
         <div class="form-grille">
           <div class="form-groupe col-plein">
-            <select class="form-ctrl" id="rem-collection" onchange="remFiltrerGammes()">
-              <option value="">— Collection —</option>
+            <select class="form-ctrl" id="rem-libre-type">
+              <option value="livraison">Livraison</option>
+              <option value="promotion">Geste commercial / promotion</option>
             </select>
           </div>
           <div class="form-groupe col-plein">
-            <select class="form-ctrl" id="rem-gamme" onchange="remFiltrerProduits()">
-              <option value="">— Gamme (toutes) —</option>
-            </select>
-          </div>
-          <div class="form-groupe col-plein">
-            <select class="form-ctrl" id="rem-produit" onchange="remFiltrerFormats()">
-              <option value="">— Produit —</option>
-            </select>
-          </div>
-          <div class="form-groupe col-plein">
-            <select class="form-ctrl" id="rem-format" onchange="remMettreAJourPrix()">
-              <option value="">— Format —</option>
-            </select>
-          </div>
-          <div class="form-groupe col-plein">
-            <div class="ven-qte-ligne">
-              <button class="bouton bouton-petit" onclick="remChangerQte(-1)">−</button>
-              <input type="number" class="form-ctrl" id="rem-quantite" min="1" value="1" inputmode="numeric" oninput="remMettreAJourPrix()">
-              <button class="bouton bouton-petit" onclick="remChangerQte(1)">+</button>
-            </div>
-          </div>
-          <div class="form-groupe col-demi">
-            <label class="form-label">Prix unitaire (modifiable)</label>
-            <input type="text" inputmode="decimal" class="form-ctrl" id="rem-prix" oninput="remRecalculerLigne()">
-          </div>
-          <div class="form-groupe col-demi">
-            <label class="form-label">Total ligne</label>
-            <input type="text" class="form-ctrl" id="rem-total-ligne" readonly>
-          </div>
-          <div class="form-groupe col-plein">
-            <button class="bouton bouton-plein-largeur" onclick="remAjouterLigne()">+ Ajouter au remboursement</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SAISIE LIBRE (sans retour) -->
-    <div id="rem-saisie-libre" class="form-panel cache">
-      <div class="form-panel-header">
-        <span class="form-panel-titre">Montant à rembourser</span>
-      </div>
-      <div class="form-body">
-        <div class="form-grille">
-          <div class="form-groupe col-plein">
-            <input type="text" class="form-ctrl" id="rem-libre-description" placeholder="Description (raison du remboursement)">
+            <input type="text" class="form-ctrl" id="rem-libre-description" placeholder="Description (facultatif)">
           </div>
           <div class="form-groupe col-plein">
             <input type="text" inputmode="decimal" class="form-ctrl" id="rem-libre-montant" placeholder="Montant ($)">
           </div>
           <div class="form-groupe col-plein">
-            <button class="bouton bouton-plein-largeur" onclick="remAjouterLigneLibre()">+ Ajouter</button>
+            <button class="bouton bouton-plein-largeur" onclick="remAjouterLibre()">+ Ajouter ce montant</button>
           </div>
         </div>
+        <div id="rem-libre-liste" style="margin-top:12px"></div>
       </div>
     </div>
 
-    <!-- LISTE DES LIGNES -->
-    <div class="form-panel cache" id="rem-liste-panel">
+    <!-- ÉTAPE 4 — TOTAL -->
+    <div class="form-panel cache" id="rem-total-panel">
       <div class="form-panel-header">
-        <span class="form-panel-titre">Lignes du remboursement</span>
+        <span class="form-panel-titre">Total à rembourser</span>
       </div>
       <div class="form-body">
-        <div id="rem-liste"></div>
-        <div class="form-grille" style="margin-top:16px">
+        <div class="form-grille">
           <div class="form-groupe col-plein">
             <input type="text" class="form-ctrl" id="rem-total" placeholder="Total à rembourser" readonly>
           </div>
@@ -2050,10 +2020,10 @@
       </div>
     </div>
 
-    <!-- CLIENT -->
+    <!-- ÉTAPE 5 — COORDONNÉES (reprises de la vente) -->
     <div class="form-panel cache" id="rem-client-panel">
       <div class="form-panel-header">
-        <span class="form-panel-titre">Client (optionnel)</span>
+        <span class="form-panel-titre">Coordonnées (reprises de la vente, modifiables)</span>
       </div>
       <div class="form-body">
         <div class="form-grille">
@@ -2070,15 +2040,16 @@
       </div>
     </div>
 
-    <!-- MODE DE REMBOURSEMENT -->
+    <!-- ÉTAPE 6 — SORTIE D'ARGENT -->
     <div class="form-panel cache" id="rem-paiement-panel">
       <div class="form-panel-header">
-        <span class="form-panel-titre">Mode de remboursement</span>
+        <span class="form-panel-titre">Comment l'argent sort</span>
       </div>
       <div class="form-body">
         <div class="form-actions-vertical">
           <button class="bouton bouton-plein-largeur" onclick="finaliserRemboursement('comptant')">Comptant</button>
-          <button class="bouton bouton-plein-largeur" onclick="finaliserRemboursement('credit')">Crédit (carte)</button>
+          <button class="bouton bouton-plein-largeur" onclick="finaliserRemboursement('interac')">Interac</button>
+          <button class="bouton bouton-plein-largeur" onclick="finaliserRemboursement('square')">Square</button>
         </div>
       </div>
     </div>
@@ -2434,6 +2405,7 @@
     </div>
   </div>
   <div class="msg-zone" id="msg-plan-comptable"></div>
+  <div id="alarme-comptable"></div>
   <div class="chargement" id="loading-plan-comptable"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
   <div id="contenu-plan-comptable"></div>
 </div>
@@ -2448,6 +2420,67 @@
   <div class="msg-zone" id="msg-bilan-resultats"></div>
   <div class="chargement" id="loading-bilan-resultats"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
   <div id="contenu-bilan-resultats"></div>
+</div>
+
+<div class="section-admin" id="section-journal-general">
+  <div class="page-entete fade-in">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Comptabilité</div>
+      <div class="page-entete-titre">Journal <em>général</em></div>
+    </div>
+  </div>
+  <div class="msg-zone" id="msg-journal-general"></div>
+
+  <!-- SAISIE MANUELLE -->
+  <div class="form-panel">
+    <div class="form-panel-header"><span class="form-panel-titre">Nouvelle écriture</span></div>
+    <div class="form-body">
+      <div class="form-grille">
+        <div class="form-groupe col-demi">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-ctrl" id="jg-date">
+        </div>
+        <div class="form-groupe col-demi">
+          <label class="form-label">Description</label>
+          <input type="text" class="form-ctrl" id="jg-libelle" placeholder="Ex. Dépôt Square, transfert…">
+        </div>
+      </div>
+      <div id="jg-lignes" style="margin-top:8px"></div>
+      <button class="bouton bouton-petit bouton-contour" onclick="jgAjouterLigne()">+ Ajouter une ligne</button>
+      <div id="jg-balance" style="margin:14px 0;font-weight:600"></div>
+      <div class="form-actions">
+        <button class="bouton" id="jg-enregistrer" onclick="jgEnregistrer()">Enregistrer l'écriture</button>
+        <button class="bouton bouton-contour" onclick="jgOuvrirSaveModele()">Sauvegarder comme modèle</button>
+      </div>
+      <div id="jg-modele-save" class="cache" style="margin-top:12px;border-top:1px solid var(--beige);padding-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- MODÈLES -->
+  <div class="form-panel">
+    <div class="form-panel-header"><span class="form-panel-titre">Modèles</span></div>
+    <div class="form-body"><div id="jg-modeles"></div></div>
+  </div>
+
+  <!-- DÉPÔTS SQUARE -->
+  <div class="form-panel">
+    <div class="form-panel-header">
+      <span class="form-panel-titre">Dépôts Square</span>
+      <button class="bouton bouton-petit bouton-contour" onclick="jgChargerDepots()">Voir mes dépôts</button>
+    </div>
+    <div class="form-body">
+      <div id="jg-depots"><div class="texte-secondaire">Clique « Voir mes dépôts » — l'app ira demander à Square.</div></div>
+    </div>
+  </div>
+
+  <!-- JOURNAL -->
+  <div class="form-panel">
+    <div class="form-panel-header"><span class="form-panel-titre">Journal</span></div>
+    <div class="form-body">
+      <div class="chargement" id="loading-journal-general"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+      <div id="jg-journal"></div>
+    </div>
+  </div>
 </div>
 
 <div class="section-admin" id="section-contenu-site">
@@ -3636,39 +3669,6 @@
     </div>
   </div>
 
- <div class="modal-admin-overlay" id="modal-if-nouvel-ingredient">
-  <div class="modal-admin">
-    <div class="modal-admin-header">
-      <div class="modal-admin-titre">Nouvel ingrédient</div>
-      
-    </div>
-    <div class="modal-admin-body">
-      <div class="form-groupe">
-        <label class="form-label">Catégorie UC</label>
-        <select class="form-ctrl" id="modal-if-cat"></select>
-      </div>
-      <div class="form-groupe cache" id="modal-if-nouvelle-cat-groupe">
-        <label class="form-label">Nouvelle catégorie UC</label>
-        <input type="text" class="form-ctrl" id="modal-if-nouvelle-cat" placeholder="Ex: Ingrédients Secs">
-      </div>
-      <div class="form-groupe cache" id="modal-if-nouveau-nom-groupe">
-        <label class="form-label">Nouveau nom UC</label>
-        <input type="text" class="form-ctrl" id="modal-if-nouveau-nom" placeholder="Ex: Cire émulsifiante">
-      </div>
-      <div class="form-groupe">
-      <!--   <label class="form-label">Nom UC</label>-->
-        <select class="form-ctrl" id="modal-if-nomuc"></select>
-      </div>
-    </div>
-    <div class="modal-admin-body">
-      <div class="form-actions">
-        <button class="bouton bouton-petit bouton-contour" onclick="fermerModalIfNouvelIngredient()">Annuler</button>
-        <button class="bouton bouton-petit" onclick="modalIfConfirmer()">Confirmer</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="modal-admin-overlay" id="modal-ajouter-inci">
     <div class="modal-admin">
       <div class="modal-admin-header">
@@ -3977,6 +3977,7 @@
 <script src="../js/admin-liste-prix.js"></script>
 <script src="../js/admin-references.js"></script>
 <script src="../js/admin-comptabilite.js"></script>
+<script src="../js/admin-journal.js"></script>
 
 <div class="modal-admin-overlay" id="modal-ref-saisie">
   <div class="modal-admin">

@@ -1,5 +1,6 @@
 # PLAN COMPTABLE — Univers Caresse
-### État : achats et FABRICATION branchés à la comptabilité (2026-07-14, à tester après déploiement). Ventes : pas encore branchées (arbre partiellement déroulé).
+### État (2026-07-21) : achats, fabrication, **ventes** (les deux portes : directes et coups de cœur), **remboursements**, **journal général + modèles récurrents** et **dépôts Square** sont tous codés dans `codegs.txt` — **rien n'est encore déployé**. Liste des comptes remise à jour le 2026-07-21 d'après la vraie feuille.
+> Voir `ITEM-ventes-comptabilite.md` et `ITEM-journal-general.md` pour le détail et ce qui reste.
 > Plan **ouvert** : des comptes restent à ajouter. Ce fichier suffit à reprendre
 > sans reposer les questions déjà tranchées.
 
@@ -17,8 +18,9 @@
 ```
 1000  ACTIF
   1100  Encaisse
-        1105  Fond de caisse
-        1110  Compte bancaire
+        1001  En suspens
+		1105  Fond de caisse
+        1110  Compte bancaire Tangerine
         Sous-total 1100
   1200  Ventes à déposer et à recevoir
         1205  Comptant à déposer
@@ -32,7 +34,7 @@
         1310  Inventaire de produits à vendre
         Sous-total 1300
   1400  Équipement
-        1405  Équipement (sous-comptes par catégorie à venir)
+        1405  Équipement
         1410  Amortissement cumulé — Équipement
         Sous-total 1400  (valeur nette)
   TOTAL DE L'ACTIF (1000)
@@ -46,6 +48,7 @@
         2205  Visa à rembourser
         2210  Interac à rembourser
         2215  Comptant à rembourser
+        2217  JC à rembourser
         Sous-total 2200
   TOTAL DU PASSIF (2000)
 
@@ -53,6 +56,7 @@
         3005  Mises de fonds
         3010  Retraits
         3015  Bénéfices non répartis
+        3100  Bénéfice net
   TOTAL DE L'AVOIR (3000)
 
 4000  REVENUS
@@ -62,24 +66,25 @@
   TOTAL DES REVENUS (4000)
 
 5000  DÉPENSES
-  5100  Coût des marchandises vendues
-        5010 à 5036  Un compte par catégorie UC (créés : Argiles 5010, Beurres 5012,
-        Cires 5014, Couleurs 5016, Herbes et Fleurs 5018, Huiles 5020, HA 5022,
-        HE 5024, Hydrolats 5026, Liquides 5028, Secs 5030, Saveurs 5032,
-        Emballages 5034, Contenants 5035, Étiquettes 5036)
-        Sous-total 5100
-  5200  Frais de vente
+  5000  Coût des ventes
+        5001  Ingrédients  (coût des marchandises vendues, à la vente)
+        5010  Retours invendables
+        5020  Ajustements stocks
+        Sous-total 5000
+  5100  Frais de vente
         5205  Frais Square
         5210  Frais d'expédition
         5215  Promotion
-        Sous-total 5200
+        Sous-total 5100
   5300  Frais d'exploitation
         5305  Licences
         5310  Frais bancaires
         5315  Honoraires
         5320  Entretien
         5325  Fourniture de bureau
+        5327  Cellulaire - Internet
         5330  Frais de déplacement
+        5332  Divers
         5335  Amortissement
         Sous-total 5300
   TOTAL DES DÉPENSES (5000)
@@ -214,7 +219,7 @@
 - Square + Square manuel = **un seul** compte « Square à recevoir » (même dépôt, net des frais).
 - « Payer plus tard » = client pas encore payé → argent **à recevoir** (1220), pas à déposer.
 - Pas de TPS/TVQ présentement → aucun compte de taxe.
-- Coût des marchandises vendues (modèle de Chantal) : à la fabrication d'un lot, ingrédients + emballages **sortent du stock** (actif) et entrent dans l'**inventaire de produits à vendre** (actif) ; à la **vente**, ce coût passe en **dépense** (5100), détaillé par catégorie UC.
+- Coût des marchandises vendues (modèle de Chantal) : à la fabrication d'un lot, ingrédients + emballages **sortent du stock** (actif) et entrent dans l'**inventaire de produits à vendre** (actif) ; à la **vente**, ce coût passe en **dépense** (5001 Ingrédients — un seul compte, plus de détail par catégorie UC).
 - Amortissement : **dépense** (5335) + contrepartie à l'**actif** (1410, réduit la valeur nette de l'équipement).
 
 ---
@@ -295,7 +300,7 @@ N°  Compte                              Débit  Crédit
 7   4015 Rabais et promotions            5
 7   4005 Ventes de produits                     30
 7   4010 Livraison facturée                     8
-7   5100 Coût des marchandises vendues   12
+7   5001 Ingrédients (coût des ventes)   12
 7   1310 Inventaire de produits à vendre         12
 7   5210 Frais d'expédition             9
 7   2110 Postes Canada à payer                  9
@@ -314,7 +319,7 @@ N°  Compte                              Débit  Crédit
 9   4015 Rabais et promotions                    5
 9   1205 Comptant à déposer                      25
 9   1310 Inventaire de produits à vendre  12
-9   5100 Coût des marchandises vendues           12
+9   5001 Ingrédients (coût des ventes)           12
 ```
 - **Exigence** : le système doit retenir, pour chaque vente, ce que chaque article a payé (pour calculer la part de rabais au remboursement).
 
@@ -328,11 +333,12 @@ N°  Compte                          Débit  Crédit
 15  1210 Square à recevoir                 100
 ```
 - Square dépose en **lots** (souvent une journée), pas vente par vente.
+- ✅ **CODÉ le 2026-07-21 (pas déployé)** : panneau « Dépôts Square » dans le journal général. L'app demande ses dépôts à Square (le jeton a la permission, vérifié), montre pour chacun brut / frais / net et le nombre de transactions, et pose l'écriture ci-dessus **en un clic**. La **référence** de l'écriture est le numéro de dépôt Square (`po_…`), ce qui empêche tout doublon. Square fournit le **frais réel** — rien à calculer entre crédit et débit.
 
 ---
 
 ## À prévoir — étape 6 (branchements automatiques, à dérouler avant de coder)
-- **Dépôt Square automatisable** : interroger Square pour les dépôts et leurs frais, écriture bâtie seule (moment de l'interrogation, dépôt déjà entré, frais encore en attente… à border).
+- ✅ **Dépôt Square — FAIT le 2026-07-21 (pas déployé).** Les trois réserves notées ici ont été bordées : le **moment de l'interrogation** → c'est Chantal qui clique « Voir mes dépôts » (aucun automate, aucun déclencheur programmé dans le projet) ; le **dépôt déjà entré** → le numéro `po_…` sert de référence, un dépôt déjà inscrit n'a pas de bouton et le serveur refuse ; les **frais en attente** → on lit les frais réels sur le dépôt lui-même (payout entries), pas sur le paiement, donc ils sont toujours arrivés. Détail dans `ITEM-journal-general.md`.
 
 ---
 
