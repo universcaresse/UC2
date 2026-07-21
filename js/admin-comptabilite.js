@@ -921,6 +921,47 @@ function glAfficher() {
   zone.innerHTML = html;
 }
 
+// Impression : la zone de l'admin a une hauteur fixe qui défile, donc l'imprimante
+// ne verrait que la première page. On ouvre plutôt une page propre et on imprime celle-là.
+function glImprimer() {
+  const zone = document.getElementById('gl-etats');
+  if (!zone || !zone.innerHTML.trim()) {
+    afficherMsg('grand-livre', 'Il n\'y a rien à imprimer pour l\'instant.', 'erreur');
+    return;
+  }
+  const annee = (document.getElementById('gl-annee') || {}).value || '';
+  const fin   = (document.getElementById('gl-fin')   || {}).value || '';
+
+  const styles =
+    ':root{--beige:#d8d2c8;--primary:#8b8680;--gris:#8b8680;--rouge:#c44536}' +
+    'body{font-family:Arial,Helvetica,sans-serif;font-size:10.5pt;color:#000;margin:16mm 12mm}' +
+    'h1{font-size:15pt;margin:0 0 2mm}' +
+    '.sous{font-size:10pt;color:#555;margin:0 0 8mm}' +
+    '.titre{font-size:12.5pt;font-weight:700;margin:7mm 0 2mm;border-bottom:1px solid #000;padding-bottom:1mm}' +
+    '.accroche{font-weight:700;margin:3mm 0 1mm}' +
+    '.bloc{margin-bottom:5mm}' +
+    '.lignetotal{display:flex;justify-content:space-between;font-weight:700;border-top:1px solid #000;padding-top:1mm;margin-top:1mm}' +
+    '.section-label{font-weight:700;margin-top:4mm}' +
+    '.texte-secondaire{color:#666}';
+
+  const fenetre = window.open('', '_blank');
+  if (!fenetre) {
+    afficherMsg('grand-livre', 'Ton navigateur a bloqué la fenêtre d\'impression — autorise les fenêtres surgissantes pour ce site.', 'erreur');
+    return;
+  }
+  fenetre.document.write(
+    '<!doctype html><html lang="fr"><head><meta charset="utf-8">' +
+    '<title>Grand livre ' + annee + '</title><style>' + styles + '</style></head><body>' +
+    '<h1>Univers Caresse — Grand livre</h1>' +
+    '<div class="sous">Exercice ' + annee + ' · au ' + fin + '</div>' +
+    zone.innerHTML +
+    '</body></html>'
+  );
+  fenetre.document.close();
+  fenetre.focus();
+  fenetre.print();
+}
+
 // ─── Toutes les transactions d'un compte, derrière le montant cliqué ───
 // mode « bilan » : tout depuis le début jusqu'à la date de fin (c'est un solde).
 // mode « periode » : seulement du début à la fin choisis (c'est un mouvement).
