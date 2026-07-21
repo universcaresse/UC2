@@ -923,14 +923,13 @@ function glAfficher() {
 
 // Impression : la zone de l'admin a une hauteur fixe qui défile, donc l'imprimante
 // ne verrait que la première page. On ouvre plutôt une page propre et on imprime celle-là.
-function glImprimer() {
-  const zone = document.getElementById('gl-etats');
+// Une seule mécanique pour les deux documents (bilan et grand livre).
+function imprimerDocumentComptable(zoneId, titre, sousTitre, cleMessage) {
+  const zone = document.getElementById(zoneId);
   if (!zone || !zone.innerHTML.trim()) {
-    afficherMsg('grand-livre', 'Il n\'y a rien à imprimer pour l\'instant.', 'erreur');
+    afficherMsg(cleMessage, 'Il n\'y a rien à imprimer pour l\'instant.', 'erreur');
     return;
   }
-  const annee = (document.getElementById('gl-annee') || {}).value || '';
-  const fin   = (document.getElementById('gl-fin')   || {}).value || '';
 
   const styles =
     ':root{--beige:#d8d2c8;--primary:#8b8680;--gris:#8b8680;--rouge:#c44536}' +
@@ -946,20 +945,34 @@ function glImprimer() {
 
   const fenetre = window.open('', '_blank');
   if (!fenetre) {
-    afficherMsg('grand-livre', 'Ton navigateur a bloqué la fenêtre d\'impression — autorise les fenêtres surgissantes pour ce site.', 'erreur');
+    afficherMsg(cleMessage, 'Ton navigateur a bloqué la fenêtre d\'impression — autorise les fenêtres surgissantes pour ce site.', 'erreur');
     return;
   }
   fenetre.document.write(
     '<!doctype html><html lang="fr"><head><meta charset="utf-8">' +
-    '<title>Grand livre ' + annee + '</title><style>' + styles + '</style></head><body>' +
-    '<h1>Univers Caresse — Grand livre</h1>' +
-    '<div class="sous">Exercice ' + annee + ' · au ' + fin + '</div>' +
+    '<title>' + titre + '</title><style>' + styles + '</style></head><body>' +
+    '<h1>Univers Caresse — ' + titre + '</h1>' +
+    '<div class="sous">' + sousTitre + '</div>' +
     zone.innerHTML +
     '</body></html>'
   );
   fenetre.document.close();
   fenetre.focus();
   fenetre.print();
+}
+
+function glImprimer() {
+  const annee = (document.getElementById('gl-annee') || {}).value || '';
+  const fin   = (document.getElementById('gl-fin')   || {}).value || '';
+  imprimerDocumentComptable('gl-etats', 'Grand livre', 'Exercice ' + annee + ' · au ' + fin, 'grand-livre');
+}
+
+function brImprimer() {
+  const annee = (document.getElementById('br-annee') || {}).value || '';
+  const debut = (document.getElementById('br-debut') || {}).value || '';
+  const fin   = (document.getElementById('br-fin')   || {}).value || '';
+  imprimerDocumentComptable('br-etats', 'Bilan et résultats',
+    'Exercice ' + annee + ' · du ' + debut + ' au ' + fin, 'bilan-resultats');
 }
 
 // ─── Toutes les transactions d'un compte, derrière le montant cliqué ───
