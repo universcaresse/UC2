@@ -233,8 +233,8 @@ function jgAfficherJournal(ecritures) {
     return ''
       + '<div style="border-bottom:1px solid var(--beige);padding:12px 0">'
       +   '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px">'
-      +     '<div><strong>#' + echapperHtml(e.no_ecriture) + '</strong> · ' + echapperHtml(e.date) + ' · ' + echapperHtml(e.libelle)
-      +       (e.reference ? ' <span class="texte-secondaire">(' + echapperHtml(e.reference) + ')</span>' : '') + '</div>'
+      +     '<div><strong>J-' + echapperHtml(e.no_ecriture) + '</strong> · ' + echapperHtml(e.date) + ' · ' + echapperHtml(e.libelle)
+      +       (e.beneficiaire ? ' <span class="texte-secondaire">— ' + echapperHtml(e.beneficiaire) + '</span>' : '') + '</div>'
       +     bouton
       +   '</div>'
       +   lignesHtml

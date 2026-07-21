@@ -53,6 +53,76 @@ function pcRendreAlarme(anomalies) {
 }
 
 // Nom de la classe selon le premier chiffre du numéro
+// ═══════════════════════════════════════
+// RATTRAPAGE — inscrire les écritures du passé qui manquent
+// Deux temps : on REGARDE d'abord, on inscrit seulement après ton accord.
+// ═══════════════════════════════════════
+async function pcVoirRattrapage() {
+  const zone = document.getElementById('rattrapage-resultat');
+  if (!zone) return;
+  zone.innerHTML = '<div class="texte-secondaire">Je regarde…</div>';
+
+  const res = await appelAPIPost('getRattrapageComptable');
+  if (!res || !res.success) {
+    zone.innerHTML = '<div class="texte-secondaire">' +
+      echapperHtml((res && res.message) ? res.message : 'Impossible de regarder.') + '</div>';
+    return;
+  }
+
+  const total = res.nb_ventes + res.nb_remboursements;
+  if (!total) {
+    zone.innerHTML = '<div class="texte-secondaire">✅ Rien ne manque — tout a son écriture.</div>';
+    return;
+  }
+
+  let html = '<div style="border:1px solid var(--beige);border-radius:6px;padding:12px 14px">'
+    + '<div style="font-weight:600;margin-bottom:8px">Ce qui manque au journal</div>'
+    + '<ul style="margin:0 0 10px 0;padding-left:20px;line-height:1.7">'
+    + '<li><strong>' + res.nb_ventes + '</strong> vente' + (res.nb_ventes > 1 ? 's' : '') + ' — ' + formaterPrix(res.total_ventes) + '</li>'
+    + '<li><strong>' + res.nb_remboursements + '</strong> remboursement' + (res.nb_remboursements > 1 ? 's' : '') + ' — ' + formaterPrix(res.total_remboursements) + '</li>'
+    + '</ul>';
+
+  if (res.sans_cout) {
+    html += '<div style="color:var(--rouge);font-size:0.9rem;margin-bottom:8px">⚠️ ' + res.sans_cout +
+      ' vente' + (res.sans_cout > 1 ? 's' : '') + ' sans coût connu (le lot n\'a pas de coût). Le revenu serait inscrit, mais pas le coût — finis tes achats et tes lots avant.</div>';
+  }
+
+  if (res.problemes && res.problemes.length) {
+    html += '<div style="font-size:0.9rem;margin-bottom:8px"><strong>' + res.problemes.length +
+      '</strong> que je refuse de deviner, à régler à la main :<ul style="margin:4px 0 0 0;padding-left:20px">';
+    res.problemes.slice(0, 10).forEach(p => {
+      html += '<li>' + echapperHtml(p.reference) + ' — ' + echapperHtml(p.raison) + '</li>';
+    });
+    html += '</ul></div>';
+  }
+
+  html += '<div class="texte-secondaire" style="font-size:0.85rem;margin-bottom:10px">'
+    + 'Chaque écriture sera inscrite à <strong>sa date d\'origine</strong>. Celles qui existent déjà sont sautées — aucun doublon possible.</div>'
+    + '<button class="bouton bouton-petit" onclick="pcLancerRattrapage()">Inscrire ces ' + total + ' écritures</button>'
+    + '</div>';
+
+  zone.innerHTML = html;
+}
+
+async function pcLancerRattrapage() {
+  if (!confirm('Inscrire les écritures manquantes au journal ?\n\nChacune portera sa date d\'origine. Rien ne sera effacé, et ce qui a déjà son écriture est sauté.')) return;
+
+  const zone = document.getElementById('rattrapage-resultat');
+  if (zone) zone.innerHTML = '<div class="texte-secondaire">J\'inscris…</div>';
+
+  const res = await appelAPIPost('lancerRattrapageComptable');
+  if (!res || !res.success) {
+    afficherMsg('plan-comptable', (res && res.message) ? res.message : 'Rattrapage refusé.', 'erreur');
+    if (zone) zone.innerHTML = '';
+    return;
+  }
+
+  afficherMsg('plan-comptable', '✅ ' + res.inscrites + ' écriture' + (res.inscrites > 1 ? 's' : '') + ' inscrite' + (res.inscrites > 1 ? 's' : '') + ' au journal.');
+  if (zone) zone.innerHTML = '';
+  chargerPlanComptable(); // recharge l'alarme, qui devrait s'être vidée
+}
+
+// Nom de la classe selon le premier chiffre du numéro
 function pcNomClasse(numero) {
   const c = String(numero || '').charAt(0);
   if (c === '1') return 'Actif';
@@ -559,7 +629,7 @@ function brRendreChoix() {
 
   contenu.innerHTML = `
     <div class="grille">
-      <div class="champ">
+      <div class="champ champ-plein">
         <label class="libelle">Exercice (fin au 31 décembre)</label>
         <select class="controle" id="br-annee" onchange="brChangerAnnee()">${options}</select>
       </div>
@@ -634,8 +704,16 @@ function brRendreClasse(chiffre, titre, montants) {
   const vus = new Set();
   let totalClasse = 0;
 
-  const ligneCompte = (c, m) =>
-    `<div class="rangeeitem"><div class="rangeeitem-info"><div class="rangeeitem-titre"><span class="numero">${c.numero}</span>${c.nom}</div></div><span class="rangeeitem-valeur">${formaterPrix(m)}</span></div>`;
+  // Le bilan cumule depuis toujours; l'état ne montre que la période choisie
+  const modeClic = (chiffre === '4' || chiffre === '5') ? 'periode' : 'bilan';
+
+  const ligneCompte = (c, m) => {
+    // 3015 et 3100 sont calculés (bénéfices), pas tirés d'écritures : pas de détail à montrer
+    const calcule = (String(c.numero) === '3015' || String(c.numero) === '3100');
+    const cls  = 'rangeeitem' + (calcule ? '' : ' cliquable');
+    const clic = calcule ? '' : ` onclick="brVoirCompte('${c.numero}','${modeClic}')"`;
+    return `<div class="${cls}"${clic}><div class="rangeeitem-info"><div class="rangeeitem-titre"><span class="numero">${c.numero}</span>${c.nom}</div></div><span class="rangeeitem-valeur">${formaterPrix(m)}</span></div>`;
+  };
 
   let html = `<div class="section-label">${titre}</div>`;
 
@@ -671,6 +749,277 @@ function brRendreClasse(chiffre, titre, montants) {
   return { html, total: totalClasse };
 }
 
+// ══════════════════════════════════════════════════════════════
+// GRAND LIVRE — les documents du comptable
+// Deux pièces : la balance de vérification (le test que tout se tient)
+// et le grand livre (tous les comptes, chacun avec son report et ses mouvements).
+// Aucune donnée neuve : c'est la même que le bilan.
+// ══════════════════════════════════════════════════════════════
+var glDonnees = null;
+
+async function chargerGrandLivre() {
+  const loading = document.getElementById('loading-grand-livre');
+  const contenu = document.getElementById('contenu-grand-livre');
+  if (loading) loading.style.display = '';
+  if (contenu) contenu.innerHTML = '';
+
+  const res = await appelAPI('getBilanResultats');
+  if (loading) loading.style.display = 'none';
+
+  if (!res || !res.success) {
+    afficherMsg('grand-livre', 'Erreur : ' + ((res && res.message) || 'chargement impossible'), 'erreur');
+    return;
+  }
+  glDonnees = res;
+  glRendreChoix();
+}
+
+function glRendreChoix() {
+  const contenu = document.getElementById('contenu-grand-livre');
+  if (!contenu) return;
+
+  const anneeCourante = new Date().getFullYear();
+  const annees = new Set([anneeCourante]);
+  (glDonnees.ecritures || []).forEach(e => {
+    const a = parseInt(String(e.date).slice(0, 4));
+    if (a) annees.add(a);
+  });
+  const options = [...annees].sort().reverse().map(a => `<option value="${a}">${a}</option>`).join('');
+
+  contenu.innerHTML = `
+    <div class="grille">
+      <div class="champ champ-plein">
+        <label class="libelle">Exercice (fin au 31 décembre)</label>
+        <select class="controle" id="gl-annee" onchange="glChangerAnnee()">${options}</select>
+      </div>
+      <div class="champ">
+        <label class="libelle">Période — du</label>
+        <input type="date" class="controle" id="gl-debut" onchange="glAfficher()">
+      </div>
+      <div class="champ">
+        <label class="libelle">au</label>
+        <input type="date" class="controle" id="gl-fin" onchange="glAfficher()">
+      </div>
+    </div>
+    <div id="gl-etats"></div>
+  `;
+  glChangerAnnee();
+}
+
+function glChangerAnnee() {
+  const annee = document.getElementById('gl-annee').value;
+  const aujourdhui = new Date().toISOString().slice(0, 10);
+  document.getElementById('gl-debut').value = annee + '-01-01';
+  document.getElementById('gl-fin').value =
+    (String(aujourdhui).slice(0, 4) === String(annee)) ? aujourdhui : (annee + '-12-31');
+  glAfficher();
+}
+
+function glAfficher() {
+  const zone = document.getElementById('gl-etats');
+  if (!zone || !glDonnees) return;
+  const annee = document.getElementById('gl-annee').value;
+  const fin   = document.getElementById('gl-fin').value;
+  if (!annee || !fin) return;
+
+  const finPrec = (parseInt(annee, 10) - 1) + '-12-31';
+  const comptes = (glDonnees.comptes || []).slice()
+    .sort((a, b) => String(a.numero).localeCompare(String(b.numero)));
+
+  // Toutes les écritures jusqu'à la date de fin, rangées par compte
+  const parCompte = {};
+  (glDonnees.ecritures || []).forEach(e => {
+    if (!e.date || e.date > fin) return;
+    const k = String(e.compte);
+    if (!parCompte[k]) parCompte[k] = [];
+    parCompte[k].push(e);
+  });
+
+  // ── 1. Balance de vérification ──
+  let totDebit = 0, totCredit = 0, lignesBal = '';
+  comptes.forEach(c => {
+    const lignes = parCompte[String(c.numero)] || [];
+    if (!lignes.length) return;
+    let d = 0, cr = 0;
+    lignes.forEach(e => { d += e.debit; cr += e.credit; });
+    const net = Math.round((d - cr) * 100) / 100;
+    if (net === 0) return;
+    const auDebit  = net > 0 ?  net : 0;
+    const auCredit = net < 0 ? -net : 0;
+    totDebit += auDebit; totCredit += auCredit;
+    lignesBal +=
+      '<div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--beige);font-size:0.9rem">' +
+        '<span style="width:60px;flex:none" class="texte-secondaire">' + echapperHtml(String(c.numero)) + '</span>' +
+        '<span style="flex:1;min-width:120px">' + echapperHtml(c.nom || '') + '</span>' +
+        '<span style="width:100px;text-align:right;flex:none">' + (auDebit  ? formaterPrix(auDebit)  : '') + '</span>' +
+        '<span style="width:100px;text-align:right;flex:none">' + (auCredit ? formaterPrix(auCredit) : '') + '</span>' +
+      '</div>';
+  });
+
+  const equilibre = Math.abs(totDebit - totCredit) < 0.005;
+  let html = `<div class="titre separateur-haut">Balance de vérification au ${fin}</div>` +
+    '<div style="display:flex;gap:10px;padding:5px 0;border-bottom:2px solid var(--primary);font-weight:600;font-size:0.85rem">' +
+      '<span style="width:60px;flex:none">Nº</span>' +
+      '<span style="flex:1;min-width:120px">Compte</span>' +
+      '<span style="width:100px;text-align:right;flex:none">Débit</span>' +
+      '<span style="width:100px;text-align:right;flex:none">Crédit</span>' +
+    '</div>' + lignesBal +
+    '<div class="lignetotal"><span class="lignetotal-libelle grand">Total</span><span>' +
+      formaterPrix(totDebit) + ' / ' + formaterPrix(totCredit) + ' ' + (equilibre ? '✅' : '⚠️') +
+    '</span></div>';
+
+  // ── 2. Grand livre : chaque compte, son report, ses mouvements ──
+  html += `<div class="titre separateur-haut">Grand livre — exercice ${annee}</div>`;
+  let nbComptes = 0;
+
+  comptes.forEach(c => {
+    const toutes = parCompte[String(c.numero)] || [];
+    const sens = brSens(c.numero);
+
+    let ouverture = 0;
+    toutes.filter(e => e.date <= finPrec).forEach(e => { ouverture += (e.debit - e.credit) * sens; });
+    const mouvements = toutes.filter(e => e.date > finPrec)
+      .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+
+    if (!mouvements.length && Math.abs(ouverture) < 0.005) return; // compte muet : on le saute
+    nbComptes++;
+
+    let solde = ouverture, corps = '';
+    corps +=
+      '<div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--beige);font-size:0.88rem;font-style:italic">' +
+        '<span style="width:52px;flex:none"></span>' +
+        '<span style="width:86px;flex:none">' + echapperHtml(finPrec) + '</span>' +
+        '<span style="flex:1;min-width:110px">Solde reporté</span>' +
+        '<span style="width:80px;flex:none"></span><span style="width:80px;flex:none"></span>' +
+        '<span style="width:92px;text-align:right;flex:none;font-weight:600">' + formaterPrix(ouverture) + '</span>' +
+      '</div>';
+
+    mouvements.forEach(e => {
+      solde += (e.debit - e.credit) * sens;
+      const desc = echapperHtml(e.libelle || '') +
+        (e.beneficiaire ? ' <span class="texte-secondaire">— ' + echapperHtml(e.beneficiaire) + '</span>' : '');
+      corps +=
+        '<div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--beige);font-size:0.88rem">' +
+          '<span style="width:52px;flex:none" class="texte-secondaire">J-' + echapperHtml(e.no_ecriture || '') + '</span>' +
+          '<span style="width:86px;flex:none">' + echapperHtml(e.date) + '</span>' +
+          '<span style="flex:1;min-width:110px">' + desc + '</span>' +
+          '<span style="width:80px;text-align:right;flex:none">' + (e.debit  ? formaterPrix(e.debit)  : '') + '</span>' +
+          '<span style="width:80px;text-align:right;flex:none">' + (e.credit ? formaterPrix(e.credit) : '') + '</span>' +
+          '<span style="width:92px;text-align:right;flex:none;font-weight:600">' + formaterPrix(solde) + '</span>' +
+        '</div>';
+    });
+
+    html += '<div class="bloc" style="margin-bottom:18px">' +
+      '<div class="accroche">' + echapperHtml(String(c.numero) + ' — ' + (c.nom || '')) + '</div>' +
+      corps +
+      '<div class="lignetotal"><span class="lignetotal-libelle moyen">Solde au ' + echapperHtml(fin) + '</span><span>' + formaterPrix(solde) + '</span></div>' +
+      '</div>';
+  });
+
+  if (!nbComptes) html += '<div class="texte-secondaire">Aucun compte n\'a de mouvement pour cet exercice.</div>';
+
+  zone.innerHTML = html;
+}
+
+// ─── Toutes les transactions d'un compte, derrière le montant cliqué ───
+// mode « bilan » : tout depuis le début jusqu'à la date de fin (c'est un solde).
+// mode « periode » : seulement du début à la fin choisis (c'est un mouvement).
+function brVoirCompte(numero, mode) {
+  if (!brDonnees) return;
+  const debut = document.getElementById('br-debut').value;
+  const fin   = document.getElementById('br-fin').value;
+
+  const compte = (brDonnees.comptes || []).find(c => String(c.numero) === String(numero));
+  const nomCompte = numero + (compte && compte.nom ? ' — ' + compte.nom : '');
+
+  const annee         = document.getElementById('br-annee').value;
+  const finPrecedente = (parseInt(annee, 10) - 1) + '-12-31';
+  const sens          = brSens(numero);
+  const toutes        = (brDonnees.ecritures || []).filter(e => String(e.compte) === String(numero) && e.date);
+
+  // Bilan : on fige le solde au 31 décembre de l'année précédente (le report),
+  // puis on ne montre que les transactions de l'exercice choisi.
+  // État des résultats : pas de report — c'est un mouvement de la période.
+  let ouverture = 0;
+  if (mode === 'bilan') {
+    toutes.filter(e => e.date <= finPrecedente).forEach(e => { ouverture += (e.debit - e.credit) * sens; });
+  }
+
+  const lignes = toutes
+    .filter(e => e.date <= fin && (mode === 'bilan' ? e.date > finPrecedente : e.date >= debut))
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+
+  let solde = ouverture, corps = '';
+
+  if (mode === 'bilan') {
+    corps +=
+      '<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--beige);font-size:0.9rem;font-style:italic">' +
+        '<span style="width:52px;flex:none"></span>' +
+        '<span style="width:86px;flex:none">' + echapperHtml(finPrecedente) + '</span>' +
+        '<span style="flex:1;min-width:120px">Solde reporté</span>' +
+        '<span style="width:84px;flex:none"></span>' +
+        '<span style="width:84px;flex:none"></span>' +
+        '<span style="width:92px;text-align:right;flex:none;font-weight:600">' + formaterPrix(ouverture) + '</span>' +
+      '</div>';
+  }
+
+  lignes.forEach(e => {
+    solde += (e.debit - e.credit) * sens;
+    const desc = echapperHtml(e.libelle || '') +
+      (e.beneficiaire ? ' <span class="texte-secondaire">— ' + echapperHtml(e.beneficiaire) + '</span>' : '') +
+      (e.notes ? ' <span class="texte-secondaire">(' + echapperHtml(e.notes) + ')</span>' : '');
+    corps +=
+      '<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--beige);font-size:0.9rem">' +
+        '<span style="width:52px;flex:none" class="texte-secondaire">J-' + echapperHtml(e.no_ecriture || '') + '</span>' +
+        '<span style="width:86px;flex:none">' + echapperHtml(e.date) + '</span>' +
+        '<span style="flex:1;min-width:120px">' + desc + '</span>' +
+        '<span style="width:84px;text-align:right;flex:none">' + (e.debit  ? formaterPrix(e.debit)  : '') + '</span>' +
+        '<span style="width:84px;text-align:right;flex:none">' + (e.credit ? formaterPrix(e.credit) : '') + '</span>' +
+        '<span style="width:92px;text-align:right;flex:none;font-weight:600">' + formaterPrix(solde) + '</span>' +
+      '</div>';
+  });
+
+  if (!lignes.length) {
+    corps += '<div class="texte-secondaire" style="padding-top:8px">Aucune transaction dans cette période.</div>';
+  }
+
+  const entete = (lignes.length || mode === 'bilan')
+    ? '<div style="display:flex;gap:10px;padding:6px 0;border-bottom:2px solid var(--primary);font-weight:600;font-size:0.85rem">' +
+        '<span style="width:52px;flex:none">Nº</span>' +
+        '<span style="width:86px;flex:none">Date</span>' +
+        '<span style="flex:1;min-width:120px">Description</span>' +
+        '<span style="width:84px;text-align:right;flex:none">Débit</span>' +
+        '<span style="width:84px;text-align:right;flex:none">Crédit</span>' +
+        '<span style="width:92px;text-align:right;flex:none">Solde</span>' +
+      '</div>'
+    : '';
+
+  const periodeTexte = (mode === 'bilan')
+    ? 'Exercice ' + annee + ' — solde reporté au ' + finPrecedente + ', puis les transactions jusqu\'au ' + fin
+    : 'Du ' + debut + ' au ' + fin;
+
+  const ancien = document.getElementById('detail-compte-overlay');
+  if (ancien) ancien.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'detail-compte-overlay';
+  overlay.className = 'voile ouvert';
+  overlay.innerHTML =
+    '<div class="modale">' +
+      '<div class="modale-entete">' +
+        '<span class="titre">' + echapperHtml(nomCompte) + '</span>' +
+        '<button type="button" class="boutons-fermer" id="detail-compte-fermer">✕</button>' +
+      '</div>' +
+      '<div class="modale-corps">' +
+        '<div class="texte-secondaire" style="margin-bottom:10px">' + echapperHtml(periodeTexte) +
+          ' · ' + lignes.length + ' transaction' + (lignes.length > 1 ? 's' : '') + '</div>' +
+        entete + corps +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  document.getElementById('detail-compte-fermer').onclick = () => overlay.remove();
+}
+
 // Affiche le bilan et l'état des résultats selon les choix
 function brAfficher() {
   const zone = document.getElementById('br-etats');
@@ -688,7 +1037,12 @@ function brAfficher() {
   const depenses = brRendreClasse('5', 'Dépenses', r.periode);
   const balance  = Math.abs(actif.total - (passif.total + avoir.total)) < 0.005;
 
-  let html = `<div class="titre separateur-haut">Bilan au ${fin}</div>` +
+  // L'état des résultats d'abord, le bilan ensuite
+  let html = `<div class="titre separateur-haut">État des résultats du ${debut} au ${fin}</div>` +
+    revenus.html + depenses.html +
+    `<div class="lignetotal"><span class="lignetotal-libelle grand">Bénéfice net de la période</span><span>${formaterPrix(revenus.total - depenses.total)}</span></div>`;
+
+  html += `<div class="titre separateur-haut">Bilan au ${fin}</div>` +
     actif.html + passif.html + avoir.html +
     `<div class="lignetotal"><span class="lignetotal-libelle grand">Actif = Passif + Avoir</span>
      <span>${formaterPrix(actif.total)} / ${formaterPrix(passif.total + avoir.total)} ${balance ? '✅' : '⚠️'}</span></div>`;
@@ -697,10 +1051,6 @@ function brAfficher() {
     html += `<div class="section-label">Comptes inconnus</div>
       <div class="textes-discrets">Des écritures portent un numéro absent du plan : ${r.inconnus.join(', ')}</div>`;
   }
-
-  html += `<div class="titre separateur-haut">État des résultats du ${debut} au ${fin}</div>` +
-    revenus.html + depenses.html +
-    `<div class="lignetotal"><span class="lignetotal-libelle grand">Bénéfice net de la période</span><span>${formaterPrix(revenus.total - depenses.total)}</span></div>`;
 
   zone.innerHTML = html;
 }

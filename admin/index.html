@@ -100,7 +100,7 @@
         <div class="nav-dropdown">
            <button class="nav-dropdown-item" onclick="afficherSection('plan-comptable', null)">gestion comptable</button>
           <button class="nav-dropdown-item" onclick="afficherSection('journal-general', null)">journal général</button>
-		  <button class="nav-dropdown-item bientot">grand livre</button>
+		  <button class="nav-dropdown-item" onclick="afficherSection('grand-livre', null)">grand livre</button>
 		  <button class="nav-dropdown-item" onclick="afficherSection('bilan-resultats', null)">bilan et résultat</button>
         </div>
       </li>
@@ -196,7 +196,7 @@
 		 
 		  <button class="sidebar-lien" onclick="afficherSection('plan-comptable', this)">gestion comptable</button>
           <button class="sidebar-lien" onclick="afficherSection('journal-general', this)">journal général</button>
-		  <button class="sidebar-lien bientot">grand livre</button>
+		  <button class="sidebar-lien" onclick="afficherSection('grand-livre', this)">grand livre</button>
 		  <button class="sidebar-lien" onclick="afficherSection('bilan-resultats', this)">bilan et résultat</button>
 	 
        
@@ -2426,6 +2426,21 @@
   <div id="contenu-bilan-resultats"></div>
 </div>
 
+<div class="section-admin" id="section-grand-livre">
+  <div class="page-entete fade-in">
+    <div class="page-entete-gauche">
+      <div class="page-entete-eyebrow">Comptabilité — documents du comptable</div>
+      <div class="page-entete-titre">Grand <em>livre</em></div>
+    </div>
+    <div class="form-actions">
+      <button class="boutons boutons-contour" onclick="window.print()">Imprimer</button>
+    </div>
+  </div>
+  <div class="msg-zone" id="msg-grand-livre"></div>
+  <div class="chargement" id="loading-grand-livre"><span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>Chargement...</div>
+  <div id="contenu-grand-livre"></div>
+</div>
+
 <div class="section-admin" id="section-journal-general">
   <div class="page-entete fade-in">
     <div class="page-entete-gauche">
@@ -2446,11 +2461,11 @@
         </div>
         <div class="form-groupe col-demi">
           <label class="form-label">Description</label>
-          <input type="text" class="form-ctrl" id="jg-libelle" placeholder="Ex. Dépôt Square, transfert…">
+          <input type="text" class="form-ctrl" id="jg-libelle" placeholder="Ex. transfert, frais, etc">
         </div>
       </div>
       <div id="jg-lignes" style="margin-top:8px"></div>
-      <button class="bouton bouton-petit bouton-contour" onclick="jgAjouterLigne()">+ Ajouter une ligne</button>
+      <button class="bouton bouton-petit bouton-contour" onclick="jgAjouterLigne()">+ Ajouter un compte</button>
       <div id="jg-balance" style="margin:14px 0;font-weight:600"></div>
       <div class="form-actions">
         <button class="bouton" id="jg-enregistrer" onclick="jgEnregistrer()">Enregistrer l'écriture</button>
