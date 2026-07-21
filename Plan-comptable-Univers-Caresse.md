@@ -280,7 +280,9 @@ N°  Date        Compte                    Libellé         Réf   Débit  Créd
 - **Bilan** (photo à une date) : classes 1000 / 2000 / 3000. Doit égaler : **Actif = Passif + Avoir**.
 - **État des résultats** (sur une période) : classes 4000 / 5000. **Revenus − dépenses = bénéfice/perte**, reporté au bilan dans l'avoir.
 - **Journal** : toutes les écritures dans l'ordre — même donnée que la saisie, présentée pour l'impression.
-- Chaque montant du bilan et de l'état des résultats est **cliquable** pour voir les écritures derrière.
+- ✅ **FAIT (2026-07-21)** — Chaque montant du bilan et de l'état des résultats est **cliquable** : une fenêtre montre les transactions derrière (nº J-, date, description, bénéficiaire, débit, crédit, solde qui se construit). Au **bilan** : solde reporté au 31 décembre de l'année précédente, puis les transactions de l'exercice — le détail finit exactement sur le montant cliqué. À l'**état des résultats** : seulement la période, sans report. Les comptes 3015 et 3100 ne sont pas cliquables (calculés, pas tirés d'écritures).
+- ✅ **FAIT (2026-07-21) — page « Grand livre »** (menu Comptabilité, bouton qui était « bientôt ») : **balance de vérification** (tous les comptes, débit/crédit, ✅ si les totaux sont égaux) + **grand livre** (chaque compte : report, mouvements, solde final). Même choix d'exercice/période que le bilan, bouton Imprimer, comptes muets sautés. Aucune donnée neuve côté serveur — c'est celle du bilan.
+- **Ordre d'affichage (2026-07-21, choix de Chantal)** : l'**état des résultats en premier**, le bilan ensuite. Le choix de l'exercice sur la première ligne, la période sur la deuxième.
 
 ---
 
