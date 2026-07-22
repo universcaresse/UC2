@@ -530,13 +530,14 @@ function afficherTableauRemboursements(items) {
   }
   if (vide) vide.classList.add('cache');
 
-  let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody>';
+  // Plus de colonne « Type » : elle venait de l'ancien modèle où un remboursement entier
+  // était « avec » ou « sans » retour. Le choix se fait maintenant article par article,
+  // et l'information exacte est dans le détail du remboursement.
+  let html = '<div class="tableau-wrap"><table class="tableau-admin"><thead><tr><th>Date</th><th>Client</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody>';
   items.forEach(r => {
-    const typeLabel = r.type_remb === 'avec-retour' ? 'Avec retour' : 'Sans retour';
     html += `<tr class="cliquable" onclick="voirDetailRemboursement('${r.rem_id}')">
       <td>${r.date}</td>
       <td>${r.client || '—'}</td>
-      <td>${typeLabel}</td>
       <td>${r.mode_paiement || '—'}</td>
       <td style="color:var(--rouge)">${formaterPrix(r.total)}</td>
       <td>${r.statut}</td>

@@ -5,6 +5,28 @@
 
 ## 1. Le code
 
+1.0 🔴🔴🔴 **TOUJOURS VÉRIFIER DANS LES FICHIERS AVANT DE PARLER.** 🔴🔴🔴
+Avant **tout commentaire, toute décision, toute question** : aller lire les vrais fichiers du projet.
+- Jamais de réponse de mémoire, jamais de « je pense que », jamais de « normalement ça fait ».
+- Jamais poser une question dont la réponse est déjà dans le code ou dans un `.md`.
+- Jamais affirmer qu'une chose est faite, cassée ou absente sans l'avoir vue.
+- Si la vérification est impossible, **le dire** au lieu d'affirmer.
+
+Cette règle passe avant les autres : une réponse rapide et fausse coûte plus cher à Chantal qu'une réponse lente et vérifiée. La règle 1.7 (preuve Vérifié / Impacts) est la forme écrite de cette vérification quand il y a une proposition.
+
+**1.0.1 🔴 « JE N'AI PAS TROUVÉ » N'EST PAS « CE N'EST PAS FAIT ».**
+Une affirmation **négative** — « ce n'est pas fait », « ça ne marche pas », « il y a un trou », « il manque X » — demande une preuve **plus forte** qu'une affirmation positive. Chercher à un seul endroit et ne rien voir ne prouve rien.
+Avant toute affirmation négative :
+- chercher **par la fonctionnalité**, pas par le fichier où on l'imagine : les `id` du HTML, les libellés à l'écran, tout le dépôt — pas une seule fonction;
+- pour un trou de sécurité, vérifier **qui peut atteindre le code** (une action hors de `ACTIONS_PUBLIQUES` exige la clé admin — une cliente ne peut pas l'appeler);
+- si le doute reste, écrire « **je n'ai pas trouvé** », jamais « ça n'existe pas ».
+
+**1.0.2 🔴 RÉÉCRIRE OU FUSIONNER UN FICHIER, C'EST TOUT RE-AFFIRMER.**
+Quand on résume, fusionne ou réécrit un `.md`, **chaque phrase recopiée redevient une affirmation de Claude**, datée d'aujourd'hui. Recopier une vieille liste sans la contrôler, c'est mentir avec la signature du jour. Avant de réécrire : vérifier chaque affirmation technique dans le code, ou l'écrire explicitement comme non vérifiée, avec sa date d'origine.
+*Faute du 2026-07-22 : une liste de « fonctions à créer » datée de juin recopiée telle quelle dans le fichier fusionné — trois des quatre existaient déjà.*
+
+*Deux autres fautes du 2026-07-22 qui ont fait perdre du temps à Chantal : un « trou de sécurité » qui n'existait pas (le code public recalculait déjà les prix), et une pastille déclarée manquante alors qu'elle existait ailleurs que dans la fonction regardée.*
+
 1.1 **Jamais de code sans autorisation explicite.** On analyse, on propose en mots simples et bref, on attend le OK.
 
 1.2 **Changements uniquement par trouve-et-remplace.** Un seul à la fois. Attendre le « ok » de Chantal avant de passer au suivant.
@@ -14,6 +36,24 @@
 1.4 **Pas de solution sans analyse complète.** S'il manque une info (un fichier, une fonction), la demander. On ne devine jamais.
 
 1.5 **Réutiliser l'existant** : variables CSS, classes, fonctions déjà en place. **Objectif : réduire le code, pas le gonfler.** Améliorer un style partagé une fois plutôt que copier-coller par section.
+
+1.5b 🔴 **LE CSS — `generique.css` est la nouvelle maison.**
+- ⛔ **GEL EN COURS** : Chantal transfère elle-même tout le CSS. **Ne toucher à AUCUN fichier `css/*.css`** sans qu'elle le demande explicitement. Si un travail semble exiger du CSS, le dire et le contourner autrement (classe existante, style en ligne). Ce gel tombe quand elle dira que son transfert est fini.
+- Deux feuilles chargées dans cet ordre : `style.css` (l'ancienne) puis `generique.css` (la nouvelle, qui gagne).
+- Tout ce qui est **neuf et partagé** va dans `generique.css`, jamais dans `style.css`. On ne touche à `style.css` que pour **retirer** un doublon déjà repris ailleurs.
+- ⚠️ **Piège principal : les deux feuilles n'ont pas les mêmes noms de variables.** Dans `generique.css`, utiliser la colonne de droite.
+
+| Sert à | style.css (ancien) | generique.css (à utiliser) |
+|---|---|---|
+| Vert principal | `--primary` | `--primaire` |
+| Jaune / accent | `--accent` | `--secondaire` |
+| Rouge | `--danger` | `--rouge` |
+| Blanc | `--blanc` | `--blancpur` |
+| Beige | `--beige` | `--sable` |
+| Gris | `--gris` | `--grise` |
+| Gris foncé | `--gris-fonce` | `--grise-foncee` |
+
+- Mesures : dans `generique.css`, utiliser ses `--espace-4` à `--espace-48`, `--taille-…`, `--bordure-…`, `--rayon-1` — pas les `--padding-page` / `--nav-h` de `style.css`.
 
 1.6 **Ne jamais renommer les `id`** (le JS s'y accroche). Seulement les classes, et seulement sur demande.
 
@@ -53,6 +93,8 @@ Le travail et l'analyse d'un item vont dans le `.md` de cet item. La vue d'ensem
 2.6 **Ne JAMAIS décider de son emploi du temps.** Chantal choisit le rythme et l'ordre des travaux. **Ne jamais proposer d'arrêter ni dire « on s'arrête ici ».** C'est Chantal, et elle seule, qui décide quand on arrête. Claude continue tant qu'elle ne l'a pas dit.
 
 2.7 **Ton** : très court. Sans s'excuser à répétition. Revenir au concret.
+
+2.9 🔴 **METTRE `ETAT.md` À JOUR À CHAQUE SESSION.** À la fin de chaque séance de travail, Claude met à jour `ETAT.md` : ce qui a été construit, les nouvelles colonnes ou feuilles, et surtout **les nouveaux « tuyaux dans les murs »** (les pièges découverts). C'est ce fichier qui empêche la session suivante de casser quelque chose sans le voir venir. Ne pas attendre que Chantal le demande.
 
 2.8 Brièveté stricte. 3 lignes max par défaut. Donner la conclusion et l'action, rien d'autre : pas de préambule, pas de récap, pas d'explication du « comment ça marche », pas de raisonnement montré. Chantal ne veut pas voir la réflexion ni le code expliqué — seulement quoi faire. Une seule question à la fin, oui/non si possible. Si une réponse longue semble nécessaire, demander d'abord.
 

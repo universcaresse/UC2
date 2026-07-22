@@ -464,6 +464,7 @@ function afficherTableauCommandes(items) {
     { titre: 'EN ATTENTE DE RÉAPPROVISIONNEMENT', statuts: ['En attente de réapprovisionnement'] },
     { titre: 'À RETRAVAILLER',                  statuts: ['À retravailler'] },
     { titre: 'À EXPÉDIER',                      statuts: ['À expédier'] },
+    { titre: 'ÉTIQUETTE PRÊTE — À DÉPOSER',     statuts: ['Étiquette prête'] },
     { titre: 'À LIVRER',                        statuts: ['À livrer'] },
     { titre: 'FRAIS À PAYER',                   statuts: ['Frais à payer'] },
     { titre: 'TERMINÉES',                       statuts: ['Terminée'] },
@@ -518,7 +519,7 @@ function afficherTableauCommandes(items) {
     return 'var(--accent)';
   }
 
-  function rendreBloc(titre, liste) {
+  function rendreBloc(titre, liste, actionHtml) {
     if (!liste.length) return '';
     const lignes = liste.map(c => {
       const couleur = calculerPastilleStock(c.cmd_id);
@@ -542,13 +543,21 @@ function afficherTableauCommandes(items) {
           <thead><tr><th>Nº</th><th>Date</th><th>Client</th><th>Total prévu</th><th>Solde</th><th>Statut</th><th></th></tr></thead>
           <tbody>${lignes}</tbody>
         </table>
+        ${actionHtml || ''}
       </div>
     </div>`;
   }
 
   let html = '';
   blocs.forEach(b => {
-    html += rendreBloc(b.titre, items.filter(c => b.statuts.includes(c.statut)));
+    // Le bouton de dépôt vit DANS le bloc, sous la liste : on voit les colis avant de cliquer.
+    let action = '';
+    if (b.statuts.includes('Étiquette prête')) {
+      action = `<div style="padding:14px 0 4px"><button class="bouton" onclick="deposerColis()">📮 J'ai déposé mes colis</button></div>`;
+    } else if (b.statuts.includes('Terminée')) {
+      action = `<div style="padding:14px 0 4px"><button class="bouton bouton-contour" onclick="suivreColis()">📦 Où sont mes colis?</button></div>`;
+    }
+    html += rendreBloc(b.titre, items.filter(c => b.statuts.includes(c.statut)), action);
   });
   if (autres.length) html += rendreBloc('AUTRES', autres);
 
@@ -620,6 +629,14 @@ async function voirDetailCommande(cmd_id) {
       <div>${c.statut}</div>
       ${c.probleme_paiement ? `<div style="margin-top:4px;font-weight:500;color:${c.probleme_paiement.indexOf('Payé en partie') === 0 ? 'var(--accent)' : 'var(--danger)'}">⚠ ${echapperHtml(c.probleme_paiement)}</div>` : ''}
     </div>
+    ${c.no_tracage ? `<div style="margin-bottom:16px">
+      <div class="form-label">Livraison</div>
+      ${c.livraison_date
+        ? `<div style="font-weight:600;color:var(--primary)">✅ Livré le ${echapperHtml(String(c.livraison_date))}</div>`
+        : `<div>${echapperHtml(c.livraison_etat || 'Pas encore vérifié')}</div>`}
+      <div class="texte-secondaire" style="font-size:0.85rem">Suivi ${echapperHtml(String(c.no_tracage))}</div>
+      <a href="https://www.canadapost-postescanada.ca/track-reperage/fr#/details/${encodeURIComponent(String(c.no_tracage))}" target="_blank" style="color:var(--primary);text-decoration:underline;font-size:0.85rem">Voir chez Poste Canada</a>
+    </div>` : ''}
     <div class="separateur-haut">
       <div class="form-label">Items commandés</div>`;
 
@@ -719,6 +736,11 @@ async function voirDetailCommande(cmd_id) {
   if (c.statut === 'Modifiée') {
     actionsHTML += `<button class="bouton bouton-or" onclick="modifierProduitsCommande('${c.cmd_id}')">Revoir et re-proposer</button>`;
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
+  }
+  // Poste Canada ne rembourse qu'une étiquette pas encore déposée : le bouton
+  // n'existe donc que tant que le colis n'est pas parti.
+  if (c.statut === 'Étiquette prête') {
+    actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerEtiquette('${c.cmd_id}')">Annuler l'étiquette</button>`;
   }
   if (c.statut === 'Verrouillée') {
     actionsHTML += `<button class="bouton bouton-or" onclick="ouvrirFormCompleter('${c.cmd_id}')">Reprendre la proposition</button>`;
@@ -1881,14 +1903,32 @@ function choisirPosteCanada(cmd_id) {
   document.getElementById('btn-choix-personne-' + cmd_id)?.classList.add('cache');
 }
 
-function genererEtiquette(cmd_id) {
+async function genererEtiquette(cmd_id) {
   const champPoids = document.getElementById('etiq-poids-' + cmd_id);
   const poids = parseFloat(champPoids ? champPoids.value : '');
   if (!poids || poids <= 0) {
     afficherMsg('commandes', 'Entre le poids du colis en grammes avant de générer.', 'erreur');
     return;
   }
-  confirmerAction("Acheter l'étiquette chez Poste Canada maintenant? Votre compte Poste Canada sera facturé, sans retour possible.", function() { genererEtiquetteConfirmee(cmd_id, poids); });
+
+  // On demande le tarif AVANT de faire signer : jamais d'achat à l'aveugle.
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  let prixTexte = '';
+  if (c && c.code_postal) {
+    afficherChargement();
+    const tarif = await appelAPI('calculerTarifPosteCanada', { code_postal: c.code_postal, poids: poids });
+    cacherChargement();
+    if (tarif && tarif.success) {
+      prixTexte = formaterPrix(tarif.montant) + ' seront portés à ta Visa.\n\n';
+    } else {
+      prixTexte = '⚠️ Poste Canada n\'a pas donné le tarif — tu achèterais sans connaître le prix.\n\n';
+    }
+  }
+
+  confirmerAction(
+    "Acheter l'étiquette chez Poste Canada maintenant?\n\n" + prixTexte + "Sans retour possible.",
+    function() { genererEtiquetteConfirmee(cmd_id, poids); }
+  );
 }
 
 async function genererEtiquetteConfirmee(cmd_id, poids) {
@@ -1905,37 +1945,140 @@ async function genererEtiquetteConfirmee(cmd_id, poids) {
     const dejaPdf = await appelAPIPost('getEtiquettePdf', { cmd_id });
     if (dejaPdf && dejaPdf.success && fenetrePdf) {
       fenetrePdf.location = await rognerEtiquetteEnUrl(dejaPdf.pdf_base64);
-    } else if (fenetrePdf) { fenetrePdf.close(); }
-    afficherMsg('commandes', 'Une étiquette existait déjà — rouverte, aucun nouvel achat.');
+      afficherMsg('commandes', 'Une étiquette existait déjà — rouverte, aucun nouvel achat.');
+    } else {
+      // Achetée et payée, mais le PDF n'est pas chez nous : surtout ne pas racheter.
+      if (fenetrePdf) fenetrePdf.close();
+      afficherMsg('commandes',
+        '⚠️ Une étiquette a déjà été ACHETÉE et payée pour cette commande' +
+        (res.no_tracage ? ' (suivi ' + res.no_tracage + ')' : '') +
+        ', mais son PDF n\'est pas ici. Va l\'imprimer depuis ton compte Poste Canada — ne la regénère pas.', 'erreur');
+    }
     return;
   }
   if (!(res && res.success)) {
     if (fenetrePdf) fenetrePdf.close();
-    afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    // res.achetee = Poste Canada a facturé, mais la suite a cassé. À ne surtout pas confondre
+    // avec un échec ordinaire, sinon elle regénère et paie deux fois.
+    afficherMsg('commandes', (res && res.achetee ? '⚠️ ' : '❌ ') + (res?.message || 'Erreur.'), 'erreur');
     return;
   }
 
   if (fenetrePdf) fenetrePdf.location = await rognerEtiquetteEnUrl(res.pdf_base64);
 
-  const res2 = await appelAPIPost('expedierCommande', { cmd_id, no_tracage: res.no_tracage });
+  // La cliente n'est PAS avertie ici : le colis est encore sur la table.
+  // La commande attend au statut « Étiquette prête » jusqu'au retour du bureau de poste.
+  const res2 = await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'Étiquette prête' });
 
-  const telephone = c.telephone || '';
-  if (telephone) {
-    const lienSuivi = 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage);
-    let sms = 'Bonjour ' + (c.client || '') + ',\n\n';
-    sms += 'Bonne nouvelle, votre commande ' + cmd_id + ' est en route!\n';
-    sms += 'Suivez votre colis ici : ' + lienSuivi + '\n';
-    if (res2 && res2.lien_facture) sms += 'Votre facture : ' + res2.lien_facture + '\n';
-    sms += '\nMerci !\nUnivers caresse Savonnerie artisanale';
-    window.open('sms:' + telephone + '?body=' + encodeURIComponent(sms));
-  }
   if (res2 && res2.success) {
-    if (res2.courriel_parti) afficherMsg('commandes', '✅ Étiquette générée, commande expédiée, courriel envoyé.');
-    else afficherMsg('commandes', '⚠️ Étiquette générée et commande expédiée, mais le courriel au client n\'est PAS parti — à renvoyer à la main.', 'erreur');
+    afficherMsg('commandes', '✅ Étiquette achetée et imprimée. La cliente sera avertie quand tu auras déposé le colis.');
     fermerFicheCommande();
     chargerCommandes();
   } else {
-    afficherMsg('commandes', '⚠️ Étiquette créée, mais expédition non finalisée : ' + (res2?.message || ''), 'erreur');
+    afficherMsg('commandes', '⚠️ Étiquette achetée, mais le statut n\'a pas changé : ' + (res2?.message || ''), 'erreur');
+  }
+}
+
+// ─── Où sont mes colis ? ───
+// Poste Canada n'avertit de rien : on va demander, et on garde la réponse sur la commande.
+async function suivreColis() {
+  afficherChargement();
+  const res = await appelAPIPost('suivreColis');
+  cacherChargement();
+
+  if (!res || !res.success) {
+    afficherMsg('commandes', '❌ ' + ((res && res.message) || 'Suivi impossible.'), 'erreur');
+    return;
+  }
+  const items = res.items || [];
+  if (!items.length) {
+    afficherMsg('commandes', 'Aucun colis à suivre.');
+    return;
+  }
+  const livres = items.filter(i => i.date_livraison).length;
+  afficherMsg('commandes', '📦 ' + items.length + ' colis vérifié' + (items.length > 1 ? 's' : '') +
+    ' — ' + livres + ' livré' + (livres > 1 ? 's' : '') + '.' +
+    (res.bac_a_sable ? ' ⚠️ Bac à sable : ces états ne sont pas réels.' : ''));
+  chargerCommandes();
+}
+
+// ─── Annuler une étiquette achetée mais pas encore déposée ───
+function annulerEtiquette(cmd_id) {
+  confirmerAction(
+    "Annuler l'étiquette de la commande " + cmd_id + " ?\n\n" +
+    "Poste Canada recevra une demande de remboursement et répondra avec un numéro de billet. " +
+    "L'argent revient sur ta Visa dans quelques jours — la comptabilité ne bougera qu'à ce moment-là.\n\n" +
+    "La commande retournera à « À expédier ».",
+    async function() {
+      const res = await appelAPIPost('annulerEtiquette', { cmd_id });
+      if (!res || !res.success) {
+        afficherMsg('commandes', '❌ ' + ((res && res.message) || 'Annulation refusée.'), 'erreur');
+        return;
+      }
+      afficherMsg('commandes', '✅ Demande de remboursement envoyée' +
+        (res.billet ? ' — billet nº ' + res.billet : '') +
+        '. La commande est revenue à « À expédier ». Le frais sera défait quand le crédit paraîtra sur ta Visa.');
+      fermerFicheCommande();
+      chargerCommandes();
+    }
+  );
+}
+
+// ─── Retour du bureau de poste : on dépose le lot ───
+// Les courriels partent tous d'un coup côté serveur. Les textos, non : l'appareil
+// n'ouvre l'application de messages que sur un clic direct, un client à la fois.
+async function deposerColis() {
+  const res = await appelAPIPost('deposerColis');
+  if (!res || !res.success) {
+    afficherMsg('commandes', '❌ ' + ((res && res.message) || 'Dépôt impossible.'), 'erreur');
+    return;
+  }
+  const items = (res.items || []).filter(i => i.success);
+  if (!items.length) {
+    afficherMsg('commandes', 'Aucun colis n\'attend d\'être déposé.');
+    return;
+  }
+  const rates = items.filter(i => !i.courriel_parti);
+  afficherMsg('commandes', '✅ ' + items.length + ' colis déposé' + (items.length > 1 ? 's' : '') + ', courriels envoyés.' +
+    (rates.length ? ' ⚠️ ' + rates.length + ' courriel(s) non parti(s) — à renvoyer à la main.' : ''));
+
+  cmdAfficherTextos(items.filter(i => i.telephone));
+  chargerCommandes();
+}
+
+function cmdAfficherTextos(liste) {
+  const zone = document.getElementById('cmd-textos-a-envoyer');
+  if (!zone) return;
+  if (!liste.length) { zone.innerHTML = ''; return; }
+  window.cmdTextosEnAttente = liste;
+
+  zone.innerHTML = '<div class="form-panel visible">'
+    + '<div class="form-panel-header"><span class="form-panel-titre">Textos à envoyer (' + liste.length + ')</span></div>'
+    + '<div class="form-body">'
+    + '<div class="texte-secondaire" style="margin-bottom:10px">Ton appareil ouvre les messages un à la fois — un clic chacun.</div>'
+    + liste.map((c, i) =>
+        '<div id="texto-' + i + '" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--beige)">'
+        + '<span>' + echapperHtml(c.client || c.cmd_id) + ' <span class="texte-secondaire">' + echapperHtml(c.cmd_id) + '</span></span>'
+        + '<button class="bouton bouton-petit" onclick="cmdEnvoyerTexto(' + i + ')">Texto</button></div>').join('')
+    + '</div></div>';
+}
+
+function cmdEnvoyerTexto(i) {
+  const c = (window.cmdTextosEnAttente || [])[i];
+  if (!c) return;
+  const lienSuivi = 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(c.no_tracage);
+  let sms = 'Bonjour ' + (c.client || '') + ',\n\n';
+  sms += 'Bonne nouvelle, votre commande ' + c.cmd_id + ' est en route!\n';
+  sms += 'Suivez votre colis ici : ' + lienSuivi + '\n';
+  if (c.lien_facture) sms += 'Votre facture : ' + c.lien_facture + '\n';
+  sms += '\nMerci !\nUnivers caresse Savonnerie artisanale';
+  window.open('sms:' + c.telephone + '?body=' + encodeURIComponent(sms));
+
+  const ligne = document.getElementById('texto-' + i);
+  if (ligne) {
+    ligne.style.opacity = '0.45';
+    const b = ligne.querySelector('button');
+    if (b) { b.disabled = true; b.textContent = 'Envoyé'; }
   }
 }
 

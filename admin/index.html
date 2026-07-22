@@ -2094,6 +2094,7 @@
     </div>
   </div>
   <div class="msg-zone" id="msg-commandes"></div>
+  <div id="cmd-textos-a-envoyer"></div>
 
   <!-- FORMULAIRE COMMANDE -->
   <div id="form-commande" class="cache">
@@ -2349,10 +2350,14 @@
     <select class="form-ctrl filtre-select" id="filtre-cmd-statut" onchange="filtrerCommandes()">
       <option value="">Tous les statuts</option>
       <option value="En attente">En attente</option>
+      <option value="Verrouillée">Verrouillée</option>
       <option value="Modifiée">Modifiée</option>
       <option value="À retravailler">À retravailler</option>
       <option value="En attente de paiement">En attente de paiement</option>
+      <option value="Payée — facture à faire">Payée — facture à faire</option>
+      <option value="En attente de réapprovisionnement">En attente de réapprovisionnement</option>
       <option value="À expédier">À expédier</option>
+      <option value="Étiquette prête">Étiquette prête — à déposer</option>
       <option value="À livrer">À livrer</option>
       <option value="Frais à payer">Frais à payer</option>
       <option value="Terminée">Terminée</option>
@@ -2492,6 +2497,28 @@
     </div>
     <div class="form-body">
       <div id="jg-depots"><div class="texte-secondaire">Clique « Voir mes dépôts » — l'app ira demander à Square.</div></div>
+    </div>
+  </div>
+
+  <!-- FRAIS D'EXPÉDITION -->
+  <div class="form-panel visible">
+    <div class="form-panel-header">
+      <span class="form-panel-titre">Frais d'expédition à inscrire</span>
+      <button class="bouton bouton-petit bouton-contour" onclick="jgChargerFraisExpedition()">Vérifier</button>
+    </div>
+    <div class="form-body">
+      <div id="jg-frais-expedition"><div class="texte-secondaire">Les étiquettes achetées dont Poste Canada n'avait pas encore fixé le prix.</div></div>
+    </div>
+  </div>
+
+  <!-- REMBOURSEMENTS D'ÉTIQUETTE -->
+  <div class="form-panel visible">
+    <div class="form-panel-header">
+      <span class="form-panel-titre">Étiquettes annulées — remboursement reçu ?</span>
+      <button class="bouton bouton-petit bouton-contour" onclick="jgChargerRemboursementsEtiquette()">Vérifier</button>
+    </div>
+    <div class="form-body">
+      <div id="jg-remb-etiquette"><div class="texte-secondaire">Les étiquettes annulées dont le crédit n'est pas encore revenu sur la Visa.</div></div>
     </div>
   </div>
 

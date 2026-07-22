@@ -471,6 +471,96 @@ async function jgInscrireDepot(payout_id, date) {
   await jgRechargerListes();
 }
 
+// ═══════════════════════════════════════
+// FRAIS D'EXPÉDITION — les étiquettes achetées dont le prix n'était pas encore fixé
+// Rien n'est estimé : on redemande à Poste Canada le montant vraiment facturé.
+// ═══════════════════════════════════════
+async function jgChargerFraisExpedition() {
+  const zone = document.getElementById('jg-frais-expedition');
+  if (!zone) return;
+  zone.innerHTML = '<div class="texte-secondaire">Je vérifie…</div>';
+
+  const res = await appelAPIPost('getFraisExpeditionAInscrire');
+  if (!res || !res.success) {
+    zone.innerHTML = '<div class="texte-secondaire">' +
+      echapperHtml((res && res.message) ? res.message : 'Vérification impossible.') + '</div>';
+    return;
+  }
+  jgAfficherFraisExpedition(res.items || []);
+}
+
+function jgAfficherFraisExpedition(items) {
+  const zone = document.getElementById('jg-frais-expedition');
+  if (!zone) return;
+  if (!items.length) {
+    zone.innerHTML = '<div class="texte-secondaire">✅ Rien en attente — tous les envois achetés ont leur frais au journal.</div>';
+    return;
+  }
+  zone.innerHTML = items.map(f => ''
+    + '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--beige);flex-wrap:wrap">'
+    +   '<div><strong>' + echapperHtml(f.cmd_id) + '</strong>'
+    +     (f.client ? ' <span class="texte-secondaire">— ' + echapperHtml(f.client) + '</span>' : '') + '</div>'
+    +   '<button class="bouton bouton-petit" onclick="jgInscrireFraisExpedition(\'' + echapperHtml(f.cmd_id) + '\')">Inscrire le frais</button>'
+    + '</div>').join('');
+}
+
+async function jgInscrireFraisExpedition(cmd_id) {
+  const res = await appelAPIPost('inscrireFraisExpedition', { cmd_id });
+  if (!res || !res.success) {
+    afficherMsg('journal-general', (res && res.message) ? res.message : 'Inscription refusée.', 'erreur');
+    return;
+  }
+  afficherMsg('journal-general', '✅ Frais d\'expédition inscrit : ' + formaterPrix(res.montant) + ' sur la Visa.');
+  await jgChargerFraisExpedition();
+  await jgRechargerListes();
+}
+
+// ═══════════════════════════════════════
+// ÉTIQUETTES ANNULÉES — le crédit est-il revenu sur la Visa ?
+// L'écriture du frais n'est défaite qu'ici, quand Chantal voit le crédit :
+// le compte 2205 doit coller au vrai relevé.
+// ═══════════════════════════════════════
+async function jgChargerRemboursementsEtiquette() {
+  const zone = document.getElementById('jg-remb-etiquette');
+  if (!zone) return;
+  zone.innerHTML = '<div class="texte-secondaire">Je vérifie…</div>';
+
+  const res = await appelAPIPost('getRemboursementsEtiquette');
+  if (!res || !res.success) {
+    zone.innerHTML = '<div class="texte-secondaire">' +
+      echapperHtml((res && res.message) ? res.message : 'Vérification impossible.') + '</div>';
+    return;
+  }
+  jgAfficherRemboursementsEtiquette(res.items || []);
+}
+
+function jgAfficherRemboursementsEtiquette(items) {
+  const zone = document.getElementById('jg-remb-etiquette');
+  if (!zone) return;
+  if (!items.length) {
+    zone.innerHTML = '<div class="texte-secondaire">✅ Rien en attente — aucune étiquette annulée sans son crédit.</div>';
+    return;
+  }
+  zone.innerHTML = items.map(r => ''
+    + '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--beige);flex-wrap:wrap">'
+    +   '<div><strong>' + echapperHtml(r.cmd_id) + '</strong>'
+    +     (r.client ? ' <span class="texte-secondaire">— ' + echapperHtml(r.client) + '</span>' : '')
+    +     '<div class="texte-secondaire" style="font-size:0.85rem">billet nº ' + echapperHtml(r.billet) + '</div></div>'
+    +   '<button class="bouton bouton-petit" onclick="jgConfirmerRemboursementEtiquette(\'' + echapperHtml(r.cmd_id) + '\')">Crédit reçu</button>'
+    + '</div>').join('');
+}
+
+async function jgConfirmerRemboursementEtiquette(cmd_id) {
+  const res = await appelAPIPost('confirmerRemboursementEtiquette', { cmd_id });
+  if (!res || !res.success) {
+    afficherMsg('journal-general', (res && res.message) ? res.message : 'Impossible de défaire le frais.', 'erreur');
+    return;
+  }
+  afficherMsg('journal-general', '✅ Frais d\'expédition défait pour ' + cmd_id + ' — la Visa est créditée au journal.');
+  await jgChargerRemboursementsEtiquette();
+  await jgRechargerListes();
+}
+
 async function jgAnnuler(reference) {
   if (!confirm('Annuler l\'écriture ' + reference + ' ? Une contre-passation (l\'inverse) sera inscrite — rien n\'est effacé.')) return;
 

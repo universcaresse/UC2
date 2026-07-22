@@ -1,5 +1,6 @@
 # À FAIRE — page inventaire production
 ### Plan validé avec Chantal — 26 juin 2026
+### ✅ TOUT EST FAIT — vérifié dans le code le 2026-07-22 : les six étapes de la section 2. La 2.2 (retrait de la pile « disponible » de fabrication) est prouvée par le défaut `blocs = ['en_cure', 'epuise']` ligne 150 de `admin-fabrication.js`.
 
 ## 1. Décidé
 1.1 Page inventaire = pile « disponible » seulement, affichée comme dans fabrication (regroupée, cliquable). Pas de bouton « entrer un lot ».

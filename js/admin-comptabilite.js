@@ -731,7 +731,11 @@ function brRendreClasse(chiffre, titre, montants) {
     totalClasse += sousTotal;
     const ligneSousTotal = sectionsPleines.length < 2 ? '' :
       `<div class="lignetotal"><span class="lignetotal-libelle moyen">Sous-total ${s.nom}</span><span>${formaterPrix(sousTotal)}</span></div>`;
-    html += `<div class="bloc"><div class="accroche">${s.nom}</div>${lignes}${ligneSousTotal}</div>`;
+    // Quand la section porte le même nom que la classe (« Revenus » sous « Revenus »),
+    // on n'écrit pas le titre deux fois.
+    const memeNom = String(s.nom || '').trim().toLowerCase() === String(titre || '').trim().toLowerCase();
+    const accroche = memeNom ? '' : `<div class="accroche">${s.nom}</div>`;
+    html += `<div class="bloc">${accroche}${lignes}${ligneSousTotal}</div>`;
   });
 
   const restants = dansClasse.filter(c => !vus.has(c.numero));
@@ -941,7 +945,14 @@ function imprimerDocumentComptable(zoneId, titre, sousTitre, cleMessage) {
     '.bloc{margin-bottom:5mm}' +
     '.lignetotal{display:flex;justify-content:space-between;font-weight:700;border-top:1px solid #000;padding-top:1mm;margin-top:1mm}' +
     '.section-label{font-weight:700;margin-top:4mm}' +
-    '.texte-secondaire{color:#666}';
+    '.texte-secondaire{color:#666}' +
+    // Les lignes du bilan tiennent leur mise en page de ton CSS, absent ici : on la redonne
+    '.rangeeitem{display:flex;align-items:baseline;justify-content:space-between;gap:6mm;' +
+      'padding:0.8mm 0;border-bottom:1px solid var(--beige)}' +
+    '.rangeeitem-info{flex:1;min-width:0}' +
+    '.rangeeitem-titre{display:flex;gap:3mm}' +
+    '.numero{color:#666;min-width:13mm;display:inline-block}' +
+    '.rangeeitem-valeur{white-space:nowrap;text-align:right}';
 
   const fenetre = window.open('', '_blank');
   if (!fenetre) {

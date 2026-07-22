@@ -25,7 +25,8 @@
   - 2.4.1 **Le stock est ENLEVÉ de mon inventaire** (réservé pour ce client — c'est ici que ça sort, une seule fois)
   - 2.4.2 Statut → « En attente de paiement »
   - 2.4.3 Le client reçoit le courriel (un seul bouton aujourd'hui : Payer) + le texto
-  - 2.4.4 ⚠️ Bogue connu : le texto part avant le courriel — ✏️ Correction décidée : courriel d'abord, texto seulement s'il a réussi
+  - 2.4.4 ~~Bogue connu : le texto part avant le courriel — Correction décidée : courriel d'abord, texto seulement s'il a réussi~~
+    **ANNULÉ le 2026-07-22 — ce n'est pas un bogue, on garde le texto en premier.** Raison : l'appareil n'ouvre l'application de messages que si ça arrive à l'instant du clic. Attendre l'envoi du courriel ferait bloquer le texto par le navigateur. Respecter l'ancienne décision aurait exigé deux clics; Chantal a tranché : on garde un seul clic, texto d'abord.
 
 **3 — Le client reçoit la proposition**
 - 3.1 Il clique « Payer » → Square s'ouvre → il paie → il revient automatiquement sur le message « Merci »
@@ -45,7 +46,7 @@
 ---
 
 ## CORRECTIONS DÉCIDÉES (12 juin 2026)
-- 1. Courriel d'abord, texto seulement si le courriel a réussi (2.4.4)
+- 1. ~~Courriel d'abord, texto seulement si le courriel a réussi (2.4.4)~~ — **ANNULÉE le 2026-07-22**, voir 2.4.4. Le texto reste en premier.
 - 2. Garder l'identifiant du lien Square à sa création (2.2.1)
 - 3. Le lien Square expire au retour « Merci » + filet au clic « Paiement reçu » (4.2.4)
 
@@ -106,7 +107,7 @@ Aujourd'hui le courriel n'a qu'un bouton « Payer », sans explication. Décidé
 
 *(3.f « il ne répond jamais » retiré : déjà couvert par le délai de 3.b.)*
 
-**Logique du bloc 1 : complète.** Reste les textes à écrire, et la vérification dans le vrai code (sécurité, fermetures réellement branchées) — non faite.
+**Logique du bloc 1 : complète.** ✅ **Vérification dans le vrai code FAITE le 2026-07-22** : les trois portes du courriel (Payer / Modifier / J'ai une question) sont en place avec les mots validés · l'identifiant du lien Square est gardé · le lien se ferme au retour « Merci » avec le filet au clic « Paiement reçu » · les points orange/rouge se calculent depuis `date_proposition` · la page Modifier, le statut « À retravailler » et les deux versions côte à côte existent · l'annulation par le client et le formulaire Contact prérempli aussi. Seule la correction 1 (ordre courriel/texto) a été **annulée** volontairement — voir 2.4.4.
 
 ---
 
@@ -204,6 +205,6 @@ Lui confirmer clairement que c'est annulé — pas de doute possible. Ton doux, 
 
 - L'identifiant Square (`payment_link.id`) est retourné par l'API mais jamais sauvegardé aujourd'hui. Il doit aller en col 21 de `Commandes_Entete_v2` (première colonne libre après `type_promo` en col 20).
 - Fermer un lien Square = appel API Square avec cet identifiant. Impossible sans lui.
-- L'ordre des opérations à l'envoi doit être : courriel d'abord → texto seulement si courriel réussi (pas l'inverse comme aujourd'hui).
+- ~~L'ordre des opérations à l'envoi doit être : courriel d'abord → texto seulement si courriel réussi.~~ **Annulé le 2026-07-22 : l'ordre actuel (texto d'abord) est le bon et reste tel quel.** Le « Bonjour , » sans prénom du texto est **voulu**, ce n'est pas un bogue — ne pas le « corriger ».
 - Le bouton Relancer doit ouvrir un aperçu avant d'envoyer, pas envoyer directement.
 - Les points orange/rouge se calculent à partir de `date_proposition` (col 16).
