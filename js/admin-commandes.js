@@ -1119,6 +1119,8 @@ function ouvrirFormCompleter(cmd_id) {
   document.getElementById('completer-courriel').value  = c.courriel || '';
   document.getElementById('completer-telephone').value = c.telephone || '';
   document.getElementById('completer-livraison').value = (c.livraison && c.livraison > 0) ? c.livraison : '';
+  const casePerso = document.getElementById('completer-livraison-perso');
+  if (casePerso) casePerso.checked = !!c.livraison_perso;
   document.getElementById('completer-note').value     = c.note_proposition || '';
   document.getElementById('completer-square').value   = c.lien_square || '';
   const selPromoCmd = document.getElementById('completer-promotion');
@@ -1223,6 +1225,21 @@ async function genererLienSquare() {
 }
 
 var cmdCompleterPanier = [];
+
+// ─── « Je livre moi-même » : remplit le tarif, reste modifiable à la main ───
+var LIVRAISON_PERSO_MONTANT = 2.75;
+
+function cmdLivraisonPerso() {
+  const coche  = document.getElementById('completer-livraison-perso').checked;
+  const champ  = document.getElementById('completer-livraison');
+  const montant = LIVRAISON_PERSO_MONTANT.toFixed(2).replace('.', ',');
+  if (coche) {
+    champ.value = montant;
+  } else if (champ.value === montant) {
+    // On ne vide que si c'est bien le montant qu'on avait mis — jamais un chiffre tapé à la main
+    champ.value = '';
+  }
+}
 
 // ─── POSTE CANADA : poids du colis + tarif ───
 var cmdCompleterPoidsParFormat = {};
@@ -1515,6 +1532,7 @@ async function apercuProposition() {
     rabais: rabais > 0 ? formaterPrix(rabais) : 0,
     promo_nom: cmdCompleterNomPromo(),
     livraison: livraisonNum > 0 ? formaterPrix(livraisonNum) : 0,
+    livraison_perso: !!document.getElementById('completer-livraison-perso')?.checked,
     total: formaterPrix(totalAvec),
     apercu: true
   });
@@ -1653,6 +1671,7 @@ async function envoyerPropositionV3() {
     rabais: rabais > 0 ? formaterPrix(rabais) : 0,
     promo_nom: cmdCompleterNomPromo(),
     livraison: livraisonNum > 0 ? formaterPrix(livraisonNum) : 0,
+    livraison_perso: !!document.getElementById('completer-livraison-perso')?.checked,
     total: formaterPrix(totalAvec)
   });
 
