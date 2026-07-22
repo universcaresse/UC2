@@ -3,6 +3,10 @@
    Créé le 4 mai 2026 selon LOGIQUE-VENTES.md
    ═══════════════════════════════════════ */
 
+// Code postal de l'atelier — sert à mesurer la distance depuis la fiche d'une commande.
+// Si l'atelier déménage, c'est ici qu'on le change.
+var ORIGINE_POSTALE = 'J0K 1E0';
+
 // ─── ÉTAT GLOBAL ───
 var cmdLignes          = [];
 var cmdIdEnCours       = null;
@@ -616,7 +620,7 @@ async function voirDetailCommande(cmd_id) {
       <div>${echapperHtml(c.client) || '—'}</div>
       ${c.courriel ? `<div class="texte-secondaire">${echapperHtml(c.courriel)}</div>` : ''}
       ${c.telephone ? `<div class="texte-secondaire">${echapperHtml(c.telephone)}</div>` : ''}
-      ${c.code_postal ? `<div class="texte-secondaire">${echapperHtml(c.code_postal)}</div>` : ''}
+      ${c.code_postal ? `<div class="texte-secondaire"><a href="https://www.google.com/maps/dir/${encodeURIComponent(ORIGINE_POSTALE)}/${encodeURIComponent(c.code_postal)}" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:underline" title="Distance depuis ${echapperHtml(ORIGINE_POSTALE)}">${echapperHtml(c.code_postal)}</a></div>` : ''}
       ${(c.rue || c.ville || c.province) ? `<div class="texte-secondaire">${echapperHtml([c.rue, c.ville, c.province].filter(Boolean).join(', '))}</div>` : ''}
       <button class="bouton bouton-contour bouton-petit" style="margin-top:6px" onclick="modifierAdresseCommande('${c.cmd_id}')">Modifier l'adresse</button>
     </div>

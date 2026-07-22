@@ -1000,7 +1000,7 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
 
   function section(titre, liste, avecBoutons, sousTitre) {
     if (!liste.length) return '';
-    let h = '<div class="sur-titre">' + titre + '</div>';
+    let h = titre ? '<div class="sur-titre">' + titre + '</div>' : '';
     if (sousTitre) h += '<p class="textes-discrets">' + sousTitre + '</p>';
     liste.forEach(l => { h += rangee(l, avecBoutons); });
     return h;
@@ -1011,7 +1011,8 @@ function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
     return reponses[cle] === 'garder' || reponses[cle] === 'laisser';
   });
 
-  let html = section('Prêts à partir', prets, false, '');
+  // « Prêts à partir » n'a de sens que par contraste : si tout est prêt, on l'efface.
+  let html = section((temporaires.length || definitifs.length) ? 'Prêts à partir' : '', prets, false, '');
   html += section('En attente de fabrication', temporaires, true, 'Indiquez ce que vous souhaitez faire pour chaque produit.');
   html += section('Non disponibles', definitifs, false, 'Ces produits ne peuvent pas faire partie de cette commande.');
 
