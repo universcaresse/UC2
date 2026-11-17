@@ -13,7 +13,7 @@ Vérifié le 2026-07-22 : **9 020 lignes dans un seul fichier**. Tout y est — 
 ---
 
 ## 2. Finir la migration CSS
-En cours, **par Chantal elle-même**. La règle et le tableau des noms de variables sont dans `METHODE.md` (règle 1.5b). Tant que ce n'est pas fini, personne d'autre ne touche aux `css/*.css`.
+En cours, **par Chantal elle-même**. La règle et le tableau des noms de variables sont dans `REFERENCE.md` (section 6). Tant que ce n'est pas fini, personne d'autre ne touche aux `css/*.css`.
 
 ---
 

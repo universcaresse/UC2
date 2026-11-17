@@ -1,8 +1,10 @@
 # ÉTAT DU PROJET — Univers Caresse
 Portrait global du site — la vue d'ensemble.
-Les règles de travail sont dans METHODE.md. Chaque item en cours a son propre .md.
+Les règles de travail sont dans REFERENCE.md (remplace METHODE.md depuis le 16 nov. 2026). Chaque item en cours a son propre .md.
 Refait le 16 juin 2026, allégé le 28 juin 2026, comptabilité ajoutée le 22 juillet 2026.
-**Se met à jour à chaque session** (règle 2.9 de METHODE.md).
+**Se met à jour à chaque session** (REFERENCE.md, section 10).
+
+**Qui mène (16 nov. 2026)** : Jean-Claude prend le site en main au complet, avec l'accord de Chantal. Priorité : la sécurité (REFERENCE.md, section 1). Seul dépôt actif : `universcaresse/UC2`; les copies `ngjcpvino/UC2`, `UC2-1` et `uc2-site` sont archivées.
 ⚠️ = à confirmer dans les fichiers avant d'agir.
 
 ---
@@ -15,9 +17,9 @@ Refait le 16 juin 2026, allégé le 28 juin 2026, comptabilité ajoutée le 22 j
 - Serveur : Google Sheets + Apps Script (Code.gs). Tout lui parle par appelAPI (lire) et appelAPIPost (écrire, via doPost). Chaque aller-retour = 1 à 3 secondes.
 
 ### 1.2 Les tuyaux dans les murs (à vérifier avant TOUT changement)
-- CONFIG, appelAPI, appelAPIPost vivent dans main.js → toucher main.js peut briser toute l'admin
+- appelAPI et appelAPIPost vivent dans main.js → toucher main.js peut briser toute l'admin. L'adresse du serveur (`CONFIG`) vit dans `js/config.js`, chargé avant main.js (vérifié le 16 nov. 2026)
 - Les JS admin partagent des variables communes (donneesProduits, donneesCollections, listesDropdown, prodCache, squareAppId…) → toucher l'une = impacts ailleurs
-- Deux feuilles de style : `style.css` (ancienne) puis `generique.css` (nouvelle, gagne). ⚠️ **Les deux n'ont pas les mêmes noms de couleurs** (`--primary` / `--primaire`, `--beige` / `--sable`…) → règle et tableau complet dans METHODE 1.5b. **Le CSS est gelé** : Chantal le transfère elle-même.
+- Deux feuilles de style : `style.css` (ancienne) puis `generique.css` (nouvelle, gagne). ⚠️ **Les deux n'ont pas les mêmes noms de couleurs** (`--primary` / `--primaire`, `--beige` / `--sable`…) → règle et tableau complet dans REFERENCE.md, section 6. **Le CSS est gelé** : Chantal le transfère elle-même.
 - **Sécurité** : les écritures du serveur exigent une clé admin (`CLE_ADMIN`, vérifiée dans `doPost` contre la liste `ACTIONS_PUBLIQUES`). Le navigateur la garde après la connexion et `appelAPIPost` l'ajoute seul. Les **lectures** restent ouvertes; quelques écritures publiques aussi (demande de coups de cœur, renvoi d'une liste modifiée protégé par le jeton `?cmd=`).
 - Code.gs modifié = redéploiement (nouvelle version). HTML/CSS/JS modifié = republier le site
 - 🔴 **Le serveur est en DEUX fichiers** : `Code.gs` (≈9 000 lignes, copie locale `codegs.txt`) et un fichier utilitaire (copie locale `utilitairegs.txt` : `getSS`, `toGrammes`, couleurs…). Ils se parlent sans problème — `codegs` appelle `getSS` 187 fois. **Mais deux fonctions du même nom dans deux fichiers = le dernier chargé gagne, en silence.** Un doublon d'`envoyerContact_v2` dormait ainsi (l'ancienne version, texte brut sans `replyTo`) — retiré le 2026-07-22. Avant d'ajouter une fonction, vérifier qu'elle n'existe pas déjà **dans l'autre fichier**.
