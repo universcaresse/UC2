@@ -642,6 +642,10 @@ async function appelAPI(action, params = {}) {
     url.searchParams.set('action', action);
     Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
     url.searchParams.set('t', Date.now());
+    // La clé admin part avec chaque lecture : seules celles du site public s'en passent (17 nov. 2026)
+    let cle = '';
+    try { cle = sessionStorage.getItem('uc_cle') || ''; } catch (e) {}
+    if (cle) url.searchParams.set('cle', cle);
     const response = await fetch(url.toString());
     if (!response.ok) throw new Error('Erreur réseau');
     return await response.json();
