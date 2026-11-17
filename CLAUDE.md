@@ -16,5 +16,6 @@
 - **Site public** : `index.html` + `js/main.js` + `js/main-demande.js`, servi par GitHub Pages à **universcaresse.ca** (`CNAME`).
 - **Admin** : `admin/index.html` + `admin/login.html` + `js/admin.js` (chef d'orchestre) + un `js/admin-*.js` par section.
 - **Adresse du serveur** : `js/config.js` (`CONFIG.APPS_SCRIPT_URL`), chargé avant `main.js`. Les appels passent par `appelAPI` (lire) et `appelAPIPost` (écrire), dans `main.js`.
-- **Serveur** : Google Sheets + Apps Script (`Code.gs` + un fichier utilitaire). ⚠️ **Le code du serveur n'est PAS dans ce dépôt** : ne jamais affirmer ce qu'il fait sans l'avoir lu — le demander à l'utilisateur, ou le dire.
+- **Serveur** : projet Apps Script **« UC2 »** (compte universcaresse, 11 fichiers : `Code.gs`, `Utilitaires.gs`, outils des fournisseurs…). Sa copie vit dans le dépôt **PRIVÉ `universcaresse/UC2-serveur`** (17 nov. 2026) : le lire là avant d'affirmer quoi que ce soit. ⚠️ La copie peut être en retard sur ce qui roule dans Google : en cas de doute, la reprendre par le connecteur Drive (projet partagé en lecture avec ngjcpvino).
+- **Feuille de données** : identifiant `16Syw5XypiHauOMpuAu-bWfIMMnMObn9avqoSEYjaNu0` (`SS_ID` dans `Code.gs`). Le vieux projet Drive « univers caresse » (mars 2026, achats d'ingrédients) n'est PAS le serveur.
 - **Publier le site = commit + push sur `main`**, après le OK. Le serveur, lui, se redéploie à la main (Apps Script → Gérer les déploiements → Nouvelle version).
