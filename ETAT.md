@@ -6,7 +6,7 @@ Refait le 16 juin 2026, allégé le 28 juin 2026, comptabilité ajoutée le 22 j
 
 **Qui mène (16 nov. 2026)** : Jean-Claude prend le site en main au complet, avec l'accord de Chantal. Priorité : la sécurité (REFERENCE.md, section 1). Seul dépôt actif : `universcaresse/UC2`; les copies `ngjcpvino/UC2`, `UC2-1` et `uc2-site` sont archivées.
 
-**Serveur dans un dépôt privé (17 nov. 2026)** : les 11 fichiers du projet Apps Script « UC2 » sont copiés dans le dépôt privé `universcaresse/UC2-serveur` (pris par le connecteur Drive; le projet est partagé en lecture avec ngjcpvino). La clé Pure Arôme (`PARO_TOKEN`, `purearomecomplet.gs`) y est laissée en clair, à la demande de Jean-Claude — le dépôt doit donc rester privé. Prochaines étapes possibles : découper `Code.gs` par sujet, mise en ligne automatique (modèle Dionysos).
+**Serveur dans un dépôt privé (17 nov. 2026)** : les 11 fichiers du projet Apps Script « UC2 » sont copiés dans le dépôt privé `universcaresse/UC2-serveur` (pris par le connecteur Drive; le projet est partagé en lecture avec ngjcpvino). La clé Pure Arôme (`PARO_TOKEN`, `purearomecomplet.gs`) y est laissée en clair, à la demande de Jean-Claude — le dépôt doit donc rester privé. Ménage du 17 nov. 2026 : 4 fichiers inutiles retirés (`Catalogue`, `Sans titre`, `trouverDoublons`, `Fichier sans titre 2` — dans l'historique d'UC2-serveur au besoin), les outils des fournisseurs renommés `Fournisseur-….gs`. **Outil de mise en ligne** (repris de Dionysos) dans `UC2-serveur/outils/deployer.py` : voir CLAUDE.md. L'app sert la version 400 (avant le ménage, ce qui est sans effet sur le site).
 ⚠️ = à confirmer dans les fichiers avant d'agir.
 
 ---
