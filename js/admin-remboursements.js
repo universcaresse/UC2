@@ -537,7 +537,7 @@ function afficherTableauRemboursements(items) {
   items.forEach(r => {
     html += `<tr class="cliquable" onclick="voirDetailRemboursement('${r.rem_id}')">
       <td>${r.date}</td>
-      <td>${r.client || '—'}</td>
+      <td>${echapperHtml(r.client) || '—'}</td>
       <td>${r.mode_paiement || '—'}</td>
       <td style="color:var(--rouge)">${formaterPrix(r.total)}</td>
       <td>${r.statut}</td>

@@ -709,9 +709,9 @@ function ouvrirApercuFacture() {
 
   if (client || courriel || telephone) {
     html += `<div style="margin-bottom:16px;font-size:0.85rem;color:var(--gris)">`;
-    if (client)    html += `<div>${client}</div>`;
-    if (courriel)  html += `<div>${courriel}</div>`;
-    if (telephone) html += `<div>${telephone}</div>`;
+    if (client)    html += `<div>${echapperHtml(client)}</div>`;
+    if (courriel)  html += `<div>${echapperHtml(courriel)}</div>`;
+    if (telephone) html += `<div>${echapperHtml(telephone)}</div>`;
     html += `</div>`;
   }
 
@@ -1057,9 +1057,9 @@ async function imprimerFacture(venIdRecu) {
   ${client || courriel || telephone ? `
   <div class="client-bloc">
     <div class="client-label">Client</div>
-    ${client ? `<div class="client-nom">${client}</div>` : ''}
-    ${courriel ? `<div class="client-info">${courriel}</div>` : ''}
-    ${telephone ? `<div class="client-info">${telephone.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2-$3')}</div>` : ''}
+    ${client ? `<div class="client-nom">${echapperHtml(client)}</div>` : ''}
+    ${courriel ? `<div class="client-info">${echapperHtml(courriel)}</div>` : ''}
+    ${telephone ? `<div class="client-info">${echapperHtml(telephone.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2-$3'))}</div>` : ''}
   </div>` : ''}
   <table>
     <thead>
@@ -1278,7 +1278,7 @@ function afficherTableauVentes(items) {
     html += `<tr class="cliquable" onclick="voirDetailVente('${v.ven_id}')">
       <td>${v.ven_id.replace('VEN-', '')}</td>
       <td>${v.date}</td>
-      <td>${v.client || '—'}</td>
+      <td>${echapperHtml(v.client) || '—'}</td>
       <td>${v.mode_paiement || '—'}</td>
       <td>${formaterPrix(v.total_net || v.total)}</td>
       <td>${statutAffiche}</td>

@@ -533,7 +533,7 @@ function afficherTableauCommandes(items) {
       return `<tr class="cliquable" onclick="voirDetailCommande('${c.cmd_id}')">
         <td>${(c.cmd_id || '').replace('CMD-', '')}</td>
         <td>${c.date}</td>
-        <td>${c.client || '—'}</td>
+        <td>${echapperHtml(c.client) || '—'}</td>
         <td>${formaterPrix(c.total_prevu)}</td>
         <td>${formaterPrix(c.solde)}</td>
         <td>${c.statut}</td>
@@ -662,7 +662,7 @@ async function voirDetailCommande(cmd_id) {
     const gamLigne = proLigne ? donneesGammes.find(g2 => String(g2.gam_id) === String(proLigne.gam_id)) : null;
     const situation = [colLigne?.nom, gamLigne?.nom].filter(Boolean).join(' · ');
     html += `<div style="padding:8px 0;border-bottom:1px solid var(--beige)">
-      <div>${l.nom} — ${l.format_poids} ${l.format_unite}</div>
+      <div>${echapperHtml(l.nom)} — ${echapperHtml(l.format_poids)} ${echapperHtml(l.format_unite)}</div>
       ${situation ? `<div class="texte-secondaire">${situation}</div>` : ''}
       <div class="texte-secondaire">Qté : ${l.quantite} × ${formaterPrix(l.prix_unitaire)} = ${formaterPrix(l.prix_unitaire * l.quantite)}</div>
       <div style="color:${stockCouleur};font-size:0.78rem;font-weight:500;margin-top:2px">${stockTexte}</div>
@@ -1059,7 +1059,7 @@ function ouvrirFormCompleter(cmd_id) {
       let blocV = '<div style="margin-top:12px;padding:10px;border:1px dashed var(--accent);border-radius:6px"><div class="form-label">Version originale (avant la modification du client)</div>';
       rv.lignes.forEach(function (l) {
         const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
-        blocV += '<div class="texte-secondaire">' + (pro ? pro.nom : l.pro_id) + ' — ' + l.format_poids + ' ' + l.format_unite + ' × ' + l.quantite + '</div>';
+        blocV += '<div class="texte-secondaire">' + echapperHtml(pro ? pro.nom : l.pro_id) + ' — ' + echapperHtml(l.format_poids) + ' ' + echapperHtml(l.format_unite) + ' × ' + echapperHtml(l.quantite) + '</div>';
       });
       blocV += '</div>';
       zoneRecap.insertAdjacentHTML('beforeend', blocV);
@@ -1091,21 +1091,21 @@ function ouvrirFormCompleter(cmd_id) {
 
     const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
 
-    recap += '<div style="padding:8px 0;border-bottom:1px solid #f2e4cf" data-cle="' + cle + '">';
+    recap += '<div style="padding:8px 0;border-bottom:1px solid #f2e4cf" data-cle="' + echapperHtml(cle) + '">';
     recap += '<div style="display:flex;align-items:center;gap:8px">';
     recap += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + couleur + ';flex-shrink:0"></span>';
-    recap += '<span>' + nom + ' — ' + l.format_poids + ' ' + l.format_unite + ' × ' + l.quantite + ' = ' + formaterPrix(l.prix_unitaire * l.quantite) + '</span>';
+    recap += '<span>' + echapperHtml(nom) + ' — ' + echapperHtml(l.format_poids) + ' ' + echapperHtml(l.format_unite) + ' × ' + echapperHtml(l.quantite) + ' = ' + formaterPrix(l.prix_unitaire * l.quantite) + '</span>';
     recap += '</div>';
 
     if (statut !== 'pret') {
       recap += '<div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
-      recap += '<select class="form-ctrl" style="width:auto;font-size:0.85rem" data-cle="' + cle + '" onchange="cmdCompleterChangerType(this);cmdCompleterMajPoids()">';
+      recap += '<select class="form-ctrl" style="width:auto;font-size:0.85rem" data-cle="' + echapperHtml(cle) + '" onchange="cmdCompleterChangerType(this);cmdCompleterMajPoids()">';
       recap += '<option value="temporaire-cure">Lot en cure</option>';
       recap += '<option value="temporaire-fab" selected>Pas encore fabriqué</option>';
       recap += '<option value="temporaire-partiel">Quantité partielle</option>';
       recap += '<option value="definitif">Définitif</option>';
       recap += '</select>';
-      recap += '<input type="date" class="form-ctrl" style="width:auto;font-size:0.85rem" data-cle-date="' + cle + '" value="' + dateAutoStr + '">';
+      recap += '<input type="date" class="form-ctrl" style="width:auto;font-size:0.85rem" data-cle-date="' + echapperHtml(cle) + '" value="' + dateAutoStr + '">';
       recap += '</div>';
     }
     recap += '</div>';
