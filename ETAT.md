@@ -11,12 +11,25 @@ Refait le 16 juin 2026, allégé le 28 juin 2026, comptabilité ajoutée le 22 j
 
 ---
 
+## 0. LE VOCABULAIRE (17 nov. 2026) — un seul mot pour chaque chose, partout
+- **Univers Caresse** : l'entreprise de Chantal (savonnerie artisanale).
+- **Le site** : tout ce que le navigateur affiche, dans le dépôt GitHub `universcaresse/UC2`, en ligne à universcaresse.ca. Deux parties :
+  - **le site public** : ce que voient les clientes (`index.html`);
+  - **l'admin** : les écrans de gestion de Chantal (`admin/`).
+- **Le serveur** : le moteur caché (commandes, stock, courriels, comptabilité). C'est le projet Apps Script nommé « UC2 » dans le compte universcaresse; sa copie est dans le dépôt privé `universcaresse/UC2-serveur`.
+- **La feuille de données** : la feuille Google « Univers Caresse », qui garde toutes les données. Elle contient des **onglets** (ex. `Commandes_Entete_v2`) — on dit « onglet », jamais « feuille », pour une page de la feuille de données.
+- **`_v2`** : un reste d'histoire, pas une version. Ce qui roule aujourd'hui porte `_v2` (43 onglets et les fonctions du serveur), plus deux onglets sans suffixe : `Commandes_Versions` et `Propositions_Copies`. Aucune « V1 » n'est en usage dans le code du serveur (vérifié le 17 nov. 2026; l'état des vieux onglets de la feuille reste à faire).
+- **Les sauvegardes** : chaque nuit, `sauvegarderQuotidien_v2` (`Utilitaires.gs`) copie la feuille de données dans le dossier Drive « Univers Caresse — Sauvegardes » (`UC_Sauvegarde_AAAA-MM-JJ`), l'envoie en Excel à universcaresse@gmail.com et jette les copies de plus de 30 jours.
+- **Publier** = mettre le site en ligne (commit + push sur `main`). **Redéployer** = mettre le serveur en ligne (Apps Script → Gérer les déploiements → Nouvelle version).
+
+---
+
 ## 1. LA CARTE DU PROJET
 
 ### 1.1 Les trois étages
 - Site public : index.html + js/main.js + js/main-demande.js (coups de cœur)
 - Admin : admin/index.html + admin/login.html + js/admin.js (chef d'orchestre) + un js/admin-*.js par section + catalogue-builder.js
-- Serveur : Google Sheets + Apps Script (Code.gs). Tout lui parle par appelAPI (lire) et appelAPIPost (écrire, via doPost). Chaque aller-retour = 1 à 3 secondes.
+- Serveur : Apps Script (projet « UC2 ») qui lit et écrit la feuille de données. Tout lui parle par appelAPI (lire) et appelAPIPost (écrire, via doPost). Chaque aller-retour = 1 à 3 secondes.
 
 ### 1.2 Les tuyaux dans les murs (à vérifier avant TOUT changement)
 - appelAPI et appelAPIPost vivent dans main.js → toucher main.js peut briser toute l'admin. L'adresse du serveur (`CONFIG`) vit dans `js/config.js`, chargé avant main.js (vérifié le 16 nov. 2026)
@@ -32,13 +45,13 @@ Refait le 16 juin 2026, allégé le 28 juin 2026, comptabilité ajoutée le 22 j
 - 🔴 **`.admin-contenu` a une hauteur fixe qui défile** → une impression normale ne sort que la première page. Pour imprimer, ouvrir une fenêtre propre et imprimer celle-là (voir `imprimerDocumentComptable`).
 - Une action de **lecture** peut vivre dans `doPost` quand elle exige la clé admin (ex. `getVenteRemboursable`) → l'appeler avec `appelAPIPost`, pas `appelAPI`.
 - Poste Canada est encore en **bac à sable**. 🔴 **Un seul interrupteur** : `const PC_TEST = true;` au premier niveau de `Code.gs` (sorti de `genererEtiquette` le 2026-07-22). L'achat, le prix, l'annulation ET le suivi s'en servent tous — le basculer à `false` fait passer les quatre en production d'un coup. En bac à sable : étiquettes gratuites, suivi bidon, rien de comptabilisé.
-- Aucun **déclencheur automatique** dans le projet. Rien ne tourne seul : tout part d'un clic ou de l'ouverture d'une page.
+- **Une tâche tourne seule chaque nuit : la sauvegarde** (voir section 0). Les copies de la feuille de données traînent avec elles un vieux script attaché : c'est pourquoi la liste Apps Script montre un « univers caresse » par jour (constaté le 17 nov. 2026). Aucune autre tâche automatique trouvée (les déclencheurs se règlent dans Apps Script, pas dans le code : à revoir à l'étape 2 du ménage). Le reste part d'un clic ou de l'ouverture d'une page (corrigé le 17 nov. 2026 — l'ancienne note disait « aucun déclencheur »).
 
 ### 1.3 Repères — proposition et coups de cœur
 - Page client « modifier » = section-coupdecoeur (jamais le modal), deux zones : #coupdecoeur-commande et #coupdecoeur-bloque (cachée via class="cache")
 - Lien client : ?cmd=CMD-XXXX (+ &jeton=… pour la sécurité)
 
-### 1.4 Repères — feuilles Google Sheets
+### 1.4 Repères — onglets de la feuille de données
 - Commandes_Entete_v2 : cmd_id (1) · date (2) · nom (3) · courriel (4) · téléphone (5) · total (6) · acompte (7) · solde (8) · statut (9) · message (10) · ven_id_lien (11) · code_postal (12) · note_proposition (13) · lien_square (14) · livraison (15) · date_proposition (16) · prénom (17) · rabais (18) · promo_id (19) · type_promo (20) · ⚠️ link_id_square (21, à confirmer) · no_tracage
 - Commandes_Lignes_v2 : cmd_id (1) · pro_id (2) · format_poids (3) · format_unite (4) · quantite (5) · prix_unitaire (6) · lots (7) · type_ligne (8) · date_dispo (9)
 - Lots_v2 : lot_id · pro_id · date_fabrication · date_disponibilite · nb_unites · … · cout_total (9) · cout_unite (10) · format_poids (12) · format_unite (13) · nb_unites_vendu (15)
@@ -95,4 +108,4 @@ L'écran de proposition doit couvrir toutes les sortes avant de toucher à « ce
 Le courriel et la page montrent les trois mêmes sections (chacune apparaît seulement si elle contient quelque chose), plus un total et le(s) bouton(s).
 
 ### 2.5 Avis d'expédition
-Toujours un numéro de suivi. Texto pas automatique (Messages s'ouvre pré-rempli). Numéro gardé dans la feuille. Lien Postes Canada en français.
+Toujours un numéro de suivi. Texto pas automatique (Messages s'ouvre pré-rempli). Numéro gardé dans la feuille de données. Lien Postes Canada en français.

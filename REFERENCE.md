@@ -7,12 +7,13 @@
 - **Les données des clientes ne vont JAMAIS dans le dépôt** : noms, courriels, téléphones, adresses, commandes, factures. Le dépôt est servi publiquement. Elles vivent seulement dans la feuille Google.
 - **Aucune clé, aucun mot de passe dans le dépôt** : clé admin, Square, Poste Canada. Leur place est dans les Propriétés du script Apps Script. Jamais en dur dans un `.js`, un `.html` ou un `.md`.
 - **Toute nouvelle écriture du serveur exige la clé admin.** Une action ne devient publique (`ACTIONS_PUBLIQUES`) que si l'utilisateur le décide, avec sa propre garde (ex. le jeton `?cmd=`).
-- **Le serveur ne croit jamais ce que le navigateur d'une cliente lui envoie** (prix, totaux, stock) : il recalcule à partir de ses propres feuilles.
+- **Le serveur ne croit jamais ce que le navigateur d'une cliente lui envoie** (prix, totaux, stock) : il recalcule à partir de la feuille de données.
 - **Rien de ce qu'une cliente tape ne s'affiche tel quel** : toujours échappé avant d'aller dans la page ou dans un courriel.
 - Avant chaque publication, vérifier en silence que le changement n'ouvre aucune de ces portes. Si un doute existe, le dire avant de publier.
 - **Les comptes** (GitHub, Google, Square, Poste Canada) : jamais demander un mot de passe dans la conversation.
 
 ## 2. Démarrage d'une conversation
+- **Le vocabulaire** est fixé dans `ETAT.md`, section 0 : l'employer partout, sans synonymes.
 - Lire CE fichier ET `ETAT.md` au complet, en une seule passe, PUIS travailler.
 - Ne pas redemander à l'utilisateur d'expliquer sa façon de procéder, ni quels fichiers existent. Ne pas annoncer « je vais lire » plusieurs fois.
 
@@ -35,14 +36,14 @@
 - **L'IA modifie les fichiers du dépôt directement.** Plus de « trouve-et-remplace » à recopier à la main.
 - **Le serveur (`Code.gs`)** est hors du dépôt : en attendant qu'il ait son propre dépôt privé, l'IA donne la fonction complète à coller, avec son nom et son fichier, jamais un fragment.
 - **Aller vite : regrouper** les changements sans dépendance. Ne découper que si une étape doit être validée avant la suivante.
-- Après une série, dire clairement ce qu'il faut **publier / redéployer** et tout **geste manuel** (ex. ajouter une colonne dans la feuille).
+- Après une série, dire clairement ce qu'il faut **publier / redéployer** et tout **geste manuel** (ex. ajouter une colonne dans un onglet de la feuille de données).
 - L'utilisateur ne teste qu'à la fin : **vérifier la syntaxe** des fichiers modifiés (`node --check`) et tracer chaque parcours en silence. Si une étape dépend d'une autre pas encore publiée, avertir de ne pas tester entre les deux.
 - **Ne jamais renommer un `id`** (le JS s'y accroche).
 - **Le stock et les factures** : jamais sortir le stock deux fois, jamais réutiliser un numéro de facture (annuler, pas effacer). La comptabilité ne s'efface jamais : une correction inscrit l'écriture inverse.
 
 ## 6. Le CSS
 - ⛔ **Gel en cours** : Chantal transfère elle-même le CSS vers `generique.css`. Ne toucher à aucun `css/*.css` sans demande explicite. Si un travail semble exiger du CSS, le dire et réutiliser une classe existante. Le gel tombe quand l'utilisateur le dira.
-- Deux feuilles chargées dans l'ordre : `style.css` (ancienne) puis `generique.css` (nouvelle, gagne). Le neuf et partagé va dans `generique.css`.
+- Deux feuilles de style chargées dans l'ordre : `style.css` (ancienne) puis `generique.css` (nouvelle, gagne). Le neuf et partagé va dans `generique.css`.
 - ⚠️ Les deux n'ont pas les mêmes noms de couleurs. Dans `generique.css`, utiliser la colonne de droite :
 
 | Sert à | style.css (ancien) | generique.css (à utiliser) |
