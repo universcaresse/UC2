@@ -5,6 +5,8 @@ Refait le 16 juin 2026, allégé le 28 juin 2026, comptabilité ajoutée le 22 j
 **Se met à jour à chaque session** (REFERENCE.md, section 10).
 
 **Qui mène (16 nov. 2026)** : Jean-Claude prend le site en main au complet, avec l'accord de Chantal. Priorité : la sécurité (REFERENCE.md, section 1). Seul dépôt actif : `universcaresse/UC2`; les copies `ngjcpvino/UC2`, `UC2-1` et `uc2-site` sont archivées.
+
+**Serveur dans un dépôt privé — EN COURS (16 nov. 2026)** : dépôt privé `universcaresse/UC2-serveur` créé, `ngjcpvino` y est invité (Write) et Claude y a accès. **Encore vide** : Jean-Claude y copie les fichiers depuis l'éditeur Apps Script (un fichier `.gs` par fichier de l'éditeur), à l'ordinateur. Ensuite : vérifier qu'ils sont complets, puis découper par sujet et mettre en place la mise en ligne automatique (modèle Dionysos). Le projet Drive « univers caresse » (mars 2026, gestion des achats) n'est PAS le serveur actuel.
 ⚠️ = à confirmer dans les fichiers avant d'agir.
 
 ---
