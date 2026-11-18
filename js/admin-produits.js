@@ -1515,23 +1515,21 @@ async function confirmerModalNouvelIngredient() {
   if (!nom) { document.getElementById('modal-nouvel-ing-nom').focus(); return; }
   if (!cat_id) { afficherMsg('recettes', 'Choisir une catégorie.', 'erreur'); return; }
 
-  var dernierNum = (listesDropdown.fullData || []).reduce(function(max, d) {
-    var n = parseInt((d.ing_id || '').replace('ING-', '')) || 0;
-    return n > max ? n : max;
-  }, 0);
-  var ing_id = 'ING-' + String(dernierNum + 1).padStart(3, '0');
-
   var statut = catRequiertInci(cat_id) ? 'a-valider' : 'valide';
 
+  // Le numéro est donné par le serveur (18 nov. 2026); un ingrédient de même nom et même catégorie est repris
   var res = await appelAPIPost('createIngredientInci', {
-    ing_id: ing_id, cat_id: cat_id, nom_UC: nom, statut: statut, inci: '', source: ''
+    cat_id: cat_id, nom_UC: nom, statut: statut, inci: '', source: ''
   });
   if (!res || !res.success) {
-    afficherMsg('recettes', 'Erreur création ingrédient.', 'erreur');
+    afficherMsg('recettes', (res && res.message) || 'Erreur création ingrédient.', 'erreur');
     return;
   }
+  var ing_id = res.ing_id;
   if (!listesDropdown.fullData) listesDropdown.fullData = [];
-  listesDropdown.fullData.push({ ing_id: ing_id, cat_id: cat_id, nom_UC: nom, inci: '', statut: statut });
+  if (!listesDropdown.fullData.some(function(d) { return d.ing_id === ing_id; })) {
+    listesDropdown.fullData.push({ ing_id: ing_id, cat_id: cat_id, nom_UC: nom, inci: res.inci || '', statut: res.statut || statut });
+  }
 
   var modal = document.getElementById('modal-nouvel-ing-produit');
   if (modal) modal.classList.remove('ouvert');

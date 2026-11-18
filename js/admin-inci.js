@@ -203,35 +203,5 @@ function inciAjouterNomUC()            {}
 function fermerModalNomUC()            {}
 async function confirmerModalNomUC()   {}
 function inciRechercher()              {}
-function fermerModalAjouterInci()      { document.getElementById('modal-ajouter-inci')?.classList.remove('ouvert'); }
-async function modalInciGo() {
-  const modal      = document.getElementById('modal-ajouter-inci');
-  const idx        = modal?.dataset.idx;
-  const fournisseur = modal?.dataset.fournisseur;
-  const nom        = document.getElementById('modal-inci-nom')?.value.trim();
-  const inci       = document.getElementById('modal-inci-inci')?.value.trim();
-  const cat        = document.getElementById('if-type-' + idx)?.value;
-  if (!nom) { afficherMsg('import-facture', 'Le nom est requis.', 'erreur'); return; }
-  if (!cat) { afficherMsg('import-facture', 'Choisir une catégorie dans le tableau.', 'erreur'); return; }
-  const ing_id = 'ING-' + Date.now();
-  const res = await appelAPIPost('createIngredientInci', { ing_id, cat_id: cat, nom_UC: nom, nom_fournisseur: nom, inci: inci || '', statut: 'actif' });
-  if (!res || !res.success) { afficherMsg('import-facture', res?.message || 'Erreur création ingrédient.', 'erreur'); return; }
-  listesDropdown.fullData.push({ ing_id, cat_id: cat, nom_UC: nom, inci: inci || '' });
-  const item = ifItems[idx];
-  // import désactivé
-  const select = document.getElementById(`if-nomuc-${idx}`);
-  if (select) {
-    const opt = document.createElement('option');
-    opt.value = nom; opt.textContent = nom; opt.selected = true;
-    select.appendChild(opt);
-  }
-  const tr = document.getElementById(`if-nomuc-${idx}`)?.closest('tr');
-  if (tr) tr.classList.remove('ligne-rouge');
-  fermerModalAjouterInci();
-  afficherMsg('import-facture', `✅ "${nom}" créé et mappé.`);
-}
-function modalInciToggleChamps()       {}
-function modalInciSyncNomUC()         {}
-function afficherStatutModalInci()     {}
 
 

@@ -3722,49 +3722,6 @@
     </div>
   </div>
 
-<div class="modal-admin-overlay" id="modal-ajouter-inci">
-    <div class="modal-admin">
-      <div class="modal-admin-header">
-        <div class="modal-admin-titre" id="modal-ajouter-inci-titre">Nouvel ingrédient</div>
-      </div>
-      <div class="modal-admin-body">
-        <div class="form-groupe">
-          <label class="form-label">Nom de l'ingrédient</label>
-          <input type="text" class="form-ctrl" id="modal-inci-nom" placeholder="Ex: Huile de coco" oninput="modalInciSyncNomUC()">
-        </div>
-        <div class="form-groupe" id="modal-inci-groupe-url">
-          <label class="form-label">URL de Purearome, Arbressence, Mauvaises Herbes ou Divine Essence</label>
-          <input type="text" class="form-ctrl" id="modal-inci-url" placeholder="Exemple : https://www.purearome.com/fr/produit/..." oninput="modalInciToggleChamps()">
-        </div>
-        <div class="form-groupe" id="modal-inci-groupe-fourn">
-          <label class="form-label">Ou nom d'un autre fournisseur</label>
-          <input type="text" class="form-ctrl" id="modal-inci-fourn" placeholder="Ex: Aliksir, Pranarôm…" oninput="modalInciToggleChamps()">
-        </div>
-        <div id="modal-inci-champs-manuels" class="cache">
-          <div class="form-groupe">
-            <label class="form-label">INCI</label>
-            <input type="text" class="form-ctrl" id="modal-inci-inci" placeholder="Ex: Cocos Nucifera Oil">
-          </div>
-          <div class="form-groupe">
-            <label class="form-label">Nom botanique</label>
-            <input type="text" class="form-ctrl" id="modal-inci-bot" placeholder="Ex: Cocos nucifera">
-          </div>
-          <div class="form-groupe">
-            <label class="form-label">Note olfactive</label>
-            <input type="text" class="form-ctrl" id="modal-inci-note" placeholder="Ex: Boisé, doux…">
-          </div>
-        </div>
-        <div id="modal-inci-statut" class="form-valeur cache"></div>
-      </div>
-      <div class="modal-admin-body">
-        <div class="form-actions">
-          <button class="bouton bouton-petit bouton-contour" onclick="fermerModalAjouterInci()">Annuler</button>
-          <button class="bouton bouton-petit" id="modal-inci-btn-go" onclick="modalInciGo()">Go</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
 <div class="modal-admin-overlay" id="modal-facture">
           <div class="modal-admin">
             <div class="modal-admin-header">

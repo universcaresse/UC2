@@ -1097,12 +1097,6 @@ async function efConfirmerModalIngredient() {
   if (existant) {
     ing_id = existant.ing_id;
   } else {
-    var dernierNum = (listesDropdown.fullData || []).reduce(function(max, d) {
-      var n = parseInt((d.ing_id || '').replace('ING-', '')) || 0;
-      return n > max ? n : max;
-    }, 0);
-    ing_id = 'ING-' + String(dernierNum + 1).padStart(3, '0');
-
     var statut = catRequiertInci(cat_id) ? 'a-valider' : 'valide';
 
     var selNomFourn = document.getElementById('ef-nom-fourn');
@@ -1110,8 +1104,9 @@ async function efConfirmerModalIngredient() {
       ? selNomFourn.options[selNomFourn.selectedIndex].textContent
       : '';
 
+    // Le numéro est donné par le serveur (18 nov. 2026)
     var res = await appelAPIPost('createIngredientInci', {
-      ing_id: ing_id, cat_id: cat_id, nom_UC: nouveauNom,
+      cat_id: cat_id, nom_UC: nouveauNom,
       statut: statut, inci: '',
       source: ef.factureActive ? ef.factureActive.four_code : '',
       four_id: ef.factureActive ? ef.factureActive.four_id : '',
@@ -1121,9 +1116,12 @@ async function efConfirmerModalIngredient() {
       afficherMsg('ef', (res && res.message) || 'Erreur création ingrédient.', 'erreur');
       return;
     }
-    listesDropdown.fullData.push({
-      ing_id: ing_id, cat_id: cat_id, nom_UC: nouveauNom, inci: '', statut: statut
-    });
+    ing_id = res.ing_id;
+    if (!listesDropdown.fullData.some(function(d) { return d.ing_id === ing_id; })) {
+      listesDropdown.fullData.push({
+        ing_id: ing_id, cat_id: cat_id, nom_UC: nouveauNom, inci: res.inci || '', statut: res.statut || statut
+      });
+    }
   }
 
   var sel = document.getElementById('ef-nom-uc');

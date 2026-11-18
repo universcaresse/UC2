@@ -568,22 +568,17 @@ async function sauvegarderLot() {
 
 // ─── COÛT DE REVIENT ───
 
+// Coût réel d'une recette : grammes × prix moyen pondéré du stock, exactement comme saveLot le recalcule.
+// La marge de perte n'y entre pas (18 nov. 2026) : elle ne sert qu'à la fiche produit, pour fixer le prix de vente;
+// le lot, le stock et la comptabilité restent au prix réel (avant, une marge faisait refuser la fabrication).
 function calculerCoutRevient(ingredients) {
   const stock  = listesDropdown.stock  || [];
-  const config = listesDropdown.config || {};
 
   let total = 0;
   ingredients.forEach(ing => {
     const stockItem = stock.find(s => s.ing_id === ing.ing_id);
     if (!stockItem) return;
-
-    const prixParG = stockItem.prix_par_g_reel || 0;
-    const cat_id   = stockItem.cat_id || '';
-    const cfg      = config[cat_id] || {};
-    const perte    = cfg.margePertePct || 0;
-    const facteur  = 1 + (perte / 100);
-
-    total += (ing.quantite_g || 0) * prixParG * facteur;
+    total += (ing.quantite_g || 0) * (stockItem.prix_par_g_reel || 0);
   });
 
   // Structure ouverte pour bonifier plus tard :

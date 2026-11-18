@@ -120,7 +120,7 @@ async function sauvegarderFournisseur() {
     ef.fournisseurs = fournisseursDonnees;
     efPopulerFournisseurs();
     const sel = document.getElementById('ef-fournisseur');
-    if (sel) sel.value = payload.four_id;
+    if (sel) sel.value = res.four_id || payload.four_id;
   }
 }
 
@@ -144,18 +144,4 @@ async function supprimerFournisseur(four_id) {
       afficherMsg('fournisseurs', res?.message || 'Erreur suppression.', 'erreur');
     }
   });
-}
-
-// ─── CRÉER DEPUIS FACTURE ───
-// Appelé par efCreerFacture() quand four_id === '__nouveau__'
-async function efSauvegarderNouveauFournisseur(nom) {
-  const code = nom.trim().slice(0, 4).toUpperCase();
-  const res  = await appelAPIPost('saveFournisseur', { nom, code, site_web: '', notes: '' });
-  if (res && res.success && res.four_id) {
-    const nouveau = { four_id: res.four_id, nom, code, site_web: '', notes: '' };
-    ef.fournisseurs.push(nouveau);
-    fournisseursDonnees.push(nouveau);
-    return { four_id: res.four_id, code };
-  }
-  return { four_id: '', code: '' };
 }
