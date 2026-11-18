@@ -588,6 +588,12 @@ window.addEventListener('DOMContentLoaded', async function () {
       const r = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
       window.ucCommandeVue = r;
       window.ucCommandeNumero = numero;
+      // Des produits à venir : la cliente répond d'abord sur sa page (garder / laisser tomber), puis paie (18 nov. 2026)
+      if (r && r.success && r.statut === 'En attente de paiement' && r.choix_cliente !== 'recevoir' &&
+          (r.lignes || []).some(l => l.type_ligne === 'temporaire')) {
+        afficherPageUniqueBloc2(r, numero, jeton);
+        return;
+      }
       if (r && r.success && r.statut === 'En attente de paiement' && r.lien_square) {
         // Avant d'offrir le paiement : vérifier que le lien Square est encore vivant.
         const verif = await appelAPIPost('verifierLienSquareCommande', { cmd_id: numero, jeton: jeton });
@@ -721,7 +727,9 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         } else {
           const messageBloque = (res.statut === 'À expédier')
             ? 'Votre commande est en traitement — elle ne peut plus être modifiée.'
-            : 'Cette commande ne peut plus être modifiée-annulée.';
+            : (res.statut === 'En attente de réapprovisionnement')
+              ? 'C\'est noté : nous vous recontacterons dès que tout sera prêt.'
+              : 'Cette commande ne peut plus être modifiée-annulée.';
           bloque.innerHTML = '<p class="titre">Merci de votre intérêt</p>' +
             '<p class="textes-discrets">' + messageBloque + '</p>' +
             '<p><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
@@ -737,11 +745,18 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     const aDesDefinitifs  = res.lignes.some(l => l.type_ligne === 'definitif');
     const estBloc2ou3 = aDesTemporaires || aDesDefinitifs;
 
-    if (!estBloc2ou3) {
+    // Sorte 2 : la page à trois sections (18 nov. 2026 : avant, elle était aussitôt écrasée par la liste
+    // ordinaire). « Modifier la liste » y ramène ici avec action=modifier-liste.
+    if (estBloc2ou3 && res.statut === 'En attente de paiement' && params.get('action') !== 'modifier-liste') {
+      afficherPageUniqueBloc2(res, numero, jeton);
+      return;
+    }
+
+    {
       // Proposition déjà envoyée (statut « En attente de paiement ») : on NE laisse PAS
       // modifier/renvoyer depuis le 1er courriel (ça effacerait la proposition). On guide
       // le client vers le paiement, ou vers Contact.
-      if (res.statut === 'En attente de paiement' && params.get('action') !== 'modifier') {
+      if (res.statut === 'En attente de paiement' && params.get('action') !== 'modifier' && params.get('action') !== 'modifier-liste') {
         if (zone) zone.innerHTML = '<h2 class="titre">Une proposition vous a été envoyée pour cette commande.</h2>' +
           '<p class="textes-discrets">Nous vous avons envoyé une proposition par courriel, avec les prix et la livraison. Si vous ne la retrouvez pas...</p>' +
           '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" id="prop-renvoyer">Recevez à nouveau votre proposition</button>' +
@@ -774,9 +789,6 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       }));
       sauvegarderDemandeListe();
       demandeRafraichirAffichage();
-    } else {
-      // Blocs 2 et 3 — page unique avec sections
-      afficherPageUniqueBloc2(res.lignes, numero, jeton);
     }
 
     let coupdecoeurTouche = false;
@@ -965,124 +977,125 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
   }
 });
 
-function afficherPageUniqueBloc2(lignes, cmd_id, jeton) {
+// Sorte 2 — la page de la proposition à trois sections (prêts · à venir · non disponibles). Réécrite le 18 nov. 2026 :
+// · « Recevoir ce qui est prêt » garde le choix de la cliente sur le serveur, puis l'amène à l'adresse et au paiement
+//   (avant : la commande passait « À expédier » sans paiement);
+// · « Attendre que tout soit prêt » : les produits prêts restent mis de côté;
+// · un seul écouteur de clics (avant, chaque réponse en ajoutait un); textes échappés.
+function afficherPageUniqueBloc2(res, cmd_id, jeton) {
   const zone = document.getElementById('coupdecoeur-commande');
   if (!zone) return;
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  const sec = document.getElementById('section-coupdecoeur');
+  if (sec) sec.classList.add('active');
 
-  const prets      = lignes.filter(l => !l.type_ligne || l.type_ligne === 'pret');
+  const lignes      = res.lignes || [];
+  const cleDe       = l => l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
+  const prets       = lignes.filter(l => !l.type_ligne || l.type_ligne === 'pret');
   const temporaires = lignes.filter(l => l.type_ligne === 'temporaire');
   const definitifs  = lignes.filter(l => l.type_ligne === 'definitif');
+  const esc   = t => (typeof echapperHtml === 'function') ? echapperHtml(t) : String(t == null ? '' : t);
+  const prix  = n => (typeof formaterPrix === 'function') ? formaterPrix(n) : (Number(n) || 0).toFixed(2).replace('.', ',') + ' $';
+  const dateLongue = v => {
+    const d = new Date(String(v || '').slice(0, 10) + 'T12:00:00');
+    return isNaN(d) ? '' : d.toLocaleDateString('fr-CA', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
 
-  // Charger les réponses sauvegardées
-  let reponsesStr = '';
-  try { reponsesStr = localStorage.getItem('uc_reponses_' + cmd_id) || '{}'; } catch(e) {}
-  const reponses = JSON.parse(reponsesStr);
-
-  function rangee(l, avecBoutons) {
-    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
-    const rep = reponses[cle];
-    let html = '<div class="rangeeitem" data-cle="' + cle + '">';
-    html += '<div class="rangeeitem-info">';
-    if (l.nom_collection) html += '<div class="sur-titre">' + l.nom_collection + '</div>';
-    html += '<div class="rangeeitem-titre">' + (l.nom || l.pro_id) + '</div>';
-    html += '<div class="rangeeitem-meta">' + (l.nom_gamme ? l.nom_gamme + ' · ' : '') + l.format_poids + ' ' + l.format_unite;
-    if (l.date_dispo) html += ' &nbsp;·&nbsp; disponible vers ' + l.date_dispo;
-    html += '</div></div>';
-    if (avecBoutons) {
-      html += '<div class="actions">';
-      html += '<button type="button" class="boutons boutons-petit' + (rep === 'garder' ? ' boutons-accent' : ' boutons-contour') + '" data-action="garder" data-cle="' + cle + '">Garder</button>';
-      html += '<button type="button" class="boutons boutons-petit' + (rep === 'laisser' ? ' boutons-rouge' : ' boutons-contour') + '" data-action="laisser" data-cle="' + cle + '">Laisser tomber</button>';
-      html += '</div>';
-    }
-    html += '</div>';
-    return html;
+  // Réponses : celles de ce navigateur pour CETTE proposition, sinon celles déjà gardées par le serveur
+  const cleReponses = 'uc_reponses_' + cmd_id + '_' + (res.date_prop || 0);
+  let reponses = {};
+  try { reponses = JSON.parse(localStorage.getItem(cleReponses) || '{}') || {}; } catch (e) { reponses = {}; }
+  if (res.choix_cliente && !Object.keys(reponses).length) {
+    temporaires.forEach(l => { reponses[cleDe(l)] = (res.temporaires_gardes || []).indexOf(cleDe(l)) > -1 ? 'garder' : 'laisser'; });
   }
 
-  function section(titre, liste, avecBoutons, sousTitre) {
+  const totalPrets = prets.reduce((s, l) => s + (l.prix_unitaire || 0) * (l.quantite || 0), 0);
+  const totalAPayer = Math.max(0, totalPrets + (res.livraison || 0) - (res.rabais || 0));
+
+  function rangee(l, sorte) {
+    const cle = cleDe(l);
+    const rep = reponses[cle];
+    let h = '<div class="rangeeitem">';
+    h += '<div class="rangeeitem-info">';
+    if (l.nom_collection) h += '<div class="sur-titre">' + esc(l.nom_collection) + '</div>';
+    h += '<div class="rangeeitem-titre">' + esc(l.nom || l.pro_id) + '</div>';
+    h += '<div class="rangeeitem-meta">' + (l.nom_gamme ? esc(l.nom_gamme) + ' · ' : '') + esc(l.format_poids) + ' ' + esc(l.format_unite) + ' × ' + esc(l.quantite);
+    if (sorte === 'temporaire' && dateLongue(l.date_dispo)) h += ' &nbsp;·&nbsp; disponible vers le ' + dateLongue(l.date_dispo);
+    h += '</div></div>';
+    if (sorte === 'pret') h += '<div class="rangeeitem-valeur">' + prix((l.prix_unitaire || 0) * (l.quantite || 0)) + '</div>';
+    if (sorte === 'temporaire') {
+      h += '<div class="actions">';
+      h += '<button type="button" class="boutons boutons-petit' + (rep === 'garder' ? ' boutons-accent' : ' boutons-contour') + '" data-action="garder" data-cle="' + esc(cle) + '">Garder</button>';
+      h += '<button type="button" class="boutons boutons-petit' + (rep === 'laisser' ? ' boutons-rouge' : ' boutons-contour') + '" data-action="laisser" data-cle="' + esc(cle) + '">Laisser tomber</button>';
+      h += '</div>';
+    }
+    return h + '</div>';
+  }
+
+  function section(titre, liste, sorte, sousTitre) {
     if (!liste.length) return '';
     let h = titre ? '<div class="sur-titre">' + titre + '</div>' : '';
     if (sousTitre) h += '<p class="textes-discrets">' + sousTitre + '</p>';
-    liste.forEach(l => { h += rangee(l, avecBoutons); });
+    liste.forEach(l => { h += rangee(l, sorte); });
     return h;
   }
 
-  const tousRepondus = temporaires.every(l => {
-    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
-    return reponses[cle] === 'garder' || reponses[cle] === 'laisser';
-  });
-
-  // « Prêts à partir » n'a de sens que par contraste : si tout est prêt, on l'efface.
-  let html = section((temporaires.length || definitifs.length) ? 'Prêts à partir' : '', prets, false, '');
-  html += section('En attente de fabrication', temporaires, true, 'Indiquez ce que vous souhaitez faire pour chaque produit.');
-  html += section('Non disponibles', definitifs, false, 'Ces produits ne peuvent pas faire partie de cette commande.');
-
-  if (tousRepondus || !temporaires.length) {
-    const aGardes = temporaires.some(l => reponses[l.pro_id + '|' + l.format_poids + '|' + l.format_unite] === 'garder');
-    if (prets.length || aGardes) {
-      html += '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" data-action="recevoir-pret">Recevoir ce qui est prêt</button>';
+  function rendre(message) {
+    const tousRepondus = temporaires.every(l => reponses[cleDe(l)] === 'garder' || reponses[cleDe(l)] === 'laisser');
+    let html = '<h2 class="titre">Votre proposition</h2>';
+    html += section('Prêts à partir', prets, 'pret', '');
+    html += '<div class="lignetotal"><span class="lignetotal-libelle">À payer maintenant' + ((res.livraison || 0) > 0 ? ' (livraison incluse)' : '') + '</span><span>' + prix(totalAPayer) + '</span></div>';
+    html += section('En attente de fabrication', temporaires, 'temporaire', 'Pour chaque produit, dites-nous si vous souhaitez le garder pour plus tard.');
+    html += section('Non disponibles', definitifs, 'definitif', 'Ces produits ne pourront malheureusement pas faire partie de cette commande.');
+    if (tousRepondus) {
+      html += '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" data-action="recevoir-pret">Recevoir ce qui est prêt et payer</button>';
+      if (temporaires.length) html += '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="attendre-tout">Attendre que tout soit prêt</button>';
+    } else {
+      html += '<p class="textes-discrets">Répondez pour chaque produit en attente de fabrication pour continuer.</p>';
     }
-    html += '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="attendre-tout">Attendre que tout soit prêt</button>';
+    html += '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="modifier-liste">Modifier la liste</button>';
+    html += '<p class="textes-discrets"><a href="#" class="lien-discret" data-action="question">J\'ai une question</a></p>';
+    html += '<div id="coupdecoeur-msg" class="' + (message ? '' : 'cache') + '">' + (message ? esc(message) : '') + '</div>';
+    zone.innerHTML = html;
   }
 
-  html += '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="modifier-bloc2">Modifier</button>';
-  html += '<p class="textes-discrets"><a href="#" class="lien-discret" onclick="ouvrirContactCommande(null, \'' + cmd_id + '\'); return false;">J\'ai une question</a></p>';
-  html += '<div id="coupdecoeur-msg" class="cache"></div>';
+  const lien = action => window.location.pathname + '?cmd=' + encodeURIComponent(cmd_id) + '&jeton=' + encodeURIComponent(jeton) + '&action=' + action;
 
-  zone.innerHTML = html;
-
-  zone.addEventListener('click', async function handler(ev) {
+  async function surClic(ev) {
     const btn = ev.target.closest('[data-action]');
-    if (!btn) return;
+    if (!btn || !zone.contains(btn)) return;
     const action = btn.dataset.action;
-    const cle    = btn.dataset.cle || '';
-
     if (action === 'garder' || action === 'laisser') {
-      reponses[cle] = action;
-      try { localStorage.setItem('uc_reponses_' + cmd_id, JSON.stringify(reponses)); } catch(e) {}
-      afficherPageUniqueBloc2(lignes, cmd_id, jeton);
+      reponses[btn.dataset.cle] = action;
+      try { localStorage.setItem(cleReponses, JSON.stringify(reponses)); } catch (e) {}
+      rendre();
       return;
     }
+    if (action === 'question') { ev.preventDefault(); ouvrirContactCommande(res, cmd_id); return; }
+    if (action === 'modifier-liste') { window.location.href = lien('modifier-liste'); return; }
+    if (action !== 'recevoir-pret' && action !== 'attendre-tout') return;
 
-    if (action === 'modifier-bloc2') {
-      demandeListe = lignes.map(l => ({
-        pro_id: l.pro_id, format_poids: l.format_poids, format_unite: l.format_unite,
-        nom_produit: l.nom, prix_unitaire: l.prix_unitaire, image_url: l.image_url,
-        nom_collection: l.nom_collection, nom_gamme: l.nom_gamme, quantite: l.quantite
-      }));
-      sauvegarderDemandeListe();
-      demandeRafraichirAffichage();
-      return;
+    btn.disabled = true;
+    montrerVoile();
+    const gardes = temporaires.filter(l => reponses[cleDe(l)] === 'garder').map(cleDe);
+    try {
+      const r = await appelAPIPost(action === 'recevoir-pret' ? 'recevoirPret' : 'attendreTout', { cmd_id: cmd_id, jeton: jeton, gardes: gardes });
+      cacherVoile();
+      if (!r || !r.success) { rendre('Erreur : ' + ((r && r.message) || 'échec') + '. Réessayez ou écrivez-nous.'); return; }
+      if (action === 'recevoir-pret') { window.location.href = lien('payer'); return; }
+      zone.removeEventListener('click', surClic);
+      try { localStorage.removeItem(cleReponses); } catch (e) {}
+      zone.innerHTML = '<h2 class="titre">C\'est noté!</h2>' +
+        '<p class="textes-discrets">Vos produits prêts sont mis de côté. Nous vous recontacterons dès que tout sera prêt.</p>' +
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
+    } catch (e) {
+      cacherVoile();
+      rendre('Erreur : ' + e.message + '. Réessayez ou écrivez-nous.');
     }
+  }
 
-    if (action === 'attendre-tout' || action === 'recevoir-pret') {
-      btn.disabled = true;
-      montrerVoile();
-      const msg = document.getElementById('coupdecoeur-msg');
-      const temporairesGardes = temporaires
-        .filter(l => reponses[l.pro_id + '|' + l.format_poids + '|' + l.format_unite] === 'garder')
-        .map(l => ({ pro_id: l.pro_id, format_poids: l.format_poids, format_unite: l.format_unite, date_dispo: l.date_dispo }));
-
-      try {
-        const r = await appelAPIPost(action === 'recevoir-pret' ? 'recevoirPret' : 'attendreTout', {
-          cmd_id, jeton, temporaires_gardes: temporairesGardes
-        });
-        cacherVoile();
-        if (r && r.success) {
-          zone.removeEventListener('click', handler);
-          if (action === 'recevoir-pret') {
-            zone.innerHTML = '<h2 class="titre">Merci!</h2><p class="textes-discrets">Ce qui est prêt est en route. Nous vous recontacterons pour le reste.</p><button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
-          } else {
-            zone.innerHTML = '<h2 class="titre">Noté!</h2><p class="textes-discrets">Nous vous recontacterons quand tout sera prêt.</p><button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
-          }
-        } else {
-          if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || 'échec'); msg.classList.remove('cache'); }
-          btn.disabled = false;
-        }
-      } catch(e) {
-        cacherVoile();
-        if (msg) { msg.textContent = 'Erreur : ' + e.message; msg.classList.remove('cache'); }
-        btn.disabled = false;
-      }
-    }
-  });
+  if (zone._ucSorte2) zone.removeEventListener('click', zone._ucSorte2);
+  zone._ucSorte2 = surClic;
+  zone.addEventListener('click', surClic);
+  rendre();
 }

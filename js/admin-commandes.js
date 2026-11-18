@@ -745,6 +745,10 @@ async function voirDetailCommande(cmd_id) {
   if (c.statut === 'Étiquette prête') {
     actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerEtiquette('${c.cmd_id}')">Annuler l'étiquette</button>`;
   }
+  if (c.statut === 'En attente de réapprovisionnement') {
+    actionsHTML += `<button class="bouton bouton-or" onclick="reproposerCommande('${c.cmd_id}')">Re-proposer</button>`;
+    actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
+  }
   if (c.statut === 'Verrouillée') {
     actionsHTML += `<button class="bouton bouton-or" onclick="ouvrirFormCompleter('${c.cmd_id}')">Reprendre la proposition</button>`;
   }
@@ -903,7 +907,9 @@ function annulerCommande(cmd_id) {
   const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
   // « Payée — facture à faire » ajouté le 18 nov. 2026 : son stock restait sorti pour toujours
   const payee = c && c.statut === 'Payée — facture à faire';
-  const stockSorti = c && (c.statut === 'En attente de paiement' || c.statut === 'Modifiée' || payee);
+  // « En attente de réapprovisionnement » (18 nov. 2026) : produits prêts mis de côté, ou commande suivante sans stock
+  const reappro = c && c.statut === 'En attente de réapprovisionnement';
+  const stockSorti = c && (c.statut === 'En attente de paiement' || c.statut === 'Modifiée' || payee || reappro);
   let message = stockSorti
     ? 'Annuler cette commande ? Le stock réservé sera remis en inventaire.'
     : 'Annuler cette commande ?';
@@ -933,15 +939,39 @@ function annulerCommande(cmd_id) {
   });
 }
 
+// Re-proposer une commande « En attente de réapprovisionnement » (18 nov. 2026) : le stock mis de côté retourne
+// en inventaire (rien à rendre pour une commande suivante), la commande repasse « En attente », puis l'écran de
+// proposition s'ouvre comme d'habitude.
+function reproposerCommande(cmd_id) {
+  confirmerAction('Re-proposer cette commande ? Les produits mis de côté retournent en inventaire, puis l\'écran de proposition s\'ouvre.', async () => {
+    afficherChargement();
+    const r = await appelAPIPost('remettreStockCommande', { cmd_id, statut_apres: 'En attente' });
+    if (!r || !r.success) {
+      cacherChargement();
+      afficherMsg('commandes', '❌ ' + (r?.message || 'Erreur.'), 'erreur');
+      return;
+    }
+    fermerFicheCommande();
+    await chargerCommandes();
+    cacherChargement();
+    ouvrirFormCompleter(cmd_id);
+  });
+}
+
 // ═══════════════════════════════════════
 // COMPLÉTER LA COMMANDE (nouveau flow)
 // ═══════════════════════════════════════
 var cmdCompleterIdEnCours = null;
 
+// Montant du lien Square généré dans cet écran : s'il ne colle plus au total au moment d'envoyer (un produit
+// passé « à venir » après coup, une livraison changée), l'envoi est refusé (18 nov. 2026)
+var cmdCompleterMontantLien = null;
+
 function ouvrirFormCompleter(cmd_id) {
   const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
   if (!c) return;
   cmdCompleterIdEnCours = cmd_id;
+  cmdCompleterMontantLien = null;
 
   // Verrou : le client ne peut plus toucher la commande pendant qu'on prépare la proposition
   if (c.statut === 'En attente') {
@@ -1105,15 +1135,7 @@ async function genererLienSquare() {
   if (!c) return;
   const livraison = parseFloat(String(document.getElementById('completer-livraison').value).replace(',', '.')) || 0;
   const rabais = cmdCompleterCalculerRabais();
-  const lignes = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours);
-  const totalPrets = lignes.reduce((s, l) => {
-    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
-    const sel = document.querySelector('[data-cle="' + cle + '"]');
-    const type = (sel && sel.value) ? sel.value : 'pret';
-    if (type === 'definitif' || type.startsWith('temporaire')) return s;
-    return s + (l.prix_unitaire * l.quantite);
-  }, 0);
-  const montant = Math.max(0, totalPrets + livraison - rabais);
+  const montant = Math.max(0, Math.round((cmdCompleterSousTotalPrets() + livraison - rabais) * 100) / 100);
   if (montant <= 0) { afficherMsg('commandes', 'Montant invalide — aucun produit prêt à payer.', 'erreur'); return; }
   afficherChargement();
   const courriel = document.getElementById('completer-courriel').value.trim();
@@ -1123,6 +1145,7 @@ async function genererLienSquare() {
   const res = await appelAPIPost('creerLienPaiement', { cmd_id: cmdCompleterIdEnCours, montant: montant, nom: 'Vos coups de cœur. Commande ' + c.cmd_id.replace('CMD-', '-'), courriel: courriel, telephone: telephone, prenom: prenom, nom_client: nomClient });
   cacherChargement();
   if (res && res.success && res.url) {
+    cmdCompleterMontantLien = montant;
     document.getElementById('completer-square').value = res.url;
     if (res.link_id) {
       const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
@@ -1347,19 +1370,44 @@ function cmdCompleterAppliquerPromo() {
   }
 }
 
+// Type d'une ligne choisi dans l'écran de proposition : « pret », « temporaire » ou « definitif ».
+// 18 nov. 2026 : lu sur la liste (select), pas sur la rangée qui porte le même data-cle — avant, toutes les
+// lignes partaient « prêtes ». Sans liste (assez de stock), la ligne est prête.
+function cmdCompleterTypeLigne(l) {
+  const sel = document.querySelector('select[data-cle="' + l.pro_id + '|' + l.format_poids + '|' + l.format_unite + '"]');
+  const v = sel ? sel.value : 'pret';
+  return !v || v === 'pret' ? 'pret' : v.indexOf('temporaire') === 0 ? 'temporaire' : 'definitif';
+}
+
+function cmdCompleterDateLigne(l) {
+  const inp = document.querySelector('input[data-cle-date="' + l.pro_id + '|' + l.format_poids + '|' + l.format_unite + '"]');
+  return inp && !inp.disabled ? inp.value : '';
+}
+
+// Tout l'argent de la proposition se calcule sur les produits prêts : ce sont les seuls que la cliente paie
+// maintenant (sous-total, rabais, total, solde, lien Square — 18 nov. 2026)
+function cmdCompleterLignesPretes() {
+  return toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours && cmdCompleterTypeLigne(l) === 'pret');
+}
+
+function cmdCompleterSousTotalPrets() {
+  return Math.round(cmdCompleterLignesPretes().reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0) * 100) / 100;
+}
+
 function cmdCompleterCalculerRabais() {
   const sel = document.getElementById('completer-promotion');
   if (!sel || !sel.value) return 0;
   const data = JSON.parse(sel.value);
-  const sousTotal = cmdCompleterPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
+  const panier = cmdCompleterPanier.filter(l => cmdCompleterTypeLigne({ pro_id: l.pro_id, format_poids: l.poids, format_unite: l.unite }) === 'pret');
+  const sousTotal = panier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   if (data.kind === 'programmee') {
     if (data.statut !== 'applicable') return 0;
     const p = donneesPromotions.find(x => x.promo_id === data.promo_id);
     if (!p) return 0;
     if (p.type === 'qte_produit') {
       let rabais = 0;
-      cmdCompleterPanier.forEach(l => {
-        const qteTotale = cmdCompleterPanier.filter(x => x.pro_id === l.pro_id).reduce((s, x) => s + x.quantite, 0);
+      panier.forEach(l => {
+        const qteTotale = panier.filter(x => x.pro_id === l.pro_id).reduce((s, x) => s + x.quantite, 0);
         if (qteTotale >= p.quantite_min) rabais += p.valeur * l.quantite;
       });
       return rabais;
@@ -1416,12 +1464,14 @@ async function apercuProposition() {
   const square    = document.getElementById('completer-square').value.trim();
   const livraisonNum = parseFloat(String(document.getElementById('completer-livraison').value).replace(',', '.')) || 0;
   const rabais    = cmdCompleterCalculerRabais();
-  const totalAvec = Math.max(0, (c.total_prevu || 0) + livraisonNum - rabais);
+  const sousTotalPrets = cmdCompleterSousTotalPrets();
+  const totalAvec = Math.max(0, sousTotalPrets + livraisonNum - rabais);
 
   const lignesCourriel = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
     const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
     const col = donneesCollections.find(cc => cc.col_id === (pro && pro.col_id));
     const gam = donneesGammes.find(gg => gg.gam_id === (pro && pro.gam_id));
+    const type = cmdCompleterTypeLigne(l);
     return {
       nom: pro ? pro.nom : l.pro_id,
       nom_collection: col ? col.nom : '',
@@ -1429,8 +1479,10 @@ async function apercuProposition() {
       poids: l.format_poids,
       unite: l.format_unite,
       quantite: l.quantite,
+      type_ligne: type,
+      date_dispo: type === 'temporaire' ? cmdCompleterDateLigne(l) : '',
       prix_unitaire: formaterPrix(l.prix_unitaire),
-      prix_total: formaterPrix(l.prix_unitaire * l.quantite)
+      prix_total: type === 'pret' ? formaterPrix(l.prix_unitaire * l.quantite) : ''
     };
   });
 
@@ -1442,7 +1494,7 @@ async function apercuProposition() {
     note: note,
     lien_square: square,
     lignes: lignesCourriel,
-    sous_total: formaterPrix(c.total_prevu || 0),
+    sous_total: formaterPrix(sousTotalPrets),
     rabais: rabais > 0 ? formaterPrix(rabais) : 0,
     promo_nom: cmdCompleterNomPromo(),
     livraison: livraisonNum > 0 ? formaterPrix(livraisonNum) : 0,
@@ -1496,12 +1548,8 @@ async function envoyerPropositionV3() {
   const dateProposition = new Date().toLocaleDateString('fr-CA');
 
   const lignesPayload = toutesCommandesLignes.filter(l => l.cmd_id === cmdCompleterIdEnCours).map(l => {
-    const cle = l.pro_id + '|' + l.format_poids + '|' + l.format_unite;
-    const selType  = document.querySelector('[data-cle="' + cle + '"]');
-    const inpDate  = document.querySelector('[data-cle-date="' + cle + '"]');
-    const typeLigne = selType ? selType.value : 'pret';
-    const dateDispo = inpDate ? inpDate.value : '';
-    const typeNormalise = !typeLigne || typeLigne === 'pret' ? 'pret' : typeLigne.startsWith('temporaire') ? 'temporaire' : 'definitif';
+    const typeNormalise = cmdCompleterTypeLigne(l);
+    const dateDispo = typeNormalise === 'temporaire' ? cmdCompleterDateLigne(l) : '';
     return {
       pro_id: l.pro_id,
       format_poids: l.format_poids,
@@ -1515,7 +1563,20 @@ async function envoyerPropositionV3() {
 
   const rabais = cmdCompleterCalculerRabais();
   const promoInfo = cmdCompleterTypePromo();
-  const totalAvec = Math.max(0, (c.total_prevu || 0) + livraisonNum - rabais);
+  const sousTotalPrets = cmdCompleterSousTotalPrets();
+  const totalAvec = Math.max(0, sousTotalPrets + livraisonNum - rabais);
+  if (square && cmdCompleterMontantLien !== null && Math.abs(cmdCompleterMontantLien - totalAvec) > 0.005) {
+    window.cmdCompleterEnvoiEnCours = false;
+    cacherChargement();
+    afficherMsg('commandes', '❌ Le lien Square demande ' + formaterPrix(cmdCompleterMontantLien) + ', mais le total est maintenant ' + formaterPrix(totalAvec) + ' : générez le lien à nouveau.', 'erreur');
+    return;
+  }
+  if (!cmdCompleterLignesPretes().length) {
+    window.cmdCompleterEnvoiEnCours = false;
+    afficherMsg('commandes', '❌ Aucun produit prêt : une proposition sans produit prêt ne peut pas encore partir.', 'erreur');
+    cacherChargement();
+    return;
+  }
 
   const resUpdate = await appelAPIPost('updateCommandeComplete', {
     cmd_id: cmdCompleterIdEnCours,
@@ -1561,6 +1622,7 @@ async function envoyerPropositionV3() {
     const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
     const col = donneesCollections.find(cc => cc.col_id === (pro && pro.col_id));
     const gam = donneesGammes.find(gg => gg.gam_id === (pro && pro.gam_id));
+    const type = cmdCompleterTypeLigne(l);
     return {
       nom: pro ? pro.nom : l.pro_id,
       nom_collection: col ? col.nom : '',
@@ -1568,8 +1630,10 @@ async function envoyerPropositionV3() {
       poids: l.format_poids,
       unite: l.format_unite,
       quantite: l.quantite,
+      type_ligne: type,
+      date_dispo: type === 'temporaire' ? cmdCompleterDateLigne(l) : '',
       prix_unitaire: formaterPrix(l.prix_unitaire),
-      prix_total: formaterPrix(l.prix_unitaire * l.quantite)
+      prix_total: type === 'pret' ? formaterPrix(l.prix_unitaire * l.quantite) : ''
     };
   });
 
@@ -1580,7 +1644,7 @@ async function envoyerPropositionV3() {
     note: note,
     lien_square: square,
     lignes: lignesCourriel,
-    sous_total: formaterPrix(c.total_prevu || 0),
+    sous_total: formaterPrix(sousTotalPrets),
     rabais: rabais > 0 ? formaterPrix(rabais) : 0,
     promo_nom: cmdCompleterNomPromo(),
     livraison: livraisonNum > 0 ? formaterPrix(livraisonNum) : 0,
@@ -1645,7 +1709,9 @@ async function confirmerPaiementCommande(mode_paiement) {
       await appelAPIPost('annulerLienSquare', { link_id: c.link_id_square });
     }
     cacherChargement();
-    afficherMsg('commandes', '✅ Paiement confirmé. Facture ' + res.ven_id + ' créée.');
+    afficherMsg('commandes', '✅ Paiement confirmé. Facture ' + res.ven_id + ' créée.' +
+      (res.suite ? ' Les produits gardés par la cliente forment la commande ' + res.suite + ' (en attente de réapprovisionnement).' : '') +
+      (res.avertissement ? ' ⚠️ ' + res.avertissement : ''), res.avertissement ? 'erreur' : undefined);
     fermerFicheCommande();
     chargerCommandes();
   } else {
