@@ -1274,7 +1274,8 @@ function ouvrirModal(produit) {
     prixFormatEl.style.color = couleurTexteContraste(couleur) === 'carte-infos-fonce' ? 'rgba(0,0,0,0.85)' : 'white';
   }
 
-  // INCI — V2 : ingredients = [{ing_id, nom_ingredient, quantite_g}]
+  // INCI : ingredients = [{ing_id, nom_ingredient, inci, cat_id}], déjà triés par le serveur de la plus grande quantité
+  // à la plus petite (ordre légal). Les grammes ne sortent plus du serveur : ce sont les recettes (18 nov. 2026).
   // La liste INCI vient de nom_ingredient — mais on affiche UNIQUEMENT le code INCI
   // ⚠️ RÈGLE LÉGALE : jamais de nom_ingredient à la place de INCI
   // En V2 les ingrédients publics n'ont pas de champ inci direct dans le catalogue
@@ -1284,7 +1285,7 @@ function ouvrirModal(produit) {
     const ingredients = produit.ingredients || [];
     const avecInci = ingredients.filter(i => i.inci && i.inci.trim());
     if (avecInci.length > 0) {
-      const tries = [...avecInci].sort((a, b) => (parseFloat(b.quantite_g) || 0) - (parseFloat(a.quantite_g) || 0));
+      const tries = avecInci;
       const vus = new Set();
       const inciUniques = [];
       tries.forEach(i => {
