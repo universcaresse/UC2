@@ -1569,15 +1569,6 @@ async function envoyerPropositionV3() {
   const square    = document.getElementById('completer-square').value;
   const livraisonNum = parseFloat(String(livraison).replace(',', '.')) || 0;
 
-  // Ouvrir le texto tout de suite — doit partir du clic direct, avant les envois
-  if (telephone) {
-    let texteSms = 'Bonjour ' + ',\n\n';
-    texteSms += 'Votre proposition de commande Univers caresse - Savonnerie artisanale vient de vous être envoyée par courriel.\n';
-    texteSms += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
-    texteSms += 'Merci !\nUnivers caresse - Savonnerie artisanale';
-    window.open('sms:' + telephone + '?body=' + encodeURIComponent(texteSms));
-  }
-
   afficherChargement();
 
   const dateProposition = new Date().toLocaleDateString('fr-CA');
@@ -1678,7 +1669,15 @@ async function envoyerPropositionV3() {
   cacherChargement();
 
   if (resCourriel && resCourriel.success) {
-    afficherMsg('commandes', '✅ Proposition envoyée au client, stock sorti.');
+    afficherMsg('commandes', '✅ Proposition envoyée à ' + courriel + ', stock sorti.');
+    // Texto après le courriel (18 nov. 2026) : passer à Messages pendant les envois pouvait les couper sur iPad
+    if (telephone) {
+      let texteSms = 'Bonjour ' + (prenom || client) + ',\n\n';
+      texteSms += 'Votre proposition de commande Univers caresse - Savonnerie artisanale vient de vous être envoyée par courriel.\n';
+      texteSms += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
+      texteSms += 'Merci !\nUnivers caresse - Savonnerie artisanale';
+      ouvrirTexto(telephone, texteSms, true);
+    }
   } else {
     afficherMsg('commandes', '⚠️ Stock sorti, mais le courriel n\'est pas parti : ' + (resCourriel?.message || 'erreur') + '. Corrige le courriel et renvoie.', 'erreur');
   }
@@ -1733,12 +1732,12 @@ function textoProposition(cmd_id) {
     return;
   }
 
-  let texte = 'Bonjour ' + (c.client || '') + ',\n\n';
+  let texte = 'Bonjour ' + (c.prenom || c.client || '') + ',\n\n';
   texte += 'Votre proposition de commande Univers caresse Savonnerie artisanale vient de vous être envoyée par courriel.\n';
   texte += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
   texte += 'Merci !\nUnivers caresse Savonnerie artisanale';
 
-  window.open('sms:' + telephone + '?body=' + encodeURIComponent(texte));
+  ouvrirTexto(telephone, texte);
 }
 
 // ═══════════════════════════════════════
@@ -1825,7 +1824,7 @@ async function facturerFrais(cmd_id) {
       let sms = 'Bonjour ' + (c.client || '') + ',\n\n';
       sms += 'Voici les frais de livraison pour votre commande ' + cmd_id + ' : ' + formaterPrix(resT.montant) + '.\n';
       sms += 'Payez ici : ' + res.url + '\n\nMerci !\nUnivers caresse Savonnerie artisanale';
-      window.open('sms:' + telephone + '?body=' + encodeURIComponent(sms));
+      ouvrirTexto(telephone, sms, true);
     }
     if (res.courriel_parti) afficherMsg('commandes', '✅ Frais facturés, courriel envoyé.');
     else afficherMsg('commandes', "⚠️ Frais facturés, mais le courriel n'est PAS parti — à renvoyer à la main.", 'erreur');
@@ -1911,7 +1910,7 @@ function livrerEnPersonne(cmd_id) {
       sms += "Votre commande " + cmd_id + " vous sera livrée aujourd'hui.\n";
       if (res.lien_facture) sms += 'Votre facture : ' + res.lien_facture + '\n';
       sms += '\nMerci !\nUnivers caresse Savonnerie artisanale';
-      window.open('sms:' + telephone + '?body=' + encodeURIComponent(sms));
+      ouvrirTexto(telephone, sms, true);
     }
     if (res.courriel_parti) afficherMsg('commandes', '✅ Commande à livrer, courriel envoyé.');
     else afficherMsg('commandes', "⚠️ Commande à livrer, mais le courriel au client n'est PAS parti — à renvoyer à la main.", 'erreur');
@@ -2095,7 +2094,7 @@ function cmdEnvoyerTexto(i) {
   sms += 'Suivez votre colis ici : ' + lienSuivi + '\n';
   if (c.lien_facture) sms += 'Votre facture : ' + c.lien_facture + '\n';
   sms += '\nMerci !\nUnivers caresse Savonnerie artisanale';
-  window.open('sms:' + c.telephone + '?body=' + encodeURIComponent(sms));
+  ouvrirTexto(c.telephone, sms);
 
   const ligne = document.getElementById('texto-' + i);
   if (ligne) {

@@ -1202,7 +1202,7 @@ let texte = `Merci pour votre achat chez Univers caresse — Savonnerie artisana
   texte += `Univers caresse — Savonnerie artisanale\n\n`;
   texte += `${lienFacture}`;
 
-  window.open(`sms:${telephone}?body=${encodeURIComponent(texte)}`);
+  ouvrirTexto(telephone, texte, true);
   if (btnFvT) { btnFvT.disabled = false; btnFvT.innerHTML = btnFvT.dataset.texteOriginal || 'Texto'; }
   document.getElementById('modal-apres-vente').classList.remove('ouvert');
 } 

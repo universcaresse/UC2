@@ -363,10 +363,23 @@ function stringToColor(str) {
   return palette[Math.abs(h) % palette.length];
 }
 
-function confirmerAction(message, callback) {
+function confirmerAction(message, callback, libelle) {
   document.getElementById('modal-confirm-message').textContent = message;
-  document.getElementById('modal-confirm-btn').onclick = () => { fermerModalConfirm(); callback(); };
+  const btn = document.getElementById('modal-confirm-btn');
+  btn.textContent = libelle || 'Confirmer';
+  btn.onclick = () => { fermerModalConfirm(); callback(); };
   document.getElementById('modal-confirm').classList.add('ouvert');
+}
+
+// Texto (18 nov. 2026) : ouvre Messages avec le texte prêt; il reste à appuyer sur Envoyer.
+// Sur iPad et iPhone, Messages ne s'ouvre que sur un toucher direct. Après une attente du serveur
+// (apresAttente), le toucher est perdu : on montre donc un bouton « Ouvrir Messages ».
+function ouvrirTexto(telephone, texte, apresAttente) {
+  const tel = String(telephone || '').replace(/[^\d+]/g, '');
+  if (!tel) { afficherMsg('commandes', 'Aucun téléphone : texto impossible.', 'erreur'); return; }
+  const lien = 'sms:' + tel + '?&body=' + encodeURIComponent(texte);
+  if (!apresAttente) { window.location.href = lien; return; }
+  confirmerAction('Texto prêt pour le ' + telephone + '.', () => { window.location.href = lien; }, 'Ouvrir Messages');
 }
 
 function fermerModalConfirm() {
