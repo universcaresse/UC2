@@ -285,6 +285,11 @@ async function supprimerCollection(col_id) {
     afficherMsg('collections', `Impossible — ${gammes.length} gamme(s) sont liées à cette collection.`, 'erreur');
     return;
   }
+  const familles = (typeof donneesFamilles !== 'undefined' ? donneesFamilles : []).filter(f => f.col_id === col_id);
+  if (familles.length > 0) {
+    afficherMsg('collections', `Impossible — ${familles.length} famille(s) sont liées à cette collection.`, 'erreur');
+    return;
+  }
   confirmerAction('Supprimer cette collection ?', async () => {
     afficherChargement();
     const res = await appelAPIPost('deleteCollection', { col_id });

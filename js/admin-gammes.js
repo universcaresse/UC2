@@ -254,9 +254,14 @@ async function supprimerGamme(gam_id) {
     afficherMsg('collections', `Impossible — ${produitsLies.length} produit(s) sont liés à cette gamme.`, 'erreur');
     return;
   }
- confirmerAction('Supprimer cette gamme ?', async () => {
+  const familles = (typeof donneesFamilles !== 'undefined' ? donneesFamilles : []).filter(f => f.gam_id === gam_id);
+  if (familles.length > 0) {
+    afficherMsg('collections', `Impossible — ${familles.length} famille(s) sont liées à cette gamme.`, 'erreur');
+    return;
+  }
+  // Le serveur efface lui-même les ingrédients de la gamme (deleteGamme)
+  confirmerAction('Supprimer cette gamme ?', async () => {
     afficherChargement();
-    await appelAPIPost('saveGammeIngredients', { gam_id, ingredients: [] });
     const res = await appelAPIPost('deleteGamme', { gam_id, col_id: gam.col_id });
     if (res && res.success) {
       cacherChargement();
