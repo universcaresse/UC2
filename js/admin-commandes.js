@@ -466,7 +466,6 @@ function afficherTableauCommandes(items) {
     { titre: 'EN ATTENTE DE PAIEMENT',          statuts: ['En attente de paiement'] },
     { titre: 'PAYÉES — FACTURE À FAIRE',        statuts: ['Payée — facture à faire'] },
     { titre: 'EN ATTENTE DE RÉAPPROVISIONNEMENT', statuts: ['En attente de réapprovisionnement'] },
-    { titre: 'À RETRAVAILLER',                  statuts: ['À retravailler'] },
     { titre: 'À EXPÉDIER',                      statuts: ['À expédier'] },
     { titre: 'ÉTIQUETTE PRÊTE — À DÉPOSER',     statuts: ['Étiquette prête'] },
     { titre: 'À LIVRER',                        statuts: ['À livrer'] },
@@ -879,24 +878,6 @@ async function modifierCommande(cmd_id) {
 }
 
 // ═══════════════════════════════════════
-// CHANGER LE STATUT D'UNE COMMANDE
-// ═══════════════════════════════════════
-
-
-async function changerStatutCommande(cmd_id, nouveauStatut) {
-  afficherChargement();
-  const res = await appelAPIPost('updateStatutCommande', { cmd_id, statut: nouveauStatut });
-  cacherChargement();
-  if (res && res.success) {
-    afficherMsg('commandes', '✅ Statut mis à jour.');
-    fermerFicheCommande();
-    chargerCommandes();
-  } else {
-    afficherMsg('commandes', 'Erreur lors de la mise à jour.', 'erreur');
-  }
-}
-
-// ═══════════════════════════════════════
 // ANNULER UNE COMMANDE
 // ═══════════════════════════════════════
 function modifierProduitsCommande(cmd_id) {
@@ -907,9 +888,8 @@ function modifierProduitsCommande(cmd_id) {
     : 'Modifier les produits ? Le stock de cette commande sera remis en inventaire et tu devras renvoyer une proposition corrigée. Continuer ?';
   confirmerAction(message, async () => {
     afficherChargement();
-    const res = dejaModifiee
-      ? await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'En attente' })
-      : await appelAPIPost('remettreStockCommande', { cmd_id, statut_apres: 'En attente' });
+    // Toujours par remettreStockCommande (18 nov. 2026) : une commande « Modifiée » peut encore avoir son stock sorti
+    const res = await appelAPIPost('remettreStockCommande', { cmd_id, statut_apres: 'En attente' });
     cacherChargement();
     if (res && res.success) {
       await modifierCommande(cmd_id);
@@ -921,13 +901,18 @@ function modifierProduitsCommande(cmd_id) {
 
 function annulerCommande(cmd_id) {
   const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
-  const stockSorti = c && (c.statut === 'En attente de paiement' || c.statut === 'Modifiée');
+  // « Payée — facture à faire » ajouté le 18 nov. 2026 : son stock restait sorti pour toujours
+  const payee = c && c.statut === 'Payée — facture à faire';
+  const stockSorti = c && (c.statut === 'En attente de paiement' || c.statut === 'Modifiée' || payee);
   let message = stockSorti
     ? 'Annuler cette commande ? Le stock réservé sera remis en inventaire.'
     : 'Annuler cette commande ?';
   if (c && c.acompte > 0) {
     message = `⚠️ Un acompte de ${formaterPrix(c.acompte)} a été versé. Pensez à le rembourser au client avant d'annuler.`
       + (stockSorti ? ' Le stock sera remis en inventaire.' : '') + ' Continuer ?';
+  }
+  if (payee) {
+    message = '⚠️ Cette commande est payée : rembourser la cliente dans Square. Le stock sera remis en inventaire. Annuler la commande ?';
   }
   confirmerAction(message, async () => {
     afficherChargement();
@@ -946,77 +931,6 @@ function annulerCommande(cmd_id) {
       afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
     }
   });
-}
-
-// ═══════════════════════════════════════
-// CONVERTIR UNE COMMANDE EN VENTE
-// ═══════════════════════════════════════
-async function convertirCommandeEnVente(cmd_id) {
-  afficherChargement();
-  const [resEntete, resLignes, resLots] = await Promise.all([
-    appelAPI('getCommandesEntete'),
-    appelAPI('getCommandesLignes', { cmd_id }),
-    appelAPI('getLotsDisponibles')
-  ]);
-  cacherChargement();
-
-  if (!resEntete || !resEntete.success || !resLignes || !resLignes.success) {
-    afficherMsg('commandes', 'Erreur de chargement.', 'erreur');
-    return;
-  }
-
-  const c = resEntete.items.find(x => x.cmd_id === cmd_id);
-  if (!c) return;
-
-  // Fermer la fiche commande avant de changer de section
-  fermerFicheCommande();
-
-  // Préparer la conversion : aller dans la section Ventes et pré-remplir le panier
-  venLotsDisponibles = (resLots && resLots.success) ? resLots.items : [];
-
-  // Aller dans la section Ventes
-  afficherSection('ventes', null);
-  document.getElementById('contenu-ventes').classList.add('cache');
-  document.getElementById('filtres-ventes').classList.add('cache');
-  document.querySelector('#section-ventes .page-entete .bouton')?.classList.add('cache');
-
-  // Ouvrir le formulaire de vente
-  ouvrirFormVente();
-
-  // Remplir le client
-  document.getElementById('ven-client').value    = c.client || '';
-  document.getElementById('ven-courriel').value  = c.courriel || '';
-  document.getElementById('ven-telephone').value = c.telephone || '';
-
-  // Remplir le panier avec les lignes de la commande, en associant un lot disponible
-  venPanier = [];
-  (resLignes.items || []).forEach(l => {
-    const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
-    const lot = venLotsDisponibles.find(x =>
-      String(x.pro_id) === String(l.pro_id) &&
-      String(x.format_poids) === String(l.format_poids) &&
-      String(x.format_unite) === String(l.format_unite)
-    );
-    venPanier.push({
-      pro_id: l.pro_id,
-      lot_id: lot?.lot_id || '',
-      nom: pro?.nom || l.pro_id,
-      poids: l.format_poids,
-      unite: l.format_unite,
-      quantite: l.quantite,
-      prix_unitaire: l.prix_unitaire
-    });
-  });
-
-  venRafraichirPanier();
-
-  // Stocker le cmd_id pour l'utiliser après finalisation
-  sessionStorage.setItem('cmd-en-conversion', JSON.stringify({
-    cmd_id,
-    acompte: c.acompte || 0
-  }));
-
-  afficherMsg('ventes', `Commande ${c.cmd_id} prête à être convertie. Ajustez si besoin et finalisez la vente. Acompte versé : ${formaterPrix(c.acompte)}`);
 }
 
 // ═══════════════════════════════════════

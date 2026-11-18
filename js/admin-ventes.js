@@ -913,22 +913,6 @@ async function finaliserVente(modePaiement) {
     return;
   }
 
-  // Si cette vente provient d'une conversion de commande, mettre à jour la commande
-  const conversionRaw = sessionStorage.getItem('cmd-en-conversion');
-  if (conversionRaw) {
-    try {
-      const conversion = JSON.parse(conversionRaw);
-      if (conversion && conversion.cmd_id) {
-        await appelAPIPost('updateStatutCommande', {
-          cmd_id: conversion.cmd_id,
-          statut: 'Livrée',
-          ven_id_lien: ven_id
-        });
-      }
-    } catch (e) { /* ignore */ }
-    sessionStorage.removeItem('cmd-en-conversion');
-  }
-
   cacherChargement();
 
   // Sauvegarder l'état pour la modal après-vente
