@@ -1327,7 +1327,7 @@ function supprimerOuArchiverProduit(pro_id) {
         afficherMsg('recettes', 'Produit supprimé.');
       } else {
         cacherChargement();
-        afficherMsg('recettes', 'Erreur.', 'erreur');
+        afficherMsg('recettes', (res && res.message) || 'Erreur.', 'erreur');  // ex. : le produit a un historique
       }
     });
   }
