@@ -282,7 +282,7 @@ async function validerConnexionAdmin() {
     window.location.reload();
   } else {
     const err = document.getElementById('erreur-mdp-admin');
-    if (err) err.textContent = 'Mot de passe incorrect.';
+    if (err) err.textContent = (res && res.message) || 'Mot de passe incorrect.';
   }
 }
 

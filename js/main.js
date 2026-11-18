@@ -260,7 +260,11 @@ async function validerConnexion() {
     if (res.cle) sessionStorage.setItem('uc_cle', res.cle);
     window.location.href = '/admin/';
   } else {
-    document.getElementById('erreur-connexion').classList.remove('cache');
+    const errConnexion = document.getElementById('erreur-connexion');
+    if (errConnexion) {
+      if (res && res.message) errConnexion.textContent = res.message;
+      errConnexion.classList.remove('cache');
+    }
     document.getElementById('input-mdp').value = '';
     document.getElementById('input-mdp').focus();
     if (btn) { btn.disabled = false; btn.textContent = 'Entrer'; }
