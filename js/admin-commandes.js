@@ -1483,6 +1483,14 @@ async function envoyerPropositionV3() {
   const square    = document.getElementById('completer-square').value;
   const livraisonNum = parseFloat(String(livraison).replace(',', '.')) || 0;
 
+  // Courriel vérifié avant de toucher à quoi que ce soit (18 nov. 2026) : un courriel invalide faisait sortir
+  // le stock sans que la proposition parte
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(courriel)) {
+    window.cmdCompleterEnvoiEnCours = false;
+    afficherMsg('commandes', '❌ Le courriel de la cliente semble invalide : corrigez-le avant d\'envoyer.', 'erreur');
+    return;
+  }
+
   afficherChargement();
 
   const dateProposition = new Date().toLocaleDateString('fr-CA');
@@ -1531,19 +1539,19 @@ async function envoyerPropositionV3() {
 
   if (!resUpdate || !resUpdate.success) {
     cacherChargement();
-    afficherMsg('commandes', 'Erreur lors de la sauvegarde.', 'erreur');
+    window.cmdCompleterEnvoiEnCours = false; // fermer l'écran relâchera le verrou
+    afficherMsg('commandes', '❌ Enregistrement refusé : ' + (resUpdate?.message || 'erreur'), 'erreur');
     return;
   }
 
-  // Lever le verrou juste avant la sortie de stock (elle exige « En attente »)
-  await appelAPIPost('updateStatutCommande', { cmd_id: cmdCompleterIdEnCours, statut: 'En attente' });
-
+  // La sortie de stock accepte la commande « Verrouillée » (18 nov. 2026) : plus besoin de lever le verrou d'abord
   const resStock = await appelAPIPost('sortirStockCommande', {
     cmd_id: cmdCompleterIdEnCours
   });
 
   if (!resStock || !resStock.success) {
     cacherChargement();
+    window.cmdCompleterEnvoiEnCours = false; // fermer l'écran relâchera le verrou
     afficherMsg('commandes', '❌ ' + (resStock?.message || 'Erreur lors de la sortie du stock.'), 'erreur');
     return;
   }
@@ -1593,16 +1601,18 @@ async function envoyerPropositionV3() {
       ouvrirTexto(telephone, texteSms, true);
     }
   } else {
-    afficherMsg('commandes', '⚠️ Stock sorti, mais le courriel n\'est pas parti : ' + (resCourriel?.message || 'erreur') + '. Corrige le courriel et renvoie.', 'erreur');
+    afficherMsg('commandes', '⚠️ Stock sorti, mais le courriel n\'est pas parti : ' + (resCourriel?.message || 'erreur') + '. Réessayez plus tard avec « Renvoyer la proposition » dans la fiche de la commande.', 'erreur');
   }
   fermerFormCompleter();
   chargerCommandes();
 }
 
 var cmdPaiementIdEnCours = null;
+var cmdPaiementSorte = 'vente'; // « vente » : Paiement reçu · « frais » : Frais payés
 
 function paiementRecu(cmd_id) {
   cmdPaiementIdEnCours = cmd_id;
+  cmdPaiementSorte = 'vente';
   document.getElementById('modal-mode-paiement-cmd').classList.add('ouvert');
 }
 
@@ -1615,6 +1625,18 @@ async function confirmerPaiementCommande(mode_paiement) {
   const cmd_id = cmdPaiementIdEnCours;
   if (!cmd_id) return;
   afficherChargement();
+  if (cmdPaiementSorte === 'frais') {
+    const resF = await appelAPIPost('fraisPayesCommande', { cmd_id, mode_paiement });
+    cacherChargement();
+    if (resF && resF.success) {
+      afficherMsg('commandes', '✅ Frais inscrits, commande revenue à « À expédier ».');
+      fermerFicheCommande();
+      chargerCommandes();
+    } else {
+      afficherMsg('commandes', '❌ ' + (resF?.message || 'Erreur.'), 'erreur');
+    }
+    return;
+  }
   const res = await appelAPIPost('creerVenteDepuisCommande', { cmd_id, mode_paiement });
   if (res && res.success) {
     // Filet : fermer le lien Square si on a le link_id
@@ -1747,19 +1769,12 @@ async function facturerFrais(cmd_id) {
   });
 }
 
+// Frais payés autrement que par le lien Square : on demande le mode (même fenêtre que « Paiement reçu »),
+// le serveur inscrit l'écriture des frais et repasse la commande « À expédier » (18 nov. 2026).
 function fraisPayes(cmd_id) {
-  confirmerAction('Confirmer que les frais de livraison sont payés?', async function() {
-    afficherChargement();
-    const res = await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'À expédier' });
-    cacherChargement();
-    if (res && res.success) {
-      afficherMsg('commandes', '✅ Commande revenue à « À expédier ».');
-      fermerFicheCommande();
-      chargerCommandes();
-    } else {
-      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
-    }
-  });
+  cmdPaiementIdEnCours = cmd_id;
+  cmdPaiementSorte = 'frais';
+  document.getElementById('modal-mode-paiement-cmd').classList.add('ouvert');
 }
 
 function retourALivrer(cmd_id) {
