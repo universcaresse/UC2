@@ -104,7 +104,7 @@ function afficherPanneauAProduire(cmdEntetes, cmdLignes, lotsDispo, cibleId, pan
 
     lignesHTML += '<tr>' +
       '<td>' + nom + '</td>' +
-      '<td>' + b.format_poids + ' ' + b.format_unite + '</td>' +
+      '<td>' + echapperHtml(b.format_poids + ' ' + b.format_unite) + '</td>' +
       '<td>' + b.commande + '</td>' +
       '<td>' + dispo + '</td>' +
       '<td style="color:' + (manque > 0 ? 'var(--rouge)' : 'var(--primary)') + ';font-weight:500">' + (manque > 0 ? manque + ' à produire' : '✅ OK') + '</td>' +
