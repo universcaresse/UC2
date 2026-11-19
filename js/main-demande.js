@@ -203,8 +203,8 @@ function ouvrirContactCommande(res, numero) {
   if (elC) elC.value = (res && res.courriel) || '';
   if (elS) {
     const opt = document.createElement('option');
-    opt.value = 'Question —  ' + numero;
-    opt.textContent = 'Question —  ' + numero;
+    opt.value = 'Question — ' + numero;
+    opt.textContent = 'Question — ' + numero;
     opt.selected = true;
     elS.appendChild(opt);
   }
@@ -570,8 +570,8 @@ window.addEventListener('DOMContentLoaded', async function () {
     if (elC) elC.value = courrielQ;
     if (elS) {
       const opt = document.createElement('option');
-      opt.value = 'Question —  ' + numero;
-      opt.textContent = 'Question —  ' + numero;
+      opt.value = 'Question — ' + numero;
+      opt.textContent = 'Question — ' + numero;
       opt.selected = true;
       elS.appendChild(opt);
     }
@@ -709,6 +709,13 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       return;
     }
 
+    // « J'ai changé d'idée » (courriels de la demande et de la liste modifiée) : l'écran d'annulation tout de suite
+    // (19 nov. 2026 : avant, le lien ouvrait la liste, ou un refus pour une liste « À retravailler »).
+    if (params.get('action') === 'annuler' && ['En attente', 'En attente de paiement', 'À retravailler'].indexOf(res.statut) > -1) {
+      afficherAnnulationCommande(zone, numero, jeton);
+      return;
+    }
+
     if (res.statut !== 'En attente de paiement' && res.statut !== 'En attente') {
       demandeVider();
       if (zone) zone.innerHTML = '';
@@ -721,7 +728,8 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         };
         if (res.statut === 'Terminée') {
           const lienSuiviT = res.no_tracage ? 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage) : '';
-          bloque.innerHTML = '<p class="titre">Votre commande est en route!</p>' +
+          // Sans numéro de suivi, la commande a été livrée en personne
+          bloque.innerHTML = '<p class="titre">' + (res.no_tracage ? 'Votre commande est en route!' : 'Votre commande a été livrée.') + '</p>' +
             (lienSuiviT ? '<p class="textes-discrets"><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + echapperHtml(res.no_tracage) + '</a></p>' : '') +
             '<p><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
             '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
@@ -730,7 +738,15 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
             ? 'Votre commande est en traitement — elle ne peut plus être modifiée.'
             : (res.statut === 'En attente de réapprovisionnement')
               ? 'C\'est noté : nous vous recontacterons dès que tout sera prêt.'
-              : 'Cette commande ne peut plus être modifiée-annulée.';
+              : (res.statut === 'À retravailler')
+                ? 'Votre liste modifiée est bien reçue : nous vous reviendrons avec une nouvelle proposition.'
+                : (res.statut === 'Verrouillée')
+                  ? 'Nous préparons votre proposition en ce moment : elle vous arrivera par courriel sous peu.'
+                  : (res.statut === 'Annulée')
+                    ? 'Cette commande est annulée.'
+                    : (res.statut === 'Payée — facture à faire')
+                      ? 'Votre paiement est reçu : la commande est en préparation.'
+                      : 'Cette commande ne peut plus être modifiée ni annulée.';
           bloque.innerHTML = '<p class="titre">Merci de votre intérêt</p>' +
             '<p class="textes-discrets">' + messageBloque + '</p>' +
             '<p><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
@@ -854,7 +870,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
           '<div class="champ"><label class="libelle">Si vous voulez nous dire ce qui s\'est passé, nous lisons tout (c\'est facultatif)</label>' +
           '<textarea id="coupdecoeur-raison" class="controle" rows="3"></textarea></div>' +
           '<button type="button" class="boutons boutons-rouge boutons-pleine-largeur" data-action="confirmer-annulation">Oui, annuler s.v.p.</button>' +
-          '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="retour-liste">Non, revenir à ma liste</button>' +
+          '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" data-action="retour-liste">Non, revenir à la liste</button>' +
           '<div id="coupdecoeur-msg" class="cache"></div>';
         return;
       }
@@ -977,6 +993,49 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     if (zone) zone.textContent = 'Erreur : ' + e.message;
   }
 });
+
+// « J'ai changé d'idée » : l'écran d'annulation ouvert directement par le lien d'un courriel (19 nov. 2026).
+function afficherAnnulationCommande(zone, numero, jeton) {
+  if (!zone) return;
+  zone.innerHTML = '<h2 class="titre">Vous souhaitez annuler?</h2>' +
+    '<p class="textes-discrets">Cette action est définitive. Voulez-vous vraiment annuler cette commande?</p>' +
+    '<div class="champ"><label class="libelle">Si vous voulez nous dire ce qui s\'est passé, nous lisons tout (c\'est facultatif)</label>' +
+    '<textarea id="coupdecoeur-raison" class="controle" rows="3"></textarea></div>' +
+    '<button type="button" class="boutons boutons-rouge boutons-pleine-largeur" id="annul-confirmer">Oui, annuler s.v.p.</button>' +
+    '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" id="annul-retour">Non, revenir à la commande</button>' +
+    '<div id="coupdecoeur-msg" class="cache"></div>';
+  document.getElementById('annul-retour').addEventListener('click', function () {
+    window.location.href = '?cmd=' + encodeURIComponent(numero) + '&jeton=' + encodeURIComponent(jeton || '');
+  });
+  const btnOui = document.getElementById('annul-confirmer');
+  btnOui.addEventListener('click', async function () {
+    btnOui.disabled = true;
+    montrerVoile();
+    const msg = document.getElementById('coupdecoeur-msg');
+    const raison = (document.getElementById('coupdecoeur-raison') || {}).value || '';
+    let r = null, erreur = '';
+    try { r = await appelAPIPost('annulerCommandeClient', { cmd_id: numero, jeton: jeton, raison: raison }); }
+    catch (e) { erreur = e.message; }
+    let annulee = !!(r && r.success);
+    if (!annulee) {
+      try {
+        const v = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
+        annulee = !!(v && v.success && v.statut === 'Annulée');
+      } catch (e2) {}
+    }
+    cacherVoile();
+    if (annulee) {
+      demandeVider();
+      try { localStorage.removeItem('uc_modif_cmd'); sessionStorage.removeItem('uc_modif_active'); } catch (e3) {}
+      zone.innerHTML = '<h2 class="titre">Commande annulée</h2>' +
+        '<p class="textes-discrets">Votre commande a bien été annulée. Nous espérons vous revoir bientôt.</p>' +
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
+      return;
+    }
+    if (msg) { msg.textContent = 'Erreur : ' + ((r && r.message) || erreur || 'échec'); msg.classList.remove('cache'); }
+    btnOui.disabled = false;
+  });
+}
 
 // Sorte 2 — la page de la proposition à trois sections (prêts · à venir · non disponibles). Réécrite le 18 nov. 2026 :
 // · « Recevoir ce qui est prêt » garde le choix de la cliente sur le serveur, puis l'amène à l'adresse et au paiement
