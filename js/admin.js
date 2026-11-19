@@ -413,13 +413,16 @@ function cacherChargement() {
 }
 
 async function exporterTextes() {
+  // La fenêtre s'ouvre au toucher, avant l'attente : après, Safari (iPad, iPhone) la bloque (19 nov. 2026).
+  const fenetre = window.open('', '_blank');
   afficherChargement();
   const res = await appelAPI('exporterTextesSite');
   cacherChargement();
-if (res && res.success) {
-  window.open(res.url, '_blank');
-  afficherMsg('gammes', '✅ Fichier exporté — vérifiez votre Google Drive : ' + res.nom);
-} else {
-  afficherMsg('gammes', '❌ Erreur : ' + (res?.message || 'inconnue'), 'erreur');
-}
+  if (res && res.success) {
+    if (fenetre) fenetre.location = res.url;
+    afficherMsg('gammes', '✅ Fichier exporté — vérifiez votre Google Drive : ' + echapperHtml(res.nom));
+  } else {
+    if (fenetre) fenetre.close();
+    afficherMsg('gammes', '❌ Erreur : ' + (res?.message || 'inconnue'), 'erreur');
+  }
 }

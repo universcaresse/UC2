@@ -1938,7 +1938,7 @@ async function genererEtiquette(cmd_id) {
     if (tarif && tarif.success) {
       prixTexte = formaterPrix(tarif.montant) + ' seront portés à ta Visa.\n\n';
     } else {
-      prixTexte = '⚠️ Poste Canada n\'a pas donné le tarif — tu achèterais sans connaître le prix.\n\n';
+      prixTexte = '⚠️ Poste Canada n\'a pas donné le tarif' + (tarif && tarif.message ? ' (' + tarif.message + ')' : '') + ' — tu achèterais sans connaître le prix.\n\n';
     }
   }
 

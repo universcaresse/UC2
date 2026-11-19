@@ -1487,6 +1487,12 @@ async function envoyerFormulaire() {
     msgSucces.classList.add('cache');
     return;
   }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(courriel)) {
+    msgErreur.textContent = 'Veuillez vérifier votre adresse courriel.';
+    msgErreur.classList.remove('cache');
+    msgSucces.classList.add('cache');
+    return;
+  }
 
   const btn = document.getElementById('btn-envoyer');
   btn.disabled = true;

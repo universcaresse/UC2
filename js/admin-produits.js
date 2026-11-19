@@ -1812,7 +1812,7 @@ var inciLabel = ings
     .join(', ');
 
   var ingsTexte = ings.slice().sort(function(a, b) { return b.quantite_g - a.quantite_g; })
-    .map(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return '- ' + i.nom_ingredient + ' | ' + ((o && o.inci) || '⚠ INCI manquant') + ' | ' + i.quantite_g + ' g'; })
+    .map(function(i) { var o = listesDropdown.fullData.find(function(d) { return d.ing_id === i.ing_id || d.nom_UC === i.nom_ingredient; }); return '- ' + i.nom_ingredient + ' | ' + ((o && o.inci) || '⚠ INCI manquant'); }) // sans les grammes : la recette ne sort pas (19 nov. 2026)
     .join('\n'); 
 
   var formatsTexte = formats.map(function(f) { return '- ' + formaterFormat(f.poids, f.unite) + ' : ' + (f.prix_vente || '—') + ' $'; }).join('\n');
@@ -1858,10 +1858,10 @@ var inciLabel = ings
   var res = await appelAPIPost('envoyerProduitGraphiste', data);
   if (btn) { btn.disabled = false; btn.textContent = 'Envoyer'; }
   if (res && res.success) {
-    afficherMsg('recettes', '✅ Envoyé à ' + email + '.');
+    afficherMsg('recettes', '✅ Envoyé à ' + echapperHtml(email) + '.');
     fermerModalExportGraphiste();
   } else {
-    afficherMsg('recettes', 'Erreur d\'envoi.', 'erreur');
+    afficherMsg('recettes', '❌ ' + ((res && res.message) || 'Erreur d\'envoi.'), 'erreur');
   }
 }
 
@@ -1912,7 +1912,7 @@ var CHAMPS_PDF_DISPONIBLES = [
   { id: 'mode_emploi',    label: 'Mode d\'emploi' },
   { id: 'instructions',   label: 'Instructions' },
   { id: 'notes',          label: 'Notes' },
-  { id: 'ingredients',    label: 'Liste détaillée des ingrédients' },
+  { id: 'ingredients',    label: 'Ingrédients avec les grammes (la recette)' },
   { id: 'inci_label',     label: 'Liste INCI pour étiquette' },
   { id: 'formats',        label: 'Formats et prix' }
 ];
@@ -1995,14 +1995,21 @@ async function genererExportPdf() {
     formats: formatsListe
   };
 
+  // La fenêtre s'ouvre au toucher, avant l'attente : après, Safari (iPad, iPhone) la bloque (19 nov. 2026).
+  var fenetre = window.open('', '_blank');
   var res = await appelAPIPost('genererProduitPdf', data);
   if (btn) { btn.disabled = false; btn.textContent = 'Générer le PDF'; }
   if (res && res.success && res.url) {
-    window.open(res.url, '_blank');
-    afficherMsg('recettes', '✅ PDF généré.');
+    if (fenetre) {
+      fenetre.location = res.url;
+      afficherMsg('recettes', '✅ PDF généré.');
+    } else {
+      afficherMsg('recettes', '✅ PDF généré : <a href="' + echapperHtml(res.url) + '" target="_blank" rel="noopener">l\'ouvrir</a>.');
+    }
     fermerModalExportPdf();
   } else {
-    afficherMsg('recettes', 'Erreur de génération.', 'erreur');
+    if (fenetre) fenetre.close();
+    afficherMsg('recettes', '❌ ' + ((res && res.message) || 'Erreur de génération.'), 'erreur');
   }
 }
 
