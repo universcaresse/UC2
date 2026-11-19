@@ -748,6 +748,13 @@ async function voirDetailCommande(cmd_id) {
   if (c.statut === 'Verrouillée') {
     actionsHTML += `<button class="bouton bouton-or" onclick="ouvrirFormCompleter('${c.cmd_id}')">Reprendre la proposition</button>`;
   }
+  // La cliente a changé sa liste après la proposition (19 nov. 2026) : stock déjà rendu, lien Square fermé,
+  // elle ne peut plus y toucher. L'écran de proposition montre sa nouvelle liste et la version d'avant.
+  if (c.statut === 'À retravailler') {
+    actionsHTML += `<button class="bouton bouton-or" onclick="ouvrirFormCompleter('${c.cmd_id}')">Créer la proposition</button>`;
+    actionsHTML += `<button class="bouton" onclick="modifierProduitsCommande('${c.cmd_id}')">Modifier les produits</button>`;
+    actionsHTML += `<button class="bouton bouton-rouge" onclick="annulerCommande('${c.cmd_id}')">Annuler la commande</button>`;
+  }
   actionsHTML += `<button class="bouton bouton-contour" onclick="fermerFicheCommande()">Fermer</button>`;
 
   actions.innerHTML = actionsHTML;
@@ -882,7 +889,7 @@ async function modifierCommande(cmd_id) {
 // ═══════════════════════════════════════
 function modifierProduitsCommande(cmd_id) {
   const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
-  const dejaModifiee = c && c.statut === 'Modifiée';
+  const dejaModifiee = c && (c.statut === 'Modifiée' || c.statut === 'À retravailler');
   const message = dejaModifiee
     ? 'Revoir cette commande et renvoyer une proposition corrigée ? Continuer ?'
     : 'Modifier les produits ? Le stock de cette commande sera remis en inventaire et tu devras renvoyer une proposition corrigée. Continuer ?';
@@ -906,6 +913,8 @@ function annulerCommande(cmd_id) {
   // « En attente de réapprovisionnement » (18 nov. 2026) : produits prêts mis de côté, ou commande suivante sans stock
   const reappro = c && c.statut === 'En attente de réapprovisionnement';
   const stockSorti = c && (c.statut === 'En attente de paiement' || c.statut === 'Modifiée' || payee || reappro);
+  // « À retravailler » (19 nov. 2026) : stock déjà rendu au renvoi de la cliente, mais la remise reste la porte sûre
+  const parRemise = stockSorti || (c && c.statut === 'À retravailler');
   let message = stockSorti
     ? 'Annuler cette commande ? Le stock réservé sera remis en inventaire.'
     : 'Annuler cette commande ?';
@@ -918,7 +927,7 @@ function annulerCommande(cmd_id) {
   }
   confirmerAction(message, async () => {
     afficherChargement();
-    const res = stockSorti
+    const res = parRemise
       ? await appelAPIPost('remettreStockCommande', { cmd_id, statut_apres: 'Annulée' })
       : await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'Annulée' });
     cacherChargement();
