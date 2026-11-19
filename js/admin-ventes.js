@@ -1039,7 +1039,10 @@ async function envoyerFactureCourriel(venIdRecu) {
   }));
   
 
+  // ven_id : le serveur fait la facture à partir de la vente enregistrée (19 nov. 2026); le reste ne sert plus qu'à
+  // un serveur d'avant
   const res = await appelAPIPost('envoyerFacture', {
+    ven_id: venIdRecu,
     courriel,
     client,
     numero: venNumeroAffiche,
