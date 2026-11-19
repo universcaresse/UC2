@@ -664,10 +664,16 @@ async function voirDetailCommande(cmd_id) {
     </div>`;
   });
 
-  const totalArticles = (c.lignes || []).reduce((s, l) => s + (parseFloat(l.prix_unitaire) || 0) * (parseInt(l.quantite) || 0), 0);
+  // 19 nov. 2026 : la facturation suit la proposition (produits prêts + livraison − rabais) et dit « payée » dès que
+  // le paiement est confirmé (avant : « Sous-total » = produits seulement, et une commande payée chez Square, pas
+  // encore facturée, affichait « Paiement reçu 0,00 $ » et tout le solde à payer).
+  const lignesPretes = (c.lignes || []).filter(l => !l.type_ligne || l.type_ligne === 'pret');
+  const lignesComptees = lignesPretes.length ? lignesPretes : (c.lignes || []);
+  const totalArticles = lignesComptees.reduce((s, l) => s + (parseFloat(l.prix_unitaire) || 0) * (parseInt(l.quantite) || 0), 0);
   const livraisonNum = parseFloat(c.livraison) || 0;
   const rabaisNum = parseFloat(c.rabais) || 0;
-  const estPayee = !!c.ven_id_lien;
+  const totalCommande = Math.max(0, Math.round((totalArticles + livraisonNum - rabaisNum) * 100) / 100);
+  const estPayee = !!c.ven_id_lien || ['Payée — facture à faire', 'À expédier', 'Étiquette prête', 'À livrer', 'Frais à payer', 'Terminée'].includes(c.statut);
 
   html += `</div>
       </div>
@@ -676,10 +682,10 @@ async function voirDetailCommande(cmd_id) {
         <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Total des articles</span><span>${formaterPrix(totalArticles)}</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Frais de livraison</span><span>${formaterPrix(livraisonNum)}</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Escomptes</span><span>${rabaisNum > 0 ? '-' + formaterPrix(rabaisNum) : formaterPrix(0)}</span></div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;margin-top:2px;border-top:1px solid var(--beige);font-weight:600"><span>Sous-total</span><span>${formaterPrix(c.total_prevu)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;margin-top:2px;border-top:1px solid var(--beige);font-weight:600"><span>Total</span><span>${formaterPrix(totalCommande)}</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;margin-top:6px"><span>Acompte versé</span><span>${formaterPrix(c.acompte)}</span></div>
-        <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Paiement reçu</span><span>${formaterPrix(estPayee ? c.total_prevu : c.acompte)}</span></div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--beige);color:var(--primary);font-weight:600"><span>Solde à payer</span><span>${formaterPrix(estPayee ? 0 : c.solde)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Paiement reçu</span><span>${formaterPrix(estPayee ? totalCommande : c.acompte)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--beige);color:var(--primary);font-weight:600"><span>Solde à payer</span><span>${formaterPrix(estPayee ? 0 : Math.max(0, totalCommande - (parseFloat(c.acompte) || 0)))}</span></div>
       </div>
     </div>`;
 
@@ -1688,7 +1694,7 @@ async function envoyerPropositionV3() {
     afficherMsg('commandes', '✅ Proposition envoyée à ' + courriel + ', stock sorti.');
     // Texto après le courriel (18 nov. 2026) : passer à Messages pendant les envois pouvait les couper sur iPad
     if (telephone) {
-      let texteSms = 'Bonjour ' + (prenom || client) + ',\n\n';
+      let texteSms = bonjourTexto(prenom || client);
       texteSms += 'Votre proposition de commande Univers caresse - Savonnerie artisanale vient de vous être envoyée par courriel.\n';
       texteSms += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
       texteSms += 'Merci !\nUnivers caresse - Savonnerie artisanale';
@@ -1754,6 +1760,12 @@ async function confirmerPaiementCommande(mode_paiement) {
 // COUCOU TEXTO — propose au client de vérifier ses courriels
 // Ouvre l'app Messages, pré-remplie (envoi manuel)
 // ═══════════════════════════════════════
+// Le début d'un texto : « Bonjour Julie, » (le prénom d'abord), ou « Bonjour, » sans nom (19 nov. 2026)
+function bonjourTexto(nom) {
+  const n = String(nom || '').trim();
+  return 'Bonjour' + (n ? ' ' + n : '') + ',\n\n';
+}
+
 function textoProposition(cmd_id) {
   const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
   if (!c) return;
@@ -1764,7 +1776,7 @@ function textoProposition(cmd_id) {
     return;
   }
 
-  let texte = 'Bonjour ' + (c.prenom || c.client || '') + ',\n\n';
+  let texte = bonjourTexto(c.prenom || c.client);
   texte += 'Votre proposition de commande Univers caresse Savonnerie artisanale vient de vous être envoyée par courriel.\n';
   texte += 'Pensez à vérifier vos courriels indésirables (pourriels) si vous ne la voyez pas.\n\n';
   texte += 'Merci !\nUnivers caresse Savonnerie artisanale';
@@ -1853,7 +1865,7 @@ async function facturerFrais(cmd_id) {
     if (!(res && res.success)) { afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur'); return; }
     const telephone = c.telephone || '';
     if (telephone) {
-      let sms = 'Bonjour ' + (c.client || '') + ',\n\n';
+      let sms = bonjourTexto(c.prenom || c.client);
       sms += 'Voici les frais de livraison pour votre commande ' + cmd_id + ' : ' + formaterPrix(resT.montant) + '.\n';
       sms += 'Payez ici : ' + res.url + '\n\nMerci !\nUnivers caresse Savonnerie artisanale';
       ouvrirTexto(telephone, sms, true);
@@ -1931,7 +1943,7 @@ function livrerEnPersonne(cmd_id) {
     }
     const telephone = c.telephone || '';
     if (telephone) {
-      let sms = 'Bonjour ' + (c.client || '') + ',\n\n';
+      let sms = bonjourTexto(c.prenom || c.client);
       sms += "Votre commande " + cmd_id + " vous sera livrée aujourd'hui.\n";
       if (res.lien_facture) sms += 'Votre facture : ' + res.lien_facture + '\n';
       sms += '\nMerci !\nUnivers caresse Savonnerie artisanale';
@@ -2124,7 +2136,7 @@ function cmdEnvoyerTexto(i) {
   const c = (window.cmdTextosEnAttente || [])[i];
   if (!c) return;
   const lienSuivi = 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(c.no_tracage);
-  let sms = 'Bonjour ' + (c.client || '') + ',\n\n';
+  let sms = bonjourTexto(c.prenom || c.client);
   sms += 'Bonne nouvelle, votre commande ' + c.cmd_id + ' est en route!\n';
   sms += 'Suivez votre colis ici : ' + lienSuivi + '\n';
   if (c.lien_facture) sms += 'Votre facture : ' + c.lien_facture + '\n';
@@ -2142,13 +2154,20 @@ function cmdEnvoyerTexto(i) {
 
 async function rognerEtiquetteEnUrl(base64) {
   const octets = Uint8Array.from(atob(base64), ch => ch.charCodeAt(0));
-  const pdfDoc = await PDFLib.PDFDocument.load(octets);
-  const page = pdfDoc.getPage(0);
-  const { x, y, width, height } = page.getMediaBox();
-  const moitie = width / 2;
-  // garder la moitié DROITE (l'étiquette); le reste (instructions + reçu) est jeté
-  page.setMediaBox(x + moitie, y, moitie, height);
-  page.setCropBox(x + moitie, y, moitie, height);
-  const bytes = await pdfDoc.save();
-  return URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+  // 19 nov. 2026 : si la bibliothèque PDF n'a pas chargé (unpkg injoignable) ou si le PDF ne se lit pas, l'étiquette
+  // s'ouvre entière. Avant, l'erreur arrêtait tout : étiquette payée, mais commande restée « À expédier », sans message.
+  try {
+    if (typeof PDFLib === 'undefined') throw new Error('PDFLib absent');
+    const pdfDoc = await PDFLib.PDFDocument.load(octets);
+    const page = pdfDoc.getPage(0);
+    const { x, y, width, height } = page.getMediaBox();
+    const moitie = width / 2;
+    // garder la moitié DROITE (l'étiquette); le reste (instructions + reçu) est jeté
+    page.setMediaBox(x + moitie, y, moitie, height);
+    page.setCropBox(x + moitie, y, moitie, height);
+    const bytes = await pdfDoc.save();
+    return URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+  } catch (e) {
+    return URL.createObjectURL(new Blob([octets], { type: 'application/pdf' }));
+  }
 }
