@@ -198,11 +198,6 @@ async function afficherProduits(conserverFiltre) {
   if (grille)  grille.classList.add('cache');
   if (vide)    vide.classList.add('cache');
 
-  var filtreCol = document.getElementById('filtre-recette-collection');
-  var filtreLig = document.getElementById('filtre-recette-ligne');
-  if (filtreCol) filtreCol.value = '';
-  if (filtreLig) { filtreLig.innerHTML = '<option value="">Toutes les gammes</option>'; filtreLig.disabled = true; }
-
   await chargerCollectionsPourSelecteur();
   injecterBoutonActualiser();
 
@@ -440,10 +435,6 @@ function reinitialiserFiltresRecettes() {
   if (btnTout) btnTout.classList.add('actif');
   var bar = document.getElementById('filtre-recette-ligne-bar');
   if (bar) { bar.innerHTML = ''; bar.classList.add('cache'); }
-  var elStat = document.getElementById('filtre-recette-statut');
-  var elNom  = document.getElementById('filtre-recette-nom');
-  if (elStat) elStat.value = '';
-  if (elNom)  elNom.value  = '';
   filtrerRecettes();
 }
 
@@ -629,7 +620,7 @@ function ouvrirFicheProduit(pro_id) {
     '';
 
   // Mettre à jour le bouton Supprimer/Archiver dans la barre d'actions du bas
-  var btnSupp = document.querySelector('#fiche-recette .form-body-actions .bouton-rouge');
+  var btnSupp = document.querySelector('#fiche-recette .form-actions .bouton-rouge');
   if (btnSupp) {
     btnSupp.textContent = labelBtnSupp;
     var conteneurActions = btnSupp.parentElement;
@@ -1041,7 +1032,7 @@ function appliquerSurgrasNA() {
 
 // ─── ENREGISTREMENT ───
 async function sauvegarderRecette() {
-  var btnSauvegarder = document.querySelector('#form-recettes .form-body-actions .bouton');
+  var btnSauvegarder = document.querySelector('#form-recettes .form-actions button[onclick="sauvegarderRecette()"]');
 
   function reactiverBouton() {
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
@@ -1659,16 +1650,6 @@ function supprimerEmballageFormat(format_id, idx) {
 function rafraichirListeFormatsRecette() {
   var liste = document.getElementById('liste-formats-recette');
   if (!liste) return;
-  var labels = document.getElementById('labels-formats-recette');
-  if (labels) {
-  labels.classList.remove('cache');
-  labels.innerHTML =
-    '<span class="form-label" style="flex:1">Contenu net</span>' +
-    '<span class="form-label" style="flex:1">Unité</span>' +
-    '<span class="form-label" style="flex:1">Nb unités fabriquées</span>' +
-    '<span class="form-label" style="flex:1">Prix de vente ($)</span>' +
-    '<span style="width:32px"></span>';
-}
 
   if (formatsRecette.length === 0) {
     liste.innerHTML = '';

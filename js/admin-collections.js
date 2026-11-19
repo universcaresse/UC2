@@ -107,9 +107,7 @@ function ouvrirFormCollection() {
   fermerFicheCollection();
   document.getElementById('form-collections-titre').textContent = 'Nouvelle collection';
   document.getElementById('fc-rowIndex').value = '';
-  document.getElementById('fc-mode').value     = 'collection';
   document.getElementById('fc-bloc-collection').classList.remove('cache');
-  document.getElementById('fc-bloc-ligne').classList.add('cache');
   const selPos = document.getElementById('fc-position');
   if (selPos) {
     selPos.innerHTML = '<option value="0">En premier</option>';
@@ -146,7 +144,6 @@ function fermerFormCollection() {
 async function modifierCollection(col_id) {
   const col = donneesCollections.find(c => c.col_id === col_id);
   if (!col) return;
-  document.getElementById('fc-mode').value             = 'collection';
   document.getElementById('form-collections-titre').textContent = 'Modifier la collection';
   document.getElementById('fc-rowIndex').value         = col.col_id;
   document.getElementById('fc-rang').value             = col.rang || '';
@@ -169,8 +166,6 @@ async function modifierCollection(col_id) {
   if (mcCol) mcCol.value = col.mots_cles || '';
   const descCol = document.getElementById('fc-desc-col');
   if (descCol) { descCol.value = col.description || ''; ajusterHauteurTextarea(descCol); }
-  if (document.getElementById('fc-couleur-hex')) (document.getElementById('fc-couleur-hex') || {}).value = col.couleur_hex || '';
-  if (document.getElementById('fc-couleur-hex')) apercuCouleurCollection(document.getElementById('fc-couleur-hex'));
   document.getElementById('fc-photo-url').value        = col.photo_url || '';
   const preview = document.getElementById('fc-photo-preview');
   if (preview) preview.innerHTML = col.photo_url ? `<img src="${col.photo_url}">` : '';
@@ -194,48 +189,6 @@ async function sauvegarderCollection() {
   const btnSauvegarder = document.querySelector('#form-collections .bandeau .boutons-vert');
   if (btnSauvegarder) { btnSauvegarder.disabled = true; btnSauvegarder.innerHTML = 'Sauvegarde…'; }
   const rowIndex = document.getElementById('fc-rowIndex').value;
-  const mode     = document.getElementById('fc-mode').value;
-
-  if (mode === 'ligne') {
-    // Gamme V2
-    const col_id = document.getElementById('fc-collection-ligne').value;
-    const nom    = document.getElementById('fc-ligne').value.toUpperCase();
-    if (!col_id || !nom) {
-      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
-      afficherMsg('collections', 'Le nom de la gamme est requis.', 'erreur');
-      return;
-    }
-    const d = {
-      gam_id:      rowIndex || '', // nouvelle : le serveur donne le numéro (19 nov. 2026)
-      col_id,
-      rang:        parseInt(document.getElementById('fc-rang-ligne')?.value) || 99,
-      nom,
-      description: document.getElementById('fc-desc-ligne').value,
-      couleur_hex: document.getElementById('fc-couleur-hex-ligne')?.value || '',
-      photo_url:   document.getElementById('fc-photo-url-ligne')?.value  || '',
-      rowIndex:    rowIndex || null
-    };
-   const res = rowIndex
-      ? await appelAPIPost('saveGamme', { ...d, rowIndex })
-      : await appelAPIPost('saveGamme', d);
-    if (res && res.success) {
-      const resIng = await appelAPIPost('saveGammeIngredients', {
-        gam_id: res.gam_id || d.gam_id,
-        ingredients: ingredientsBase.map(i => ({ ing_id: i.ing_id || '', nom_ingredient: i.nom, quantite_g: i.quantite }))
-      });
-      cacherChargement();
-      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
-      fermerFormCollection();
-      if (!resIng || !resIng.success) afficherMsg('collections', '⚠️ Gamme enregistrée, mais pas ses ingrédients : ' + ((resIng && resIng.message) || 'erreur'), 'erreur');
-      else afficherMsg('collections', rowIndex ? 'Gamme mise à jour.' : 'Gamme ajoutée.');
-      await chargerCollections();
-    } else {
-      cacherChargement();
-      afficherMsg('collections', '❌ ' + ((res && res.message) || 'Erreur lors de la sauvegarde.'), 'erreur');
-      if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
-    }
-    return;
-  }
 
   // Collection V2
   const positionChoisie = parseInt(document.getElementById('fc-position')?.value) || 0;

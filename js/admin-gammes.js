@@ -111,7 +111,6 @@ function ouvrirFormGamme(col_id) {
   if (previewGN1) previewGN1.innerHTML = '';
   const previewGN2 = document.getElementById('fg-photo-noel-preview');
   if (previewGN2) previewGN2.innerHTML = '';
-  (document.getElementById('fg-couleur-hex') || {}).value = '';
   const sel = document.getElementById('fg-collection');
   sel.innerHTML = '<option value="">— Choisir —</option>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {
@@ -286,7 +285,6 @@ document.getElementById('btn-nouvelle-gamme').classList.add('cache');
    if (previewGN) previewGN.innerHTML = gam.photo_noel_url ? `<img src="${gam.photo_noel_url}">` : '';
  
 document.getElementById('fg-desc').value        = gam.description || '';
-  if (document.getElementById('fg-couleur-hex')) (document.getElementById('fg-couleur-hex') || {}).value = gam.couleur_hex || '';
   const sel = document.getElementById('fg-collection');
   sel.innerHTML = '<option value="">— Choisir —</option>';
   donneesCollections.sort((a, b) => (a.rang || 99) - (b.rang || 99)).forEach(col => {

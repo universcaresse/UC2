@@ -584,13 +584,9 @@ function venGetNomPromo() {
 // CALCUL DU TOTAL
 // ═══════════════════════════════════════
 function venCalculerTotal() {
+  // Le formulaire ne montre que le sous-total : le total (livraison et rabais) s'affiche dans l'aperçu de la facture
   const sousTotal = venPanier.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
-  const livraison = parseFloat(String(document.getElementById('ven-livraison').value).replace(',', '.')) || 0;
-  const rabais    = venCalculerRabais();
-  const total     = sousTotal + livraison - rabais;
   document.getElementById('ven-sous-total').value = formaterPrix(sousTotal);
-  const elTotal = document.getElementById('ven-total');
-  if (elTotal) elTotal.value = formaterPrix(Math.max(0, total));
 }
 
 // ═══════════════════════════════════════

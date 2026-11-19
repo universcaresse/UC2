@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const batiAvecCopie = catalogueCharge && donneesCatalogue !== res;
       donneesCatalogue = res;
       afficherCollectionsPublic();
-      afficherNbProduits();
       document.querySelectorAll('.hero-stat-num').forEach(el => setTimeout(() => el.classList.add('visible'), 50));
       if (batiAvecCopie) {
         catalogueCharge = false;
@@ -188,7 +187,6 @@ function afficherSection(id) {
   }
   if (id === 'accueil') {
     afficherCollectionsPublic();
-    afficherNbProduits();
   }
  if (id === 'catalogue') {
     if (!collectionEnAttente) {
@@ -243,7 +241,6 @@ function verifierSession() {
   const session = sessionStorage.getItem('uc_admin');
   if (session === 'true') {
     adminConnecte = true;
-    afficherModeAdmin();
   }
 }
 
@@ -288,15 +285,6 @@ async function afficherFacturePublique(numeroF, jetonF) {
   }
 }
 
-
-function afficherModeAdmin() {
-  const btnConnexion   = document.getElementById('btn-connexion');
-  const btnDeconnexion = document.getElementById('btn-deconnexion');
-  const lienAdmin      = document.getElementById('nav-admin-link');
-  if (btnConnexion)   btnConnexion.classList.add('cache');
-  if (btnDeconnexion) btnDeconnexion.classList.remove('cache');
-  if (lienAdmin)      lienAdmin.classList.remove('cache');
-}
 
 function afficherMaintenance() {
   document.getElementById('page-maintenance').classList.remove('cache');
@@ -609,14 +597,11 @@ function initNav() {
     if (burger && window.innerWidth <= 900) {
       const scrollActuel = window.scrollY;
       const filtres = document.getElementById('filtres-bar');
-      const loupe = document.getElementById('loupe-mobile');
       if (scrollActuel > dernierScroll && scrollActuel > 60) {
         burger.classList.add('cache-scroll');
-        if (loupe) loupe.classList.add('cache-scroll');
         if (filtres) filtres.classList.add('cache-scroll');
       } else {
         burger.classList.remove('cache-scroll');
-        if (loupe) loupe.classList.remove('cache-scroll');
         if (filtres) filtres.classList.remove('cache-scroll');
       }
       dernierScroll = scrollActuel;
@@ -747,13 +732,6 @@ function afficherCollectionsPublic() {
         </div>
       </a>`;
   });
-}
-
-function afficherNbProduits() {
-  if (!donneesCatalogue) return;
-  const nb = (donneesCatalogue.produits || []).length;
-  const statProd = document.getElementById('hero-stat-produits');
-  if (nb > 0 && statProd) statProd.textContent = nb + '+';
 }
 
 function afficherRegroupementsPublic(res) {
