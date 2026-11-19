@@ -48,18 +48,69 @@ document.addEventListener('DOMContentLoaded', async () => {
   verifierSession();
   initNav();
   initScrollAnimations();
+  // Les trois lectures partent ensemble et chacune s'affiche dès qu'elle arrive (19 nov. 2026).
+  // Elles partent avant initSPA : la copie gardée est déjà là si la page s'ouvre sur le catalogue.
+  const lectures = Promise.all([
+    lecturePublique('getContenu', res => {
+      // Une copie gardée en maintenance ne s'affiche pas : le serveur dira si c'est encore vrai.
+      if (res && res.copie && String((res.contenu || {}).maintenance_active) === '1') return false;
+      if (res && res.success) appliquerContenu(res.contenu);
+    }),
+    lecturePublique('getCatalogue', res => {
+      if (!res || !res.success) return;
+      // Le catalogue était déjà bâti avec la copie gardée : le refaire avec la réponse du serveur.
+      const batiAvecCopie = catalogueCharge && donneesCatalogue !== res;
+      donneesCatalogue = res;
+      afficherCollectionsPublic();
+      afficherNbProduits();
+      document.querySelectorAll('.hero-stat-num').forEach(el => setTimeout(() => el.classList.add('visible'), 50));
+      if (batiAvecCopie) {
+        catalogueCharge = false;
+        if (window.location.hash === '#catalogue') chargerCatalogue();
+      }
+    }),
+    lecturePublique('getRegroupements', afficherRegroupementsPublic)
+  ]);
   initSPA(); // une seule fois — bug V1 corrigé
-  const [resContenu, resCat] = await Promise.all([appelAPI('getContenu'), appelAPI('getCatalogue')]);
-  if (resContenu && resContenu.success) appliquerContenu(resContenu.contenu);
-  if (resCat && resCat.success) {
-    donneesCatalogue = resCat;
-    afficherCollectionsPublic();
-    afficherNbProduits();
-    afficherRegroupementsPublic();
-    document.querySelectorAll('.hero-stat-num').forEach(el => setTimeout(() => el.classList.add('visible'), 50));
-  }
+  await lectures;
     window.dispatchEvent(new Event('uc:donneesChargees')); // ← seule ligne ajoutée
 });
+
+// ─── LECTURES DU SITE PUBLIC (19 nov. 2026) ───
+// Le navigateur garde la dernière réponse du serveur (catalogue, textes, regroupements : rien que du public).
+// À la visite suivante, elle s'affiche tout de suite (marquée copie: true), puis la réponse du serveur la
+// remplace si elle a changé. Sans copie, on attend le serveur comme avant. Si afficher rend false, la copie
+// n'a pas été montrée : la réponse du serveur s'affiche même si elle est pareille.
+const demandesPubliquesEnCours = {};
+function demandePublique(action) {
+  // Une seule demande à la fois pour la même lecture : la recherche et le catalogue attendent celle déjà partie.
+  if (!demandesPubliquesEnCours[action]) {
+    demandesPubliquesEnCours[action] = appelAPI(action).finally(() => { delete demandesPubliquesEnCours[action]; });
+  }
+  return demandesPubliquesEnCours[action];
+}
+
+async function lecturePublique(action, afficher) {
+  const nom = 'uc_copie_' + action;
+  let gardee = null, montree = false;
+  try { gardee = localStorage.getItem(nom); } catch (e) {}
+  if (gardee) {
+    try {
+      const copie = JSON.parse(gardee);
+      if (copie && copie.success) { copie.copie = true; montree = afficher(copie) !== false; }
+      else gardee = null;
+    } catch (e) { gardee = null; montree = false; }
+  }
+  const res = await demandePublique(action);
+  if (res && res.success) {
+    const texte = JSON.stringify(res);
+    if (texte === gardee && montree) return;
+    try { localStorage.setItem(nom, texte); } catch (e) {}
+    afficher(res);
+  } else if (!gardee) {
+    afficher(res);
+  }
+}
 
 window.addEventListener('resize', () => {
   const liens = document.getElementById('nav-links');
@@ -335,7 +386,7 @@ function lancerRecherche() {
   if (requete.length < 2) { zone.innerHTML = ''; return; }
   if (!donneesCatalogue || !donneesCatalogue.produits) {
     zone.innerHTML = '<p class="description">Chargement…</p>';
-    appelAPI('getCatalogue').then(resCat => {
+    demandePublique('getCatalogue').then(resCat => {
       if (resCat && resCat.success && resCat.produits) { donneesCatalogue = resCat; lancerRecherche(); }
     });
     return;
@@ -703,14 +754,14 @@ function afficherNbProduits() {
   if (nb > 0 && statProd) statProd.textContent = nb + '+';
 }
 
-async function afficherRegroupementsPublic() {
+function afficherRegroupementsPublic(res) {
   const strip = document.getElementById('regroupements-strip');
   if (!strip) return;
-  const res = await appelAPI('getRegroupements');
   if (!res || !res.success || !res.items || !res.items.length) {
     strip.closest('.section-collections')?.classList.add('cache');
     return;
   }
+  strip.closest('.section-collections')?.classList.remove('cache');
   window._regroupementsData = res.items;
   const countEl = document.getElementById('regroupements-count');
   if (countEl) countEl.textContent = res.items.length + ' univers';
@@ -753,7 +804,7 @@ function chargerCatalogue() {
       catalogueTimestamp = maintenant;
       construireCatalogue();
     } else {
-      appelAPI('getCatalogue').then(resCat => {
+      demandePublique('getCatalogue').then(resCat => {
         if (!resCat || !resCat.success || !resCat.produits) {
           afficherErreurCatalogue('Impossible de charger le catalogue.');
           return;

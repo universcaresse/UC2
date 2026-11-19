@@ -41,7 +41,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await chargerDonneesInitiales();
 });
 async function chargerDonneesInitiales() {
-const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resPromo, resRegro, resIngs, resEmb, resStock, resLots, resVL, resRegPro] = await Promise.all([
+// Toutes les lectures du démarrage partent ensemble, les commandes de l'accueil aussi (19 nov. 2026).
+const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resPromo, resRegro, resIngs, resEmb, resStock, resLots, resVL, resRegPro, resCmdAccueil] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getGammes'),
     appelAPI('getFamilles'),
@@ -57,7 +58,8 @@ const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resProm
     appelAPI('getStock'),
     appelAPI('getLots'),
     appelAPI('getVentesLignes'),
-    appelAPI('getRegroupementsProduits')
+    appelAPI('getRegroupementsProduits'),
+    appelAPI('getCommandesEntete')
   ]);
   if (resCol && resCol.success) {
     donneesCollections = resCol.items || [];
@@ -111,7 +113,6 @@ if (resGam && resGam.success) {
     donneesRegroupements = resRegro.items || [];
   }
 
-  const resCmdAccueil = await appelAPI('getCommandesEntete');
   const spanEntrantes = document.getElementById('accueil-commandes-entrantes');
   if (spanEntrantes && resCmdAccueil && resCmdAccueil.success) {
     const nbEntrantes = (resCmdAccueil.items || []).filter(c => c.statut === 'En attente').length;
