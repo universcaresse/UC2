@@ -787,6 +787,17 @@ function afficherBoutonRougeProduit(pro_id) {
   var action = actionRougeProduit(pro_id);
   btn.textContent = action === 'archiver' ? 'Archiver' : 'Supprimer';
   btn.classList.toggle('cache', !action);
+  // « Désarchiver » : seulement sur un produit archivé (19 nov. 2026, Jean-Claude)
+  var btnDes = btn.parentElement.querySelector('[data-bouton-desarchiver]');
+  if (!btnDes) {
+    btnDes = document.createElement('button');
+    btnDes.className = 'bouton';
+    btnDes.dataset.boutonDesarchiver = '1';
+    btnDes.textContent = 'Désarchiver';
+    btnDes.onclick = function() { if (produitActif) desarchiverProduit(produitActif.pro_id); };
+    btn.insertAdjacentElement('afterend', btnDes);
+  }
+  btnDes.classList.toggle('cache', produitActif.statut !== 'archive');
 }
 
 // ─── FERMETURE / ÉDITION / SUPPRESSION ───
@@ -1298,11 +1309,20 @@ function supprimerOuArchiverProduit(pro_id) {
 
 // Archiver : le produit garde tout son historique, reste dans l'admin, disparaît du site public et des listes
 // de choix (commande, vente, fabrication). Il se ramène par Modifier → Statut.
-async function archiverProduit(pro_id) {
+function archiverProduit(pro_id) { return changerStatutProduit(pro_id, 'archive', 'Produit archivé.'); }
+
+// Désarchiver : le produit revient en « Test » (pas sur le site public); « Public » se remet dans Modifier.
+function desarchiverProduit(pro_id) {
+  confirmerAction('Désarchiver ce produit ? Il revient en « Test ».', function() {
+    return changerStatutProduit(pro_id, 'test', 'Produit désarchivé (en « Test »).');
+  }, 'Désarchiver');
+}
+
+async function changerStatutProduit(pro_id, statut, messageOk) {
   afficherChargement();
   var pro = donneesProduits.find(function(p) { return p.pro_id === pro_id; });
   if (!pro) { cacherChargement(); return; }
-  var d = Object.assign({}, pro, { statut: 'archive' });
+  var d = Object.assign({}, pro, { statut: statut });
   // Re-formater les ingrédients/formats pour saveProduit
   d.ingredients = (prodCache.ingredients[pro_id] || []).map(function(i) {
     return { ing_id: i.ing_id, nom_ingredient: i.nom_ingredient, quantite_g: i.quantite_g };
@@ -1314,11 +1334,11 @@ async function archiverProduit(pro_id) {
   if (res && res.success) {
     // Mettre à jour le cache
     var idx = donneesProduits.findIndex(function(p) { return p.pro_id === pro_id; });
-    if (idx >= 0) donneesProduits[idx].statut = 'archive';
+    if (idx >= 0) donneesProduits[idx].statut = statut;
     cacherChargement();
     fermerFicheProduit();
     afficherProduits(true);
-    afficherMsg('recettes', 'Produit archivé.');
+    afficherMsg('recettes', messageOk);
   } else {
     cacherChargement();
     afficherMsg('recettes', '❌ ' + ((res && res.message) || 'Erreur.'), 'erreur');
