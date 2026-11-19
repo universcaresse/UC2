@@ -90,9 +90,8 @@ async function sauvegarderPromotion() {
   const type = document.getElementById('fp-type').value;
   const nom  = document.getElementById('fp-nom').value.trim();
   if (!type || !nom) { cacherChargement(); afficherMsg('promotions', 'Type et nom requis.', 'erreur'); return; }
-  const dernierNumPromo = donneesPromotions.length ? Math.max(...donneesPromotions.map(p => parseInt((p.promo_id || '').replace('PROMO-', '')) || 0)) : 0;
   const d = {
-    promo_id:       id || ('PROMO-' + String(dernierNumPromo + 1).padStart(4, '0')),
+    promo_id:       id || '', // nouvelle : le serveur donne le numéro (19 nov. 2026)
     fam_id:         document.getElementById('fp-famille').value || '',
     type,
     nom,
@@ -108,7 +107,7 @@ async function sauvegarderPromotion() {
     chargerPromotions();
   } else {
     cacherChargement();
-    afficherMsg('promotions', 'Erreur.', 'erreur');
+    afficherMsg('promotions', '❌ ' + ((res && res.message) || 'Erreur.'), 'erreur');
   }
 }
 
@@ -128,7 +127,7 @@ async function supprimerPromotion(promo_id) {
       chargerPromotions();
     } else {
       cacherChargement();
-      afficherMsg('promotions', 'Erreur.', 'erreur');
+      afficherMsg('promotions', '❌ ' + ((res && res.message) || 'Erreur.'), 'erreur');
     }
   });
 }

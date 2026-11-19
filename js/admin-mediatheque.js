@@ -1,5 +1,9 @@
 // ─── MÉDIATHÈQUE — GESTION ───
 var _mediathequeDonnees = null;
+// Photos affichées dans chaque grille (19 nov. 2026) : les boutons passent par leur rang dans CETTE liste,
+// jamais par une adresse ou un nom recopiés dans le HTML (une apostrophe cassait le clic).
+var _medGrille = [];
+var _medGrilleModal = [];
 
 
 var _medNiveau2 = '';
@@ -108,29 +112,33 @@ function medFiltrer() {
 
   const grille = document.getElementById('med-grille');
   
+  _medGrille = items;
   if (!items.length) { grille.innerHTML = '<p class="vide-desc">Aucune photo.</p>'; return; }
-  grille.innerHTML = items.map(i => {
-    const catAffichee = i.categorie.replace(/^images\//i, '');
-    const nomEchappe = (i.nom || '').replace(/'/g, "\\'");
+  grille.innerHTML = items.map((i, idx) => {
+    const catAffichee = echapperHtml(i.categorie.replace(/^images\//i, ''));
     return `
-    <div class="carte" onclick="medOuvrirPhoto('${i.url}', '${i.nom}')">
-      <button onclick="event.stopPropagation(); medSupprimerPhoto(${i.rowIndex}, '${nomEchappe}')" title="Supprimer"
+    <div class="carte" onclick="medOuvrirPhoto(${idx})">
+      <button onclick="event.stopPropagation(); medSupprimerPhoto(${idx})" title="Supprimer"
         style="position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:none;background:rgba(0,0,0,0.55);color:white;font-size:14px;line-height:1;cursor:pointer;z-index:2;">✕</button>
       <div class="carte-bg" style="background:#888"></div>
       <div style="position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);"></div>
-      <img src="${i.url}" alt="${i.nom}" onerror="this.style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+      <img src="${echapperHtml(i.url)}" alt="${echapperHtml(i.nom)}" onerror="this.style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
       <div class="carte-contenu" style="background:rgba(0,0,0,0.5);width:100%;padding:8px 12px;border-radius:0 0 8px 8px;">
         <span class="carte-titre">${catAffichee}</span>
-        <span class="carte-slogan">${i.nom}</span>
+        <span class="carte-slogan">${echapperHtml(i.nom)}</span>
       </div>
     </div>`;
   }).join('');
 }
 
-async function medSupprimerPhoto(rowIndex, nom) {
-  if (!confirm('Supprimer "' + nom + '" définitivement (feuille + Cloudinary) ?')) return;
+// Suppression par l'adresse de la photo (19 nov. 2026) : avant, par son rang dans la feuille, qui pouvait
+// avoir bougé depuis le chargement (la mauvaise photo partait, aussi chez Cloudinary).
+async function medSupprimerPhoto(idx) {
+  const photo = _medGrille[idx];
+  if (!photo) return;
+  if (!confirm('Supprimer "' + (photo.nom || '') + '" définitivement (feuille + Cloudinary) ?')) return;
   afficherMsg('mediatheque', 'Suppression en cours…');
-  const res = await appelAPIPost('supprimerMediatheque', { rowIndex });
+  const res = await appelAPIPost('supprimerMediatheque', { url: photo.url });
   if (!res || !res.success) {
     afficherMsg('mediatheque', '❌ Erreur : ' + (res?.message || 'inconnue'), 'erreur');
     return;
@@ -140,23 +148,11 @@ async function medSupprimerPhoto(rowIndex, nom) {
   chargerMediatheque();
 }
 
-async function envoyerDriveVersCloudinary() {
-  afficherChargement();
-  afficherMsg('mediatheque', 'Envoi vers Cloudinary en cours… (peut prendre quelques minutes)');
-  const res = await appelAPI('envoyerDriveVersCloudinary');
-  cacherChargement();
-  if (!res || !res.success) {
-    afficherMsg('mediatheque', '❌ Erreur : ' + (res?.message || 'inconnue'), 'erreur');
-    return;
-  }
-  afficherMsg('mediatheque', '✅ ' + res.message);
-}
-
 async function mediathequeSyncCloudinary() {
   afficherChargement();
   afficherMsg('mediatheque', 'Synchronisation en cours…');
   const res = await appelAPI('syncCloudinary');
-  if (!res || !res.success) { cacherChargement(); afficherMsg('mediatheque', 'Erreur de synchronisation.', 'erreur'); return; }
+  if (!res || !res.success) { cacherChargement(); afficherMsg('mediatheque', '❌ Synchronisation : ' + ((res && res.message) || 'erreur'), 'erreur'); return; }
   _mediathequeDonnees = null;
   cacherChargement();
   afficherMsg('mediatheque', `✅ ${res.ajouts} photo(s) ajoutée(s).`);
@@ -255,17 +251,18 @@ function filtrerMediatheque() {
 
   const grille = document.getElementById('mediatheque-grille');
   grille.className = 'collections-grille';
+  _medGrilleModal = items;
   if (!items.length) { grille.innerHTML = '<p class="vide-desc">Aucune photo</p>'; return; }
-  grille.innerHTML = items.map(i => {
-    const catAffichee = i.categorie.replace(/^images\//i, '');
+  grille.innerHTML = items.map((i, idx) => {
+    const catAffichee = echapperHtml(i.categorie.replace(/^images\//i, ''));
     return `
-    <div class="carte" onclick="selectionnerPhotoMediatheque('${i.url}', '${i.nom}')">
+    <div class="carte" onclick="selectionnerPhotoMediatheque(${idx})">
       <div class="carte-bg" style="background:#888"></div>
       <div style="position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);"></div>
-      <img src="${i.url}" alt="${i.nom}" onerror="this.style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+      <img src="${echapperHtml(i.url)}" alt="${echapperHtml(i.nom)}" onerror="this.style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
       <div class="carte-contenu" style="background:rgba(0,0,0,0.5);width:100%;padding:8px 12px;border-radius:0 0 8px 8px;">
         <span class="carte-titre">${catAffichee}</span>
-        <span class="carte-slogan">${i.nom}</span>
+        <span class="carte-slogan">${echapperHtml(i.nom)}</span>
       </div>
     </div>`;
   }).join('');
@@ -274,11 +271,14 @@ function filtrerMediatheque() {
 
 
 
-function selectionnerPhotoMediatheque(url, nom) {
+function selectionnerPhotoMediatheque(idx) {
+  const photo = _medGrilleModal[idx];
+  if (!photo) return;
+  const url = photo.url;
   const champ = document.getElementById(_mediathequeChampId);
   if (champ) champ.value = url;
   const preview = document.getElementById(_mediathequePreviewId);
-  if (preview) preview.innerHTML = `<img src="${url}" class="photo-preview">`;
+  if (preview) preview.innerHTML = `<img src="${echapperHtml(url)}" class="photo-preview">`;
   fermerModalMediatheque();
 }
 
@@ -361,7 +361,7 @@ function ajoutApercu() {
         div.style.cssText = 'display:flex;flex-direction:column;gap:8px;width:180px';
         div.innerHTML = `
           <img src="${canvas2.toDataURL('image/jpeg', 0.85)}" style="width:180px;height:180px;object-fit:cover;border-radius:8px">
-          <input type="text" class="form-ctrl" value="${_ajoutPhotos[idx].nom}"
+          <input type="text" class="form-ctrl" value="${echapperHtml(_ajoutPhotos[idx].nom)}"
             oninput="_ajoutPhotos[${idx}].nom=this.value" placeholder="Nom de la photo">
         `;
         zone.appendChild(div);
@@ -389,6 +389,7 @@ async function envoyerPhotos() {
     if (!p) continue;
     const res = await appelAPIPost('uploadPhoto', { image: p.base64, nom: p.nom, dossier });
     if (!res || !res.success) { erreurs++; dernierMessage = res?.message || ''; }
+    else if (res.avertissement) { dernierMessage = res.avertissement; }
   }
   btn.textContent = 'Envoyer';
   btn.disabled = false;
@@ -396,16 +397,18 @@ async function envoyerPhotos() {
   if (erreurs) {
     afficherMsg('mediatheque', '❌ ' + erreurs + ' photo(s) en erreur. ' + (dernierMessage || ''), 'erreur');
   } else {
-    afficherMsg('mediatheque', '✅ Photo(s) ajoutée(s) avec succès.');
+    afficherMsg('mediatheque', dernierMessage ? '⚠️ ' + dernierMessage : '✅ Photo(s) ajoutée(s) avec succès.', dernierMessage ? 'erreur' : 'succes');
     _mediathequeDonnees = null;
     chargerMediatheque();
   }
 }
 
-function medOuvrirPhoto(url, nom) {
+function medOuvrirPhoto(idx) {
+  const photo = _medGrille[idx];
+  if (!photo) return;
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
-  overlay.innerHTML = `<img src="${url}" alt="${nom}" style="max-width:90%;max-height:90%;object-fit:contain;">`;
+  overlay.innerHTML = `<img src="${echapperHtml(photo.url)}" alt="${echapperHtml(photo.nom)}" style="max-width:90%;max-height:90%;object-fit:contain;">`;
   overlay.onclick = () => overlay.remove();
   document.body.appendChild(overlay);
 }

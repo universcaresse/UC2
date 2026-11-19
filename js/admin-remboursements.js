@@ -55,11 +55,8 @@ async function ouvrirFormRemboursement() {
   remArticles     = [];
   remLibres       = [];
 
-  // Générer un nouveau numéro
-  const dernierNum = toutesRemboursements.length
-    ? Math.max(...toutesRemboursements.map(r => parseInt((r.rem_id || '').replace('REM-', '')) || 0))
-    : 0;
-  remIdEnCours = 'REM-' + String(dernierNum + 1).padStart(4, '0');
+  // Le numéro est donné par le serveur à l'enregistrement (19 nov. 2026)
+  remIdEnCours = null;
 
   // Réinitialiser les panneaux : seul le choix de la vente est visible
   document.getElementById('rem-articles-panel').classList.add('cache');
@@ -129,6 +126,8 @@ function remFiltrerVentes() {
   const dateFin   = document.getElementById('rem-vente-date-fin').value   || '';
 
   const filtrees = remVentesDispo.filter(v => {
+    // Seule une vente finalisée se rembourse (une vente pas encore payée se modifie)
+    if (['Finalisé', 'Finalisée'].indexOf(v.statut) === -1) return false;
     const okClient  = !client  || (v.client || '').toLowerCase().includes(client);
     const okProduit = !produit || (v.produits_resume || '').toLowerCase().includes(produit);
 
@@ -407,69 +406,29 @@ async function finaliserRemboursement(modePaiement) {
 
   afficherChargement();
 
-  const rem_id    = remIdEnCours;
-  const client    = document.getElementById('rem-client').value;
-  const courriel  = document.getElementById('rem-courriel').value;
-  const telephone = document.getElementById('rem-telephone').value;
-
-  // Créer l'entête (rattachée à la vente)
-  const resCreate = await appelAPIPost('createRemboursement', {
-    rem_id,
-    ven_id: remVenteChoisie.ven_id,
-    client,
-    courriel,
-    telephone,
-    type_remb: '',
-    mode_paiement: modePaiement
-  });
-
-  if (!resCreate || !resCreate.success) {
-    cacherChargement();
-    afficherMsg('remboursements', resCreate && resCreate.message ? resCreate.message : 'Erreur lors de la création.', 'erreur');
-    return;
-  }
-
-  // Lignes produit (avec destination retour/perte — stockée à l'étape 4)
-  for (const a of articlesARendre) {
-    await appelAPIPost('addRemboursementLigne', {
-      rem_id,
-      type: 'produit',
-      pro_id: a.pro_id,
-      format_poids: a.format_poids,
-      format_unite: a.format_unite,
-      quantite: a.qte_rendue,
-      prix_unitaire: a.prix_rembourse,
-      retour: a.destination,
-      prix_plein: a.prix_plein
-    });
-  }
-
-  // Lignes libres (avec compte livraison/promotion — stocké à l'étape 4)
-  for (const l of remLibres) {
-    await appelAPIPost('addRemboursementLigne', {
-      rem_id,
-      type: 'libre',
-      description: l.description,
-      montant: l.montant,
-      compte: l.type
-    });
-  }
-
-  // Finaliser
-  const resFin = await appelAPIPost('finaliserRemboursement', {
-    rem_id,
-    type_remb: '',
-    mode_paiement: modePaiement
+  // Tout part d'un seul coup (19 nov. 2026) : le serveur vérifie, numérote, écrit, remet le stock et
+  // comptabilise; un refus n'écrit rien.
+  const resFin = await appelAPIPost('enregistrerRemboursement', {
+    ven_id:    remVenteChoisie.ven_id,
+    client:    document.getElementById('rem-client').value,
+    courriel:  document.getElementById('rem-courriel').value,
+    telephone: document.getElementById('rem-telephone').value,
+    mode_paiement: modePaiement,
+    articles: articlesARendre.map(a => ({
+      pro_id: a.pro_id, format_poids: a.format_poids, format_unite: a.format_unite,
+      quantite: a.qte_rendue, prix_rembourse: a.prix_rembourse, retour: a.destination
+    })),
+    libres: remLibres.map(l => ({ type: l.type, description: l.description, montant: l.montant }))
   });
 
   cacherChargement();
 
   if (!resFin || !resFin.success) {
-    afficherMsg('remboursements', resFin && resFin.message ? resFin.message : 'Erreur lors de la finalisation.', 'erreur');
+    afficherMsg('remboursements', '❌ ' + ((resFin && resFin.message) || 'Erreur lors de l\'enregistrement.'), 'erreur');
     return;
   }
 
-  afficherMsg('remboursements', '✅ Remboursement enregistré.');
+  afficherMsg('remboursements', '✅ Remboursement ' + echapperHtml(resFin.rem_id || '') + ' enregistré.');
   fermerFormRemboursement();
   chargerRemboursements();
 }

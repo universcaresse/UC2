@@ -1962,6 +1962,12 @@ async function genererEtiquetteConfirmee(cmd_id, poids) {
     const dejaPdf = await appelAPIPost('getEtiquettePdf', { cmd_id });
     if (dejaPdf && dejaPdf.success && fenetrePdf) {
       fenetrePdf.location = await rognerEtiquetteEnUrl(dejaPdf.pdf_base64);
+      // 19 nov. 2026 : la commande passe quand même « Étiquette prête » (avant, elle restait « À expédier »
+      // et le dépôt du colis était refusé).
+      if (c.statut === 'À expédier') {
+        const resS = await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'Étiquette prête' });
+        if (resS && resS.success) { fermerFicheCommande(); chargerCommandes(); }
+      }
       afficherMsg('commandes', 'Une étiquette existait déjà — rouverte, aucun nouvel achat.');
     } else {
       // Achetée et payée, mais le PDF n'est pas chez nous : surtout ne pas racheter.
