@@ -589,6 +589,7 @@ window.addEventListener('DOMContentLoaded', async function () {
       const r = await appelAPIPost('getCommandePublique', { cmd_id: numero, jeton: jeton });
       window.ucCommandeVue = r;
       window.ucCommandeNumero = numero;
+      if (r && r.success && afficherSiVieuxCourriel(z, r, numero, jeton, params)) return;
       // Des produits à venir : la cliente répond d'abord sur sa page (garder / laisser tomber), puis paie (18 nov. 2026)
       if (r && r.success && r.statut === 'En attente de paiement' && r.choix_cliente !== 'recevoir' &&
           (r.lignes || []).some(l => l.type_ligne === 'temporaire')) {
@@ -688,26 +689,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     }
 
     // Vieux courriel de proposition : une plus récente existe
-    const propParam = parseInt(params.get('prop') || '0', 10);
-    if (propParam && res.date_prop && (res.date_prop - propParam) > 60000) {
-      demandeVider();
-      if (zone) zone.innerHTML = '<h2 class="titre">Une nouvelle proposition vous a été envoyée le ' + new Date(res.date_prop).toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' }) + '.</h2>' +
-        '<p class="textes-discrets">Ce courriel n\'est plus à jour. Retrouvez la proposition la plus récente dans vos courriels, ou recevez-la à nouveau.</p>' +
-        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" id="prop-renvoyer2">Recevez à nouveau votre proposition</button>' +
-        '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" id="prop-ecrivez2">Écrivez-nous</button>' +
-        '<p class="textes-discrets cache" id="prop-renvoyer2-msg"></p>';
-      var bEcr2 = document.getElementById('prop-ecrivez2');
-      if (bEcr2) bEcr2.addEventListener('click', function () { ouvrirContactCommande(res, numero); });
-      var bR2 = document.getElementById('prop-renvoyer2');
-      if (bR2) bR2.addEventListener('click', async function () {
-        var msgR2 = document.getElementById('prop-renvoyer2-msg');
-        bR2.disabled = true;
-        var rR2 = (typeof appelAPIPost === 'function') ? await appelAPIPost('renvoyerCopieProposition', { cmd_id: numero, jeton: jeton }) : null;
-        if (rR2 && rR2.success) { if (msgR2) { msgR2.textContent = 'C\'est envoyé, vérifiez vos courriels (pensez aux indésirables).'; msgR2.classList.remove('cache'); } }
-        else { if (msgR2) { msgR2.textContent = 'Erreur : ' + ((rR2 && rR2.message) || 'échec'); msgR2.classList.remove('cache'); bR2.disabled = false; } }
-      });
-      return;
-    }
+    if (afficherSiVieuxCourriel(zone, res, numero, jeton, params)) return;
 
     // « J'ai changé d'idée » (courriels de la demande et de la liste modifiée) : l'écran d'annulation tout de suite
     // (19 nov. 2026 : avant, le lien ouvrait la liste, ou un refus pour une liste « À retravailler »).
@@ -993,6 +975,31 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
     if (zone) zone.textContent = 'Erreur : ' + e.message;
   }
 });
+
+// Un vieux courriel de proposition (une plus récente a été envoyée depuis) : on le dit, on offre de la recevoir à
+// nouveau. Rend true si c'est le cas. 19 nov. 2026 : aussi pour « Réglez en quelques clics » (action=payer) — avant,
+// le bouton de paiement d'un vieux courriel menait au paiement de la nouvelle proposition, que la cliente n'avait pas vue.
+function afficherSiVieuxCourriel(zone, res, numero, jeton, params) {
+  const propParam = parseInt(params.get('prop') || '0', 10);
+  if (!(propParam && res && res.date_prop && (res.date_prop - propParam) > 60000)) return false;
+  demandeVider();
+  if (zone) zone.innerHTML = '<h2 class="titre">Une nouvelle proposition vous a été envoyée le ' + new Date(res.date_prop).toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' }) + '.</h2>' +
+    '<p class="textes-discrets">Ce courriel n\'est plus à jour. Retrouvez la proposition la plus récente dans vos courriels, ou recevez-la à nouveau.</p>' +
+    '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" id="prop-renvoyer2">Recevez à nouveau votre proposition</button>' +
+    '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" id="prop-ecrivez2">Écrivez-nous</button>' +
+    '<p class="textes-discrets cache" id="prop-renvoyer2-msg"></p>';
+  var bEcr2 = document.getElementById('prop-ecrivez2');
+  if (bEcr2) bEcr2.addEventListener('click', function () { ouvrirContactCommande(res, numero); });
+  var bR2 = document.getElementById('prop-renvoyer2');
+  if (bR2) bR2.addEventListener('click', async function () {
+    var msgR2 = document.getElementById('prop-renvoyer2-msg');
+    bR2.disabled = true;
+    var rR2 = (typeof appelAPIPost === 'function') ? await appelAPIPost('renvoyerCopieProposition', { cmd_id: numero, jeton: jeton }) : null;
+    if (rR2 && rR2.success) { if (msgR2) { msgR2.textContent = 'C\'est envoyé, vérifiez vos courriels (pensez aux indésirables).'; msgR2.classList.remove('cache'); } }
+    else { if (msgR2) { msgR2.textContent = 'Erreur : ' + ((rR2 && rR2.message) || 'échec'); msgR2.classList.remove('cache'); bR2.disabled = false; } }
+  });
+  return true;
+}
 
 // « J'ai changé d'idée » : l'écran d'annulation ouvert directement par le lien d'un courriel (19 nov. 2026).
 function afficherAnnulationCommande(zone, numero, jeton) {

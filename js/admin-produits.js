@@ -1323,13 +1323,11 @@ async function changerStatutProduit(pro_id, statut, messageOk) {
   var pro = donneesProduits.find(function(p) { return p.pro_id === pro_id; });
   if (!pro) { cacherChargement(); return; }
   var d = Object.assign({}, pro, { statut: statut });
-  // Re-formater les ingrédients/formats pour saveProduit
-  d.ingredients = (prodCache.ingredients[pro_id] || []).map(function(i) {
-    return { ing_id: i.ing_id, nom_ingredient: i.nom_ingredient, quantite_g: i.quantite_g };
-  });
-  d.formats = (prodCache.formats[pro_id] || []).map(function(f) {
-    return { format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix_vente, nb_unites: f.nb_unites, poste_gr: f.poste_gr || 0, actif: f.actif !== false };
-  });
+  // Un changement de statut ne touche pas la recette (19 nov. 2026) : sans « ingredients » ni « formats », le serveur
+  // les laisse tels quels. Avant, ils étaient renvoyés depuis la mémoire de l'écran : si leur chargement avait
+  // échoué, archiver effaçait les formats et la recette du produit.
+  delete d.ingredients;
+  delete d.formats;
   var res = await appelAPIPost('saveProduit', d);
   if (res && res.success) {
     // Mettre à jour le cache

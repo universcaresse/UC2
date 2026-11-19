@@ -864,3 +864,8 @@ input:autofill {
   margin-right: calc(-1 * var(--espace-56));
   margin-bottom: var(--espace-10);
 }
+/* Admin, de 1024 à 1199 px (iPad à l'horizontale) : le menu du haut tient sur la largeur (19 nov. 2026 : il
+   débordait et « accueil » sortait de l'écran à gauche) */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .nav-admin-btn { padding: 8px 6px; letter-spacing: 0.03em; }
+}
