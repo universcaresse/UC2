@@ -1254,6 +1254,7 @@ function supprimerProduit(pro_id) { supprimerOuArchiverProduit(pro_id); }
 function supprimerOuArchiverProduit(pro_id) {
   if (produitAHistorique(pro_id)) {
     // Archiver
+    if (resteAVendre(pro_id)) return;
     var nbLots = (prodCache.lots || []).filter(function(l) { return l.pro_id === pro_id; }).length;
     var nbVentes = (prodCache.ventesLignes || []).filter(function(v) { return v.pro_id === pro_id; }).length;
     var raisons = [];
@@ -1292,7 +1293,17 @@ function supprimerOuArchiverProduit(pro_id) {
 
 // Archiver : le produit garde tout son historique, reste dans l'admin, disparaît du site public et des listes
 // de choix (commande, vente, fabrication). Il se ramène par Modifier → Statut.
+// Il reste de ce produit à vendre : pas d'archivage (19 nov. 2026). Rend true (et le dit) s'il en reste dans ses lots.
+// Le serveur vérifie aussi les unités réservées par une commande pas encore payée.
+function resteAVendre(pro_id) {
+  var enLots = (prodCache.lots || []).filter(function(l) { return l.pro_id === pro_id; })
+    .reduce(function(s, l) { return s + Math.max(0, (l.nb_unites || 0) - (l.nb_unites_vendu || 0)); }, 0);
+  if (enLots > 0) afficherMsg('recettes', 'Il reste ' + enLots + ' unité(s) de ce produit dans ses lots : vendez-les avant de l\'archiver.', 'erreur');
+  return enLots > 0;
+}
+
 async function archiverProduit(pro_id) {
+  if (resteAVendre(pro_id)) return;
   afficherChargement();
   var pro = donneesProduits.find(function(p) { return p.pro_id === pro_id; });
   if (!pro) { cacherChargement(); return; }
