@@ -1261,32 +1261,7 @@ function supprimerOuArchiverProduit(pro_id) {
     if (nbVentes > 0) raisons.push(nbVentes + ' vente(s)');
     confirmerAction(
       'Ce produit a un historique (' + raisons.join(', ') + '). Il ne peut pas être supprimé. Voulez-vous l\'archiver ? Il restera dans l\'admin mais ne sera plus visible sur le site public.',
-      async function() {
-        afficherChargement();
-        var pro = donneesProduits.find(function(p) { return p.pro_id === pro_id; });
-        if (!pro) { cacherChargement(); return; }
-        var d = Object.assign({}, pro, { statut: 'archive' });
-        // Re-formater les ingrédients/formats pour saveProduit
-        d.ingredients = (prodCache.ingredients[pro_id] || []).map(function(i) {
-          return { ing_id: i.ing_id, nom_ingredient: i.nom_ingredient, quantite_g: i.quantite_g };
-        });
-        d.formats = (prodCache.formats[pro_id] || []).map(function(f) {
-          return { format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix_vente, nb_unites: f.nb_unites, poste_gr: f.poste_gr || 0, actif: f.actif !== false };
-        });
-        var res = await appelAPIPost('saveProduit', d);
-        if (res && res.success) {
-          // Mettre à jour le cache
-          var idx = donneesProduits.findIndex(function(p) { return p.pro_id === pro_id; });
-          if (idx >= 0) donneesProduits[idx].statut = 'archive';
-          cacherChargement();
-          fermerFicheProduit();
-          afficherProduits(true);
-          afficherMsg('recettes', 'Produit archivé.');
-        } else {
-          cacherChargement();
-          afficherMsg('recettes', '❌ ' + ((res && res.message) || 'Erreur.'), 'erreur');
-        }
-      }
+      function() { return archiverProduit(pro_id); }
     );
   } else {
     // Supprimer pour de vrai
@@ -1302,11 +1277,45 @@ function supprimerOuArchiverProduit(pro_id) {
         fermerFicheProduit();
         afficherProduits(true);
         afficherMsg('recettes', 'Produit supprimé.');
+      } else if (res && res.historique) {
+        // Historique que l'admin ne voit pas (commande, remboursement) : le serveur refuse, on offre l'archivage (19 nov. 2026)
+        cacherChargement();
+        confirmerAction(res.message.replace(/ Archivez-le plutôt.*$/, '') + ' Voulez-vous l\'archiver ? Il restera dans l\'admin mais ne sera plus visible sur le site public.',
+          function() { return archiverProduit(pro_id); });
       } else {
         cacherChargement();
-        afficherMsg('recettes', (res && res.message) || 'Erreur.', 'erreur');  // ex. : le produit a un historique
+        afficherMsg('recettes', (res && res.message) || 'Erreur.', 'erreur');
       }
     });
+  }
+}
+
+// Archiver : le produit garde tout son historique, reste dans l'admin, disparaît du site public et des listes
+// de choix (commande, vente, fabrication). Il se ramène par Modifier → Statut.
+async function archiverProduit(pro_id) {
+  afficherChargement();
+  var pro = donneesProduits.find(function(p) { return p.pro_id === pro_id; });
+  if (!pro) { cacherChargement(); return; }
+  var d = Object.assign({}, pro, { statut: 'archive' });
+  // Re-formater les ingrédients/formats pour saveProduit
+  d.ingredients = (prodCache.ingredients[pro_id] || []).map(function(i) {
+    return { ing_id: i.ing_id, nom_ingredient: i.nom_ingredient, quantite_g: i.quantite_g };
+  });
+  d.formats = (prodCache.formats[pro_id] || []).map(function(f) {
+    return { format_id: f.format_id, poids: f.poids, unite: f.unite, prix_vente: f.prix_vente, nb_unites: f.nb_unites, poste_gr: f.poste_gr || 0, actif: f.actif !== false };
+  });
+  var res = await appelAPIPost('saveProduit', d);
+  if (res && res.success) {
+    // Mettre à jour le cache
+    var idx = donneesProduits.findIndex(function(p) { return p.pro_id === pro_id; });
+    if (idx >= 0) donneesProduits[idx].statut = 'archive';
+    cacherChargement();
+    fermerFicheProduit();
+    afficherProduits(true);
+    afficherMsg('recettes', 'Produit archivé.');
+  } else {
+    cacherChargement();
+    afficherMsg('recettes', '❌ ' + ((res && res.message) || 'Erreur.'), 'erreur');
   }
 }
 
