@@ -1139,41 +1139,45 @@ function fermerFormCompleter() {
   cmdCompleterIdEnCours = null;
 }
 
-async function genererLienSquare() {
-  const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
-  if (!c) return;
+// Crée le lien de paiement Square de la proposition, ferme l'ancien et retient le nouveau (19 nov. 2026 : sert au
+// bouton « Générer le lien Square » et à l'envoi, qui le crée lui-même s'il manque). Rend { ok, url, message }.
+async function cmdCompleterCreerLien(c) {
   const livraison = parseFloat(String(document.getElementById('completer-livraison').value).replace(',', '.')) || 0;
   const rabais = cmdCompleterCalculerRabais();
   const montant = Math.max(0, Math.round((cmdCompleterSousTotalPrets() + livraison - rabais) * 100) / 100);
-  if (montant <= 0) { afficherMsg('commandes', 'Montant invalide — aucun produit prêt à payer.', 'erreur'); return; }
-  afficherChargement();
-  const courriel = document.getElementById('completer-courriel').value.trim();
-  const telephone = document.getElementById('completer-telephone').value.trim();
-  const prenom = document.getElementById('completer-prenom').value.trim();
-  const nomClient = document.getElementById('completer-client').value.trim();
-  const res = await appelAPIPost('creerLienPaiement', { cmd_id: cmdCompleterIdEnCours, montant: montant, nom: 'Vos coups de cœur. Commande ' + c.cmd_id.replace('CMD-', '-'), courriel: courriel, telephone: telephone, prenom: prenom, nom_client: nomClient });
-  cacherChargement();
-  if (res && res.success && res.url) {
-    cmdCompleterMontantLien = montant;
-    document.getElementById('completer-square').value = res.url;
-    if (res.link_id) {
-      const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
-      // 19 nov. 2026 : l'ancien lien doit être fermé (sinon la cliente pourrait payer l'ancien montant) et le
-      // nouveau retenu par le serveur (il s'en sert pour vérifier le paiement) — un échec se dit.
-      let avertLien = '';
-      if (c && c.link_id_square && c.link_id_square !== res.link_id) {
-        const rAncien = await appelAPIPost('annulerLienSquare', { link_id: c.link_id_square });
-        if (!(rAncien && rAncien.success)) avertLien += ' L\'ancien lien n\'a pas pu être fermé : fermez-le dans Square.';
-      }
-      if (c) c.link_id_square = res.link_id;
-      const rGarde = await appelAPIPost('updateCommandeEntete', { cmd_id: cmdCompleterIdEnCours, link_id_square: res.link_id });
-      if (!(rGarde && rGarde.success)) avertLien += ' Le nouveau lien n\'a pas été enregistré (' + ((rGarde && rGarde.message) || 'erreur') + ') : régénérez-le.';
-      if (avertLien) { afficherMsg('commandes', '⚠️ Lien de paiement généré.' + avertLien, 'erreur'); return; }
+  if (montant <= 0) return { ok: false, message: 'Montant invalide — aucun produit prêt à payer.' };
+  const res = await appelAPIPost('creerLienPaiement', {
+    cmd_id: c.cmd_id, montant: montant, nom: 'Vos coups de cœur — commande ' + c.cmd_id,
+    courriel: document.getElementById('completer-courriel').value.trim(),
+    telephone: document.getElementById('completer-telephone').value.trim(),
+    prenom: document.getElementById('completer-prenom').value.trim(),
+    nom_client: document.getElementById('completer-client').value.trim()
+  });
+  if (!res || !res.success || !res.url) return { ok: false, message: (res && res.message) || 'Erreur Square.' };
+  if (res.link_id) {
+    // L'ancien lien doit être fermé (sinon la cliente pourrait payer l'ancien montant) et le nouveau retenu par le
+    // serveur (il s'en sert pour vérifier le paiement)
+    if (c.link_id_square && c.link_id_square !== res.link_id) {
+      const rAncien = await appelAPIPost('annulerLienSquare', { link_id: c.link_id_square });
+      if (!(rAncien && rAncien.success)) return { ok: false, message: 'L\'ancien lien n\'a pas pu être fermé : fermez-le dans Square.' };
     }
-    afficherMsg('commandes', '✅ Lien de paiement généré.');
-  } else {
-    afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur Square.'), 'erreur');
+    c.link_id_square = res.link_id;
+    const rGarde = await appelAPIPost('updateCommandeEntete', { cmd_id: c.cmd_id, link_id_square: res.link_id });
+    if (!(rGarde && rGarde.success)) return { ok: false, message: 'Le nouveau lien n\'a pas été enregistré (' + ((rGarde && rGarde.message) || 'erreur') + ').' };
   }
+  cmdCompleterMontantLien = montant;
+  document.getElementById('completer-square').value = res.url;
+  return { ok: true, url: res.url };
+}
+
+async function genererLienSquare() {
+  const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
+  if (!c) return;
+  afficherChargement();
+  const r = await cmdCompleterCreerLien(c);
+  cacherChargement();
+  if (r.ok) afficherMsg('commandes', '✅ Lien de paiement généré.');
+  else afficherMsg('commandes', '❌ ' + r.message, 'erreur');
 }
 
 var cmdCompleterPanier = [];
@@ -1507,7 +1511,7 @@ async function apercuProposition() {
     client: client,
     numero: c.cmd_id,
     note: note,
-    lien_square: square,
+    lien_square: square || 'créé à l\'envoi',
     lignes: lignesCourriel,
     sous_total: formaterPrix(sousTotalPrets),
     rabais: rabais > 0 ? formaterPrix(rabais) : 0,
@@ -1547,7 +1551,7 @@ async function envoyerPropositionV3() {
   const telephone = document.getElementById('completer-telephone').value.trim();
   const livraison = document.getElementById('completer-livraison').value;
   const note      = document.getElementById('completer-note').value;
-  const square    = document.getElementById('completer-square').value;
+  let square      = document.getElementById('completer-square').value.trim();
   const livraisonNum = parseFloat(String(livraison).replace(',', '.')) || 0;
 
   // Courriel vérifié avant de toucher à quoi que ce soit (18 nov. 2026) : un courriel invalide faisait sortir
@@ -1580,17 +1584,28 @@ async function envoyerPropositionV3() {
   const promoInfo = cmdCompleterTypePromo();
   const sousTotalPrets = cmdCompleterSousTotalPrets();
   const totalAvec = Math.max(0, sousTotalPrets + livraisonNum - rabais);
-  if (square && cmdCompleterMontantLien !== null && Math.abs(cmdCompleterMontantLien - totalAvec) > 0.005) {
-    window.cmdCompleterEnvoiEnCours = false;
-    cacherChargement();
-    afficherMsg('commandes', '❌ Le lien Square demande ' + formaterPrix(cmdCompleterMontantLien) + ', mais le total est maintenant ' + formaterPrix(totalAvec) + ' : générez le lien à nouveau.', 'erreur');
-    return;
-  }
   if (!cmdCompleterLignesPretes().length) {
     window.cmdCompleterEnvoiEnCours = false;
     afficherMsg('commandes', '❌ Aucun produit prêt : une proposition sans produit prêt ne peut pas encore partir.', 'erreur');
     cacherChargement();
     return;
+  }
+
+  // Le lien de paiement (19 nov. 2026) : sans lien, la proposition partait sans le bouton « Réglez en quelques clics »
+  // et la cliente ne pouvait pas payer; pour une proposition refaite, la case gardait le lien d'avant (fermé, ancien
+  // montant). Il se crée donc ici s'il manque, s'il vient d'une proposition d'avant ou s'il ne colle plus au total.
+  // Un lien collé à la main pendant cet écran reste tel quel.
+  const lienDAvant = square && cmdCompleterMontantLien === null && square === String(c.lien_square || '').trim();
+  const lienDecale = square && cmdCompleterMontantLien !== null && Math.abs(cmdCompleterMontantLien - totalAvec) > 0.005;
+  if (!square || lienDAvant || lienDecale) {
+    const lien = await cmdCompleterCreerLien(c);
+    if (!lien.ok) {
+      window.cmdCompleterEnvoiEnCours = false;
+      cacherChargement();
+      afficherMsg('commandes', '❌ Lien de paiement impossible : ' + lien.message + ' Rien n\'a été envoyé.', 'erreur');
+      return;
+    }
+    square = lien.url;
   }
 
   const resUpdate = await appelAPIPost('updateCommandeComplete', {
