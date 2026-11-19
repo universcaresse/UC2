@@ -130,6 +130,8 @@ if (resGam && resGam.success) {
 	if (statCol)  statCol.textContent  = donneesCollections.length;
 	if (statProd && nbPublics > 0) statProd.textContent = nbPublics;
 	if (statUniv) statUniv.textContent = (donneesRegroupements || []).length;
+  // Les chiffres naissent invisibles (style.css) : main.js les montrait en chargeant le catalogue public, plus chargé ici (19 nov. 2026).
+  document.querySelectorAll('.hero-stat-num').forEach(el => setTimeout(() => el.classList.add('visible'), 50));
 
   // Remplir le cache produits dès le démarrage
   var ingsMap = {};

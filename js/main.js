@@ -50,7 +50,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   initScrollAnimations();
   // Les trois lectures partent ensemble et chacune s'affiche dès qu'elle arrive (19 nov. 2026).
   // Elles partent avant initSPA : la copie gardée est déjà là si la page s'ouvre sur le catalogue.
-  const lectures = Promise.all([
+  // L'admin charge aussi main.js mais n'affiche rien du site public : pas de lectures publiques là (19 nov. 2026).
+  const estAdmin = /\/admin(\/|$)/.test(window.location.pathname);
+  const lectures = estAdmin ? Promise.resolve() : Promise.all([
     lecturePublique('getContenu', res => {
       // Une copie gardée en maintenance ne s'affiche pas : le serveur dira si c'est encore vrai.
       if (res && res.copie && String((res.contenu || {}).maintenance_active) === '1') return false;
