@@ -135,6 +135,7 @@ async function sauvegarderGamme2() {
   const col_id   = document.getElementById('fg-collection').value;
   const nom      = document.getElementById('fg-nom').value.toUpperCase();
   if (!col_id || !nom) {
+    cacherChargement();
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
     afficherMsg('gammes', 'Le nom et la collection sont requis.', 'erreur');
     return;

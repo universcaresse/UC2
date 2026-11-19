@@ -173,7 +173,7 @@ async function inciValider(id, nom_UC, cat_id, ing_id) {
   const inci          = document.getElementById(`${id}-inci`)?.value  || '';
   const nomBotanique  = document.getElementById(`${id}-bot`)?.value   || '';
   const noteOlfactive = document.getElementById(`${id}-note`)?.value  || '';
-  if (!ing_id) { afficherMsg('inci', 'Ingrédient introuvable.', 'erreur'); return; }
+  if (!ing_id) { cacherChargement(); afficherMsg('inci', 'Ingrédient introuvable.', 'erreur'); return; }
   const res = await appelAPIPost('saveIngredientInci', { ing_id, inci, nom_botanique: nomBotanique, note_olfactive: noteOlfactive, statut: '✅ Validé' });
   if (res && res.success) {
     cacherChargement();

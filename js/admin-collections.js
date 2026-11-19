@@ -206,6 +206,7 @@ async function sauvegarderCollection() {
     rowIndex:    rowIndex || null
   };
   if (!d.nom) {
+    cacherChargement();
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
     afficherMsg('collections', 'Le nom de la collection est requis.', 'erreur');
     return;

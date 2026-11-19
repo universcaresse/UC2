@@ -17,9 +17,9 @@ async function chargerContenuSite() {
 }
 
 async function sauvegarderContenuSite() {
-  afficherChargement();
   const corps = document.getElementById('corps-contenu-site');
   if (!corps) return;
+  afficherChargement();
   const contenu = {};
   corps.querySelectorAll('[id^="cs-"]').forEach(el => {
     const cle = el.id.replace('cs-', '');

@@ -514,7 +514,7 @@ async function sauvegarderLot() {
   afficherChargement();
   const select = document.getElementById('fab-recette');
   const opt    = select.options[select.selectedIndex];
-  if (!opt || !opt.value) { afficherMsg('fabrication', '❌ Choisir un produit.'); return; }
+  if (!opt || !opt.value) { cacherChargement(); afficherMsg('fabrication', '❌ Choisir un produit.'); return; }
 
   const mode     = document.getElementById('form-fabrication').dataset.mode;
   const multi    = parseInt(document.getElementById('fab-multiplicateur').value) || 1;
