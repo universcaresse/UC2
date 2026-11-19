@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 async function chargerDonneesInitiales() {
 // Toutes les lectures du démarrage partent ensemble, les commandes de l'accueil aussi (19 nov. 2026).
-const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resPromo, resRegro, resIngs, resEmb, resStock, resLots, resVL, resRegPro, resCmdAccueil] = await Promise.all([
+const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resPromo, resRegro, resIngs, resEmb, resStock, resLots, resVL, resRegPro, resCmdAccueil, resEtats] = await Promise.all([
     appelAPI('getCollections'),
     appelAPI('getGammes'),
     appelAPI('getFamilles'),
@@ -59,7 +59,8 @@ const [resCol, resGam, resFam, resPro, resInci, resCfg, resCats, resFmt, resProm
     appelAPI('getLots'),
     appelAPI('getVentesLignes'),
     appelAPI('getRegroupementsProduits'),
-    appelAPI('getCommandesEntete')
+    appelAPI('getCommandesEntete'),
+    appelAPI('getEtatProduits')
   ]);
   if (resCol && resCol.success) {
     donneesCollections = resCol.items || [];
@@ -158,6 +159,7 @@ if (resGam && resGam.success) {
   prodCache.lots = (resLots && resLots.success) ? resLots.items : [];
   prodCache.ventesLignes = (resVL && resVL.success) ? resVL.items : [];
   prodCache.regroupementsProduits = (resRegPro && resRegPro.success) ? resRegPro.items : [];
+  majEtatsProduits(resEtats);
   prodCache.charge = true;
 }
 // ─── NAVIGATION SIDEBAR ───

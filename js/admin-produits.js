@@ -92,7 +92,8 @@ async function chargerCacheProduits() {
     appelAPI('getStock'),
     appelAPI('getLots'),
     appelAPI('getVentesLignes'),
-    appelAPI('getRegroupementsProduits')
+    appelAPI('getRegroupementsProduits'),
+    appelAPI('getEtatProduits')
   ]);
 
   var formatsMap = {};
@@ -151,6 +152,7 @@ async function chargerCacheProduits() {
   prodCache.lots         = (res[5] && res[5].success) ? res[5].items : [];
   prodCache.ventesLignes = (res[6] && res[6].success) ? res[6].items : [];
   prodCache.regroupementsProduits = (res[7] && res[7].success) ? res[7].items : [];
+  majEtatsProduits(res[8]);
 
   prodCache.charge = true;
   cacherChargement();
@@ -573,10 +575,6 @@ function ouvrirFicheProduit(pro_id) {
   var cureAffichage = (pro.cure === 'N/A' || pro.cure === 'na') ? 'Sans cure' : ((pro.cure || '—') + ' jours');
   var surgrasAffichage = (pro.surgras === 'N/A' || pro.surgras === 'na') ? 'Sans surgras' : (pro.surgras || '—');
 
-  // Détecter bouton Supprimer ou Archiver
-  var aHistorique = produitAHistorique(pro_id);
-  var labelBtnSupp = aHistorique ? 'Archiver' : 'Supprimer';
-
   document.getElementById('fiche-recette-titre').textContent = pro.nom || '—';
   document.getElementById('fiche-recette-contenu').innerHTML =
     avertissementInciHtml +
@@ -619,10 +617,11 @@ function ouvrirFicheProduit(pro_id) {
     formatsHtml +
     '';
 
-  // Mettre à jour le bouton Supprimer/Archiver dans la barre d'actions du bas
+  // Le bouton rouge (Supprimer ou Archiver) seulement quand c'est possible; l'état est relu au serveur en arrière-plan
+  afficherBoutonRougeProduit(pro_id);
+  appelAPI('getEtatProduits').then(function(r) { majEtatsProduits(r); afficherBoutonRougeProduit(pro_id); });
   var btnSupp = document.querySelector('#fiche-recette .form-actions .bouton-rouge');
   if (btnSupp) {
-    btnSupp.textContent = labelBtnSupp;
     var conteneurActions = btnSupp.parentElement;
     if (conteneurActions && !conteneurActions.querySelector('[data-bouton-export]')) {
       var btnGraphiste = document.createElement('button');
@@ -766,11 +765,28 @@ function retourRecetteDepuisInci() {
 }
 
 // ─── HISTORIQUE D'UN PRODUIT ───
-function produitAHistorique(pro_id) {
-  var aLot = (prodCache.lots || []).some(function(l) { return l.pro_id === pro_id; });
-  if (aLot) return true;
-  var aVente = (prodCache.ventesLignes || []).some(function(v) { return v.pro_id === pro_id; });
-  return aVente;
+// Ce que chaque produit permet (serveur, getEtatProduits) : supprimable (aucun historique) ou archivable
+// (un historique, plus rien à vendre). Ni l'un ni l'autre : pas de bouton rouge (19 nov. 2026, Jean-Claude).
+function majEtatsProduits(res) {
+  if (!res || !res.success) return;
+  prodCache.etats = {};
+  (res.items || []).forEach(function(e) { prodCache.etats[e.pro_id] = e; });
+}
+
+// 'supprimer', 'archiver' ou '' (rien de possible, ou produit déjà archivé, ou état pas encore connu)
+function actionRougeProduit(pro_id) {
+  var pro = donneesProduits.find(function(p) { return p.pro_id === pro_id; });
+  var e = (prodCache.etats || {})[pro_id];
+  if (!pro || !e || pro.statut === 'archive') return '';
+  return e.supprimable ? 'supprimer' : (e.archivable ? 'archiver' : '');
+}
+
+function afficherBoutonRougeProduit(pro_id) {
+  var btn = document.querySelector('#fiche-recette .form-actions .bouton-rouge');
+  if (!btn || !produitActif || produitActif.pro_id !== pro_id) return;
+  var action = actionRougeProduit(pro_id);
+  btn.textContent = action === 'archiver' ? 'Archiver' : 'Supprimer';
+  btn.classList.toggle('cache', !action);
 }
 
 // ─── FERMETURE / ÉDITION / SUPPRESSION ───
@@ -813,8 +829,8 @@ async function ouvrirFormProduit() {
   if (cbSurgras) { cbSurgras.checked = false; appliquerSurgrasNA(); }
 
   document.getElementById('fr-statut').value = 'test';
-  // S'assurer que l'option "Archivé" est dans le menu
-  injecterOptionArchive();
+  // Un nouveau produit ne peut pas être archivé : l'option « Archivé » est retirée du menu
+  injecterOptionArchive(null);
 
   document.getElementById('fr-collection').value = '';
   document.getElementById('fr-ligne').innerHTML = '<option value="">— Choisir collection —</option>';
@@ -845,16 +861,19 @@ function fermerFormProduit() {
 }
 function fermerFormRecette() { fermerFormProduit(); }
 
-// Injecte l'option "Archivé" dans le sélecteur de statut si elle n'y est pas
-function injecterOptionArchive() {
+// L'option « Archivé » du statut : seulement si le produit peut être archivé, ou l'est déjà (19 nov. 2026)
+function injecterOptionArchive(pro) {
   var sel = document.getElementById('fr-statut');
   if (!sel) return;
-  var existe = Array.from(sel.options).some(function(o) { return o.value === 'archive'; });
-  if (!existe) {
-    var opt = document.createElement('option');
+  var opt = Array.from(sel.options).find(function(o) { return o.value === 'archive'; });
+  var permise = !!pro && (pro.statut === 'archive' || actionRougeProduit(pro.pro_id) === 'archiver');
+  if (permise && !opt) {
+    opt = document.createElement('option');
     opt.value = 'archive';
     opt.textContent = 'Archivé';
     sel.appendChild(opt);
+  } else if (!permise && opt) {
+    opt.remove();
   }
 }
 
@@ -914,7 +933,7 @@ async function modifierProduit(pro_id) {
   var elMc = document.getElementById('fr-mots-cles');
   if (elMc) elMc.value = pro.mots_cles || '';
 
-  injecterOptionArchive();
+  injecterOptionArchive(pro);
   document.getElementById('fr-statut').value = pro.statut || 'test';
 
   await chargerCollectionsPourSelecteur();
@@ -1252,21 +1271,12 @@ function majCacheApresSauvegarde(d) {
 function supprimerProduit(pro_id) { supprimerOuArchiverProduit(pro_id); }
 
 function supprimerOuArchiverProduit(pro_id) {
-  if (produitAHistorique(pro_id)) {
-    // Archiver
-    if (resteAVendre(pro_id)) return;
-    var nbLots = (prodCache.lots || []).filter(function(l) { return l.pro_id === pro_id; }).length;
-    var nbVentes = (prodCache.ventesLignes || []).filter(function(v) { return v.pro_id === pro_id; }).length;
-    var raisons = [];
-    if (nbLots > 0)   raisons.push(nbLots + ' lot(s) de fabrication');
-    if (nbVentes > 0) raisons.push(nbVentes + ' vente(s)');
-    confirmerAction(
-      'Ce produit a un historique (' + raisons.join(', ') + '). Il ne peut pas être supprimé. Voulez-vous l\'archiver ? Il restera dans l\'admin mais ne sera plus visible sur le site public.',
-      function() { return archiverProduit(pro_id); }
-    );
-  } else {
+  var action = actionRougeProduit(pro_id);
+  if (action === 'archiver') {
+    confirmerAction('Archiver ce produit ?', function() { return archiverProduit(pro_id); }, 'Archiver');
+  } else if (action === 'supprimer') {
     // Supprimer pour de vrai
-    confirmerAction('Supprimer ce produit ?', async function() {
+    confirmerAction('Supprimer ce produit pour de bon ?', async function() {
       afficherChargement();
       var res = await appelAPIPost('deleteProduit', { pro_id: pro_id });
       if (res && res.success) {
@@ -1278,11 +1288,6 @@ function supprimerOuArchiverProduit(pro_id) {
         fermerFicheProduit();
         afficherProduits(true);
         afficherMsg('recettes', 'Produit supprimé.');
-      } else if (res && res.historique) {
-        // Historique que l'admin ne voit pas (commande, remboursement) : le serveur refuse, on offre l'archivage (19 nov. 2026)
-        cacherChargement();
-        confirmerAction(res.message.replace(/ Archivez-le plutôt.*$/, '') + ' Voulez-vous l\'archiver ? Il restera dans l\'admin mais ne sera plus visible sur le site public.',
-          function() { return archiverProduit(pro_id); });
       } else {
         cacherChargement();
         afficherMsg('recettes', (res && res.message) || 'Erreur.', 'erreur');
@@ -1293,17 +1298,7 @@ function supprimerOuArchiverProduit(pro_id) {
 
 // Archiver : le produit garde tout son historique, reste dans l'admin, disparaît du site public et des listes
 // de choix (commande, vente, fabrication). Il se ramène par Modifier → Statut.
-// Il reste de ce produit à vendre : pas d'archivage (19 nov. 2026). Rend true (et le dit) s'il en reste dans ses lots.
-// Le serveur vérifie aussi les unités réservées par une commande pas encore payée.
-function resteAVendre(pro_id) {
-  var enLots = (prodCache.lots || []).filter(function(l) { return l.pro_id === pro_id; })
-    .reduce(function(s, l) { return s + Math.max(0, (l.nb_unites || 0) - (l.nb_unites_vendu || 0)); }, 0);
-  if (enLots > 0) afficherMsg('recettes', 'Il reste ' + enLots + ' unité(s) de ce produit dans ses lots : vendez-les avant de l\'archiver.', 'erreur');
-  return enLots > 0;
-}
-
 async function archiverProduit(pro_id) {
-  if (resteAVendre(pro_id)) return;
   afficherChargement();
   var pro = donneesProduits.find(function(p) { return p.pro_id === pro_id; });
   if (!pro) { cacherChargement(); return; }
