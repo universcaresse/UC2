@@ -370,14 +370,15 @@ function demandeRendreListe() {
     const cle = demandeCle(i.pro_id, i.format_poids, i.format_unite);
     const sousTotal = (i.prix_unitaire || 0) * (i.quantite || 1);
     const prix = (typeof formaterPrix === 'function') ? formaterPrix(sousTotal) : sousTotal.toFixed(2).replace('.', ',') + ' $';
+    // 19 nov. 2026 : tout ce qui vient de la liste (gardée dans le navigateur ou renvoyée par le serveur) est échappé.
     const photo = i.image_url
-      ? '<img src="' + i.image_url + '" alt="" class="rangeeitem-photo">'
+      ? '<img src="' + echapperHtml(i.image_url) + '" alt="" class="rangeeitem-photo">'
       : '<div class="rangeeitem-photo"></div>';
-    return '<div class="rangeeitem" data-cle="' + cle + '" data-pro-id="' + i.pro_id + '" data-poids="' + i.format_poids + '" data-unite="' + i.format_unite + '">' +
+    return '<div class="rangeeitem" data-cle="' + echapperHtml(cle) + '" data-pro-id="' + echapperHtml(i.pro_id) + '" data-poids="' + echapperHtml(i.format_poids) + '" data-unite="' + echapperHtml(i.format_unite) + '">' +
         photo +
         '<div class="rangeeitem-info">' +
-          '<div class="rangeeitem-titre">' + (i.nom_produit || '') + '</div>' +
-          '<div class="rangeeitem-meta">' + (i.nom_collection ? i.nom_collection + ' · ' : '') + (i.nom_gamme ? i.nom_gamme + ' · ' : '') + i.format_poids + ' ' + i.format_unite + '</div>' +
+          '<div class="rangeeitem-titre">' + echapperHtml(i.nom_produit || '') + '</div>' +
+          '<div class="rangeeitem-meta">' + (i.nom_collection ? echapperHtml(i.nom_collection) + ' · ' : '') + (i.nom_gamme ? echapperHtml(i.nom_gamme) + ' · ' : '') + echapperHtml(i.format_poids + ' ' + i.format_unite) + '</div>' +
         '</div>' +
         '<div class="compteur">' +
           '<button type="button" class="compteur-btn" data-action="moins" aria-label="Enlever un">−</button>' +
@@ -813,14 +814,14 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         total += sous;
         const cle = i.pro_id + '|' + i.format_poids + '|' + i.format_unite;
         const photo = i.image_url
-          ? '<img src="' + i.image_url + '" alt="" class="rangeeitem-photo">'
+          ? '<img src="' + echapperHtml(i.image_url) + '" alt="" class="rangeeitem-photo">'
           : '<div class="rangeeitem-photo"></div>';
-        html += '<div class="rangeeitem" data-cle="' + cle + '">' +
+        html += '<div class="rangeeitem" data-cle="' + echapperHtml(cle) + '">' +
             photo +
             '<div class="rangeeitem-info">' +
-              (i.nom_collection ? '<div class="sur-titre">' + i.nom_collection + '</div>' : '') +
-              '<div class="rangeeitem-titre">' + (i.nom_produit || i.pro_id) + '</div>' +
-              '<div class="rangeeitem-meta">' + (i.nom_gamme ? i.nom_gamme + ' · ' : '') + i.format_poids + ' ' + i.format_unite + '</div>' +
+              (i.nom_collection ? '<div class="sur-titre">' + echapperHtml(i.nom_collection) + '</div>' : '') +
+              '<div class="rangeeitem-titre">' + echapperHtml(i.nom_produit || i.pro_id) + '</div>' +
+              '<div class="rangeeitem-meta">' + (i.nom_gamme ? echapperHtml(i.nom_gamme) + ' · ' : '') + echapperHtml(i.format_poids + ' ' + i.format_unite) + '</div>' +
             '</div>' +
             '<div class="compteur">' +
               '<button type="button" class="compteur-btn" data-action="moins">−</button>' +

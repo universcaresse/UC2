@@ -4,11 +4,14 @@
    ═══════════════════════════════════════ */
 
 async function ouvrirListePrix() {
+  // La fenêtre s'ouvre au toucher, avant l'attente : après, Safari (iPad, iPhone) la bloque (19 nov. 2026).
+  var fenetre = window.open('', '_blank');
+  if (!fenetre) { afficherMsg('produits', '❌ Le navigateur a bloqué la fenêtre : autorisez les fenêtres pour ce site.', 'erreur'); return; }
   if (!prodCache.charge) await chargerCacheProduits();
 
   // ── Produits publics seulement ──
   var produits = donneesProduits.filter(function(p) { return p.statut === 'public'; });
-  if (!produits.length) { afficherMsg('produits', 'Aucun produit public.', 'erreur'); return; }
+  if (!produits.length) { fenetre.close(); afficherMsg('produits', 'Aucun produit public.', 'erreur'); return; }
 
   // ── Organiser par collection → gamme → famille ──
   var parCollection = {};
@@ -320,7 +323,6 @@ async function ouvrirListePrix() {
 
     '</body>\n</html>';
 
-  var fenetre = window.open('', '_blank');
   fenetre.document.write(html);
   fenetre.document.close();
 }

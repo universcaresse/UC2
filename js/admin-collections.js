@@ -206,7 +206,7 @@ async function sauvegarderCollection() {
       return;
     }
     const d = {
-      gam_id:      rowIndex || ('GAM-' + Date.now()),
+      gam_id:      rowIndex || '', // nouvelle : le serveur donne le numéro (19 nov. 2026)
       col_id,
       rang:        parseInt(document.getElementById('fc-rang-ligne')?.value) || 99,
       nom,
@@ -219,16 +219,19 @@ async function sauvegarderCollection() {
       ? await appelAPIPost('saveGamme', { ...d, rowIndex })
       : await appelAPIPost('saveGamme', d);
     if (res && res.success) {
-      await appelAPIPost('saveGammeIngredients', {
-        gam_id: d.gam_id,
+      const resIng = await appelAPIPost('saveGammeIngredients', {
+        gam_id: res.gam_id || d.gam_id,
         ingredients: ingredientsBase.map(i => ({ ing_id: i.ing_id || '', nom_ingredient: i.nom, quantite_g: i.quantite }))
       });
+      cacherChargement();
       if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
       fermerFormCollection();
-      afficherMsg('collections', rowIndex ? 'Gamme mise à jour.' : 'Gamme ajoutée.');
+      if (!resIng || !resIng.success) afficherMsg('collections', '⚠️ Gamme enregistrée, mais pas ses ingrédients : ' + ((resIng && resIng.message) || 'erreur'), 'erreur');
+      else afficherMsg('collections', rowIndex ? 'Gamme mise à jour.' : 'Gamme ajoutée.');
       await chargerCollections();
     } else {
-      afficherMsg('collections', 'Erreur lors de la sauvegarde.', 'erreur');
+      cacherChargement();
+      afficherMsg('collections', '❌ ' + ((res && res.message) || 'Erreur lors de la sauvegarde.'), 'erreur');
       if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
     }
     return;
@@ -237,9 +240,8 @@ async function sauvegarderCollection() {
   // Collection V2
   const positionChoisie = parseInt(document.getElementById('fc-position')?.value) || 0;
   const rangCalcule = positionChoisie + 1;
-  const dernierNumCol = donneesCollections.length ? Math.max(...donneesCollections.map(c => parseInt((c.col_id || '').replace('COL-', '')) || 0)) : 0;
   const d = {
-    col_id:      rowIndex || ('COL-' + String(dernierNumCol + 1).padStart(4, '0')),
+    col_id:      rowIndex || '', // nouvelle : le serveur donne le numéro (19 nov. 2026)
     rang:        rangCalcule,
     nom:         document.getElementById('fc-collection').value.toUpperCase(),
     slogan:      document.getElementById('fc-slogan').value,
@@ -264,7 +266,7 @@ async function sauvegarderCollection() {
   chargerCollections();
   } else {
     cacherChargement();
-    afficherMsg('collections', 'Erreur lors de la sauvegarde.', 'erreur');
+    afficherMsg('collections', '❌ ' + ((res && res.message) || 'Erreur lors de la sauvegarde.'), 'erreur');
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
   }
 }
@@ -300,33 +302,9 @@ async function supprimerCollection(col_id) {
       await chargerCollections();
     } else {
       cacherChargement();
-      afficherMsg('collections', 'Erreur lors de la suppression.', 'erreur');
+      afficherMsg('collections', '❌ ' + ((res && res.message) || 'Erreur lors de la suppression.'), 'erreur');
     }
   });
-}
-
-function basculerModeFormCollection() {
-  const mode    = document.getElementById('fc-mode');
-  const blocCol = document.getElementById('fc-bloc-collection');
-  const blocLig = document.getElementById('fc-bloc-ligne');
-  const titre   = document.getElementById('form-collections-titre');
-  const toggle  = document.getElementById('fc-toggle-mode');
-  const col     = document.getElementById('fc-collection').value;
-
-  if (mode.value === 'collection') {
-    mode.value = 'ligne';
-    blocCol.classList.add('cache');
-    blocLig.classList.remove('cache');
-    titre.textContent   = 'Nouvelle gamme — ' + (col || '');
-    toggle.textContent  = '← Retour collection';
-    document.getElementById('fc-collection-ligne').value = col;
-  } else {
-    mode.value = 'collection';
-    blocCol.classList.remove('cache');
-    blocLig.classList.add('cache');
-    titre.textContent  = document.getElementById('fc-rowIndex').value ? 'Modifier la collection' : 'Nouvelle collection';
-    toggle.textContent = '+ Ajouter une gamme';
-  }
 }
 
 function apercuCouleurCollection(input) {

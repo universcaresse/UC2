@@ -303,7 +303,7 @@ function supprimerFacture(ach_id) {
       chargerFactures();
     } else {
       cacherChargement();
-      afficherMsg('factures', 'Erreur lors de la suppression.', 'erreur');
+      afficherMsg('factures', '❌ ' + ((res && res.message) || 'Erreur lors de la suppression.'), 'erreur');
     }
   });
 }

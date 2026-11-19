@@ -298,89 +298,6 @@ function venResetEtape(niveau) {
   venAfficherEtape();
 }
 
-function venFiltrerGammes() {
-  const col_id = document.getElementById('ven-collection').value;
-  const sel    = document.getElementById('ven-gamme');
-  sel.innerHTML = '<option value="">— Toutes —</option>';
-  donneesGammes
-    .filter(g => !col_id || g.col_id === col_id)
-    .sort((a, b) => (a.rang || 99) - (b.rang || 99))
-    .forEach(g => {
-      const o = document.createElement('option');
-      o.value = g.gam_id;
-      o.textContent = g.nom;
-      sel.appendChild(o);
-    });
-  venFiltrerProduits();
-}
-
-function venFiltrerProduits() {
-  const col_id = document.getElementById('ven-collection').value;
-  const gam_id = document.getElementById('ven-gamme').value;
-  const sel    = document.getElementById('ven-produit');
-  sel.innerHTML = '<option value="">— Choisir —</option>';
-  donneesProduits
-    .filter(p => p.statut !== 'archive' && (!col_id || p.col_id === col_id) && (!gam_id || p.gam_id === gam_id))
-    .sort((a, b) => (a.nom || '').localeCompare(b.nom || ''))
-    .forEach(p => {
-      const o = document.createElement('option');
-      o.value = p.pro_id;
-      o.textContent = p.nom;
-      sel.appendChild(o);
-    });
-  document.getElementById('ven-format').innerHTML = '<option value="">— Choisir —</option>';
-  document.getElementById('ven-prix').value        = '';
-  document.getElementById('ven-total-ligne').value = '';
-}
-
-function venFiltrerFormats() {
-  const pro_id = document.getElementById('ven-produit').value;
-  const sel    = document.getElementById('ven-format');
-  sel.innerHTML = '<option value="">— Choisir —</option>';
-  if (!pro_id) return;
-  const pro = donneesProduits.find(p => p.pro_id === pro_id);
-  (pro?.formats || [])
-    .slice()
-    .sort((a, b) => parseFloat(a.poids) - parseFloat(b.poids))
-    .forEach(f => {
-      const lot = venLotsDisponibles.find(l =>
-        String(l.pro_id) === String(pro_id) &&
-        String(l.format_poids) === String(f.poids) &&
-        String(l.format_unite) === String(f.unite)
-      );
-      const nbDispo = lot ? lot.nb_disponible : 0;
-      const o = document.createElement('option');
-      o.value = JSON.stringify({
-        lot_id: lot?.lot_id || '',
-        poids: f.poids,
-        unite: f.unite,
-        nb_disponible: nbDispo
-      });
-      o.textContent = `${f.poids} ${f.unite} — ${nbDispo} dispo`;
-      sel.appendChild(o);
-    });
-  venMettreAJourPrix();
-}
-
-function venMettreAJourPrix() {
-  const pro_id    = document.getElementById('ven-produit').value;
-  const formatVal = document.getElementById('ven-format').value;
-  if (!pro_id || !formatVal) {
-    document.getElementById('ven-prix').value        = '';
-    document.getElementById('ven-total-ligne').value = '';
-    return;
-  }
-  const format        = JSON.parse(formatVal);
-  const pro           = donneesProduits.find(p => p.pro_id === pro_id);
-  const formatProduit = (pro?.formats || []).find(f =>
-    String(f.poids) === String(format.poids) && f.unite === format.unite
-  );
-  const prix = parseFloat(String(formatProduit?.prix_vente || 0).replace(',', '.')) || 0;
-  const qte  = parseInt(document.getElementById('ven-quantite').value) || 1;
-  document.getElementById('ven-prix').value        = prix ? formaterPrix(prix) : '—';
-  document.getElementById('ven-total-ligne').value = prix ? formaterPrix(prix * qte) : '—';
-}
-
 function venChangerQte(delta) {
   const input = document.getElementById('ven-quantite');
   input.value = Math.max(1, (parseInt(input.value)||1) + delta);
@@ -413,16 +330,6 @@ function venAjouterLigne() {
   venCacherStickyBar();
   document.querySelectorAll('.ven-format-btn').forEach(b => b.classList.remove('ven-format-actif'));
   venResetEtape('collection');
-}
-
-function venResetSaisie() {
-  document.getElementById('ven-collection').value      = '';
-  document.getElementById('ven-gamme').innerHTML       = '<option value="">— Toutes —</option>';
-  document.getElementById('ven-produit').innerHTML     = '<option value="">— Choisir —</option>';
-  document.getElementById('ven-format').innerHTML      = '<option value="">— Choisir —</option>';
-  document.getElementById('ven-quantite').value        = '1';
-  document.getElementById('ven-prix').value            = '';
-  document.getElementById('ven-total-ligne').value     = '';
 }
 
 function venSupprimerLigne(i) {
@@ -748,7 +655,7 @@ function ouvrirApercuFacture() {
       <div style="display:flex;justify-content:space-between;width:280px"><span style="color:var(--gris)">Sous-total</span><span>${formaterPrix(sousTotal)}</span></div>`;
 
   if (rabais > 0) {
-    html += `<div style="display:flex;justify-content:space-between;width:280px;color:var(--primary)"><span>${nomPromo || 'Rabais'}</span><span>-${formaterPrix(rabais)}</span></div>`;
+    html += `<div style="display:flex;justify-content:space-between;width:280px;color:var(--primary)"><span>${echapperHtml(nomPromo || 'Rabais')}</span><span>-${formaterPrix(rabais)}</span></div>`;
   }
   if (livraison > 0) {
     html += `<div style="display:flex;justify-content:space-between;width:280px"><span style="color:var(--gris)">Livraison</span><span>${formaterPrix(livraison)}</span></div>`;
@@ -956,7 +863,8 @@ async function sauvegarderCoordonnees() {
   const telephone  = document.getElementById('apv-telephone').value;
   const infolettre = document.getElementById('apv-infolettre').checked ? '1' : '0';
   if (venIdEnCours) {
-    await appelAPIPost('updateStatutVente', { ven_id: venIdEnCours, courriel, telephone, infolettre });
+    const r = await appelAPIPost('updateStatutVente', { ven_id: venIdEnCours, courriel, telephone, infolettre });
+    if (!(r && r.success)) afficherMsg('ventes', '⚠️ Coordonnées pas enregistrées : ' + ((r && r.message) || 'erreur'), 'erreur');
   }
 }
 
@@ -969,6 +877,13 @@ async function imprimerFacture(venIdRecu) {
   if (!venIdRecu || venIdRecu !== venIdEnCours) { afficherMsg('ventes', "❌ Aucune vente identifiée — rien n'a été imprimé.", 'erreur'); return; }
   const btnFv = document.getElementById('btn-fv-imprimer');
   if (btnFv) { btnFv.disabled = true; btnFv.dataset.texteOriginal = btnFv.innerHTML; btnFv.innerHTML = '<span class="spinner"><span></span><span></span><span></span><span></span><span></span></span>'; }
+  // La fenêtre s'ouvre au toucher, avant l'attente : après, Safari (iPad, iPhone) la bloque (19 nov. 2026).
+  const fenetre = window.open('', '_blank');
+  if (!fenetre) {
+    if (btnFv) { btnFv.disabled = false; btnFv.innerHTML = btnFv.dataset.texteOriginal || 'Imprimer'; }
+    afficherMsg('ventes', '❌ Le navigateur a bloqué la fenêtre de la facture : autorisez les fenêtres pour ce site.', 'erreur');
+    return;
+  }
   afficherChargement();
   await sauvegarderCoordonnees();
 
@@ -988,16 +903,15 @@ async function imprimerFacture(venIdRecu) {
     return `
     <tr>
       <td style="padding:12px 0;border-bottom:1px solid #f2e4cf">
-        ${nomGamme ? `<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#d4a445;margin-bottom:3px">${nomGamme}</div>` : ''}
-        <div style="font-weight:400;color:#3d3b39">${l.nom}</div>
-        <div style="font-size:0.78rem;color:#8b8680;margin-top:2px">${l.poids} ${l.unite} &nbsp;·&nbsp; ${formaterPrix(l.prix_unitaire)} / unité</div>
+        ${nomGamme ? `<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#d4a445;margin-bottom:3px">${echapperHtml(nomGamme)}</div>` : ''}
+        <div style="font-weight:400;color:#3d3b39">${echapperHtml(l.nom)}</div>
+        <div style="font-size:0.78rem;color:#8b8680;margin-top:2px">${echapperHtml(l.poids + ' ' + l.unite)} &nbsp;·&nbsp; ${formaterPrix(l.prix_unitaire)} / unité</div>
       </td>
       <td style="padding:12px 0;border-bottom:1px solid #f2e4cf;text-align:center;color:#8b8680;font-size:0.85rem">${l.quantite}</td>
       <td style="padding:12px 0;border-bottom:1px solid #f2e4cf;text-align:right;font-family:'Playfair Display',serif;color:#5a8a3a">${formaterPrix(l.prix_unitaire * l.quantite)}</td>
     </tr>`;
   }).join('');
 
-  const fenetre = window.open('', '_blank');
   fenetre.document.write(`<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1062,7 +976,7 @@ async function imprimerFacture(venIdRecu) {
   </table>
   <div class="totaux">
     <div class="total-ligne"><span>Sous-total</span><span>${formaterPrix(sousTotal)}</span></div>
-    ${rabais > 0 ? `<div class="total-ligne" style="color:#5a8a3a"><span>${nomPromo || 'Rabais'}</span><span>-${formaterPrix(rabais)}</span></div>` : ''}
+    ${rabais > 0 ? `<div class="total-ligne" style="color:#5a8a3a"><span>${echapperHtml(nomPromo || 'Rabais')}</span><span>-${formaterPrix(rabais)}</span></div>` : ''}
     ${livraison > 0 ? `<div class="total-ligne"><span>Livraison</span><span>${formaterPrix(livraison)}</span></div>` : ''}
     <div class="total-final"><span>Total</span><span>${formaterPrix(total)}</span></div>
   </div>
@@ -1294,7 +1208,7 @@ async function voirDetailVente(ven_id) {
 
   if (!resEntete || !resEntete.success || !resLignes || !resLignes.success) {
     cacherChargement();
-    afficherMsg('ventes', 'Erreur de chargement.', 'erreur');
+    afficherMsg('ventes', '❌ ' + (((resEntete && !resEntete.success ? resEntete : resLignes) && (resEntete && !resEntete.success ? resEntete : resLignes).message) || 'Erreur de chargement.'), 'erreur');
     return;
   }
 

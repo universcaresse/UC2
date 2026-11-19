@@ -407,25 +407,6 @@ function onFiltreGammeBtn(gam_id) {
   filtrerRecettes();
 }
 
-function onFiltreCollection() {
-  var colNom = document.getElementById('filtre-recette-collection').value;
-  var selGamme = document.getElementById('filtre-recette-ligne');
-  selGamme.innerHTML = '<option value="">Toutes les gammes</option>';
-  if (colNom) {
-    var col = donneesCollections.find(function(c) { return c.nom === colNom; });
-    var gammes = col ? donneesGammes.filter(function(g) { return g.col_id === col.col_id; }) : [];
-    gammes.sort(function(a, b) { return (a.rang || 99) - (b.rang || 99); }).forEach(function(g) {
-      var opt = document.createElement('option');
-      opt.value = g.nom; opt.textContent = g.nom;
-      selGamme.appendChild(opt);
-    });
-    selGamme.disabled = false;
-  } else {
-    selGamme.disabled = true;
-  }
-  filtrerRecettes();
-}
-
 function filtrerRecettes() {
   var col_id = filtreProColId;
   var gam_id = filtreProGamId;
@@ -1085,9 +1066,8 @@ async function sauvegarderRecette() {
     var cbSurgras = document.getElementById('fr-surgras-na');
     var surgrasFinal = (cbSurgras && cbSurgras.checked) ? 'N/A' : (document.getElementById('fr-surgras').value || '');
 
-    var dernierNumPro = donneesProduits.length ? Math.max.apply(null, donneesProduits.map(function(p) { return parseInt((p.pro_id || '').replace('PRO-', '')) || 0; })) : 0;
     var d = {
-      pro_id: id || ('PRO-' + String(dernierNumPro + 1).padStart(3, '0')),
+      pro_id: id || '', // nouveau produit : le serveur donne le numéro (19 nov. 2026)
       col_id: col_id,
       gam_id: gam_id,
       fam_id: (document.getElementById('fr-famille') || {}).value || '',
@@ -1138,7 +1118,8 @@ async function sauvegarderRecette() {
     }
 
     var res = await appelAPIPost('saveProduit', d);
-    if (!res || !res.success) return erreur('Erreur à l\'enregistrement.');
+    if (!res || !res.success) return erreur('Erreur à l\'enregistrement : ' + ((res && res.message) || 'pas de réponse du serveur.'));
+    d.pro_id = res.pro_id || d.pro_id;
 
     // Mettre à jour les format_id locaux avec les vrais IDs séquentiels retournés par le backend
     var mapping = res.formatIdMap || {};
@@ -1164,7 +1145,7 @@ async function sauvegarderRecette() {
         }
       });
     });
-   await appelAPIPost('saveFormatsEmballages', {
+    var resEmb = await appelAPIPost('saveFormatsEmballages', {
       pro_id: d.pro_id,
       emballages: tousLesEmballages
     });
@@ -1173,10 +1154,14 @@ async function sauvegarderRecette() {
     var fraIdsCoches = Array.from(
       (document.getElementById('fr-regroupements-manuels') || { querySelectorAll: function() { return []; } }).querySelectorAll('input[type="checkbox"]:checked')
     ).map(function(cb) { return cb.value; });
-    await appelAPIPost('saveProduitRegroupements', {
+    var resReg = await appelAPIPost('saveProduitRegroupements', {
       pro_id: d.pro_id,
       fra_ids: fraIdsCoches
     });
+    // 19 nov. 2026 : un échec des emballages ou des regroupements se dit (avant : « Produit créé » quand même)
+    var avertProduit = [];
+    if (!resEmb || !resEmb.success) avertProduit.push('emballages pas enregistrés (' + ((resEmb && resEmb.message) || 'erreur') + ')');
+    if (!resReg || !resReg.success) avertProduit.push('regroupements pas enregistrés (' + ((resReg && resReg.message) || 'erreur') + ')');
     // Mettre à jour le cache local
     prodCache.regroupementsProduits = (prodCache.regroupementsProduits || []).filter(function(l) {
       return String(l.pro_id) !== String(d.pro_id);
@@ -1194,7 +1179,8 @@ async function sauvegarderRecette() {
       ouvrirFicheProduit(d.pro_id);
     }, 100);
 
-    afficherMsg('recettes', id ? 'Produit mis à jour.' : 'Produit créé.');
+    if (avertProduit.length) afficherMsg('recettes', '⚠️ Produit enregistré, mais ' + avertProduit.join(' · ') + '. Rouvrez-le et enregistrez de nouveau.', 'erreur');
+    else afficherMsg('recettes', id ? 'Produit mis à jour.' : 'Produit créé.');
     reactiverBouton();
   } catch (err) {
     erreur('Erreur inattendue.');
@@ -1307,7 +1293,7 @@ function supprimerOuArchiverProduit(pro_id) {
           afficherMsg('recettes', 'Produit archivé.');
         } else {
           cacherChargement();
-          afficherMsg('recettes', 'Erreur.', 'erreur');
+          afficherMsg('recettes', '❌ ' + ((res && res.message) || 'Erreur.'), 'erreur');
         }
       }
     );

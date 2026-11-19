@@ -333,9 +333,8 @@ async function sauvegarderRegroupement() {
     return;
   }
   const positionChoisie = parseInt(document.getElementById('freg-position')?.value) || 0;
-  const dernierNumFra = donneesRegroupements.length ? Math.max(...donneesRegroupements.map(f => parseInt((f.fra_id || '').replace('FRA-', '')) || 0)) : 0;
   const d = {
-    fra_id:             id || ('FRA-' + String(dernierNumFra + 1).padStart(4, '0')),
+    fra_id:             id || '', // nouveau : le serveur donne le numéro (19 nov. 2026)
     rang:               positionChoisie + 1,
     nom,
     slogan:             document.getElementById('freg-slogan').value,
@@ -379,7 +378,7 @@ async function supprimerRegroupement(fra_id) {
       afficherRegroupements();
     } else {
       cacherChargement();
-      afficherMsg('regroupements', 'Erreur lors de la suppression.', 'erreur');
+      afficherMsg('regroupements', '❌ ' + ((res && res.message) || 'Erreur lors de la suppression.'), 'erreur');
     }
   });
 }

@@ -190,11 +190,10 @@ async function sauvegarderFamille() {
   const id     = document.getElementById('ff-id').value;
   const col_id = document.getElementById('ff-collection').value;
   const nom    = document.getElementById('ff-nom').value.trim().toUpperCase();
-  if (!nom || !col_id) { afficherMsg('familles', 'Nom et collection requis.', 'erreur'); return; }
+  if (!nom || !col_id) { cacherChargement(); afficherMsg('familles', 'Nom et collection requis.', 'erreur'); return; }
   const positionChoisie = parseInt(document.getElementById('ff-position')?.value) || 0;
-  const dernierNumFam = donneesFamilles.length ? Math.max(...donneesFamilles.map(f => parseInt((f.fam_id || '').replace('FAM-', '')) || 0)) : 0;
   const d = {
-    fam_id: id || ('FAM-' + String(dernierNumFam + 1).padStart(4, '0')),
+    fam_id: id || '', // nouvelle : le serveur donne le numéro (19 nov. 2026)
     col_id,
     gam_id:      document.getElementById('ff-gamme')?.value || '',
     rang:        positionChoisie + 1,
@@ -212,7 +211,7 @@ async function sauvegarderFamille() {
     await chargerFamilles();
   } else {
     cacherChargement();
-    afficherMsg('familles', 'Erreur lors de la sauvegarde.', 'erreur');
+    afficherMsg('familles', '❌ ' + ((res && res.message) || 'Erreur lors de la sauvegarde.'), 'erreur');
   }
 }
 async function supprimerFamille(fam_id) {
@@ -233,7 +232,7 @@ async function supprimerFamille(fam_id) {
       await chargerFamilles();
     } else {
       cacherChargement();
-      afficherMsg('familles', 'Erreur lors de la suppression.', 'erreur');
+      afficherMsg('familles', '❌ ' + ((res && res.message) || 'Erreur lors de la suppression.'), 'erreur');
     }
   });
 }

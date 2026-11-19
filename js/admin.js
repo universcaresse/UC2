@@ -356,12 +356,6 @@ function couleurTexteContraste(hex) {
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance > 0.5 ? 'carte-infos-fonce' : 'carte-infos-clair';
 }
-function stringToColor(str) {
-  const palette = ['#5a8a3a','#4a7c9e','#9b6b9b','#c4773a','#3a8a7a','#8a5a3a','#6b7a3a','#9b3a5a','#3a5a8a'];
-  let h = 0;
-  for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h);
-  return palette[Math.abs(h) % palette.length];
-}
 
 function confirmerAction(message, callback, libelle) {
   document.getElementById('modal-confirm-message').textContent = message;

@@ -512,7 +512,7 @@ function afficherTableauRemboursements(items) {
 async function voirDetailRemboursement(rem_id) {
   const res = await appelAPI('getRemboursementsLignes', { rem_id });
   if (!res || !res.success) {
-    afficherMsg('remboursements', 'Erreur de chargement.', 'erreur');
+    afficherMsg('remboursements', '❌ ' + ((res && res.message) || 'Erreur de chargement.'), 'erreur');
     return;
   }
 

@@ -68,20 +68,6 @@ function fermerModalFournisseur() {
   document.getElementById('modal-fournisseur')?.classList.remove('ouvert');
 }
 
-// ─── AUTO-CODE depuis le nom ───
-function fourAutoCode() {
-  const nom  = document.getElementById('modal-four-nom')?.value || '';
-  const code = document.getElementById('modal-four-code');
-  if (code && !code.dataset.modifie) {
-    code.value = nom.trim().slice(0, 4).toUpperCase();
-  }
-}
-
-function fourCodeManuel() {
-  const code = document.getElementById('modal-four-code');
-  if (code) code.dataset.modifie = code.value ? 'true' : '';
-}
-
 // ─── SAUVEGARDER ───
 async function sauvegarderFournisseur() {
   const four_id  = document.getElementById('modal-four-id')?.value?.trim();

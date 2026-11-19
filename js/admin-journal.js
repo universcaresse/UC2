@@ -37,7 +37,7 @@ async function chargerJournalGeneral() {
   jgAfficherModeles((resModeles && resModeles.success) ? (resModeles.items || []) : []);
 
   if (!resJournal || !resJournal.success) {
-    afficherMsg('journal-general', 'Erreur de chargement du journal.', 'erreur');
+    afficherMsg('journal-general', '❌ ' + ((resJournal && resJournal.message) || 'Erreur de chargement du journal.'), 'erreur');
     document.getElementById('jg-journal').innerHTML = '';
     return;
   }

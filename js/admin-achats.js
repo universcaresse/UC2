@@ -30,20 +30,6 @@ function efAScraping(four_id) {
   return EF_SCRAPING_IDS.indexOf(four_id) >= 0;
 }
 
-function efGrammesDuFormat(qte, unite, cat_id) {
-  var q = efParseFlt(qte);
-  var cfg = (listesDropdown.config && listesDropdown.config[cat_id]) || {};
-  var d = cfg.densite || 1;
-  if (unite === 'g')     return q;
-  if (unite === 'kg')    return q * 1000;
-  if (unite === 'lbs')   return q * 453.592;
-  if (unite === 'ml')    return q * d;
-  if (unite === 'L')     return q * 1000 * d;
-  if (unite === 'l')     return q * 1000 * d;
-  if (unite === 'unité') return q;
-  return q;
-}
-
 function efSauvegarderSaisie() {
   var elQte   = document.getElementById('ef-qte');
   var elPrix  = document.getElementById('ef-prix');
@@ -84,18 +70,6 @@ function efRestaurerSaisie() {
 
 function efResetSaisie() {
   ef.saisieEnCours = { qte: '', prix: '', formatVal: '', formatText: '' };
-}
-
-// Activer/désactiver la ligne de saisie (pendant les sauvegardes)
-function efBloquerLigneSaisie(bloquer) {
-  var ligne = document.getElementById('ef-ligne-saisie');
-  if (!ligne) return;
-  var champs = ligne.querySelectorAll('select, input, button');
-  champs.forEach(function(el) {
-    el.disabled = bloquer;
-  });
-  if (bloquer) ligne.classList.add('ligne-bloquee');
-  else ligne.classList.remove('ligne-bloquee');
 }
 
 // ─── INITIALISATION ───
@@ -889,20 +863,6 @@ function efAnnulerEdit() {
   efMajBanniere();
 }
 
-async function efRechargerLignes() {
-  if (!ef.factureActive) return;
-  var resLignes = await appelAPI('getAchatsLignes', { ach_id: ef.factureActive.ach_id });
-  ef.lignes = [];
-  if (resLignes && resLignes.success) {
-    (resLignes.items || []).forEach(function(l) {
-      ef.lignes.push(efConstruireLigneDepuisAPI(l));
-    });
-  }
-  efRendreLignesSauvegardees();
-  efRendreLigneSaisie();
-  efMajBanniere();
-}
-
 // ─── SUPPRIMER UNE LIGNE ───
 function efSupprimerLigne(idx) {
   var ligne = ef.lignes[idx];
@@ -940,12 +900,10 @@ async function efFinaliser() {
   var liv = efParseFlt(document.getElementById('ef-livraison')?.value);
   var credit = efParseFlt(document.getElementById('ef-credit')?.value);
 
-  if (ef.factureActive.ach_id) {
-    await appelAPIPost('deleteAchat', { ach_id: ef.factureActive.ach_id });
-    ef.factureActive.ach_id = '';
-  }
-
+  // Achat corrigé : le serveur défait l'ancien seulement si la nouvelle version passe (19 nov. 2026 ;
+  // avant, l'écran le supprimait d'abord sans regarder la réponse).
   var res = await appelAPIPost('finaliserAchatComplet', {
+    remplace: ef.factureActive.ach_id || '',
     date: ef.factureActive.date,
     four_id: ef.factureActive.four_id,
     numero_facture: ef.factureActive.numero,
@@ -968,6 +926,7 @@ async function efFinaliser() {
     return;
   }
 
+  ef.factureActive.ach_id = '';
   afficherMsg('ef', '✅ Facture finalisée — Total : ' + formaterPrix(res.total));
   setTimeout(efReinitialiserApresFinalisation, 2000);
 }
@@ -1221,7 +1180,7 @@ async function efConfirmerModalNouvelleCatUC() {
   if (!(densite > 0)) { document.getElementById('modal-ef-nouvelle-cat-uc-densite').focus(); return; }
   var res = await appelAPIPost('saveCategorieUC', { nom: val, compte_achat: achat, inci: inci, densite: densite, marge_perte_pct: marge });
   if (!res || !res.success) {
-    afficherMsg('ef', 'Erreur création catégorie.', 'erreur');
+    afficherMsg('ef', '❌ ' + ((res && res.message) || 'Erreur création catégorie.'), 'erreur');
     return;
   }
   var cat_id = res.cat_id;
@@ -1264,7 +1223,7 @@ async function efConfirmerModalCatFourn() {
   if (!val) { document.getElementById('modal-ef-cat-fourn-valeur').focus(); return; }
   var res = await appelAPIPost('saveCategoriesFournisseur', { nom: val });
   if (!res || !res.success) {
-    afficherMsg('ef', 'Erreur création catégorie.', 'erreur');
+    afficherMsg('ef', '❌ ' + ((res && res.message) || 'Erreur création catégorie.'), 'erreur');
     return;
   }
   var cat_fourn_id = res.cat_fourn_id;
@@ -1313,7 +1272,7 @@ async function efConfirmerModalNomFourn() {
     nom: val, cat_fourn_id: cat_fourn_id, four_id: four_id
   });
   if (!res || !res.success) {
-    afficherMsg('ef', 'Erreur création produit fournisseur.', 'erreur');
+    afficherMsg('ef', '❌ ' + ((res && res.message) || 'Erreur création produit fournisseur.'), 'erreur');
     return;
   }
   var prod_fourn_id = res.prod_fourn_id;

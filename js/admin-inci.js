@@ -43,11 +43,6 @@ function inciCatRequiert(cat_id) {
   return catRequiertInci(cat_id);
 }
 
-function inciGetFiltres() {
-  const recherche = document.getElementById('inci-recherche');
-  return { recherche: recherche ? recherche.value.trim().toLowerCase() : '' };
-}
-
 function inciConstruireAccordeons() {
   const recherche = document.getElementById('inci-recherche')?.value.trim().toLowerCase() || '';
   const container = document.getElementById('inci-accordeons');

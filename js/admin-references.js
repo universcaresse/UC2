@@ -49,7 +49,7 @@ async function chargerReferences() {
 
   if (loading) loading.classList.add('cache');
   if (!res || !res.success) {
-    afficherMsg('references', 'Erreur de chargement.', 'erreur');
+    afficherMsg('references', '❌ ' + ((res && res.message) || 'Erreur de chargement.'), 'erreur');
     return;
   }
 

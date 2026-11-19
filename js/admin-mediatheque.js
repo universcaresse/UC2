@@ -148,17 +148,6 @@ async function medSupprimerPhoto(idx) {
   chargerMediatheque();
 }
 
-async function mediathequeSyncCloudinary() {
-  afficherChargement();
-  afficherMsg('mediatheque', 'Synchronisation en cours…');
-  const res = await appelAPI('syncCloudinary');
-  if (!res || !res.success) { cacherChargement(); afficherMsg('mediatheque', '❌ Synchronisation : ' + ((res && res.message) || 'erreur'), 'erreur'); return; }
-  _mediathequeDonnees = null;
-  cacherChargement();
-  afficherMsg('mediatheque', `✅ ${res.ajouts} photo(s) ajoutée(s).`);
-  chargerMediatheque();
-}
-
 // ─── MÉDIATHÈQUE — SÉLECTEUR ───
 var _mediathequeChampId   = null;
 var _mediathequePreviewId = null;

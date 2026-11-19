@@ -235,42 +235,6 @@ async function afficherFacturePublique(numeroF, jetonF) {
   }
 }
 
-function afficherConnexion() {
-  document.getElementById('modal-connexion').classList.add('ouvert');
-  setTimeout(() => { if (window.innerWidth > 900) document.getElementById('input-mdp').focus(); }, 100);
-}
-
-function fermerConnexion() {
-  document.getElementById('modal-connexion').classList.remove('ouvert');
-  document.getElementById('input-mdp').value = '';
-  document.getElementById('erreur-connexion').classList.add('cache');
-}
-
-function fermerModalConnexion(e) {
-  if (e.target === document.getElementById('modal-connexion')) fermerConnexion();
-}
-
-async function validerConnexion() {
-  const mdp = document.getElementById('input-mdp').value;
-  const btn = document.getElementById('btn-envoyer-connexion') || document.querySelector('#modal-connexion .bouton');
-  if (btn) { btn.disabled = true; btn.textContent = '…'; }
-  const res = await appelAPIPost('validerMotDePasse', { mdp });
-  if (res && res.success) {
-    sessionStorage.setItem('uc_admin', 'true');
-    if (res.cle) sessionStorage.setItem('uc_cle', res.cle);
-    window.location.href = '/admin/';
-  } else {
-    const errConnexion = document.getElementById('erreur-connexion');
-    if (errConnexion) {
-      if (res && res.message) errConnexion.textContent = res.message;
-      errConnexion.classList.remove('cache');
-    }
-    document.getElementById('input-mdp').value = '';
-    document.getElementById('input-mdp').focus();
-    if (btn) { btn.disabled = false; btn.textContent = 'Entrer'; }
-  }
-}
-
 
 function afficherModeAdmin() {
   const btnConnexion   = document.getElementById('btn-connexion');
@@ -286,15 +250,6 @@ function afficherMaintenance() {
   document.getElementById('nav').classList.add('cache');
   const burger = document.getElementById('burger');
   if (burger) burger.classList.add('cache');
-}
-
-function afficherModePublic() {
-  const btnConnexion   = document.getElementById('btn-connexion');
-  const btnDeconnexion = document.getElementById('btn-deconnexion');
-  const lienAdmin      = document.getElementById('nav-admin-link');
-  if (btnConnexion)   btnConnexion.classList.remove('cache');
-  if (btnDeconnexion) btnDeconnexion.classList.add('cache');
-  if (lienAdmin)      lienAdmin.classList.add('cache');
 }
 
 // ─── RECHERCHE (loupe) ───
@@ -396,7 +351,7 @@ function afficherResultatsRecherche(trouves, texteBrut) {
   const zone = document.getElementById('recherche-resultats');
   if (!zone) return;
   if (!trouves.length) {
-    zone.innerHTML = '<p class="description">Aucun résultat pour « ' + texteBrut + ' »</p>';
+    zone.innerHTML = '<p class="description">Aucun résultat pour « ' + echapperHtml(texteBrut) + ' »</p>';
     return;
   }
   const d = donneesCatalogue || {};
@@ -706,10 +661,6 @@ function couleurTexteContraste(hex) {
   return luminance > 0.5 ? 'carte-infos-fonce' : 'carte-infos-clair';
 }
 
-function majuscules(texte) {
-  return texte ? texte.toUpperCase() : '';
-}
-
 // ─── ACCUEIL — COLLECTIONS ───
 // V2 : infoCollections est un objet indexé par col_id
 // getCataloguePublic_v2 retourne : produits, infoCollections { col_id: { rang, nom, slogan, couleur_hex, ... } }
@@ -821,7 +772,7 @@ function chargerCatalogue() {
 
 function afficherErreurCatalogue(msg) {
   const el = document.getElementById('chargement');
-  if (el) el.innerHTML = `<p class="chargement-erreur">${msg}</p>`;
+  if (el) el.innerHTML = `<p class="chargement-erreur">${echapperHtml(msg)}</p>`;
 }
 
 function construireCatalogue() {
@@ -1132,84 +1083,6 @@ function filtrerRegroupements(fra_id) {
   if (btn) btn.classList.add('actif');
   document.querySelectorAll('#regroupements-body .collection-section').forEach(s => {
     s.classList.toggle('masquee', fra_id !== 'tout' && s.dataset.regroupement !== fra_id);
-  });
-}
-
-function ouvrirRegroupement(ing_id) {
-  const el = document.querySelector(`[onclick*="${ing_id}"]`);
-  const nom = el ? (el.dataset.nom || '') : '';
-  const description = el ? (el.dataset.desc || '') : '';
-  document.getElementById('regroupement-titre').textContent = nom.toUpperCase();
-  document.getElementById('regroupement-eyebrow').textContent = description || 'Produits par ingrédient vedette';
-  const body = document.getElementById('regroupement-body');
-  body.innerHTML = '';
-
-  if (!donneesCatalogue || !donneesCatalogue.produits) {
-    body.innerHTML = '<p>Chargement en cours…</p>';
-    naviguer('regroupement');
-    return;
-  }
-
-  const produits = (donneesCatalogue.produits || []).filter(p =>
-    (p.ingredients || []).some(i => i.ing_id === ing_id)
-  );
-
-  if (!produits.length) {
-    body.innerHTML = '<div class="vide"><p>Aucun produit trouvé pour ce regroupement.</p></div>';
-    naviguer('regroupement');
-    return;
-  }
-
-  const infoCollections = donneesCatalogue.infoCollections || {};
-
-  // Filtres par collection
-  const colsPresentes = [...new Set(produits.map(p => p.col_id))];
-  const filtresBar = document.getElementById('regroupement-filtres');
-  filtresBar.innerHTML = '<button class="filtre-btn actif" onclick="filtrerRegroupement(\'tout\')">Toutes</button>';
-  colsPresentes.forEach(col_id => {
-    const info = infoCollections[col_id] || {};
-    const btn = document.createElement('button');
-    btn.className = 'filtre-btn';
-    btn.textContent = info.nom || col_id;
-    btn.onclick = () => filtrerRegroupement(col_id);
-    filtresBar.appendChild(btn);
-  });
-
-  // Regrouper par collection
-  const parCollection = {};
-  produits.forEach(p => {
-    if (!parCollection[p.col_id]) parCollection[p.col_id] = [];
-    parCollection[p.col_id].push(p);
-  });
-
-  Object.keys(parCollection).forEach(col_id => {
-    const info = infoCollections[col_id] || {};
-    const couleurs = couleurCollection(info.nom || '', info.couleur_hex);
-    const section = document.createElement('div');
-    section.className = 'collection-section';
-    section.dataset.collection = col_id;
-    section.innerHTML = `
-      <div class="collection-entete fade-in">
-        <div>
-          <h2 class="collection-entete-nom">${(info.nom || '').toUpperCase()}</h2>
-          <p class="collection-entete-slogan">${info.slogan || ''}</p>
-        </div>
-      </div>
-      <div class="produits-grille">${parCollection[col_id].map(p => carteProduit(p)).join('')}</div>`;
-    body.appendChild(section);
-  });
-
-  naviguer('regroupement');
-}
-
-function filtrerRegroupement(col_id) {
-  document.querySelectorAll('#regroupement-filtres .filtre-btn').forEach(b => b.classList.remove('actif'));
-  document.querySelectorAll('#regroupement-filtres .filtre-btn').forEach(b => {
-    if (col_id === 'tout' && b.textContent === 'Toutes') b.classList.add('actif');
-    if (b.dataset && b.dataset.filtre === col_id) b.classList.add('actif');
-  });
-  document.querySelectorAll('#regroupement-body .collection-section').forEach(s => {
-    s.classList.toggle('masquee', col_id !== 'tout' && s.dataset.collection !== col_id);
   });
 }
 

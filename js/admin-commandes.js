@@ -73,8 +73,8 @@ async function chargerCommandes() {
     const partsF = String(c.date_frais).split('/');
     const dateF  = new Date(partsF[2], partsF[1] - 1, partsF[0]);
     if (Math.floor((new Date() - dateF) / 86400000) < 15) continue;
-    await appelAPIPost('updateStatutCommande', { cmd_id: c.cmd_id, statut: 'À livrer' });
-    c.statut = 'À livrer';
+    const rl = await appelAPIPost('updateStatutCommande', { cmd_id: c.cmd_id, statut: 'À livrer' });
+    if (rl && rl.success) c.statut = 'À livrer'; // refusé si Square dit payé : elle reste « Frais à payer »
   }
 
   if (vide) vide.classList.add('cache');
@@ -105,14 +105,9 @@ function ouvrirFormCommande() {
   cmdIdEnCours = null;
   cmdNumeroAffiche = '';
 
-  // Générer un nouveau numéro
-  const dernierNum = toutesCommandes.length
-    ? Math.max(...toutesCommandes.map(c => parseInt((c.cmd_id || '').replace('CMD-', '')) || 0))
-    : 0;
-  cmdIdEnCours     = 'CMD-' + String(dernierNum + 1).padStart(4, '0');
-  cmdNumeroAffiche = String(dernierNum + 1).padStart(4, '0');
-
-  document.getElementById('form-commande-titre').textContent = 'Nouvelle commande ' + cmdNumeroAffiche;
+  // Le numéro est donné par le serveur à l'enregistrement (19 nov. 2026 : celui deviné par l'écran pouvait
+  // être faux, le serveur garde son propre compteur).
+  document.getElementById('form-commande-titre').textContent = 'Nouvelle commande';
 
   // Vider tous les champs du formulaire
   document.getElementById('cmd-prenom').value      = '';
@@ -342,6 +337,7 @@ async function enregistrerCommande() {
   afficherChargement();
 
   const cmd_id    = cmdIdEnCours;
+  let resCree     = null;
   const acompte   = parseFloat(String(document.getElementById('cmd-acompte').value).replace(',', '.')) || 0;
   const totalPrevu = cmdLignes.reduce((s, l) => s + (l.prix_unitaire * l.quantite), 0);
   const solde     = Math.max(0, totalPrevu - acompte);
@@ -380,7 +376,6 @@ async function enregistrerCommande() {
   } else {
     // Création : entête et lignes en une seule opération, total calculé par le serveur
     const resCreate = await appelAPIPost('createCommande', {
-      cmd_id,
       client,
       prenom,
       nom,
@@ -396,10 +391,11 @@ async function enregistrerCommande() {
       afficherMsg('commandes', 'Erreur lors de la création : ' + (resCreate?.message || ''), 'erreur');
       return;
     }
+    resCree = resCreate;
   }
 
   cacherChargement();
-  afficherMsg('commandes', '✅ Commande enregistrée.');
+  afficherMsg('commandes', '✅ Commande ' + echapperHtml(cmdModeEdition ? (cmd_id || '') : ((resCree && resCree.cmd_id) || '')) + ' enregistrée.');
   fermerFormCommande();
   chargerCommandes();
 }
@@ -580,7 +576,7 @@ async function voirDetailCommande(cmd_id) {
   cacherChargement();
 
   if (!resEntete || !resEntete.success || !resLignes || !resLignes.success) {
-    afficherMsg('commandes', 'Erreur de chargement.', 'erreur');
+    afficherMsg('commandes', '❌ ' + (((resEntete && !resEntete.success ? resEntete : resLignes) && (resEntete && !resEntete.success ? resEntete : resLignes).message) || 'Erreur de chargement.'), 'erreur');
     return;
   }
 
@@ -846,7 +842,7 @@ async function modifierCommande(cmd_id) {
   cacherChargement();
 
   if (!resEntete || !resEntete.success || !resLignes || !resLignes.success) {
-    afficherMsg('commandes', 'Erreur de chargement.', 'erreur');
+    afficherMsg('commandes', '❌ ' + (((resEntete && !resEntete.success ? resEntete : resLignes) && (resEntete && !resEntete.success ? resEntete : resLignes).message) || 'Erreur de chargement.'), 'erreur');
     return;
   }
 
@@ -927,10 +923,14 @@ function annulerCommande(cmd_id) {
       : await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'Annulée' });
     cacherChargement();
     if (res && res.success) {
+      // 19 nov. 2026 : un lien Square resté ouvert laisserait payer une commande annulée — on le dit.
+      let lienOuvert = false;
       if (c && c.link_id_square) {
-        await appelAPIPost('annulerLienSquare', { link_id: c.link_id_square });
+        const rLien = await appelAPIPost('annulerLienSquare', { link_id: c.link_id_square });
+        lienOuvert = !(rLien && rLien.success);
       }
-      afficherMsg('commandes', '✅ Commande annulée.');
+      if (lienOuvert) afficherMsg('commandes', '⚠️ Commande annulée, mais le lien de paiement Square n\'a pas pu être fermé : fermez-le dans Square.', 'erreur');
+      else afficherMsg('commandes', '✅ Commande annulée.');
       fermerFicheCommande();
       chargerCommandes();
     } else {
@@ -1149,11 +1149,17 @@ async function genererLienSquare() {
     document.getElementById('completer-square').value = res.url;
     if (res.link_id) {
       const c = toutesCommandes.find(x => x.cmd_id === cmdCompleterIdEnCours);
+      // 19 nov. 2026 : l'ancien lien doit être fermé (sinon la cliente pourrait payer l'ancien montant) et le
+      // nouveau retenu par le serveur (il s'en sert pour vérifier le paiement) — un échec se dit.
+      let avertLien = '';
       if (c && c.link_id_square && c.link_id_square !== res.link_id) {
-        await appelAPIPost('annulerLienSquare', { link_id: c.link_id_square });
+        const rAncien = await appelAPIPost('annulerLienSquare', { link_id: c.link_id_square });
+        if (!(rAncien && rAncien.success)) avertLien += ' L\'ancien lien n\'a pas pu être fermé : fermez-le dans Square.';
       }
       if (c) c.link_id_square = res.link_id;
-      await appelAPIPost('updateCommandeEntete', { cmd_id: cmdCompleterIdEnCours, link_id_square: res.link_id });
+      const rGarde = await appelAPIPost('updateCommandeEntete', { cmd_id: cmdCompleterIdEnCours, link_id_square: res.link_id });
+      if (!(rGarde && rGarde.success)) avertLien += ' Le nouveau lien n\'a pas été enregistré (' + ((rGarde && rGarde.message) || 'erreur') + ') : régénérez-le.';
+      if (avertLien) { afficherMsg('commandes', '⚠️ Lien de paiement généré.' + avertLien, 'erreur'); return; }
     }
     afficherMsg('commandes', '✅ Lien de paiement généré.');
   } else {
@@ -2107,53 +2113,6 @@ function cmdEnvoyerTexto(i) {
     const b = ligne.querySelector('button');
     if (b) { b.disabled = true; b.textContent = 'Envoyé'; }
   }
-}
-
-function construireFactureCommande(cmd_id) {
-  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
-  if (!c) return null;
-
-  let sousTotal = 0;
-  const lignes = toutesCommandesLignes
-    .filter(l => l.cmd_id === cmd_id && (!l.type_ligne || l.type_ligne === 'pret'))
-    .map(l => {
-      const pro = donneesProduits.find(p => p.pro_id === l.pro_id);
-      const gam = donneesGammes.find(g => g.gam_id === (pro && pro.gam_id));
-      const pu  = parseFloat(l.prix_unitaire) || 0;
-      const qte = parseInt(l.quantite) || 0;
-      sousTotal += pu * qte;
-      return {
-        nom: pro ? pro.nom : l.pro_id,
-        gamme: gam ? gam.nom : '',
-        poids: l.format_poids,
-        unite: l.format_unite,
-        quantite: qte,
-        prix_unitaire: formaterPrix(pu),
-        prix_total: formaterPrix(pu * qte)
-      };
-    });
-
-  const livraison = parseFloat(c.livraison) || 0;
-  const rabais    = parseFloat(c.rabais) || 0;
-  const total     = Math.max(0, sousTotal - rabais + livraison);
-
-  let promoNom = '';
-  if (c.promo_id && typeof donneesPromotions !== 'undefined') {
-    const p = donneesPromotions.find(x => x.promo_id === c.promo_id);
-    if (p) promoNom = p.nom || '';
-  }
-
-  return {
-    numero: cmd_id,
-    date: c.date || new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' }),
-    client: c.client || '',
-    lignes: lignes,
-    sous_total: formaterPrix(sousTotal),
-    rabais: rabais > 0 ? formaterPrix(rabais) : 0,
-    promo_nom: promoNom,
-    livraison: livraison > 0 ? formaterPrix(livraison) : 0,
-    total: formaterPrix(total)
-  };
 }
 
 

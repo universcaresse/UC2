@@ -31,6 +31,6 @@ async function sauvegarderContenuSite() {
     afficherMsg('msg-contenu-site', 'Contenu sauvegardé.', 'succes');
   } else {
     cacherChargement();
-    afficherMsg('msg-contenu-site', 'Erreur lors de la sauvegarde.', 'erreur');
+    afficherMsg('msg-contenu-site', '❌ ' + ((data && data.message) || 'Erreur lors de la sauvegarde.'), 'erreur');
   }
 }

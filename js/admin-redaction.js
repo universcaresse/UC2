@@ -14,7 +14,7 @@ async function redInit() {
 
   if (loading) loading.classList.add('cache');
   if (!res || !res.success) {
-    afficherMsg('redaction', 'Erreur de chargement du contenu.', 'erreur');
+    afficherMsg('redaction', '❌ ' + ((res && res.message) || 'Erreur de chargement du contenu.'), 'erreur');
     return;
   }
   redContenu = { ...res.contenu };

@@ -142,9 +142,8 @@ async function sauvegarderGamme2() {
   }
   const positionChoisie = parseInt(document.getElementById('fg-position')?.value) || 0;
   const rangCalcule = positionChoisie + 1;
-  const dernierNumGam = donneesGammes.length ? Math.max(...donneesGammes.map(g => parseInt((g.gam_id || '').replace('GAM-', '')) || 0)) : 0;
   const d = {
-    gam_id: rowIndex || ('GAM-' + String(dernierNumGam + 1).padStart(4, '0')),
+    gam_id: rowIndex || '', // nouvelle : le serveur donne le numéro (19 nov. 2026)
     col_id,
     rang:        rangCalcule,
     nom,
@@ -157,9 +156,8 @@ async function sauvegarderGamme2() {
     rowIndex:    rowIndex || null
   };
   const res = await appelAPIPost('saveGamme', d);
-  await new Promise(r => setTimeout(r, 800));
   if (res && res.success) {
-    await appelAPIPost('saveGammeIngredients', {
+    const resIng = await appelAPIPost('saveGammeIngredients', {
       gam_id: res.gam_id || d.gam_id,
       ingredients: gammesIngs.map(i => ({
         ing_id:         i.ing_id || '',
@@ -170,7 +168,8 @@ async function sauvegarderGamme2() {
     if (btnSauvegarder) { btnSauvegarder.disabled = false; btnSauvegarder.innerHTML = 'Enregistrer'; }
     cacherChargement();
     fermerFormGamme2();
-    afficherMsg('gammes', rowIndex ? 'Gamme mise à jour.' : 'Gamme ajoutée.');
+    if (!resIng || !resIng.success) afficherMsg('gammes', '⚠️ Gamme enregistrée, mais pas ses ingrédients : ' + ((resIng && resIng.message) || 'erreur'), 'erreur');
+    else afficherMsg('gammes', rowIndex ? 'Gamme mise à jour.' : 'Gamme ajoutée.');
     const resGam = await appelAPI('getGammes');
     if (resGam && resGam.success) donneesGammes = resGam.items || [];
     afficherGammes();
@@ -217,24 +216,6 @@ function fermerFormGamme2() {
   if (btnNew) btnNew.classList.remove('cache');
 }
 
-async function ouvrirFicheGamme(gam_id) {
-  const gam = donneesGammes.find(g => g.gam_id === gam_id);
-  if (!gam) return;
-  document.getElementById('fiche-ligne-titre').textContent      = (gam.nom || '').toUpperCase();
-  document.getElementById('fiche-ligne-collection').textContent = donneesCollections.find(c => c.col_id === gam.col_id)?.nom || '';
-  document.getElementById('fiche-ligne-desc').textContent       = gam.description || '—';
-  document.getElementById('fiche-ligne-modifier').onclick = () => {
-    fermerFicheGamme();
-    modifierGamme(gam_id);
-  };
-  document.getElementById('btn-supprimer-ligne-fiche').onclick = () => supprimerGamme(gam_id);
-  document.getElementById('fiche-ligne-ingredients').innerHTML  = '<span class="valeur">—</span>';
-  document.getElementById('fiche-collection').classList.remove('visible');
-  document.getElementById('fiche-ligne').classList.remove('cache');
-  document.getElementById('contenu-collections').classList.add('cache');
-  window.scrollTo(0, 0);
-}
-
 function fermerFicheLigne() { fermerFicheGamme(); }
 
 function fermerFicheGamme() {
@@ -272,7 +253,7 @@ async function supprimerGamme(gam_id) {
       afficherGammes();
     } else {
       cacherChargement();
-      afficherMsg('gammes', 'Erreur.', 'erreur');
+      afficherMsg('gammes', '❌ ' + ((res && res.message) || 'Erreur.'), 'erreur');
     }
   });
 }
