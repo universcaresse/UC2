@@ -610,10 +610,10 @@ window.addEventListener('DOMContentLoaded', async function () {
         const optionsProv = provinces.map(function(p){ return '<option value="' + p + '"' + (r.province === p ? ' selected' : '') + '>' + p + '</option>'; }).join('');
         if (z) z.innerHTML = '<h2 class="titre">Adresse de livraison</h2>' +
           '<p class="textes-discrets">Avant le paiement, confirmez votre adresse pour la livraison. Disponible pour le Canada seulement.</p>' +
-          '<div class="champ"><label class="libelle">Rue <span>*</span></label><input type="text" class="controle" id="adr-rue" value="' + (r.rue || '') + '"></div>' +
-          '<div class="champ"><label class="libelle">Ville <span>*</span></label><input type="text" class="controle" id="adr-ville" value="' + (r.ville || '') + '"></div>' +
+          '<div class="champ"><label class="libelle">Rue <span>*</span></label><input type="text" class="controle" id="adr-rue" value="' + echapperHtml(r.rue || '') + '"></div>' +
+          '<div class="champ"><label class="libelle">Ville <span>*</span></label><input type="text" class="controle" id="adr-ville" value="' + echapperHtml(r.ville || '') + '"></div>' +
           '<div class="champ"><label class="libelle">Province <span>*</span></label><select class="controle" id="adr-province"><option value="">— Choisir —</option>' + optionsProv + '</select></div>' +
-          '<div class="champ"><label class="libelle">Code postal</label><input type="text" class="controle" id="adr-code-postal" value="' + (r.code_postal || '') + '" readonly><p class="textes-discrets">Les frais de livraison sont calculés avec ce code postal. Pour le changer, écrivez-nous.</p></div>' +
+          '<div class="champ"><label class="libelle">Code postal</label><input type="text" class="controle" id="adr-code-postal" value="' + echapperHtml(r.code_postal || '') + '" readonly><p class="textes-discrets">Les frais de livraison sont calculés avec ce code postal. Pour le changer, écrivez-nous.</p></div>' +
           '<div class="champ"><label class="libelle"><input type="checkbox" id="adr-infolettre"> Je souhaite recevoir l\'infolettre par courriel</label></div>' +
           '<div id="adr-erreur" class="demande-form-erreur cache"></div>' +
           '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" id="adr-continuer">Continuer vers le paiement</button>';
@@ -721,7 +721,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
         if (res.statut === 'Terminée') {
           const lienSuiviT = res.no_tracage ? 'https://www.canadapost-postescanada.ca/track-reperage/fr#/details/' + encodeURIComponent(res.no_tracage) : '';
           bloque.innerHTML = '<p class="titre">Votre commande est en route!</p>' +
-            (lienSuiviT ? '<p class="textes-discrets"><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + res.no_tracage + '</a></p>' : '') +
+            (lienSuiviT ? '<p class="textes-discrets"><a href="' + lienSuiviT + '" target="_blank" class="lien-discret">Suivre le colis — ' + echapperHtml(res.no_tracage) + '</a></p>' : '') +
             '<p><a href="#" class="lien-discret" id="bloque-ecrivez">Une question? Écrivez-nous.</a></p>' +
             '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" onclick="naviguer(\'accueil\')">Fermer</button>';
         } else {

@@ -1762,7 +1762,7 @@ function renvoyerPropositionV3(cmd_id) {
 
 
 function renvoyerCourrielLivraison(cmd_id) {
-  confirmerAction('Renvoyer au client le courriel de livraison avec sa facture?', async function() {
+  confirmerAction('Renvoyer à la cliente le courriel de livraison (« en route » avec le suivi si le colis est parti par la poste) et sa facture?', async function() {
     afficherChargement();
     const res = await appelAPIPost('renvoyerCourrielLivraison', { cmd_id });
     cacherChargement();
@@ -2051,13 +2051,17 @@ async function deposerColis() {
     return;
   }
   const items = (res.items || []).filter(i => i.success);
-  if (!items.length) {
+  // 19 nov. 2026 : les échecs s'affichent (avant, un dépôt raté disait « Aucun colis n'attend d'être déposé »)
+  const echecs = (res.items || []).filter(i => !i.success);
+  if (!items.length && !echecs.length) {
     afficherMsg('commandes', 'Aucun colis n\'attend d\'être déposé.');
     return;
   }
   const rates = items.filter(i => !i.courriel_parti);
-  afficherMsg('commandes', '✅ ' + items.length + ' colis déposé' + (items.length > 1 ? 's' : '') + ', courriels envoyés.' +
-    (rates.length ? ' ⚠️ ' + rates.length + ' courriel(s) non parti(s) — à renvoyer à la main.' : ''));
+  afficherMsg('commandes', (items.length ? '✅ ' + items.length + ' colis déposé' + (items.length > 1 ? 's' : '') + ', courriels envoyés.' : '') +
+    (rates.length ? ' ⚠️ ' + rates.length + ' courriel(s) non parti(s) — « Renvoyer le courriel » dans la fiche.' : '') +
+    (echecs.length ? ' ❌ Dépôt refusé : ' + echecs.map(i => i.cmd_id + ' (' + (i.message || 'erreur') + ')').join(', ') : ''),
+    echecs.length || rates.length ? 'erreur' : undefined);
 
   cmdAfficherTextos(items.filter(i => i.telephone));
   chargerCommandes();
