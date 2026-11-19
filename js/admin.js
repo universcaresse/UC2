@@ -362,6 +362,13 @@ function couleurTexteContraste(hex) {
   return luminance > 0.5 ? 'carte-infos-fonce' : 'carte-infos-clair';
 }
 
+// Un nombre tapé dans l'admin : « 2,25 », « 2.25 », « 1 234,50 $ » → 2.25; vide ou illisible → 0 (19 nov. 2026 :
+// parseFloat(« 2,25 ») donnait 2, et le clavier de l'iPad en français tape une virgule)
+function nombreSaisi(v) {
+  const n = parseFloat(String(v === null || v === undefined ? '' : v).replace(/[\s$\u00a0]/g, '').replace(',', '.'));
+  return isFinite(n) ? n : 0;
+}
+
 function confirmerAction(message, callback, libelle) {
   document.getElementById('modal-confirm-message').textContent = message;
   const btn = document.getElementById('modal-confirm-btn');

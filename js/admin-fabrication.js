@@ -183,7 +183,7 @@ function afficherTableauFabrication(lots, cibleId, blocs) {
         <td>${l.date_disponibilite}</td>
         <td>${l.nb_unites}</td>
      <td>${l.nb_unites_vendu || 0}</td>
-        <td>${l.cout_par_unite ? parseFloat(l.cout_par_unite).toFixed(2) + ' $' : '—'}</td>
+        <td>${l.cout_par_unite ? formaterPrix(l.cout_par_unite) : '—'}</td>
       </tr>
       <tr class="fab-lot-detail cache" id="fab-detail-${l.lot_id}">
         <td colspan="7">
@@ -464,7 +464,7 @@ async function calculerApercuLot() {
     ? coutParUnite * nbUnites 
     : cout * multi;
   document.getElementById('fab-apercu-cout').textContent = coutParUnite > 0 
-    ? coutTotal.toFixed(2) + ' $ total — ' + coutParUnite.toFixed(2) + ' $/unité' 
+    ? formaterPrix(coutTotal) + ' total — ' + formaterPrix(coutParUnite) + '/unité' 
     : '—';
 }
 

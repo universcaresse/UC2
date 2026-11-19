@@ -320,7 +320,7 @@ function rafraichirListeGammesIngs() {
         ${ingsDeType.map(d => `<option value="${d.nom_UC}" ${ing.nom===d.nom_UC?'selected':''}>${d.nom_UC}</option>`).join('')}
       </select>
       <input type="text" class="form-ctrl ing-inci" readonly placeholder="INCI" value="${inciVal}">
-      <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${ing.quantite||''}" placeholder="g" onchange="gammesIngs[${i}].quantite=parseFloat(this.value)||0">
+      <input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="${ing.quantite||''}" placeholder="g" onchange="gammesIngs[${i}].quantite=nombreSaisi(this.value)">
       <button class="bouton bouton-petit bouton-rouge" onclick="supprimerGammeIng(${i})">✕</button>
     </div>`;
   }).join('');

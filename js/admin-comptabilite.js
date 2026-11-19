@@ -563,8 +563,8 @@ function pcCatSupprimer(cat_id) {
 async function pcCatAjouter() {
   const nom     = (document.getElementById('pc-cat-nom').value || '').trim();
   const compte  = document.getElementById('pc-cat-compte').value;
-  const densite = parseFloat(document.getElementById('pc-cat-densite').value);
-  const marge   = parseFloat(document.getElementById('pc-cat-marge').value) || 0;
+  const densite = nombreSaisi(document.getElementById('pc-cat-densite').value);
+  const marge   = nombreSaisi(document.getElementById('pc-cat-marge').value);
   const inci    = String(compte) === '1305';
   if (!nom || !compte || !(densite > 0)) {
     afficherMsg('plan-comptable', 'Nom, compte et densité obligatoires.', 'erreur');

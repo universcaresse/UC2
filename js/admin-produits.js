@@ -557,7 +557,7 @@ function ouvrirFicheProduit(pro_id) {
         var sansInci = !inciCode && catRequiertInci(inciObj ? inciObj.cat_id : '');
         var s2 = stock.find(function(st) { return st.ing_id === i.ing_id; });
         var prixParG = (s2 && s2.prix_par_g_reel) || 0;
-        var coutIng = prixParG > 0 ? (i.quantite_g * prixParG).toFixed(2) + ' $' : '⚠';
+        var coutIng = prixParG > 0 ? formaterPrix(i.quantite_g * prixParG) : '⚠';
         var clickAttr = sansInci ? ' onclick="allerVersInciDepuisProduit(\'' + (i.ing_id || '') + '\')" style="cursor:pointer"' : '';
         var inciFormate = inciCode ? inciCode.toLowerCase().replace(/^([a-zà-ÿ])/, function(c) { return c.toUpperCase(); }) : '';
         return '<div class="fiche-ingredient"' + clickAttr + '>' +
@@ -1392,7 +1392,7 @@ function rafraichirListeIngredientsRecette() {
         '<option value="__nouvel_ing__">+ Nouvel ingrédient...</option>' +
       '</select>' +
       '<input type="text" class="form-ctrl ing-inci' + (inciVal ? '' : ' ing-inci-manquant') + '" readonly placeholder="INCI manquant" value="' + inciVal + '">' +
-      '<input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="' + (ing.quantite || '') + '" placeholder="g" onchange="ingredientsRecette[' + i + '].quantite=parseFloat(this.value)||0">' +
+      '<input type="text" inputmode="decimal" class="form-ctrl ing-qte" value="' + (ing.quantite || '') + '" placeholder="g" onchange="ingredientsRecette[' + i + '].quantite=nombreSaisi(this.value)">' +
       '<button class="bouton bouton-petit bouton-rouge" onclick="supprimerIngredientRecette(' + i + ')">✕</button>' +
     '</div>';
   }).join('');
@@ -1736,8 +1736,8 @@ function rafraichirListeFormatsRecette() {
             '<option value="unite" ' + (f.unite === 'unite' ? 'selected' : '') + '>unité</option>' +
           '</select>' +
           '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.nb_unites || '') + '" placeholder="Nb unités produits" onchange="formatsRecette[' + i + '].nb_unites=parseInt(this.value)||0">' +
-          '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.prix || '') + '" placeholder="Prix $" onchange="formatsRecette[' + i + '].prix=parseFloat(this.value)||0">' +
-          '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.poste_gr || '') + '" placeholder="Poids réel (g)" onchange="formatsRecette[' + i + '].poste_gr=parseFloat(this.value)||0">' +
+          '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.prix || '') + '" placeholder="Prix $" onchange="formatsRecette[' + i + '].prix=nombreSaisi(this.value)">' +
+          '<input type="text" inputmode="decimal" class="form-ctrl" value="' + (f.poste_gr || '') + '" placeholder="Poids réel (g)" onchange="formatsRecette[' + i + '].poste_gr=nombreSaisi(this.value)">' +
         '</div>' +
         '<div class="section-label">Contenant et emballage par unité</div>' +
         lignesEmb +

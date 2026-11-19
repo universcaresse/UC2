@@ -95,7 +95,7 @@ async function sauvegarderPromotion() {
     fam_id:         document.getElementById('fp-famille').value || '',
     type,
     nom,
-    valeur:         parseFloat(document.getElementById('fp-valeur').value) || 0,
+    valeur:         nombreSaisi(document.getElementById('fp-valeur').value),
     quantite_min:   parseInt(document.getElementById('fp-quantite-min').value)   || 0,
     quantite_seuil: parseInt(document.getElementById('fp-quantite-seuil').value) || 1
   };

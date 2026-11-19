@@ -1173,8 +1173,8 @@ async function efConfirmerModalNouvelleCatUC() {
   var val = document.getElementById('modal-ef-nouvelle-cat-uc-valeur')?.value?.trim();
   var achat = document.getElementById('modal-ef-nouvelle-cat-uc-compte')?.value;
   var inci = document.getElementById('modal-ef-nouvelle-cat-uc-inci')?.checked || false;
-  var densite = parseFloat(document.getElementById('modal-ef-nouvelle-cat-uc-densite')?.value);
-  var marge = parseFloat(document.getElementById('modal-ef-nouvelle-cat-uc-marge')?.value) || 0;
+  var densite = nombreSaisi(document.getElementById('modal-ef-nouvelle-cat-uc-densite')?.value);
+  var marge = nombreSaisi(document.getElementById('modal-ef-nouvelle-cat-uc-marge')?.value);
   if (!val) { document.getElementById('modal-ef-nouvelle-cat-uc-valeur').focus(); return; }
   if (!achat) { document.getElementById('modal-ef-nouvelle-cat-uc-classe').focus(); return; }
   if (!(densite > 0)) { document.getElementById('modal-ef-nouvelle-cat-uc-densite').focus(); return; }
