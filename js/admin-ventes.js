@@ -13,6 +13,8 @@ var venIdEnCours          = null;
 var venNumeroAffiche      = '';
 var venLotsDisponibles    = [];
 var venModeReprise        = false;
+// Vente créée par une finalisation refusée (ex. stock insuffisant) : la suivante la reprend au lieu d'en créer une autre (19 nov. 2026)
+var venVenteCreee         = null;
 var venEnvoiCourrielEnCours = false;
 var venClientSauvegarde   = '';
 var venLivraisonSauvegarde = 0;
@@ -67,6 +69,7 @@ function ouvrirFormVente() {
 
   // Le numéro sera attribué par le serveur lors de la création
   venIdEnCours     = null;
+  venVenteCreee    = null;
   venNumeroAffiche = '—';
 
   // Charger les lots disponibles
@@ -128,6 +131,7 @@ function fermerFormVente() {
   venPanier      = [];
   venIdEnCours   = null;
   venModeReprise = false;
+  venVenteCreee  = null;
 }
 
 // ═══════════════════════════════════════
@@ -851,11 +855,11 @@ async function finaliserVente(modePaiement) {
   if (encaissementAPayer) {
     // On change juste le mode de paiement, on ne touche pas aux lignes ni au stock
     // (le stock a déjà été décrémenté lors de la finalisation initiale)
-  } else if (venModeReprise) {
+  } else if (venModeReprise || (ven_id && ven_id === venVenteCreee)) {
     const resReset = await appelAPIPost('resetVenteLignes', { ven_id });
     if (!resReset || !resReset.success) {
       cacherChargement();
-      afficherMsg('ventes', 'Erreur lors de la réinitialisation.', 'erreur');
+      afficherMsg('ventes', '❌ Réinitialisation refusée : ' + (resReset?.message || 'erreur'), 'erreur');
       return;
     }
   } else {
@@ -867,6 +871,7 @@ async function finaliserVente(modePaiement) {
     }
     ven_id = resCreate.ven_id;
     venIdEnCours = ven_id;
+    venVenteCreee = ven_id;
     venNumeroAffiche = ven_id.replace('VEN-', '');
   }
 
@@ -909,7 +914,7 @@ async function finaliserVente(modePaiement) {
 
   if (!resFin || !resFin.success) {
     cacherChargement();
-    afficherMsg('ventes', 'Erreur lors de la finalisation.', 'erreur');
+    afficherMsg('ventes', '❌ Finalisation refusée : ' + (resFin?.message || 'erreur'), 'erreur');
     return;
   }
 

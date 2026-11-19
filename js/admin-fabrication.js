@@ -491,7 +491,7 @@ async function modifierLot(lot_id) {
     chargerFabrication();
   } else {
     cacherChargement();
-    afficherMsg('fabrication', 'Erreur.', 'erreur');
+    afficherMsg('fabrication', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
   }
 }
 
@@ -505,7 +505,7 @@ async function supprimerLot(lot_id) {
       chargerFabrication();
     } else {
       cacherChargement();
-      afficherMsg('fabrication', 'Erreur.', 'erreur');
+      afficherMsg('fabrication', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
     }
   });
 }
