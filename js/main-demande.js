@@ -256,11 +256,11 @@ function demandeCreerModalListe() {
         '<div class="form-group"><label class="form-label">Code postal (pour Poste Canada)<span>*</span></label><input type="text" class="form-control" id="demande-code-postal"></div>' +
         '<div class="form-group"><label class="form-label">Message</label><textarea class="form-control" id="demande-message"></textarea></div>' +
         '<div id="demande-form-erreur" class="demande-form-erreur cache"></div>' +
-        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur demande-form-envoyer" data-action="envoyer">Envoyer vos Coups de coeur</button>' +
+        '<button type="button" class="boutons boutons-vert boutons-pleine-largeur demande-form-envoyer" data-action="envoyer">Envoyer vos Coups de cœur</button>' +
       '</div>' +
       '<div id="demande-vue-merci" class="cache">' +
         
-        '<p class="demande-form-intro">Merci! Nous avons bien reçu vos Coups de coeur. Nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison. À bientôt!</p>' +
+        '<p class="demande-form-intro">Merci! Nous avons bien reçu vos Coups de cœur. Nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison. À bientôt!</p>' +
         '<p class="demande-form-intro">Surveillez votre boîte de réception et pensez à vérifier vos pourriels, au cas où.</p>' +
         '<button type="button" class="boutons boutons-vert boutons-pleine-largeur demande-continuer" data-action="fermer">Fermer</button>' +
       '</div>' +
@@ -336,7 +336,7 @@ function demandeOuvrirModalListe() {
   const merciP = overlay.querySelector('#demande-vue-merci p.demande-form-intro');
   if (merciP) merciP.textContent = (modif && modif.cmd)
     ? 'Merci! Votre liste modifiée a bien été envoyée. Nous vous reviendrons très bientôt avec une proposition ajustée.'
-    : 'Merci! Nous avons bien reçu vos Coups de coeur. Nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison. À bientôt!';
+    : 'Merci! Nous avons bien reçu vos Coups de cœur. Nous vous reviendrons très bientôt pour confirmer la disponibilité des produits et les frais de livraison. À bientôt!';
   const contBtn = overlay.querySelector('[data-action="continuer"]');
   if (contBtn) contBtn.textContent = (modif && modif.cmd) ? 'S.V.P mettre à jour la liste' : 'Continuer';
   overlay.classList.add('ouvert');
