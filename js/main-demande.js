@@ -757,7 +757,7 @@ if (btnAdr) btnAdr.addEventListener('click', async function () {
       // le client vers le paiement, ou vers Contact.
       if (res.statut === 'En attente de paiement' && params.get('action') !== 'modifier' && params.get('action') !== 'modifier-liste') {
         if (zone) zone.innerHTML = '<h2 class="titre">Une proposition vous a été envoyée pour cette commande.</h2>' +
-          '<p class="textes-discrets">Nous vous avons envoyé une proposition par courriel, avec les prix et la livraison. Si vous ne la retrouvez pas...</p>' +
+          '<p class="textes-discrets">Nous vous avons envoyé une proposition par courriel, avec les prix et la livraison. Si vous ne la retrouvez pas, nous pouvons vous la renvoyer.</p>' +
           '<button type="button" class="boutons boutons-vert boutons-pleine-largeur" id="prop-renvoyer">Recevez à nouveau votre proposition</button>' +
           '<button type="button" class="boutons boutons-contour boutons-pleine-largeur" id="prop-ecrivez">Écrivez-nous</button>' +
           '<p class="textes-discrets cache" id="prop-renvoyer-msg"></p>';
