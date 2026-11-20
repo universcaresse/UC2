@@ -44,6 +44,9 @@ let accueilAnime = false;
 
 // ─── INITIALISATION ───
 document.addEventListener('DOMContentLoaded', async () => {
+  // L'année du pied de page suit le calendrier (20 nov. 2026 : « © 2026 » était écrit en dur)
+  const annee = document.getElementById('annee-courante');
+  if (annee) annee.textContent = new Date().getFullYear();
   verifierRetourPaiement();
   verifierSession();
   initNav();
