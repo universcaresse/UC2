@@ -435,6 +435,12 @@ function reinitialiserFiltresCommandes() {
   afficherTableauCommandes(toutesCommandes);
 }
 
+// Une commande payée (facture liée, ou paiement confirmé et étapes suivantes) : son solde est 0 (20 nov. 2026 : la
+// liste et la fiche affichaient encore le solde de la proposition sur une commande payée)
+function commandeEstPayee(c) {
+  return !!c.ven_id_lien || ['Payée — facture à faire', 'À expédier', 'Étiquette prête', 'À livrer', 'Frais à payer', 'Terminée'].includes(c.statut);
+}
+
 function cmdToggleAccordeon(el) {
   const body = el.nextElementSibling;
   const estFerme = body.classList.contains('cache');
@@ -530,7 +536,7 @@ function afficherTableauCommandes(items) {
         <td>${c.date}</td>
         <td>${echapperHtml(c.client) || '—'}</td>
         <td>${formaterPrix(c.total_prevu)}</td>
-        <td>${formaterPrix(c.solde)}</td>
+        <td>${formaterPrix(commandeEstPayee(c) ? 0 : c.solde)}</td>
         <td>${c.statut}</td>
         <td style="text-align:center">${pastille}</td>
       </tr>`;
@@ -673,7 +679,7 @@ async function voirDetailCommande(cmd_id) {
   const livraisonNum = parseFloat(c.livraison) || 0;
   const rabaisNum = parseFloat(c.rabais) || 0;
   const totalCommande = Math.max(0, Math.round((totalArticles + livraisonNum - rabaisNum) * 100) / 100);
-  const estPayee = !!c.ven_id_lien || ['Payée — facture à faire', 'À expédier', 'Étiquette prête', 'À livrer', 'Frais à payer', 'Terminée'].includes(c.statut);
+  const estPayee = commandeEstPayee(c);
 
   html += `</div>
       </div>
