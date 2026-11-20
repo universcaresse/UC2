@@ -438,15 +438,15 @@
       <div class="edu-niveaux">
         <div class="edu-niveau">
           <div><div class="edu-niveau-pct" id="edu-s3-niv1-pct"></div><div class="edu-niveau-label" id="edu-s3-niv1-label"></div></div>
-          <div><p class="edu-niveau-texte" id="edu-s3-niv1-texte"></p><a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('COL-005');" class="edu-lien">Collection ÉPURE</a></div>
+          <div><p class="edu-niveau-texte" id="edu-s3-niv1-texte"></p><a href="#catalogue" class="edu-lien" data-collection="COL-005" data-prefixe="Collection " onclick="naviguer('catalogue'); filtrerApresChargement(this.dataset.collection);">Collection ÉPURE</a></div>
         </div>
         <div class="edu-niveau">
           <div><div class="edu-niveau-pct" id="edu-s3-niv2-pct"></div><div class="edu-niveau-label" id="edu-s3-niv2-label"></div></div>
-          <div><p class="edu-niveau-texte" id="edu-s3-niv2-texte"></p><a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('COL-001');" class="edu-lien">Collection SAPONICA</a></div>
+          <div><p class="edu-niveau-texte" id="edu-s3-niv2-texte"></p><a href="#catalogue" class="edu-lien" data-collection="COL-001" data-prefixe="Collection " onclick="naviguer('catalogue'); filtrerApresChargement(this.dataset.collection);">Collection SAPONICA</a></div>
         </div>
         <div class="edu-niveau">
           <div><div class="edu-niveau-pct" id="edu-s3-niv3-pct"></div><div class="edu-niveau-label" id="edu-s3-niv3-label"></div></div>
-          <div><p class="edu-niveau-texte" id="edu-s3-niv3-texte"></p><a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('COL-002');" class="edu-lien">Collection PETIT NUAGE</a></div>
+          <div><p class="edu-niveau-texte" id="edu-s3-niv3-texte"></p><a href="#catalogue" class="edu-lien" data-collection="COL-002" data-prefixe="Collection " onclick="naviguer('catalogue'); filtrerApresChargement(this.dataset.collection);">Collection PETIT NUAGE</a></div>
         </div>
       </div>
     </div>
@@ -624,7 +624,7 @@
           <p class="edu-type-texte" id="edu-s7-peau1-signes"></p>
           <span class="edu-type-label">Ce qu'elle aime</span>
           <p class="edu-type-texte" id="edu-s7-peau1-aime"></p>
-          <div class="edu-type-liens"><a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('COL-001');" class="edu-lien">SAPONICA</a><a href="#catalogue" onclick="naviguer('catalogue'); filtrerApresChargement('COL-005');" class="edu-lien">ÉPURE</a></div>
+          <div class="edu-type-liens"><a href="#catalogue" class="edu-lien" data-collection="COL-001" onclick="naviguer('catalogue'); filtrerApresChargement(this.dataset.collection);">SAPONICA</a><a href="#catalogue" class="edu-lien" data-collection="COL-005" onclick="naviguer('catalogue'); filtrerApresChargement(this.dataset.collection);">ÉPURE</a></div>
         </div>
         <div class="edu-type-peau">
           <div class="edu-type-titre" id="edu-s7-peau2-titre"></div>

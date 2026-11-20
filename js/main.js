@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const batiAvecCopie = catalogueCharge && donneesCatalogue !== res;
       donneesCatalogue = res;
       afficherCollectionsPublic();
+      majLiensCollections(res);
       document.querySelectorAll('.hero-stat-num').forEach(el => setTimeout(() => el.classList.add('visible'), 50));
       if (batiAvecCopie) {
         catalogueCharge = false;
@@ -964,6 +965,21 @@ function carteProduit(p) {
 function ouvrirModalFromCard(el) {
   const produit = JSON.parse(decodeURIComponent(escape(atob(el.dataset.produit))));
   ouvrirModal(produit);
+}
+
+// Les liens vers une collection écrits dans les pages (Le savon artisanal) : le nom affiché est celui de la collection
+// aujourd'hui, et un lien vers une collection disparue ou sans produit public se cache (20 nov. 2026 : avant, le nom
+// et le numéro étaient écrits en dur — renommer ou retirer une collection laissait un lien faux).
+function majLiensCollections(cat) {
+  const info = (cat && cat.infoCollections) || {};
+  const avecProduits = {};
+  ((cat && cat.produits) || []).forEach(p => { avecProduits[p.col_id] = true; });
+  document.querySelectorAll('a[data-collection]').forEach(a => {
+    const c = info[a.dataset.collection];
+    if (!c || !avecProduits[a.dataset.collection]) { a.classList.add('cache'); return; }
+    a.classList.remove('cache');
+    a.textContent = (a.dataset.prefixe || '') + (c.nom || '');
+  });
 }
 
 function filtrerApresChargement(col_id) {
