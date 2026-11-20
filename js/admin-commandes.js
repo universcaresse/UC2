@@ -560,7 +560,7 @@ function afficherTableauCommandes(items) {
     if (b.statuts.includes('Étiquette prête')) {
       action = `<div style="padding:14px 0 4px"><button class="bouton" onclick="deposerColis()">📮 J'ai déposé mes colis</button></div>`;
     } else if (b.statuts.includes('Terminée')) {
-      action = `<div style="padding:14px 0 4px"><button class="bouton bouton-contour" onclick="suivreColis()">📦 Où sont mes colis?</button></div>`;
+      action = `<div style="padding:14px 0 4px"><button class="bouton bouton-contour" onclick="suivreColis()">Suivi des colis postaux</button></div>`;
     }
     html += rendreBloc(b.titre, items.filter(c => b.statuts.includes(c.statut)), action);
   });
@@ -2070,7 +2070,7 @@ async function genererEtiquetteConfirmee(cmd_id, poids) {
   }
 }
 
-// ─── Où sont mes colis ? ───
+// ─── Suivi des colis postaux ───
 // Poste Canada n'avertit de rien : on va demander, et on garde la réponse sur la commande.
 async function suivreColis() {
   afficherChargement();
@@ -2087,7 +2087,7 @@ async function suivreColis() {
     return;
   }
   const livres = items.filter(i => i.date_livraison).length;
-  afficherMsg('commandes', '📦 ' + items.length + ' colis vérifié' + (items.length > 1 ? 's' : '') +
+  afficherMsg('commandes', items.length + ' colis vérifié' + (items.length > 1 ? 's' : '') +
     ' — ' + livres + ' livré' + (livres > 1 ? 's' : '') + '.' +
     (res.bac_a_sable ? ' ⚠️ Bac à sable : ces états ne sont pas réels.' : ''));
   chargerCommandes();
