@@ -714,6 +714,7 @@ async function voirDetailCommande(cmd_id) {
   if (c.statut === 'À expédier') {
     actionsHTML += `<button class="bouton bouton-or" id="btn-choix-poste-${c.cmd_id}" onclick="choisirPosteCanada('${c.cmd_id}')">Envoi par Poste Canada</button>`;
     actionsHTML += `<button class="bouton bouton-contour" id="btn-choix-personne-${c.cmd_id}" onclick="livrerEnPersonne('${c.cmd_id}')">Livrée en personne</button>`;
+    actionsHTML += `<button class="bouton bouton-contour" id="btn-choix-deja-${c.cmd_id}" onclick="dejaLivree('${c.cmd_id}')">Déjà livrée</button>`;
     actionsHTML += `<div id="bloc-poste-${c.cmd_id}" class="cache">`;
     actionsHTML += `<div style="background:#fff4e6;border:1px solid #f0c98b;border-radius:6px;padding:10px 12px;margin-bottom:10px;font-size:0.85rem;color:#7a5a2a">⚠️ Attention, générer l'étiquette achète l'envoi chez Poste Canada et facture votre compte.</div>`;
     actionsHTML += `<div class="form-label">Poids du colis (g, boîte incluse)</div>`;
@@ -1900,6 +1901,24 @@ function retourALivrer(cmd_id) {
   });
 }
 
+// Remise en main propre, déjà faite (20 nov. 2026, Jean-Claude) : la commande passe « Terminée » sans aucun message
+// à la cliente. La photo de livraison et « Renvoyer le courriel » (avec la facture) restent offerts ensuite.
+function dejaLivree(cmd_id) {
+  const c = toutesCommandes.find(x => x.cmd_id === cmd_id);
+  confirmerAction('La commande ' + cmd_id + (c && c.client ? ' de ' + c.client : '') + ' a déjà été remise en main propre? Elle passe « Terminée », la cliente ne reçoit aucun message.', async function() {
+    afficherChargement();
+    const res = await appelAPIPost('updateStatutCommande', { cmd_id, statut: 'Terminée' });
+    cacherChargement();
+    if (res && res.success) {
+      afficherMsg('commandes', '✅ Commande terminée, aucun message envoyé.');
+      fermerFicheCommande();
+      chargerCommandes();
+    } else {
+      afficherMsg('commandes', '❌ ' + (res?.message || 'Erreur.'), 'erreur');
+    }
+  }, 'Déjà livrée');
+}
+
 function livreeSansPhoto(cmd_id) {
   confirmerAction('Fermer cette commande sans photo de livraison?', async function() {
     afficherChargement();
@@ -1960,6 +1979,7 @@ function choisirPosteCanada(cmd_id) {
   document.getElementById('bloc-poste-' + cmd_id)?.classList.remove('cache');
   document.getElementById('btn-choix-poste-' + cmd_id)?.classList.add('cache');
   document.getElementById('btn-choix-personne-' + cmd_id)?.classList.add('cache');
+  document.getElementById('btn-choix-deja-' + cmd_id)?.classList.add('cache');
 }
 
 async function genererEtiquette(cmd_id) {
